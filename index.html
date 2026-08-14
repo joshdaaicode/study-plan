@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4F6F7">
+<meta name="description" content="國三雙軌作戰計畫 — 雄科班 3 月初試、會考 5/15–16，日期自動更新">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="作戰計畫">
+<link rel="manifest" href="manifest.json">
+<title>國三雙軌作戰計畫 — 雄科班 3月 / 會考 5月</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#131C26;
+  --ink-soft:#4E5B67;
+  --ink-faint:#7C8894;
+  --paper:#F4F6F7;
+  --card:#FFFFFF;
+  --rule:#D6DCE1;
+  --sci:#4A3DB8;
+  --sci-tint:#EDEBF9;
+  --cap:#0D7F63;
+  --cap-tint:#E5F2EE;
+  --warn:#B5620D;
+  --warn-tint:#FBEEDF;
+  --slate:#5A6673;
+  --slate-tint:#EDEFF1;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Noto Sans TC',system-ui,sans-serif;
+  font-size:15px;line-height:1.7;
+  padding:0 20px 80px;
+}
+.wrap{max-width:880px;margin:0 auto}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-family:'Noto Serif TC',serif;font-weight:900;letter-spacing:.01em;margin:0}
+h1{font-size:clamp(30px,6.5vw,50px);line-height:1.18}
+h2{font-size:clamp(20px,3.6vw,27px);line-height:1.3}
+h3{font-size:16px;font-weight:700}
+.mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-faint);
+}
+
+/* ---------- header ---------- */
+header{padding:56px 0 34px;border-bottom:1px solid var(--rule)}
+.lede{margin:20px 0 0;max-width:52ch;font-size:16.5px;color:var(--ink-soft)}
+.lede b{color:var(--ink)}
+
+/* ---------- countdown ---------- */
+.counts{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:3px;overflow:hidden;margin:30px 0 0}
+.count{background:var(--card);padding:20px 20px 18px}
+.count .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;
+  display:inline-block;padding:2px 8px;border-radius:2px;margin-bottom:10px}
+.count.a .tag{background:var(--sci-tint);color:var(--sci)}
+.count.b .tag{background:var(--cap-tint);color:var(--cap)}
+.count .n{font-family:'IBM Plex Mono',monospace;font-size:clamp(34px,8vw,46px);
+  font-weight:600;line-height:1;letter-spacing:-.02em}
+.count.a .n{color:var(--sci)} .count.b .n{color:var(--cap)}
+.count .n small{font-size:15px;font-weight:400;color:var(--ink-faint);margin-left:6px;letter-spacing:0}
+.count .d{font-size:13.5px;color:var(--ink-soft);margin-top:8px}
+
+/* ---------- sections ---------- */
+section{padding:52px 0 0}
+.sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:8px}
+.sec-note{margin:10px 0 26px;color:var(--ink-soft);max-width:60ch}
+
+/* ---------- timeline (signature) ---------- */
+.tl{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
+.tl-head{display:grid;grid-template-columns:62px 1fr 1fr;border-bottom:1px solid var(--rule);
+  background:#FBFCFC}
+.tl-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.13em;
+  padding:9px 10px;color:var(--ink-faint)}
+.tl-head .h-sci{color:var(--sci);border-left:1px solid var(--rule)}
+.tl-head .h-cap{color:var(--cap);border-left:1px solid var(--rule)}
+.tl-row{display:grid;grid-template-columns:62px 1fr 1fr;border-bottom:1px solid #EDF0F2;min-height:64px}
+.tl-row:last-child{border-bottom:0}
+.tl-mon{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-faint);
+  padding:12px 8px 12px 12px;white-space:nowrap}
+.tl-rail{position:relative;padding:12px 12px 12px 26px;border-left:1px solid var(--rule)}
+.tl-rail::before{content:"";position:absolute;left:12px;top:0;bottom:0;width:2px;background:currentColor;opacity:.22}
+.tl-rail.sci{color:var(--sci)} .tl-rail.cap{color:var(--cap)}
+.tl-rail.start::before{top:26px}
+.tl-rail.stop::before{bottom:50%}
+.tl-rail.off::before{display:none}
+.tl-rail .cap-end,.tl-rail .cap-stop{position:absolute;left:6px;width:14px;height:14px;border-radius:50%;
+  background:var(--card);border:3px solid currentColor}
+.tl-rail.stop .cap-stop{bottom:calc(50% - 7px)}
+.tl-rail.start .cap-end{top:20px}
+.chip{display:block;font-size:13px;line-height:1.45;margin-bottom:5px}
+.chip:last-child{margin-bottom:0}
+.chip .dt{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;
+  display:inline-block;padding:1px 6px;border-radius:2px;margin-right:6px}
+.sci .chip .dt{background:var(--sci-tint);color:var(--sci)}
+.cap .chip .dt{background:var(--cap-tint);color:var(--cap)}
+.chip.big{font-weight:700}
+.chip.est .dt::after{content:" 推估";font-weight:400;opacity:.75}
+.chip.clash .dt{background:var(--warn-tint);color:var(--warn)}
+.chip.clash{color:var(--warn);font-weight:700}
+.tl-empty{font-size:12px;color:#C4CCD3;font-family:'IBM Plex Mono',monospace}
+
+/* ---------- phase cards ---------- */
+.phases{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px}
+.phase{background:var(--card);padding:20px 22px;display:grid;grid-template-columns:112px 1fr;gap:20px}
+.phase .when{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-faint);line-height:1.55}
+.phase .when b{display:block;font-size:11px;letter-spacing:.12em;margin-bottom:4px}
+.phase.p-sci .when b{color:var(--sci)} .phase.p-cap .when b{color:var(--cap)}
+.phase.p-mix .when b{color:var(--slate)}
+.phase h3{margin-bottom:6px}
+.phase p{margin:0;color:var(--ink-soft);font-size:14.5px}
+.mix{display:flex;gap:4px;margin-top:12px;height:9px;border-radius:2px;overflow:hidden;max-width:340px}
+.mix i{display:block}
+.mix .m-sci{background:var(--sci)} .mix .m-cap{background:var(--cap)}
+.mix .m-dev{background:var(--slate)} .mix .m-fun{background:#C3CBD3}
+.mix-key{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint)}
+.mix-key i{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:5px}
+
+/* ---------- tables ---------- */
+.tbl-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:13.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #EDF0F2;vertical-align:top}
+thead th{background:#FBFCFC;font-weight:700;font-size:12px;letter-spacing:.04em;
+  color:var(--ink-soft);border-bottom:1px solid var(--rule);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.t{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-faint);white-space:nowrap}
+td.sci-c{color:var(--sci)} td.cap-c{color:var(--cap)} td.dev-c{color:var(--slate)}
+tr.fix td{background:#FBFAFD}
+tr.fix td.t{color:var(--sci);font-weight:600}
+.w-note{font-size:12.5px;color:var(--ink-faint);margin:10px 0 0}
+
+/* ---------- weeks ---------- */
+.wk{margin-bottom:34px}
+.wk-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.wk-title h3{font-size:17px}
+.wk-when{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-faint)}
+.wk-sub{font-size:13.5px;color:var(--ink-soft);margin:0 0 14px;max-width:58ch}
+
+/* ---------- rules / floor ---------- */
+.floor{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
+.floor li{list-style:none;padding:18px 22px;border-bottom:1px solid #EDF0F2;display:grid;
+  grid-template-columns:34px 1fr;gap:16px;align-items:start}
+.floor li:last-child{border-bottom:0}
+.floor ul{margin:0;padding:0}
+.floor .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--warn);
+  background:var(--warn-tint);border-radius:2px;text-align:center;padding:3px 0;font-weight:600}
+.floor b{display:block;margin-bottom:2px}
+.floor p{margin:0;font-size:14px;color:var(--ink-soft)}
+
+/* ---------- checklist ---------- */
+.todo{border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:6px 4px}
+.todo label{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:13px 18px;
+  border-bottom:1px solid #EDF0F2;cursor:pointer;align-items:start}
+.todo label:last-child{border-bottom:0}
+.todo input{margin-top:5px;width:15px;height:15px;accent-color:var(--sci)}
+.todo .when{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
+  display:block;margin-top:3px;letter-spacing:.06em}
+.todo input:checked + span{opacity:.45;text-decoration:line-through}
+
+.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:1px;
+  background:var(--rule);border:1px solid var(--rule);border-radius:3px}
+.method div{background:var(--card);padding:18px 20px}
+.method b{display:block;margin-bottom:5px}
+.method p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+
+footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--ink-faint)}
+
+/* ---------- responsive ---------- */
+@media (max-width:640px){
+  body{padding:0 14px 60px;font-size:14.5px}
+  .counts{grid-template-columns:1fr}
+  .tl-head,.tl-row{grid-template-columns:46px 1fr 1fr}
+  .tl-mon{padding:10px 4px 10px 7px;font-size:11.5px}
+  .tl-rail{padding:10px 8px 10px 22px}
+  .tl-rail::before{left:9px} .tl-rail .cap-end,.tl-rail .cap-stop{left:3px}
+  .chip{font-size:12.5px}
+  .phase{grid-template-columns:1fr;gap:8px}
+  .phase .when b{display:inline;margin-right:8px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .tl-row{animation:fade .5s ease both}
+}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media print{
+  body{background:#fff;padding:0}
+  section{page-break-inside:avoid}
+  .tl-row{animation:none}
+}
+/* ---------- live status panel ---------- */
+.now{margin:22px 0 0;border:1px solid var(--rule);border-radius:3px;background:var(--card);
+  display:grid;grid-template-columns:1fr 148px;gap:20px;padding:17px 20px 15px}
+.now .today{margin:0;font-size:13px;color:var(--ink-soft);display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.now .today b{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--ink);font-weight:600}
+.now .phase-now{margin:9px 0 0;font-size:13.5px;color:var(--ink-soft)}
+.now .phase-now b{color:var(--ink)}
+.bar{height:5px;background:var(--slate-tint);border-radius:3px;overflow:hidden;margin:13px 0 6px;max-width:420px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sci),var(--cap));width:0;
+  transition:width .9s cubic-bezier(.2,.7,.3,1)}
+.bar-note{margin:0;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);letter-spacing:.05em}
+.now .next{border-left:1px solid var(--rule);padding-left:18px}
+.now .next .nx-n{font-size:34px;font-weight:600;line-height:1.05;letter-spacing:-.02em;color:var(--warn);margin-top:6px}
+.now .next .nx-n small{font-size:13px;font-weight:400;color:var(--ink-faint);margin-left:4px;letter-spacing:0}
+.now .next .nx-l{margin:5px 0 0;font-size:12.5px;color:var(--ink-soft);line-height:1.45}
+
+/* ---------- auto states ---------- */
+.count.done .n{color:var(--ink-faint)}
+.count.done .n small{color:var(--ink-faint)}
+.phase.active{box-shadow:inset 3px 0 0 var(--warn)}
+.phase.active h3::after{content:"進行中";font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  letter-spacing:.12em;color:var(--warn);background:var(--warn-tint);border-radius:2px;
+  padding:2px 7px;margin-left:9px;vertical-align:2px;font-weight:600}
+.phase.past{opacity:.5}
+.phase .left{display:block;font-size:11px;color:var(--warn);margin-top:5px}
+.tl-row.now-row{background:#FEFAF4}
+.tl-row.now-row .tl-mon{color:var(--warn);font-weight:600}
+.tl-row.now-row .tl-mon::after{content:"●";display:block;font-size:8px;color:var(--warn);margin-top:2px}
+.chip.past{opacity:.34}
+.chip.past .dt{text-decoration:line-through}
+.wk.active .wk-title h3::after{content:"本週適用";font-family:'IBM Plex Mono',monospace;font-size:10.5px;
+  letter-spacing:.12em;color:var(--warn);background:var(--warn-tint);border-radius:2px;
+  padding:2px 7px;margin-left:9px;vertical-align:2px;font-weight:600}
+.wk.dim{opacity:.62}
+@media (max-width:640px){
+  .now{grid-template-columns:1fr;gap:14px;padding:15px 16px 14px}
+  .now .next{border-left:0;border-top:1px solid var(--rule);padding-left:0;padding-top:12px}
+  .now .next .nx-n{font-size:30px;margin-top:2px}
+}
+/* ---------- 日程表 月曆 ---------- */
+.cal-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:9px;margin-bottom:14px;
+  -webkit-overflow-scrolling:touch}
+.cal-tab{font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:6px 13px;
+  border:1px solid var(--rule);background:var(--card);border-radius:2px;cursor:pointer;
+  white-space:nowrap;color:var(--ink-soft);flex:0 0 auto}
+.cal-tab[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.cal-tab.is-now{box-shadow:inset 0 -2px 0 var(--warn)}
+.cal-tab:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.cal{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);background:#FBFCFC;border-bottom:1px solid var(--rule)}
+.cal-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:center;
+  padding:7px 0;color:var(--ink-faint)}
+.cal-head span.we{color:var(--sci)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-d{min-height:66px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;padding:5px 4px 6px}
+.cal-d:nth-child(7n){border-right:0}
+.cal-d.void{background:#FAFBFB}
+.cal-n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);display:block}
+.cal-d.today{background:#FEF6EC;box-shadow:inset 0 0 0 2px var(--warn)}
+.cal-d.today .cal-n{color:var(--warn);font-weight:700}
+.cal-d.pastday{opacity:.42}
+.pill{display:block;font-size:9.5px;line-height:1.4;margin-top:3px;padding:1px 4px;border-radius:2px;
+  letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-b{background:var(--sci-tint);color:var(--sci)}
+.p-g{background:var(--slate-tint);color:var(--slate)}
+.p-m{background:var(--cap-tint);color:var(--cap)}
+.p-x{background:var(--cap);color:#fff;font-weight:600}
+.p-s{background:var(--sci);color:#fff;font-weight:600}
+.p-w{background:var(--warn-tint);color:var(--warn);font-weight:600}
+.cal-note{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0 0;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint)}
+.cal-note i{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:5px}
+.cal-focus{margin:14px 0 0;padding:14px 18px;border:1px solid var(--rule);border-radius:3px;
+  background:var(--card);font-size:13.5px;color:var(--ink-soft)}
+.cal-focus b{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.13em;
+  color:var(--ink-faint);margin-bottom:5px}
+tr.todayrow td{background:#FEF6EC}
+tr.todayrow td.t{color:var(--warn);font-weight:700}
+tr.pastrow td{opacity:.45}
+@media (max-width:640px){
+  .cal-d{min-height:56px;padding:4px 2px 5px}
+  .cal-n{font-size:11px;text-align:center}
+  .pill{font-size:8.5px;padding:1px 2px;margin-top:2px}
+}
+/* ---------- 手機優化 ---------- */
+.cal-tabs{position:sticky;top:0;z-index:5;background:var(--paper);padding-top:8px}
+body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+@media (max-width:400px){
+  body{font-size:14px}
+  .cal-d{min-height:52px;padding:3px 1px 4px}
+  .pill{font-size:8px;padding:1px;letter-spacing:-.02em}
+  .cal-head span{font-size:10px}
+  .now .next .nx-n{font-size:27px}
+  .phase{padding:16px 15px}
+  .floor li{padding:15px 15px;grid-template-columns:28px 1fr;gap:12px}
+  .todo label{padding:12px 13px}
+  .method div{padding:15px 16px}
+  h1{font-size:29px}
+}
+.tbl-scroll{position:relative}
+.tbl-scroll::after{content:"";position:absolute;top:0;right:0;bottom:0;width:22px;pointer-events:none;
+  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95))}
+@media (min-width:760px){.tbl-scroll::after{display:none}}
+tr.sumrow td{background:#FDF7EF}
+tr.sumrow td.t{color:var(--warn);font-weight:600}
+tr.sumrow.todayrow td{background:#FDEFDC}
+.p-h{background:#FBE7E4;color:#B03A2E;font-weight:600}
+.cal-d.holiday{background:#FEF9F8}
+.cal-d.holiday .cal-n{color:#B03A2E}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">115 學年度 · 國三 · 雙軌作戰計畫</p>
+  <h1>兩個終點，<br>不是一個。</h1>
+  <p class="lede">雄科班初試落在 <b>3 月中</b>，會考在 <b>5/15–16</b>。中間差了兩個月——這兩個月就是你的第二次機會。所有安排都圍繞這個結構：<b>3 月中以前科學班掛帥，3 月下旬起全面轉會考。</b></p>
+
+  <div class="counts">
+    <div class="count a">
+      <span class="tag">TRACK A</span>
+      <div class="n" id="c-sci">214<small>天</small></div>
+      <p class="d">雄中科學班 初試 · 約 2027/3/13（推估，簡章為準）</p>
+    </div>
+    <div class="count b">
+      <span class="tag">TRACK B</span>
+      <div class="n" id="c-cap">277<small>天</small></div>
+      <p class="d">國中教育會考 · 2027/5/15–5/16（已公告）</p>
+    </div>
+  </div>
+  <div class="now">
+    <div>
+      <p class="today"><span class="eyebrow">今天</span> <b id="now-date">—</b></p>
+      <p class="phase-now" id="now-phase">—</p>
+      <div class="bar"><i id="now-bar"></i></div>
+      <p class="bar-note" id="now-barnote">—</p>
+    </div>
+    <div class="next">
+      <span class="eyebrow">下一關</span>
+      <div class="nx-n mono" id="next-n">—</div>
+      <p class="nx-l" id="next-l">—</p>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><h2>雙軌時間軸</h2><span class="eyebrow">2026.08 → 2027.05</span></div>
+  <p class="sec-note">左軌在 3 月結束，右軌走到 5 月。看懂這張圖，就看懂了整份計畫——你不是準備一場考試，是準備兩場，而且前面那場先到。</p>
+
+  <div class="tl">
+    <div class="tl-head"><span>月</span><span class="h-sci">科學班軌</span><span class="h-cap">會考 · 校內軌</span></div>
+
+    <div class="tl-row">
+      <div class="tl-mon">8月</div>
+      <div class="tl-rail sci start"><span class="cap-end"></span>
+        <span class="chip big"><span class="dt">現在</span>打底期起跑</span>
+        <span class="chip">國中理化全面熟練 + 高一數學起步</span>
+      </div>
+      <div class="tl-rail cap start"><span class="cap-end"></span>
+        <span class="chip"><span class="dt">8/17</span>衝刺開跑，上午全歸科學班</span>
+        <span class="chip">複習 1–2 冊，備一模</span>
+      </div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">9月</div>
+      <div class="tl-rail sci"><span class="chip">高一數學：多項式、方程式</span></div>
+      <div class="tl-rail cap">
+        <span class="chip big"><span class="dt">9/8–9</span>一模 · 國數英社 1–2 冊</span>
+        <span class="chip">開學，進入常態週表</span>
+      </div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">10月</div>
+      <div class="tl-rail sci"><span class="chip">高一物理：運動學、牛頓定律</span></div>
+      <div class="tl-rail cap">
+        <span class="chip big"><span class="dt">10/12–13</span>上學期一段</span>
+        <span class="chip"><span class="dt">10/14–16</span>畢旅（暫定，段考隔天出發）</span>
+        <span class="chip big"><span class="dt">10/28–29</span>二模 · 國數英社 1–4 冊、自然 2、4 冊</span>
+      </div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">11月</div>
+      <div class="tl-rail sci"><span class="chip">高一化學：原子結構、莫耳、化學計量</span></div>
+      <div class="tl-rail cap"><span class="chip big"><span class="dt">11/23–24</span>上學期二段</span></div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">12月</div>
+      <div class="tl-rail sci"><span class="chip">三角函數、指對數；必修生物</span></div>
+      <div class="tl-rail cap"><span class="chip big"><span class="dt">12/23–24</span>三模 · 全科 1–4 冊</span></div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">1月</div>
+      <div class="tl-rail sci">
+        <span class="chip est"><span class="dt">月底</span>簡章公告，開始每週查校網</span>
+        <span class="chip big">寒假＝科學班黃金四週</span>
+      </div>
+      <div class="tl-rail cap"><span class="chip big"><span class="dt">1/14–15</span>上學期三段</span></div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">2月</div>
+      <div class="tl-rail sci">
+        <span class="chip">地科自學（三月要考，學校還沒教）</span>
+        <span class="chip est"><span class="dt">下旬</span>報名 · 需學校推薦</span>
+      </div>
+      <div class="tl-rail cap"><span class="chip big"><span class="dt">2/18–19</span>四模 · 全科 1–5 冊</span></div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">3月</div>
+      <div class="tl-rail sci stop"><span class="cap-stop"></span>
+        <span class="chip big est"><span class="dt">≈3/13</span>初試 · 科學能力檢定</span>
+        <span class="chip big est"><span class="dt">≈3/20–21</span>複試 · 實驗實作＋面談</span>
+        <span class="chip est"><span class="dt">≈3/26</span>放榜 — 科學班軌結束</span>
+      </div>
+      <div class="tl-rail cap">
+        <span class="chip clash"><span class="dt">3/22–23</span>下學期一段 ⚠ 極可能與複試撞期</span>
+      </div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">4月</div>
+      <div class="tl-rail sci off"><span class="tl-empty">— 全部火力轉右軌 —</span></div>
+      <div class="tl-rail cap"><span class="chip big"><span class="dt">4/15–16</span>五模 · 全科 1–6 冊</span>
+        <span class="chip">錯題本第二輪、歷屆會考限時</span></div>
+    </div>
+
+    <div class="tl-row">
+      <div class="tl-mon">5月</div>
+      <div class="tl-rail sci off"><span class="tl-empty">—</span></div>
+      <div class="tl-rail cap stop"><span class="cap-stop"></span>
+        <span class="chip big"><span class="dt">5/3、5/7</span>下學期二段</span>
+        <span class="chip big"><span class="dt">5/15–16</span>國中教育會考</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>五個階段</h2><span class="eyebrow">配比會變，睡眠不變</span></div>
+  <p class="sec-note">同樣一週 26 小時的可支配時間，五個階段的分法完全不同。色條是大致比例，不是要你拿碼表計時。</p>
+
+  <div class="phases">
+    <div class="phase p-sci">
+      <div class="when"><b>PHASE 1</b>8/17 – 8/27<br>剩 11 天</div>
+      <div>
+        <h3>研發衝刺：這 11 天是全年唯一的開發窗口</h3>
+        <p>8/28 返校，之後到明年五月，開發時間等於零。所以每天下午 13:30–17:30 整塊給研發，共約 <b>43 小時</b>——這是你今年能拿到的全部。上午整段給科學班（高一數理沒人會替你上），晚上輕量掃 9/8 一模的 1–2 冊。</p>
+        <div class="mix"><i class="m-dev" style="flex:38"></i><i class="m-sci" style="flex:30"></i><i class="m-cap" style="flex:18"></i><i class="m-fun" style="flex:14"></i></div>
+      </div>
+    </div>
+
+    <div class="phase p-mix">
+      <div class="when"><b>PHASE 2</b>8/28 – 1/20<br>返校後</div>
+      <div>
+        <h3>雙軌並行：讓模考當你的複習排程</h3>
+        <p>開發歸零，原本那 3.5 小時全數轉給科學班——這正好補上三月初試的缺口。一模到三模的範圍是層層疊加的（1–2 冊 → 1–4 冊 → 全科 1–4 冊），本身就是一份現成的分散複習表，照著走舊冊自然會被反覆撿回來。段考前一週切換成 C 版週表。</p>
+        <div class="mix"><i class="m-sci" style="flex:36"></i><i class="m-cap" style="flex:44"></i><i class="m-fun" style="flex:20"></i></div>
+      </div>
+    </div>
+
+    <div class="phase p-sci">
+      <div class="when"><b>PHASE 3</b>1/21 – 3/21<br>寒假 → 初試</div>
+      <div>
+        <h3>科學班衝刺：寒假比你以為的短很多</h3>
+        <p>寒假只有 1/21–2/10，其中 2/4–2/10 全是春節，再扣掉寒輔佔掉的上午——真正能用的大約兩週的下午與晚上。<b>所以地科自學和考古題不能等寒假，要提前到 11–12 月的週末和 12/25、1/1 兩段連假。</b>寒假的角色從「打進度」降級成「密集練考古題」。會考降到每天 45 分鐘維持不斷線，四模考差一次不會怎樣。</p>
+        <div class="mix"><i class="m-sci" style="flex:64"></i><i class="m-cap" style="flex:16"></i><i class="m-fun" style="flex:20"></i></div>
+      </div>
+    </div>
+
+    <div class="phase p-cap">
+      <div class="when"><b>PHASE 4</b>3/22 – 5/16<br>會考衝刺</div>
+      <div>
+        <h3>乾淨切換：放榜那天起，科學班歸零</h3>
+        <p>不論結果如何，3 月底之後不要再回頭碰科學班的東西。八週衝會考聽起來短，但你前面為了科學班練的數理深度，會直接兌現成分數。這階段主軸是錯題本三輪＋歷屆限時，不是再讀新內容。</p>
+        <div class="mix"><i class="m-cap" style="flex:76"></i><i class="m-fun" style="flex:24"></i></div>
+      </div>
+    </div>
+
+    <div class="phase p-mix">
+      <div class="when"><b>PHASE 5</b>5/17 →<br>會考後</div>
+      <div>
+        <h3>把時間還給你自己</h3>
+        <p>停了九個月的開發從這裡重新開始。八月留下的 README 和待辦清單，就是給這一天的自己看的。同時可以開始預習高一——但這是紅利，不是義務。</p>
+        <div class="mix"><i class="m-dev" style="flex:50"></i><i class="m-fun" style="flex:35"></i><i class="m-sci" style="flex:15"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="mix-key">
+    <span><i style="background:var(--sci)"></i>科學班</span>
+    <span><i style="background:var(--cap)"></i>會考／校內</span>
+    <span><i style="background:var(--slate)"></i>軟體開發</span>
+    <span><i style="background:#C3CBD3"></i>娛樂／運動</span>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>日程表</h2><span class="eyebrow">2026.08 → 2027.05</span></div>
+  <p class="sec-note">十個月的完整月曆。開啟時自動跳到當月、標出今天，過去的日子自動淡出。固定行程（補習、資優數學）已經填好，考試日期直接標在格子裡。</p>
+
+  <div class="cal-tabs" id="cal-tabs" role="tablist"></div>
+  <div class="cal">
+    <div class="cal-head">
+      <span class="we">日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span class="we">六</span>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="cal-note">
+    <span><i style="background:var(--sci)"></i>雄科班補習 17:00–22:00</span>
+    <span><i style="background:var(--slate)"></i>資優數學 18:00–21:30</span>
+    <span><i style="background:var(--cap)"></i>模考／段考</span>
+    <span><i style="background:var(--warn)"></i>科學班考試（推估）</span>
+    <span><i style="background:#B03A2E"></i>假日／不排課表（國定假日、畢旅）</span>
+  </div>
+  <p class="w-note">國定假日依人事行政總處 115／116 年辦公日曆表；畢旅為暫定（10/14–16），確定後請更新。假日當天不顯示補習與輔導，實際是否停課請向補習班確認。<b>唯一例外：考前 7 天內的假日不跳過</b>——10/9–11 和 4/30–5/2 這兩段連假都緊貼段考，照休會直接反映在成績上。</p>
+  <div class="cal-focus" id="cal-focus"></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>暑假 11 天逐日表</h2><span class="eyebrow">8/17 → 8/28 返校</span></div>
+  <p class="sec-note">研發窗口只有這 11 天，所以逐日排。下午那格是保護區，其他都可以挪，它不行。暑輔已經上完，上午整段回到科學班——這是開學後就再也拿不到的三小時。</p>
+  <div class="tbl-scroll"><table id="sprint">
+    <thead><tr><th>日期</th><th>上午 09:00–12:15</th><th>下午 13:30–17:30 · 研發保護區</th><th>晚上</th></tr></thead>
+    <tbody>
+      <tr data-d="2026-8-17"><td class="t">8/17 一</td><td class="sci-c">數學 90 分＋理化 90 分</td><td class="dev-c"><b>D1</b>　定範圍：11 天內做得完的才算數</td><td class="cap-c">會考 1 冊　國文＋數學</td></tr>
+      <tr data-d="2026-8-18"><td class="t">8/18 二</td><td class="sci-c">數學＋理化</td><td class="dev-c"><b>D2</b>　搭骨架，先讓它跑起來</td><td class="cap-c">會考 1 冊　自然＋社會</td></tr>
+      <tr data-d="2026-8-19"><td class="t">8/19 三</td><td class="sci-c">數學＋理化</td><td class="dev-c"><b>D3</b></td><td>資優數學 18:00–21:30</td></tr>
+      <tr data-d="2026-8-20"><td class="t">8/20 四</td><td class="sci-c">數學＋理化</td><td class="dev-c"><b>D4</b></td><td class="cap-c">會考 1 冊　英文＋整冊回想</td></tr>
+      <tr data-d="2026-8-21"><td class="t">8/21 五</td><td class="sci-c">數學＋理化</td><td class="dev-c"><b>D5</b>　中期檢查：這樣下去 8/27 收得掉嗎</td><td class="cap-c">會考 2 冊　國文＋數學</td></tr>
+      <tr data-d="2026-8-22"><td class="t">8/22 六</td><td class="sci-c">預習補習進度＋會考複習</td><td class="dev-c"><b>D6</b>　13:00–16:20</td><td>雄科班補習 17:00–22:00</td></tr>
+      <tr data-d="2026-8-23"><td class="t">8/23 日</td><td class="sci-c">預習補習進度＋會考複習</td><td class="dev-c"><b>D7</b>　13:00–16:20</td><td>雄科班補習 17:00–22:00</td></tr>
+      <tr data-d="2026-8-24"><td class="t">8/24 一</td><td class="sci-c">科學班考古題（限時）</td><td class="dev-c"><b>D8</b>　進度落後就砍功能，不砍品質</td><td class="cap-c">會考 2 冊　自然＋社會</td></tr>
+      <tr data-d="2026-8-25"><td class="t">8/25 二</td><td class="sci-c">科學班考古題（限時）</td><td class="dev-c"><b>D9</b></td><td class="cap-c">會考 2 冊　英文</td></tr>
+      <tr data-d="2026-8-26"><td class="t">8/26 三</td><td class="sci-c">考古題訂正</td><td class="dev-c"><b>D10</b>　功能凍結：只修不加</td><td>資優數學 18:00–21:30</td></tr>
+      <tr data-d="2026-8-27"><td class="t">8/27 四</td><td class="sci-c">整月錯題回想</td><td class="dev-c"><b>D11</b>　收尾：README、待辦清單、版本固定</td><td>整理書包，早睡</td></tr>
+      <tr data-d="2026-8-28"><td class="t">8/28 五</td><td colspan="3"><b>返校日</b>　—　週表切換成 B 版，研發歸零到明年 5/17</td></tr>
+    </tbody>
+  </table></div>
+  <p class="w-note">D5（8/21）和 D10（8/26）是兩個檢查點。D5 進度對不上就砍範圍，不要指望最後三天趕出來；D10 之後不准再加新功能，剩下的時間只夠讓它穩下來。</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>還沒定案的變數</h2><span class="eyebrow">現在知道，比十月才發現好</span></div>
+  <p class="sec-note">下面每一項都會改動時程。排在前面的是影響最大、最該先去問清楚的。</p>
+  <div class="tbl-scroll"><table>
+    <thead><tr><th>變數</th><th>影響</th><th>怎麼處理</th></tr></thead>
+    <tbody>
+      <tr class="fix"><td class="t">寒輔實際日期<br><span style="font-size:11.5px;color:var(--ink-faint)">已確定會有</span></td><td>寒假本來就只有 1/21–2/10，春節又佔掉 2/4–2/10。寒輔再吃掉上午，實際可用只剩約兩週的下午晚上</td><td>暫定 1/21–1/29。<b>12 月拿到通知就改 <code>SUMMER</code></b>。科學班進度已改為提前到 11–12 月週末推</td></tr>
+      <tr class="fix"><td class="t">3/22–23 段考 vs 複試</td><td>科學班複試約 3/20–21，段考緊接在後；若複試改期還可能直接撞上</td><td>一月拿到簡章當天去教務處問補考規定，不要等三月</td></tr>
+      <tr><td class="t">畢旅實際日期天數</td><td>目前排 10/14–16 三天。若是四天或改期，十月整個排程要重算</td><td>學校一公布就改 <code>HOLIDAYS</code>；回來當天不排進度，隔天才恢復</td></tr>
+      <tr><td class="t">學校第八節／夜自習</td><td>國三常加課到 18:00 甚至更晚，晚上三個區塊會被壓成兩個</td><td>開學第一週就確認。若有，砍掉「主戰場二」，保留輕量區</td></tr>
+      <tr><td class="t">補習班加課</td><td>寒假班、考前衝刺班常額外加時段，週六日 17–22 可能延長或多一天</td><td>先問全年課表。加課的時數要從自習扣，不是從睡眠扣</td></tr>
+      <tr><td class="t">學校活動</td><td>運動會、校慶、園遊會、班際比賽、畢業典禮預演，每次吃掉半天到兩天</td><td>開學拿到行事曆後一次全部標進月曆</td></tr>
+      <tr><td class="t">競賽與專題</td><td>科展、數理競賽的準備期若落在段考或模考前，是最容易失控的一項</td><td>有要參加就先把截止日標進來，反推準備期是否撞考試</td></tr>
+      <tr><td class="t">颱風假／生病</td><td>台南九到十月的颱風假、加上流感季，一年掉個三到五天很正常</td><td>不要把計畫排到 100% 滿。掉的進度從週末補，不從睡眠補</td></tr>
+      <tr><td class="t">會考後行程</td><td>免試入學志願選填、特招、畢業典禮都在 5 月下旬到 6 月</td><td>五月中考完再處理，現在不用想</td></tr>
+    </tbody>
+  </table></div>
+  <p class="w-note">最該現在就去問的：<b>寒輔的實際日期與時數</b>（12 月）、<b>第八節與夜自習的安排</b>（開學第一週）。這兩個會直接改動每週能用的時數。</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>週表</h2><span class="eyebrow">四個版本，照情境切換</span></div>
+  <p class="sec-note">固定不能動的：週三 18:00–21:30 資優數學、週六日 17:00–22:00 雄科班補習（每週外部課程共 13.5 小時）。其餘時段由下面四張表填滿，開啟時會自動標出本週適用的版本。</p>
+
+  <div class="wk">
+    <div class="wk-title"><h3>A · 暑假衝刺版</h3><span class="wk-when">8/17 → 8/27（11 天）</span></div>
+    <p class="wk-sub">08:00 起床，洗漱早餐完 09:00 正式開工，往回推就寢 23:30，睡滿 8.5 小時。下午 13:30–17:30 是<b>研發保護區</b>，不排任何讀書——8/28 之後這格就沒了。國定假日整天跳過。</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>時段</th><th>平日（一、二、四、五）</th><th>週三</th><th>週六 · 週日</th></tr></thead>
+      <tbody>
+        <tr><td class="t">08:00–08:40</td><td colspan="3">起床、洗漱、早餐</td></tr>
+        <tr><td class="t">08:40–09:00</td><td colspan="3">昨日回想：闔上書默寫昨天學的重點（20 分，暖機用）</td></tr>
+        <tr><td class="t">09:00–10:30</td><td class="sci-c">科學班｜數學深度區塊</td><td class="sci-c">同左</td><td class="sci-c">科學班｜對應補習進度預習</td></tr>
+        <tr><td class="t">10:45–12:15</td><td class="sci-c">科學班｜理化</td><td class="sci-c">同左</td><td class="cap-c">會考複習（1–2 冊）</td></tr>
+        <tr><td class="t">12:15–13:30</td><td colspan="2">午餐＋午睡 20–30 分（真的睡，不是滑手機）</td><td>12:15–13:00 午餐</td></tr>
+        <tr class="fix"><td class="t">13:30–17:30</td><td class="dev-c"><b>研發主區塊（4 小時）</b><br><span style="font-size:12px;color:var(--ink-faint)">手機收起來，一次只推一件事</span></td><td class="dev-c">同左</td><td class="dev-c">13:00–16:20<br>研發（3 小時 20 分）</td></tr>
+        <tr><td class="t">17:30–18:30</td><td>運動＋晚餐</td><td>17:30–18:00 晚餐、出門</td><td>16:20–17:00 移動＋墊餐</td></tr>
+        <tr class="fix"><td class="t">18:00–22:00</td><td class="cap-c">18:30–18:50 英文單字<br>18:50–21:00 會考複習（輪科）</td><td>18:00–21:30 資優數學輔導</td><td>17:00–22:00 雄科班補習</td></tr>
+        <tr><td class="t">21:00–23:00</td><td>娛樂／自由</td><td>21:30–23:00 放鬆</td><td>22:00–22:20 補習筆記趁熱整理（只花 20 分）</td></tr>
+        <tr><td class="t">23:30</td><td colspan="3">就寢</td></tr>
+      </tbody>
+    </table></div>
+    <p class="w-note">暑輔已結束，上午兩格不再被佔用。8/15–8/16 這個週末只有補習，正式開跑是 8/17。<br>11 天研發總量約 43 小時 ＝ 平日 4h×9 天 ＋ 週末 3.3h×2 天。</p>
+  </div>
+
+  <div class="wk">
+    <div class="wk-title"><h3>B · 學期常態版</h3><span class="wk-when">9月–1月中、3月下–5月</span></div>
+    <p class="wk-sub">17:00 放學，回到家差不多 17:30，所以晚上只有三個區塊：90 分、75 分、45 分。早上不排任何進度——通勤和早自習不是讀書時間，英單移到晚上輕量區。週五第二區塊直接排娛樂，一週要有一個晚上是完全不欠帳的。</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>時段</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th></tr></thead>
+      <tbody>
+        <tr><td class="t">–17:00</td><td colspan="5">學校（17:00 放學）</td></tr>
+        <tr><td class="t">17:00–18:00</td><td colspan="2">回家、晚餐、放空（不要在這格塞讀書）</td><td>移動＋晚餐</td><td colspan="2">回家、晚餐、放空</td></tr>
+        <tr><td class="t">18:00–19:30</td><td class="cap-c">會考數學</td><td class="cap-c">會考自然</td><td rowspan="3" class="sci-c" style="background:#FBFAFD">18:00–21:30<br>資優數學輔導<br><span style="font-size:12px;color:var(--ink-faint)">回家後只做 20 分訂正</span></td><td class="cap-c">會考國文＋社會</td><td class="sci-c">科學班數學</td></tr>
+        <tr><td class="t">19:45–21:00</td><td class="sci-c">科學班理化</td><td class="sci-c">科學班數學</td><td class="sci-c">科學班｜考古題限時</td><td>娛樂（週五放鬆）</td></tr>
+        <tr><td class="t">21:00–21:45</td><td colspan="2">輕量區：英單 20 分＋當日錯題訂正</td><td colspan="2">同左</td></tr>
+        <tr><td class="t">21:45–22:45</td><td colspan="5">娛樂／自由</td></tr>
+        <tr><td class="t">22:45–23:00</td><td colspan="5">洗漱、隔天書包</td></tr>
+        <tr><td class="t">23:00</td><td colspan="5">就寢　<span style="font-size:12px;color:var(--ink-faint)">上學日約 06:30 起床＝睡 7.5 小時</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="tbl-scroll" style="margin-top:12px"><table>
+      <thead><tr><th>時段</th><th>週六</th><th>週日</th></tr></thead>
+      <tbody>
+        <tr><td class="t">08:00–09:00</td><td colspan="2">起床、洗漱、早餐</td></tr>
+        <tr><td class="t">09:00–12:15</td><td class="sci-c">科學班｜數學 90 分 ＋ 理化／生物／地科 90 分</td><td class="cap-c">會考複習 A ＋ B（依當期模考範圍）</td></tr>
+        <tr><td class="t">12:15–13:00</td><td colspan="2">午餐＋休息</td></tr>
+        <tr><td class="t">13:00–15:00</td><td class="sci-c"><b>機動區</b>　預設：科學班考古題限時＋訂正<br><span style="font-size:12px;color:var(--ink-faint)">本週有掉進度就拿來補，沒欠帳才照預設走</span></td><td>錯題本整理 60 分 ＋ 本週檢討 30 分</td></tr>
+        <tr><td class="t">15:00–16:20</td><td colspan="2">娛樂／運動 — 週日這格完全空白，不排任何事</td></tr>
+        <tr class="fix"><td class="t">17:00–22:00</td><td colspan="2">雄科班補習</td></tr>
+      </tbody>
+    </table></div>
+    <p class="w-note">每週時數：會考／校內 ≈ 11h　科學班自習 ≈ 10h（另加補習 10h＋資優數學 3.5h）　軟體開發 0h　娛樂 ≈ 9h<br>17:00 放學比原本估的 16:30 少掉每天 30 分鐘，一週少 2.5 小時，這是省不回來的——所以週末那兩個上午更不能睡掉。</p>
+  </div>
+
+  <div class="wk">
+    <div class="wk-title"><h3>C · 段考／模考週版</h3><span class="wk-when">考前 7 天</span></div>
+    <p class="wk-sub">不是加時間，是換內容。要砍的東西有明確順序——軟體開發先停，科學班自習只留週六上午 90 分鐘不斷線。<b>娛樂和睡眠一格都不准砍</b>，砍了會在考前三天反彈成崩潰。</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>項目</th><th>常態週</th><th>考試週</th><th>做什麼</th></tr></thead>
+      <tbody>
+        <tr><td>會考／段考科目</td><td class="t">14h</td><td class="t" style="color:var(--cap);font-weight:600">→ 24h</td><td>限時模擬卷＋當天訂正，不讀新內容（多出來的時數由科學班自習讓出）</td></tr>
+        <tr><td>科學班自習</td><td class="t">11h</td><td class="t">→ 1.5h</td><td>只留週六上午，維持手感</td></tr>
+        <tr><td>娛樂／運動</td><td class="t">9h</td><td class="t" style="font-weight:600">→ 9h</td><td>不動</td></tr>
+        <tr><td>睡眠</td><td class="t">7.5–8h</td><td class="t" style="font-weight:600">→ 7.5–8h</td><td>不動</td></tr>
+      </tbody>
+    </table></div>
+    <p class="w-note">模考週比段考週更輕：模考是診斷工具不是成績單，考前三天做限時卷就好，重點全在考後的訂正。</p>
+  </div>
+
+  <div class="wk">
+    <div class="wk-title"><h3>D · 寒假版</h3><span class="wk-when">1/21 → 2/3（寒輔期）</span></div>
+    <p class="wk-sub">寒輔佔掉整個上午，所以科學班全部落在下午和晚上。這兩週是初試前最後一段能連續推進的時間，考古題要在這裡寫到有手感。</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>時段</th><th>寒輔日（暫定 1/21–1/29 平日）</th><th>無寒輔日（2/1–2/3）</th><th>週六 · 週日</th></tr></thead>
+      <tbody>
+        <tr><td class="t">07:20–07:45</td><td>起床、早餐、出門</td><td colspan="2">08:00–09:00 起床、洗漱、早餐</td></tr>
+        <tr class="fix"><td class="t">07:45–12:00</td><td><b>寒輔</b></td><td class="sci-c">09:00–12:15 科學班｜數學 90＋理化 90</td><td class="sci-c">09:00–12:15 科學班｜考古題限時（整套計時）</td></tr>
+        <tr><td class="t">12:00–13:30</td><td colspan="3">午餐＋午睡 20–30 分</td></tr>
+        <tr><td class="t">13:30–15:00</td><td class="sci-c">科學班｜數學</td><td class="sci-c">科學班｜地科自學</td><td class="sci-c">13:00–16:20 考古題訂正＋弱點補強</td></tr>
+        <tr><td class="t">15:15–16:45</td><td class="sci-c">科學班｜理化／地科</td><td class="sci-c">科學班｜考古題限時</td><td>16:20–17:00 移動＋墊餐</td></tr>
+        <tr><td class="t">17:00–18:00</td><td colspan="2">晚餐＋運動</td><td rowspan="2" class="fix">17:00–22:00 雄科班補習</td></tr>
+        <tr><td class="t">18:00–19:45</td><td class="sci-c">考古題限時＋訂正</td><td class="sci-c">同左</td></tr>
+        <tr><td class="t">20:00–20:45</td><td colspan="2" class="cap-c">會考維持區：45 分鐘提取練習，不斷線就好</td><td>22:00–22:20 補習筆記整理</td></tr>
+        <tr><td class="t">20:45–22:30</td><td colspan="3">娛樂／自由</td></tr>
+        <tr><td class="t">23:00</td><td colspan="3">就寢</td></tr>
+      </tbody>
+    </table></div>
+    <p class="w-note">2/4–2/10 春節整段跳過。七天不碰任何東西，回來手感大約要三天才回得到原位——這是你選擇休息的代價，不是意外，先知道就好。<br>寒輔日期為暫定，學校公布後改 <code>SUMMER</code> 即可，月曆會自動更新。</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>彈性時間</h2><span class="eyebrow">計畫排到 85% 就好</span></div>
+  <p class="sec-note">九個月裡一定會掉進度——生病、颱風假、學校臨時活動、社團的事、單純那天狀態很差。排滿的計畫第一次被打斷就會全面崩潰，所以緩衝要事先留好，不是事後硬擠。</p>
+  <div class="floor"><ul>
+    <li><span class="num">01</span><div><b>每週：週六 13:00–15:00 機動區</b><p>預設拿來寫科學班考古題。但只要這週有掉進度，這 2 小時就改去補——補完才回到預設。這是唯一一格「可以被進度佔用」的時間。</p></div></li>
+    <li><span class="num">02</span><div><b>每週：週日 15:00–16:20 完全空白</b><p>這格不准被任何理由佔用，包含補進度。它的作用就是讓你知道「再怎麼欠帳，還是有一段時間屬於自己」。</p></div></li>
+    <li><span class="num">03</span><div><b>每次模考後：隔週一整晚只做訂正</b><p>模考的價值全在訂正，不在分數。這一晚不排新進度，把錯題本補完就結束。</p></div></li>
+    <li><span class="num">04</span><div><b>每個大關卡後留一天緩降</b><p>畢旅回來當天、段考結束當天、初試結束當天、複試結束當天，都不排進度。硬排的結果是隔天更爛。</p></div></li>
+    <li><span class="num">05</span><div><b>掉的進度從機動區補，不從睡眠補</b><p>如果連續兩週機動區都補不完，那不是你不夠努力，是計畫排太滿——直接砍掉當期優先度最低的那一項，不要靠熬夜硬撐。</p></div></li>
+  </ul></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>科學班進度表</h2><span class="eyebrow">補習教的以外，你要自己補的</span></div>
+  <p class="sec-note">從歷屆考生的心得裡看到最一致的兩件事：<b>數學不要比進度，要比解題經驗</b>——國中幾何性質熟到反射比硬啃高二數學有用；<b>地科一定要提前自學</b>——三月考，學校進度根本還沒走到。</p>
+  <div class="tbl-scroll"><table>
+    <thead><tr><th>期間</th><th>數學</th><th>物理</th><th>化學</th><th>生物 / 地科</th></tr></thead>
+    <tbody>
+      <tr><td class="t">8月</td><td>國中幾何性質徹底熟練＋高一數與式、多項式</td><td>國中理化力學全複習</td><td>國中化學全複習</td><td>—</td></tr>
+      <tr><td class="t">9–10月</td><td>多項式、方程式；資優／競賽題累積</td><td>運動學、牛頓運動定律</td><td>原子結構、莫耳與化學計量</td><td>—</td></tr>
+      <tr><td class="t">11–12月</td><td>三角函數、指對數</td><td>功與能、動量</td><td>溶液、酸鹼、氧化還原</td><td>必修生物</td></tr>
+      <tr><td class="t">寒假</td><td>排列組合、機率、向量</td><td>電磁學基礎</td><td>有機基礎</td><td>學測範圍地科（本階段最高優先）</td></tr>
+      <tr><td class="t">2月–3月初</td><td colspan="4">全面轉考古題：雄中歷屆初試為主，南一中、中一中、建中為輔，一律限時、一律訂正到懂為止</td></tr>
+      <tr><td class="t">3月中–下</td><td colspan="4">複試準備：實驗設計、數據處理與誤差分析、口頭表達；把自己做過的專題重新整理成能講 5 分鐘的版本</td></tr>
+    </tbody>
+  </table></div>
+  <p class="w-note">雄中校網有歷屆科學班甄試試題可下載，八月就去把檔案抓齊，不要等到二月才找。</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>會考進度表</h2><span class="eyebrow">跟著模考走就對了</span></div>
+  <p class="sec-note">你的五次模考範圍是層層累加的，等於學校已經幫你排好了一份分散複習表。不用另外設計，照著推進，舊冊會自動被反覆撿回來——這正是研究裡效果最好的複習結構。</p>
+  <div class="tbl-scroll"><table>
+    <thead><tr><th>期間</th><th>主攻範圍</th><th>目標</th></tr></thead>
+    <tbody>
+      <tr><td class="t">8月–9/7</td><td>國數英社 1–2 冊</td><td>一模 9/8–9</td></tr>
+      <tr><td class="t">9/10–10/27</td><td>3–4 冊 ＋ 自然 2、4 冊</td><td>二模 10/28–29（中間夾 10/12–13 一段）</td></tr>
+      <tr><td class="t">10/30–12/22</td><td>全科 1–4 冊整合，自然補齊 1、3 冊</td><td>三模 12/23–24（中間夾 11/23–24 二段）</td></tr>
+      <tr><td class="t">12/25–2/17</td><td>第 5 冊 ＋ 1–4 冊第二輪</td><td>四模 2/18–19（此期科學班優先，會考維持低強度）</td></tr>
+      <tr><td class="t">3/25–4/14</td><td>第 6 冊 ＋ 全範圍串接</td><td>五模 4/15–16</td></tr>
+      <tr><td class="t">4/17–5/14</td><td>錯題本第三輪＋歷屆會考全套限時</td><td>會考 5/15–16</td></tr>
+    </tbody>
+  </table></div>
+  <p class="w-note">寫作測驗容易被整年忽略：從 10 月起每兩週寫一篇完整的、計時 50 分鐘，找老師改。累積約 15 篇就夠了。</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>讀書方法</h2><span class="eyebrow">選效果最強的那兩種就好</span></div>
+  <p class="sec-note">兩份大規模統合分析（Dunlosky 等人 2013；Hattie 與 Donoghue 2021，涵蓋 242 項研究、逾 16 萬名參與者）得到同樣的結論：<b>分散練習</b>與<b>測驗式練習</b>是所有讀書技巧中效果最強的兩項。其餘的可以不管。</p>
+  <div class="method">
+    <div><b>提取，而不是重讀</b><p>闔上書本先默寫你記得的，再打開對答案。重讀和劃線感覺很順，但那是熟悉感不是記憶。每個讀書區塊的最後 10 分鐘拿來做這件事。</p></div>
+    <div><b>分散，而不是集中</b><p>同樣五小時，分五天各一小時遠勝一天讀完。你的模考範圍已經內建這個結構了。</p></div>
+    <div><b>交錯，而不是分堆</b><p>一節課裡混著練不同題型，比連做二十題同類型難、但學得牢。段考前尤其要這樣練。</p></div>
+    <div><b>錯題本是你的私人題庫</b><p>整年最有價值的一本。只收「訂正過還會再錯」的題，每題寫一行「我當時為什麼會錯」。四月的第三輪就靠它。</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>三條不能破的底線</h2></div>
+  <div class="floor"><ul>
+    <li><span class="num">01</span><div><b>睡滿 7.5–8 小時</b><p>記憶是在睡覺時固化的。熬夜多讀的那兩小時，會從隔天的吸收效率裡扣回去，而且扣得更多。這是整份計畫裡唯一一條完全不能談判的。</p></div></li>
+    <li><span class="num">02</span><div><b>每週三次、每次 30 分鐘以上的身體活動</b><p>不是奢侈品。連續九個月的高強度腦力工作，運動是維持專注力和情緒穩定的必要成本，不是可以省下來的時間。</p></div></li>
+    <li><span class="num">03</span><div><b>每週一個完全空白的時段</b><p>週五晚上第二區塊＋週日下午 15:00–16:20。不排讀書、不排補進度、不欠帳。撐九個月靠的是可持續，不是靠某一週特別拚。</p></div></li>
+  </ul></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>現在就要處理的事</h2><span class="eyebrow">八月做完，整年不慌</span></div>
+  <div class="todo">
+    <label><input type="checkbox"><span>把雄中校網「科學班甄試歷屆試題」整批下載存好<span class="when">本週</span></span></label>
+    <label><input type="checkbox"><span>確認自己是否符合報考資格：科學班需經學校推薦（名額為應屆畢業生前 20%），這代表段考成績整年都不能放掉<span class="when">本週，去問輔導室或教務處</span></span></label>
+    <label><input type="checkbox"><span>若曾在全國科展等全國性數理競賽獲前三名或佳作，那是報考資格的直接路徑之一，也是複試面談最強的材料——先把當時的研究內容整理成一份自己能講清楚的版本<span class="when">八月內</span></span></label>
+    <label><input type="checkbox"><span>問清楚 3/22–23 下學期一段與科學班複試若撞期，學校的補考規定<span class="when">一月拿到簡章後立刻確認</span></span></label>
+    <label><input type="checkbox"><span>把雄中校網加書籤，一月起每週查一次簡章公告<span class="when">一月起</span></span></label>
+    <label><input type="checkbox"><span>準備一本錯題本（實體或數位皆可），今天就開始用<span class="when">今天</span></span></label>
+    <label><input type="checkbox"><span>先決定這 11 天要做完什麼：範圍要小到 8/27 前能收尾，不要在 8 月開一個要三個月的坑<span class="when">今天，動工前先做</span></span></label>
+    <label><input type="checkbox"><span>8/27 把專案停在「能放九個月不腐爛」的狀態：README 寫清楚下一步、環境固定版本、待辦清單留給明年五月的自己<span class="when">8/26–27</span></span></label>
+  </div>
+</section>
+
+<footer>
+  <p>本頁的日期、倒數、階段與週表適用版本，皆依<b>開啟當天</b>自動計算，跨日會自動重算，不需手動修改。<br>會考日期 5/15–5/16 為教育部已公告確定日期。科學班各項日期為依歷屆時程推估，實際以雄中當年度招生簡章為準（簡章通常於 1 月底至 2 月初公告）。段考日期依你提供的預定版本，實際以學校行事曆為準。</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  var WD = ['日','一','二','三','四','五','六'];
+
+  // 8–12月 → 2026；1–7月 → 2027
+  function mk(m, d){ return new Date(m >= 8 ? 2026 : 2027, m - 1, d); }
+  function diff(a, b){ return Math.round((b - a) / 86400000); }
+
+  // 所有關卡（月, 日, 名稱, 是否為推估）
+  var EVENTS = [
+    [9,8,'一模 · 國數英社 1–2 冊',0],
+    [10,12,'上學期一段',0],
+    [10,28,'二模 · 1–4 冊',0],
+    [11,23,'上學期二段',0],
+    [12,23,'三模 · 全科 1–4 冊',0],
+    [1,14,'上學期三段',0],
+    [2,18,'四模 · 全科 1–5 冊',0],
+    [3,13,'雄科班初試',1],
+    [3,20,'雄科班複試',1],
+    [3,22,'下學期一段',0],
+    [4,15,'五模 · 全科 1–6 冊',0],
+    [5,3,'下學期二段',0],
+    [5,15,'國中教育會考',0]
+  ].map(function(e){ return {date: mk(e[0], e[1]), name: e[2], est: e[3]}; });
+
+  // 五個階段，順序對應 .phase 卡片
+  var PHASES = [
+    [mk(8,17),  mk(8,27),  'PHASE 1 · 研發衝刺'],
+    [mk(8,28),  mk(1,20),  'PHASE 2 · 雙軌並行'],
+    [mk(1,21),  mk(3,21),  'PHASE 3 · 科學班衝刺'],
+    [mk(3,22),  mk(5,16),  'PHASE 4 · 會考衝刺'],
+    [mk(5,17),  mk(6,30),  'PHASE 5 · 會考後']
+  ];
+
+  var START = mk(8,17), END = mk(5,16);
+
+  function render(){
+    var t = new Date(); t.setHours(0,0,0,0);
+
+    // --- 今天 ---
+    var dEl = document.getElementById('now-date');
+    if (dEl) dEl.textContent = t.getFullYear() + '年' + (t.getMonth()+1) + '月' + t.getDate() + '日　週' + WD[t.getDay()];
+
+    // --- 兩個倒數 ---
+    [{id:'c-sci', d: mk(3,13)}, {id:'c-cap', d: mk(5,15)}].forEach(function(o){
+      var el = document.getElementById(o.id); if (!el) return;
+      var n = diff(t, o.d);
+      var box = el.closest('.count');
+      if (n > 0)       el.innerHTML = n + '<small>天</small>';
+      else if (n === 0){ el.innerHTML = '<small style="font-size:22px;color:inherit;margin:0">就是今天</small>'; }
+      else             { el.innerHTML = '<small style="font-size:22px;margin:0">已結束</small>'; if (box) box.classList.add('done'); }
+    });
+
+    // --- 下一關 ---
+    var next = null;
+    for (var i = 0; i < EVENTS.length; i++){ if (diff(t, EVENTS[i].date) >= 0){ next = EVENTS[i]; break; } }
+    var nn = document.getElementById('next-n'), nl = document.getElementById('next-l');
+    if (nn && nl){
+      if (next){
+        var g = diff(t, next.date);
+        nn.innerHTML = (g === 0 ? '今天' : g + '<small>天</small>');
+        nl.textContent = next.name + '　' + (next.date.getMonth()+1) + '/' + next.date.getDate() + (next.est ? '（推估）' : '');
+      } else {
+        nn.innerHTML = '<span style="font-size:19px">全部結束</span>';
+        nl.textContent = '把時間還給你自己';
+      }
+    }
+
+    // --- 整體進度條 ---
+    var total = diff(START, END), gone = Math.max(0, Math.min(total, diff(START, t)));
+    var bar = document.getElementById('now-bar'), bn = document.getElementById('now-barnote');
+    if (bar) setTimeout(function(){ bar.style.width = (gone / total * 100).toFixed(1) + '%'; }, 120);
+    if (bn) bn.textContent = '距會考還有 ' + Math.max(0, diff(t, END)) + ' 天　·　已走完 ' + Math.round(gone / total * 100) + '%';
+
+    // --- 階段卡片 ---
+    var cards = document.querySelectorAll('.phase'), label = '—';
+    cards.forEach(function(c, i){
+      c.classList.remove('active','past');
+      var old = c.querySelector('.left'); if (old) old.remove();
+      var p = PHASES[i]; if (!p) return;
+      if (t > p[1]) c.classList.add('past');
+      else if (t >= p[0]){
+        c.classList.add('active');
+        label = p[2];
+        var left = diff(t, p[1]);
+        var s = document.createElement('span');
+        s.className = 'left';
+        s.textContent = '本階段剩 ' + (left + 1) + ' 天';
+        c.querySelector('.when').appendChild(s);
+      }
+    });
+    var ph = document.getElementById('now-phase');
+    if (ph) ph.innerHTML = '目前階段：<b>' + label + '</b>';
+
+    // --- 時間軸：標出當月、把過去的關卡淡化 ---
+    document.querySelectorAll('.tl-row').forEach(function(row){
+      var m = parseInt((row.querySelector('.tl-mon')||{}).textContent, 10);
+      row.classList.toggle('now-row', !!m && mk(m,1).getMonth() === t.getMonth() && mk(m,1).getFullYear() === t.getFullYear());
+    });
+    document.querySelectorAll('.chip').forEach(function(chip){
+      var dt = chip.querySelector('.dt'); if (!dt) return;
+      var m = dt.textContent.replace('≈','').match(/^(\d{1,2})\/(\d{1,2})/);
+      if (!m) return;
+      chip.classList.toggle('past', mk(+m[1], +m[2]) < t);
+    });
+
+    // --- 本週該用哪張週表 ---
+    var soon = EVENTS.some(function(e){ var g = diff(t, e.date); return g >= 0 && g <= 7; });
+    var winter = (t >= mk(1,21) && t <= mk(2,3));
+    var use = (t <= mk(8,27)) ? 0 : (soon ? 2 : (winter ? 3 : 1));
+    document.querySelectorAll('.wk').forEach(function(w, i){
+      w.classList.toggle('active', i === use);
+      w.classList.toggle('dim', i !== use);
+    });
+  }
+
+  render();
+  // 跨日自動重算
+  var stamp = new Date().toDateString();
+  setInterval(function(){
+    var now = new Date().toDateString();
+    if (now !== stamp){ stamp = now; render(); }
+  }, 60000);
+})();
+</script>
+<script>
+(function(){
+  // 國定假日（依人事行政總處 115/116 年辦公日曆表）。這些日子整天跳過。
+  var HOLIDAYS = {
+    '2026-9-25':'中秋節','2026-9-26':'連假','2026-9-27':'連假','2026-9-28':'教師節',
+    '2026-10-9':'國慶補假','2026-10-10':'國慶日','2026-10-11':'連假',
+    '2026-10-14':'畢旅?','2026-10-15':'畢旅?','2026-10-16':'畢旅?',
+    '2026-10-24':'連假','2026-10-25':'光復節','2026-10-26':'補假',
+    '2026-12-25':'行憲紀念','2026-12-26':'連假','2026-12-27':'連假',
+    '2027-1-1':'元旦','2027-1-2':'連假','2027-1-3':'連假',
+    '2027-2-4':'小年夜','2027-2-5':'除夕','2027-2-6':'初一','2027-2-7':'初二',
+    '2027-2-8':'初三','2027-2-9':'補假','2027-2-10':'補假',
+    '2027-2-27':'連假','2027-2-28':'和平紀念','2027-3-1':'補假',
+    '2027-4-3':'連假','2027-4-4':'兒童節','2027-4-5':'清明節','2027-4-6':'補假',
+    '2027-4-30':'勞動補假','2027-5-1':'勞動節','2027-5-2':'連假'
+  };
+
+  // 整段佔掉上午的課程。暑輔已結束；寒輔為暫定，學校公布後改這裡
+  var SUMMER = {
+    '2027-1-21':'寒輔','2027-1-22':'寒輔','2027-1-25':'寒輔','2027-1-26':'寒輔',
+    '2027-1-27':'寒輔','2027-1-28':'寒輔','2027-1-29':'寒輔'
+  };
+
+  var MONTHS = [[2026,8],[2026,9],[2026,10],[2026,11],[2026,12],[2027,1],[2027,2],[2027,3],[2027,4],[2027,5]];
+
+  // [年, 月, 日, 樣式, 標籤]
+  var MARKS = [
+    [2026,8,28,'p-w','返校日'],
+    [2026,9,8,'p-m','一模'],[2026,9,9,'p-m','一模'],
+    [2026,10,12,'p-m','一段'],[2026,10,13,'p-m','一段'],
+    [2026,10,28,'p-m','二模'],[2026,10,29,'p-m','二模'],
+    [2026,11,23,'p-m','二段'],[2026,11,24,'p-m','二段'],
+    [2026,12,23,'p-m','三模'],[2026,12,24,'p-m','三模'],
+    [2027,1,14,'p-m','三段'],[2027,1,15,'p-m','三段'],
+    [2027,1,20,'p-w','休業式'],[2027,2,11,'p-w','開學'],
+    [2027,2,18,'p-m','四模'],[2027,2,19,'p-m','四模'],
+    [2027,3,13,'p-s','初試?'],
+    [2027,3,20,'p-s','複試?'],[2027,3,21,'p-s','面談?'],
+    [2027,3,22,'p-m','一段'],[2027,3,23,'p-m','一段'],
+    [2027,4,15,'p-m','五模'],[2027,4,16,'p-m','五模'],
+    [2027,5,3,'p-m','二段'],[2027,5,7,'p-m','二段'],
+    [2027,5,15,'p-x','會考'],[2027,5,16,'p-x','會考']
+  ];
+
+  var FOCUS = {
+    '2026-8':'研發衝刺 43 小時（8/17–8/27）｜科學班：國中理化全複習＋高一數與式、多項式｜會考：1–2 冊掃過｜8/28 返校',
+    '2026-9':'科學班：多項式、方程式，開始累積資優／競賽題｜會考：9/8–9 一模後訂正，接 3–4 冊｜開學，切換 B 版週表',
+    '2026-10':'全年最擠的一個月：國慶連假→一段→畢旅→光復連假→二模，連著五件事｜10/9–11 連假是段考前最後的完整讀書時間，不能整段休掉｜畢旅回來當天不排進度，隔天才恢復｜科學班進度本月只能靠週末',
+    '2026-11':'科學班：化學原子結構、莫耳與化學計量｜會考：11/23 二段｜寫作測驗每兩週一篇，計時 50 分鐘',
+    '2026-12':'科學班：三角函數、指對數；開始必修生物｜會考：12/23 三模（全科 1–4 冊）｜寒假計畫這時就要排好',
+    '2027-1':'1/20 休業式、1/21 放寒假（只到 2/10）｜寒輔暫定 1/21–1/29 佔掉上午，下午晚上全給科學班｜1/1–1/3 元旦連假是考前少數完整區塊，別整段休｜月底起每週查雄中校網簡章',
+    '2027-2':'2/1–2/3 寒假最後三天全天可用｜2/4–2/10 春節｜2/11 開學、2/18–19 四模｜下旬科學班報名｜會考維持每天 45 分鐘不斷線',
+    '2027-3':'初試、複試、下學期一段擠在同一個月 —— 撞期規定務必一月就問清楚｜放榜後科學班歸零，全面轉會考',
+    '2027-4':'只剩會考｜4/15–16 五模（全科 1–6 冊）｜錯題本第二輪＋歷屆會考全套限時',
+    '2027-5':'5/3、5/7 下學期二段｜5/15–16 會考｜考前一週不讀新內容，只做錯題本第三輪｜5/17 之後時間全還給你自己'
+  };
+
+  var grid = document.getElementById('cal-grid'),
+      tabs = document.getElementById('cal-tabs'),
+      focus = document.getElementById('cal-focus');
+  if (!grid || !tabs) return;
+
+  function key(y,m,d){ return y+'-'+m+'-'+d; }
+  function today0(){ var t=new Date(); t.setHours(0,0,0,0); return t; }
+
+  function draw(idx){
+    var y = MONTHS[idx][0], m = MONTHS[idx][1], t = today0();
+    var first = new Date(y, m-1, 1), len = new Date(y, m, 0).getDate(), lead = first.getDay();
+    var html = '';
+
+    for (var i = 0; i < lead; i++) html += '<div class="cal-d void"></div>';
+
+    for (var d = 1; d <= len; d++){
+      var cur = new Date(y, m-1, d), dow = cur.getDay(), cls = 'cal-d';
+      var kk = y+'-'+m+'-'+d, hol = HOLIDAYS[kk];
+      if (hol) cls += ' holiday';
+      if (cur.getTime() === t.getTime()) cls += ' today';
+      else if (cur < t) cls += ' pastday';
+      html += '<div class="' + cls + '"><span class="cal-n">' + d + '</span>';
+
+      MARKS.forEach(function(k){
+        if (k[0]===y && k[1]===m && k[2]===d) html += '<span class="pill '+k[3]+'">'+k[4]+'</span>';
+      });
+      if (hol) html += '<span class="pill p-h">' + hol + '</span>';
+      if (SUMMER[kk]) html += '<span class="pill p-w">' + SUMMER[kk] + '</span>';
+      // 固定行程：8/17 起算；國定假日整天跳過
+      if (cur >= new Date(2026,7,17) && !hol){
+        if (dow === 0 || dow === 6) html += '<span class="pill p-b">補習</span>';
+        if (dow === 3) html += '<span class="pill p-g">資優數</span>';
+      }
+      html += '</div>';
+    }
+
+    var tail = (7 - ((lead + len) % 7)) % 7;
+    for (var j = 0; j < tail; j++) html += '<div class="cal-d void"></div>';
+
+    grid.innerHTML = html;
+    if (focus) focus.innerHTML = '<b>' + y + ' 年 ' + m + ' 月　本月重點</b>' + (FOCUS[y+'-'+m] || '');
+
+    Array.prototype.forEach.call(tabs.children, function(b, i){
+      b.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+    });
+  }
+
+  // 分頁按鈕
+  var t0 = today0(), nowIdx = 0;
+  MONTHS.forEach(function(mm, i){
+    var b = document.createElement('button');
+    b.className = 'cal-tab';
+    b.type = 'button';
+    b.setAttribute('role','tab');
+    b.textContent = mm[1] + '月';
+    if (mm[0] === t0.getFullYear() && mm[1] === t0.getMonth()+1){ nowIdx = i; b.classList.add('is-now'); }
+    b.addEventListener('click', function(){ draw(i); });
+    tabs.appendChild(b);
+  });
+
+  draw(nowIdx);
+  if (tabs.children[nowIdx]) tabs.children[nowIdx].scrollIntoView({block:'nearest', inline:'center'});
+
+  // 11 天逐日表：標今天、標暑輔、淡化過去
+  function markSprint(){
+    var t = today0();
+    document.querySelectorAll('#sprint tbody tr').forEach(function(r){
+      var k = r.dataset.d || '';
+      var p = k.split('-');
+      if (p.length !== 3) return;
+      var day = new Date(+p[0], +p[1]-1, +p[2]);
+      r.classList.toggle('todayrow', day.getTime() === t.getTime());
+      r.classList.toggle('pastrow', day < t);
+      // 暑輔日：上午改成暑輔，科學班順延到晚上
+      if (SUMMER[k] && r.cells.length === 4 && !r.dataset.sum){
+        r.dataset.sum = '1';
+        r.classList.add('sumrow');
+        r.cells[1].innerHTML = '<b>' + SUMMER[k] + ' 07:45–12:30</b>';
+        r.cells[1].className = '';
+        r.cells[3].innerHTML = '科學班 18:30–21:00<br><span style="font-size:11.5px;color:var(--ink-faint)">上午順延，當天不排會考</span>';
+        r.cells[3].className = 'sci-c';
+      }
+    });
+  }
+  markSprint();
+
+  var stamp = new Date().toDateString();
+  setInterval(function(){
+    var n = new Date().toDateString();
+    if (n !== stamp){ stamp = n; draw(nowIdx); markSprint(); }
+  }, 60000);
+})();
+</script>
+</body>
+</html>
