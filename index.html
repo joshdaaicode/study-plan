@@ -357,6 +357,34 @@ section[hidden]{display:none}
   .ed-row input:nth-child(3){grid-area:m}
   .ed-row button{grid-area:d}
 }
+/* ---------- 現在 + 番茄鐘 ---------- */
+.nowcard{display:grid;grid-template-columns:1fr 196px;gap:18px;border:1px solid var(--rule);
+  border-radius:3px;background:var(--card);padding:16px 18px;margin-bottom:14px}
+.nc-clock{font-size:34px;font-weight:600;line-height:1.05;letter-spacing:-.02em;margin-top:5px}
+.nc-doing{margin:9px 0 0;font-size:14.5px;color:var(--ink-soft)}
+.nc-doing b{color:var(--ink)}
+.nc-next{margin:5px 0 0;font-size:12.5px;color:var(--ink-faint)}
+.nc-right{border-left:1px solid var(--rule);padding-left:18px;text-align:center}
+.pm-time{font-size:33px;font-weight:600;line-height:1.1;margin:5px 0 9px;letter-spacing:-.02em}
+.pm-time.run{color:var(--warn)}
+.pm-time.brk{color:var(--main)}
+.pm-btns{display:flex;gap:6px;justify-content:center}
+.pm-btns .btn{padding:6px 12px;font-size:12.5px}
+.pm-sel{display:flex;gap:5px;justify-content:center;margin-top:9px}
+.pm-sel select{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 4px;
+  border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink-soft)}
+.pm-note{margin:8px 0 0;font-size:11px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace}
+.rem-banner{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;
+  background:var(--ink);color:#fff;padding:13px 15px;border-radius:4px;font-size:13.5px;
+  box-shadow:0 8px 24px rgba(19,28,38,.22);display:none;align-items:center;gap:12px}
+.rem-banner b{color:#fff}
+.rem-banner button{margin-left:auto;border:0;background:rgba(255,255,255,.18);color:#fff;
+  border-radius:3px;padding:5px 10px;font-family:inherit;font-size:12.5px;cursor:pointer;flex:0 0 auto}
+@media (max-width:640px){
+  .nowcard{grid-template-columns:1fr;gap:14px}
+  .nc-right{border-left:0;border-top:1px solid var(--rule);padding-left:0;padding-top:13px}
+  .nc-clock{font-size:30px}
+}
 </style>
 </head>
 <body>
@@ -400,6 +428,30 @@ section[hidden]{display:none}
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
   <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來，並從當天的娛樂時間扣掉。</p>
 
+  <div class="nowcard">
+    <div>
+      <span class="eyebrow">現在</span>
+      <div class="nc-clock mono" id="nc-clock">--:--</div>
+      <p class="nc-doing" id="nc-doing">—</p>
+      <p class="nc-next" id="nc-next">—</p>
+    </div>
+    <div class="nc-right">
+      <span class="eyebrow" id="pm-mode">專注</span>
+      <div class="pm-time mono" id="pm-time">25:00</div>
+      <div class="pm-btns">
+        <button class="btn solid" id="pm-go" type="button">開始</button>
+        <button class="btn ghost" id="pm-reset" type="button">重設</button>
+      </div>
+      <div class="pm-sel">
+        <select id="pm-w" aria-label="專注分鐘"></select>
+        <select id="pm-b" aria-label="休息分鐘"></select>
+      </div>
+      <p class="pm-note" id="pm-note">今天 0 顆</p>
+    </div>
+  </div>
+  <div class="bar-btns" style="margin:0 0 14px">
+    <button class="btn" id="nt-on" type="button">開啟時段提醒</button>
+  </div>
   <div class="td-budget" id="td-budget"></div>
   <div class="todo" id="td-list"></div>
 
@@ -1426,12 +1478,184 @@ section[hidden]{display:none}
     st.list=buildList(ctx.pf, st.backlog||[]); save(SK,st); render();
   });
 
+  window.__blocks=function(){
+    var out=[];
+    tplFor(ctx.pf).forEach(function(x){
+      var m=(x.t||'').match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/);
+      if(m) out.push({a:(+m[1])*60+(+m[2]), b:(+m[3])*60+(+m[4]), n:x.n});
+    });
+    out.sort(function(p,q){return p.a-q.a;});
+    return out;
+  };
+
   render();
   var stamp=new Date().toDateString();
   setInterval(function(){
     var n=new Date().toDateString();
     if(n!==stamp){ stamp=n; render(); }
   },60000);
+})();
+</script>
+<script>
+/* ===== 現在 / 番茄鐘 / 時段提醒 ===== */
+(function(){
+  var PK='plan.pomo.v1';
+  function g(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+  function s(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function pad(n){return (n<10?'0':'')+n;}
+  function hhmm(m){m=((m%1440)+1440)%1440;return pad(Math.floor(m/60))+':'+pad(m%60);}
+  function dayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+
+  var P=g(PK)||{w:25,b:5,notify:false,day:null,done:0,seq:0};
+  if(P.day!==dayKey()){P.day=dayKey();P.done=0;P.seq=0;s(PK,P);}
+
+  var elClock=document.getElementById('nc-clock'), elDoing=document.getElementById('nc-doing'),
+      elNext=document.getElementById('nc-next'), elTime=document.getElementById('pm-time'),
+      elMode=document.getElementById('pm-mode'), elGo=document.getElementById('pm-go'),
+      elReset=document.getElementById('pm-reset'), elNote=document.getElementById('pm-note'),
+      selW=document.getElementById('pm-w'), selB=document.getElementById('pm-b'),
+      btnNT=document.getElementById('nt-on');
+  if(!elClock) return;
+
+  [15,20,25,30,40,45,50].forEach(function(v){
+    var o=document.createElement('option');o.value=v;o.textContent='專注 '+v;
+    if(v===P.w)o.selected=true;selW.appendChild(o);
+  });
+  [3,5,10,15].forEach(function(v){
+    var o=document.createElement('option');o.value=v;o.textContent='休息 '+v;
+    if(v===P.b)o.selected=true;selB.appendChild(o);
+  });
+
+  /* 提示音（不需外部檔案） */
+  var AC=null;
+  function beep(times){
+    try{
+      AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+      if(AC.state==='suspended') AC.resume();
+      for(var i=0;i<(times||2);i++){
+        var o=AC.createOscillator(), gn=AC.createGain(), t0=AC.currentTime+i*0.42;
+        o.type='sine'; o.frequency.setValueAtTime(i%2?660:880,t0);
+        gn.gain.setValueAtTime(0.0001,t0);
+        gn.gain.exponentialRampToValueAtTime(0.22,t0+0.02);
+        gn.gain.exponentialRampToValueAtTime(0.0001,t0+0.34);
+        o.connect(gn); gn.connect(AC.destination); o.start(t0); o.stop(t0+0.36);
+      }
+    }catch(e){}
+  }
+
+  /* 通知：有權限用系統通知，沒有就用底部橫幅 */
+  var banner=document.createElement('div'); banner.className='rem-banner';
+  var bt=document.createElement('span'); var bb=document.createElement('button');
+  bb.type='button'; bb.textContent='知道了';
+  bb.addEventListener('click',function(){banner.style.display='none';});
+  banner.appendChild(bt); banner.appendChild(bb); document.body.appendChild(banner);
+  function notify(title,body){
+    beep(2);
+    var ok=false;
+    try{
+      if(window.Notification && Notification.permission==='granted'){
+        new Notification(title,{body:body,tag:'plan'}); ok=true;
+      }
+    }catch(e){}
+    if(!ok){
+      bt.innerHTML='<b>'+title+'</b>　'+body;
+      banner.style.display='flex';
+      setTimeout(function(){banner.style.display='none';},20000);
+    }
+  }
+  function refreshNT(){
+    var st = (window.Notification ? Notification.permission : 'unsupported');
+    if(P.notify && st==='granted') btnNT.textContent='時段提醒：開啟中';
+    else if(st==='denied') btnNT.textContent='提醒被瀏覽器封鎖（改用畫面橫幅）';
+    else btnNT.textContent='開啟時段提醒';
+  }
+  btnNT.addEventListener('click',function(){
+    P.notify=true; s(PK,P); beep(1);
+    if(window.Notification && Notification.permission==='default'){
+      Notification.requestPermission().then(function(){refreshNT();});
+    } else refreshNT();
+  });
+  refreshNT();
+
+  /* ---- 現在該做什麼 ---- */
+  var lastBlock=null, warned=null;
+  function tickNow(){
+    var d=new Date(), mins=d.getHours()*60+d.getMinutes();
+    elClock.textContent=pad(d.getHours())+':'+pad(d.getMinutes());
+    var bl=[];
+    try{ bl=(window.__blocks?window.__blocks():[])||[]; }catch(e){ bl=[]; }
+    var cur=null,nxt=null;
+    for(var i=0;i<bl.length;i++){
+      if(mins>=bl[i].a && mins<bl[i].b){ cur=bl[i]; }
+      if(bl[i].a>mins && !nxt){ nxt=bl[i]; }
+    }
+    if(cur) elDoing.innerHTML='現在應該在：<b>'+cur.n+'</b>　<span style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:var(--ink-faint)">還剩 '+(cur.b-mins)+' 分</span>';
+    else elDoing.innerHTML='<span style="color:var(--ink-faint)">現在沒有排定的區塊</span>';
+    if(nxt) elNext.textContent='接下來 '+hhmm(nxt.a)+'　'+nxt.n+'（'+(nxt.a-mins)+' 分後）';
+    else elNext.textContent='今天的區塊都排完了';
+
+    if(P.notify){
+      var id=cur?(cur.a+'|'+cur.n):null;
+      if(id && id!==lastBlock && mins-cur.a<=2){ notify('該開始了：'+cur.n, hhmm(cur.a)+'–'+hhmm(cur.b)+'，共 '+(cur.b-cur.a)+' 分'); }
+      lastBlock=id;
+      if(nxt && nxt.a-mins===5 && warned!==nxt.a){ warned=nxt.a; notify('5 分鐘後：'+nxt.n, '先把手邊的收個尾'); }
+    }
+  }
+
+  /* ---- 番茄鐘 ---- */
+  var mode='work', left=P.w*60, running=false, timer=null;
+  function paintPomo(){
+    elTime.textContent=pad(Math.floor(left/60))+':'+pad(left%60);
+    elTime.className='pm-time mono'+(running?(mode==='work'?' run':' brk'):'');
+    elMode.textContent = mode==='work'?'專注':(mode==='long'?'長休息':'休息');
+    elNote.textContent='今天 '+P.done+' 顆'+(P.done?'　≈ '+Math.round(P.done*P.w/6)/10+' 小時':'');
+    document.title = running ? (elTime.textContent+' · '+(mode==='work'?'專注':'休息')) : (window.__baseTitle||document.title);
+  }
+  function nextPhase(){
+    if(mode==='work'){
+      P.done++; P.seq++; s(PK,P);
+      var lng = P.seq%4===0;
+      mode = lng?'long':'break';
+      left = (lng?15:P.b)*60;
+      notify('完成一顆番茄鐘', lng?'連續四顆了，休息 15 分鐘再回來':'休息 '+P.b+' 分鐘');
+    } else {
+      mode='work'; left=P.w*60;
+      notify('休息結束', '回到專注 '+P.w+' 分鐘');
+    }
+    paintPomo();
+  }
+  function tickPomo(){
+    if(!running) return;
+    left--;
+    if(left<=0){ nextPhase(); }
+    paintPomo();
+  }
+  elGo.addEventListener('click',function(){
+    running=!running;
+    elGo.textContent=running?'暫停':'開始';
+    if(running){ beep(1); }
+    paintPomo();
+  });
+  elReset.addEventListener('click',function(){
+    running=false; elGo.textContent='開始'; mode='work'; left=P.w*60; paintPomo();
+  });
+  selW.addEventListener('change',function(){
+    P.w=parseInt(selW.value,10)||25; s(PK,P);
+    if(!running && mode==='work'){ left=P.w*60; } paintPomo();
+  });
+  selB.addEventListener('change',function(){
+    P.b=parseInt(selB.value,10)||5; s(PK,P);
+    if(!running && mode!=='work'){ left=P.b*60; } paintPomo();
+  });
+
+  window.__baseTitle=document.title;
+  paintPomo(); tickNow();
+  setInterval(function(){ tickPomo(); },1000);
+  setInterval(function(){
+    if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; s(PK,P); }
+    tickNow(); paintPomo();
+  },15000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tickNow(); } });
 })();
 </script>
 </body>
