@@ -306,6 +306,57 @@ tr.sumrow.todayrow td{background:#FDEFDC}
 .p-h{background:#FBE7E4;color:#B03A2E;font-weight:600}
 .cal-d.holiday{background:#FEF9F8}
 .cal-d.holiday .cal-n{color:#B03A2E}
+/* ---------- 主分頁 ---------- */
+.tabs{position:sticky;top:0;z-index:20;display:flex;gap:2px;overflow-x:auto;
+  background:var(--paper);padding:10px 0 9px;margin-bottom:2px;
+  border-bottom:1px solid var(--rule);-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex:0 0 auto;font-family:'Noto Sans TC',sans-serif;font-size:14px;font-weight:500;
+  padding:8px 15px;border:0;background:none;color:var(--ink-faint);cursor:pointer;
+  border-radius:3px;white-space:nowrap}
+.tab-btn[aria-selected="true"]{background:var(--ink);color:#fff;font-weight:700}
+.tab-btn:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+section[hidden]{display:none}
+.cal-tabs{top:53px}
+@media (max-width:640px){
+  .tabs{padding:8px 0 8px}
+  .tab-btn{font-size:13px;padding:7px 12px}
+  .cal-tabs{top:49px}
+}
+@media print{.tabs{display:none}section[hidden]{display:block!important}}
+/* ---------- 今天：任務板 ---------- */
+.td-budget{border:1px solid var(--rule);border-radius:3px;background:var(--card);
+  padding:14px 18px;margin-bottom:14px;font-size:13.5px;color:var(--ink-soft)}
+.td-budget b{color:var(--ink)}
+.td-budget .warn{color:var(--warn);font-weight:600}
+.td-budget .bar{margin:10px 0 4px;max-width:100%}
+.td-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.td-btn{font-family:'Noto Sans TC',sans-serif;font-size:13px;padding:8px 14px;border-radius:3px;
+  border:1px solid var(--rule);background:var(--card);color:var(--ink);cursor:pointer}
+.td-btn.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+.td-btn.ghost{color:var(--ink-faint)}
+.td-btn:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.todo .tk-m{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
+  display:block;margin-top:3px;letter-spacing:.05em}
+.todo .tk-fix{opacity:.6}
+.todo .tk-bk{background:#FEF6EC}
+.todo .tk-bk .tk-m{color:var(--warn)}
+.tk-del{border:0;background:none;color:var(--ink-faint);font-size:15px;cursor:pointer;padding:0 4px;line-height:1}
+.todo label.tk{grid-template-columns:22px 1fr 26px}
+.td-editor{margin-top:14px;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:16px 18px}
+.ed-head{margin:0 0 12px;font-size:13px;color:var(--ink-soft)}
+.ed-head b{display:block;font-family:'Noto Serif TC',serif;font-size:16px;color:var(--ink);margin-bottom:3px}
+.ed-row{display:grid;grid-template-columns:104px 1fr 58px 28px;gap:7px;margin-bottom:7px;align-items:center}
+.ed-row input{font-family:'Noto Sans TC',sans-serif;font-size:13px;padding:6px 8px;
+  border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink);width:100%}
+.ed-row input.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+@media (max-width:640px){
+  .ed-row{grid-template-columns:1fr 52px 26px;grid-template-areas:"t t d" "n m d"}
+  .ed-row input:nth-child(1){grid-area:t}
+  .ed-row input:nth-child(2){grid-area:n}
+  .ed-row input:nth-child(3){grid-area:m}
+  .ed-row button{grid-area:d}
+}
 </style>
 </head>
 <body>
@@ -342,6 +393,33 @@ tr.sumrow.todayrow td{background:#FDEFDC}
     </div>
   </div>
 </header>
+
+<nav class="tabs" id="main-tabs" role="tablist" aria-label="區塊切換"></nav>
+
+<section>
+  <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
+  <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來，並從當天的娛樂時間扣掉。</p>
+
+  <div class="td-budget" id="td-budget"></div>
+  <div class="todo" id="td-list"></div>
+
+  <div class="td-bar">
+    <button class="td-btn" id="td-add" type="button">＋ 新增任務</button>
+    <button class="td-btn" id="td-edit" type="button">編輯這類日子的範本</button>
+    <button class="td-btn ghost" id="td-clear" type="button">清掉欠帳</button>
+  </div>
+
+  <div class="td-editor" id="td-editor" hidden>
+    <p class="ed-head"><b id="ed-title">編輯範本</b><span>改動會套用到所有同類型的日子（例如所有暑假平日）。</span></p>
+    <div id="ed-rows"></div>
+    <div class="td-bar">
+      <button class="td-btn" id="ed-addrow" type="button">＋ 加一列</button>
+      <button class="td-btn solid" id="ed-save" type="button">儲存</button>
+      <button class="td-btn ghost" id="ed-cancel" type="button">取消</button>
+      <button class="td-btn ghost" id="ed-reset" type="button">恢復預設</button>
+    </div>
+  </div>
+</section>
 
 <section>
   <div class="sec-head"><h2>雙軌時間軸</h2><span class="eyebrow">2026.08 → 2027.05</span></div>
@@ -743,6 +821,101 @@ tr.sumrow.todayrow td{background:#FDEFDC}
 </div>
 <script>
 (function(){
+  // 每次重新整理換一句
+  var LINES = [
+    '兩個終點，<br>不是一個。',
+    '三月先到，<br>五月才是。',
+    '你不是在準備一場考試，<br>是兩場。',
+    '時間不會變多，<br>但可以排得更準。',
+    '寒假只有兩週，<br>所以現在就要動。',
+    '睡飽的人，<br>走得比較遠。',
+    '排到 85%，<br>剩下留給意外。',
+    '先做對的事，<br>再做多的事。',
+    '進度一定會掉，<br>計畫要撐得住。',
+    '今天做的，<br>五月才會知道。',
+    '慢慢來，<br>但每天都來。',
+    '錯題本才是<br>你的私人題庫。',
+    '砍範圍不丟臉，<br>熬夜硬撐才是。',
+    '一次只推一件事。',
+    '模考是溫度計，<br>不是成績單。',
+    '讀完不等於記得，<br>寫得出來才算。',
+    '闔上書，<br>才知道自己會多少。',
+    '重讀很舒服，<br>提取才有效。',
+    '分五天各讀一小時，<br>勝過一天讀五小時。',
+    '覺得難的當下，<br>才是在長。',
+    '計畫是給人用的，<br>不是人給計畫用的。',
+    '缺的那天補回來，<br>不要整個放掉。',
+    '週五晚上不欠帳。',
+    '下午那四小時，<br>是今年唯一的。',
+    '八月的決定，<br>決定十二月的輕鬆。',
+    '別跟進度比，<br>跟昨天的自己比。',
+    '訂正一題，<br>勝過多寫十題。',
+    '狀態差的那天，<br>做最簡單的那項就好。',
+    '起床時間對了，<br>一天就對了一半。',
+    '專注四十分鐘，<br>比坐四小時值錢。',
+    '手機放遠一點。',
+    '現在不懂的，<br>標起來，別跳過。',
+    '進度表是地圖，<br>不是繩子。',
+    '十月會很擠，<br>九月就要準備好。',
+    '春節休七天，<br>手感要三天才回來。',
+    '段考也是科學班的一部分。',
+    '地科沒人會教，<br>只能自己讀。',
+    '考古題要限時，<br>不然只是在看答案。',
+    '每天一點，<br>比週末爆衝穩。',
+    '累了就休息，<br>那不是放棄。',
+    '你有兩次機會，<br>別把第一次當唯一。',
+    '寫下來的計畫，<br>才叫計畫。',
+    '完成比完美重要。',
+    '開始最難，<br>撐過前五分鐘就好。',
+    '錯過一天，<br>不是錯過一年。',
+    '目標要小到抓得住。',
+    '休息也要排進表裡。',
+    '五月十五號那天，<br>你會感謝八月的自己。',
+    '今天只要贏一點點。',
+    '做完再說，<br>不要先想結果。'
+  ];
+  var h1 = document.querySelector('header h1');
+  if (h1) h1.innerHTML = LINES[Math.floor(Math.random() * LINES.length)];
+
+  // 主分頁：依 section 出現順序分組
+  var GROUPS = [
+    ['今天',  [0]],
+    ['日程',  [3,4]],
+    ['週表',  [6,7]],
+    ['進度',  [8,9]],
+    ['全年',  [1,2]],
+    ['備忘',  [5,10,11,12]]
+  ];
+  var secs = document.querySelectorAll('body > .wrap > section');
+  var nav = document.getElementById('main-tabs');
+  if (!nav || !secs.length) return;
+
+  function show(gi){
+    var set = GROUPS[gi][1];
+    secs.forEach(function(s, i){ s.hidden = set.indexOf(i) === -1; });
+    Array.prototype.forEach.call(nav.children, function(b, i){
+      b.setAttribute('aria-selected', i === gi ? 'true' : 'false');
+    });
+    try { localStorage.setItem('plan-tab', gi); } catch(e){}
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  GROUPS.forEach(function(g, i){
+    var b = document.createElement('button');
+    b.className = 'tab-btn'; b.type = 'button'; b.setAttribute('role','tab');
+    b.textContent = g[0];
+    b.addEventListener('click', function(){ show(i); });
+    nav.appendChild(b);
+  });
+
+  var saved = 0;
+  try { var v = parseInt(localStorage.getItem('plan-tab'), 10); if (v >= 0 && v < GROUPS.length) saved = v; } catch(e){}
+  show(saved);
+})();
+</script>
+
+<script>
+(function(){
   var WD = ['日','一','二','三','四','五','六'];
 
   // 8–12月 → 2026；1–7月 → 2027
@@ -1016,5 +1189,251 @@ tr.sumrow.todayrow td{background:#FDEFDC}
   }, 60000);
 })();
 </script>
+<script>
+(function(){
+  var TK='plan.tpl.v2', SK='plan.state.v2';
+  function ls(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+  function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function today0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+  function key(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  var WD=['日','一','二','三','四','五','六'];
+
+  // 判斷今天屬於哪一種日子
+  function profileOf(d){
+    var t=d.getTime();
+    var phase = t <= new Date(2026,7,27).getTime() ? 'summer'
+              : (t >= new Date(2027,0,21).getTime() && t <= new Date(2027,1,3).getTime() ? 'winter' : 'term');
+    var dow=d.getDay();
+    var kind = (dow===0||dow===6) ? 'we' : (dow===3 ? 'wed' : 'wd');
+    return phase+'-'+kind;
+  }
+  var LABEL={
+    'summer-wd':'暑假平日','summer-wed':'暑假週三','summer-we':'暑假週末',
+    'term-wd':'學期平日','term-wed':'學期週三','term-we':'學期週末',
+    'winter-wd':'寒假平日','winter-wed':'寒假週三','winter-we':'寒假週末'
+  };
+
+  // f = 固定行程（不可勾、不欠帳）；e = 娛樂（算預算，不算任務）
+  var DEF={
+   'summer-wd':[
+    {t:'08:40–09:00',n:'昨日回想',m:20},
+    {t:'09:00–10:30',n:'科學班｜數學',m:90},
+    {t:'10:45–12:15',n:'科學班｜理化',m:90},
+    {t:'13:30–17:30',n:'研發主區塊',m:240},
+    {t:'18:30–18:50',n:'英文單字',m:20},
+    {t:'18:50–21:00',n:'會考複習（輪科）',m:130},
+    {t:'21:00–23:00',n:'娛樂',m:120,e:1}],
+   'summer-wed':[
+    {t:'08:40–09:00',n:'昨日回想',m:20},
+    {t:'09:00–10:30',n:'科學班｜數學',m:90},
+    {t:'10:45–12:15',n:'科學班｜理化',m:90},
+    {t:'13:30–17:30',n:'研發主區塊',m:240},
+    {t:'18:00–21:30',n:'資優數學輔導',m:210,f:1},
+    {t:'21:30–23:00',n:'娛樂',m:90,e:1}],
+   'summer-we':[
+    {t:'08:40–09:00',n:'昨日回想',m:20},
+    {t:'09:00–10:30',n:'科學班｜補習進度預習',m:90},
+    {t:'10:45–12:15',n:'會考複習',m:90},
+    {t:'13:00–16:20',n:'研發',m:200},
+    {t:'16:20–17:00',n:'休息、移動',m:40,e:1},
+    {t:'17:00–22:00',n:'雄科班補習',m:300,f:1},
+    {t:'22:00–22:20',n:'補習筆記整理',m:20}],
+   'term-wd':[
+    {t:'18:00–19:30',n:'主戰場一',m:90},
+    {t:'19:45–21:00',n:'主戰場二',m:75},
+    {t:'21:00–21:45',n:'輕量區：英單＋錯題訂正',m:45},
+    {t:'21:45–22:45',n:'娛樂',m:60,e:1}],
+   'term-wed':[
+    {t:'18:00–21:30',n:'資優數學輔導',m:210,f:1},
+    {t:'21:45–22:05',n:'輔導內容訂正',m:20},
+    {t:'22:05–22:45',n:'娛樂',m:40,e:1}],
+   'term-we':[
+    {t:'09:00–12:15',n:'上午兩個區塊',m:195},
+    {t:'13:00–15:00',n:'機動區',m:120},
+    {t:'15:00–16:20',n:'娛樂／運動',m:80,e:1},
+    {t:'17:00–22:00',n:'雄科班補習',m:300,f:1}],
+   'winter-wd':[
+    {t:'07:45–12:00',n:'寒輔',m:255,f:1},
+    {t:'13:30–15:00',n:'科學班｜數學',m:90},
+    {t:'15:15–16:45',n:'科學班｜理化／地科',m:90},
+    {t:'18:00–19:45',n:'考古題限時＋訂正',m:105},
+    {t:'20:00–20:45',n:'會考維持區',m:45},
+    {t:'20:45–22:30',n:'娛樂',m:105,e:1}],
+   'winter-wed':[
+    {t:'07:45–12:00',n:'寒輔',m:255,f:1},
+    {t:'13:30–15:00',n:'科學班｜數學',m:90},
+    {t:'15:15–16:45',n:'科學班｜理化／地科',m:90},
+    {t:'18:00–21:30',n:'資優數學輔導',m:210,f:1},
+    {t:'21:30–22:30',n:'娛樂',m:60,e:1}],
+   'winter-we':[
+    {t:'09:00–12:15',n:'考古題限時（整套計時）',m:195},
+    {t:'13:00–16:20',n:'考古題訂正＋弱點補強',m:200},
+    {t:'17:00–22:00',n:'雄科班補習',m:300,f:1},
+    {t:'22:00–22:20',n:'補習筆記整理',m:20}]
+  };
+
+  var CAP=60, FLOOR=30, ALERT=90;   // 每天最多扣 60 分娛樂、至少留 30 分、欠帳超過 90 分示警
+
+  var tpl = ls(TK) || {};
+  function tplFor(pf){ return (tpl[pf] || DEF[pf] || []).map(function(x){ return x; }); }
+
+  var st = ls(SK) || {day:null, list:[], done:{}, backlog:[]};
+
+  function buildList(pf, backlog){
+    var out=[], i=0;
+    tplFor(pf).forEach(function(x){
+      if (x.e) return;
+      out.push({id:'t'+(i++), n:x.n, t:x.t, m:x.m, f:x.f?1:0});
+    });
+    (backlog||[]).forEach(function(b){
+      out.push({id:'b'+(i++), n:b.n, t:'欠帳', m:b.m, bk:1});
+    });
+    return out;
+  }
+
+  function rollover(){
+    var d=today0(), k=key(d), pf=profileOf(d);
+    if (st.day !== k){
+      var carry = (st.day ? (st.list||[]) : []).filter(function(x){
+        return !x.f && !st.done[x.id];
+      }).map(function(x){ return {n:x.n, m:x.m}; });
+      st.backlog = carry;
+      st.done = {};
+      st.day = k;
+      st.list = buildList(pf, st.backlog);
+      save(SK, st);
+    } else if (!st.list || !st.list.length){
+      st.list = buildList(pf, st.backlog||[]);
+      save(SK, st);
+    }
+    return {d:d, k:k, pf:pf};
+  }
+
+  var elWhen=document.getElementById('td-when'),
+      elList=document.getElementById('td-list'),
+      elBud=document.getElementById('td-budget'),
+      elEd=document.getElementById('td-editor'),
+      elRows=document.getElementById('ed-rows'),
+      elTitle=document.getElementById('ed-title');
+  if (!elList) return;
+  var ctx;
+
+  function render(){
+    ctx = rollover();
+    elWhen.textContent = (ctx.d.getMonth()+1)+'/'+ctx.d.getDate()+'　週'+WD[ctx.d.getDay()]+'　'+(LABEL[ctx.pf]||'');
+
+    // 任務清單
+    elList.innerHTML='';
+    st.list.forEach(function(x){
+      var lab=document.createElement('label');
+      lab.className='tk'+(x.f?' tk-fix':'')+(x.bk?' tk-bk':'');
+      var cb=document.createElement('input');
+      cb.type='checkbox'; cb.checked=!!st.done[x.id]; cb.disabled=!!x.f;
+      cb.addEventListener('change',function(){
+        if(cb.checked) st.done[x.id]=1; else delete st.done[x.id];
+        save(SK,st); paintBudget();
+      });
+      var sp=document.createElement('span');
+      sp.innerHTML = x.n + '<span class="tk-m">' + x.t + '　' + x.m + ' 分' + (x.f?'　固定行程':'') + (x.bk?'　昨日未完成':'') + '</span>';
+      lab.appendChild(cb); lab.appendChild(sp);
+      if (!x.f){
+        var del=document.createElement('button');
+        del.type='button'; del.className='tk-del'; del.textContent='×'; del.title='刪除';
+        del.addEventListener('click',function(ev){
+          ev.preventDefault();
+          st.list=st.list.filter(function(y){return y.id!==x.id;});
+          delete st.done[x.id]; save(SK,st); render();
+        });
+        lab.appendChild(del);
+      }
+      elList.appendChild(lab);
+    });
+    paintBudget();
+  }
+
+  function paintBudget(){
+    var base=0;
+    tplFor(ctx.pf).forEach(function(x){ if(x.e) base+=x.m; });
+    var owed=0;
+    st.list.forEach(function(x){ if(x.bk) owed+=x.m; });
+    var cut=Math.min(CAP, owed);
+    var left=Math.max(FLOOR, base-cut);
+    var todo=st.list.filter(function(x){ return !x.f && !st.done[x.id]; }).length;
+    var all=st.list.filter(function(x){ return !x.f; }).length;
+    var pct = all? Math.round((all-todo)/all*100) : 100;
+
+    var msg='<b>今日進度 '+(all-todo)+' / '+all+'</b>（'+pct+'%）'
+      + '<div class="bar"><i style="width:'+pct+'%"></i></div>'
+      + '娛樂時間 <b>'+left+' 分</b>';
+    if (cut>0) msg += '　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+cut+' 分）</span>';
+    if (owed>ALERT) msg += '<br><span class="warn">欠帳累積超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項，不要靠熬夜追。';
+    else if (cut>0) msg += '<br><span style="font-size:12.5px;color:var(--ink-faint)">每天最多扣 '+CAP+' 分，娛樂不低於 '+FLOOR+' 分，睡眠一律不動。</span>';
+    elBud.innerHTML = msg;
+  }
+
+  // 新增任務
+  document.getElementById('td-add').addEventListener('click',function(){
+    var n=prompt('任務名稱？'); if(!n) return;
+    var m=parseInt(prompt('大約幾分鐘？','60'),10); if(!m||m<1) m=60;
+    st.list.push({id:'x'+Date.now(), n:n, t:'自訂', m:m});
+    save(SK,st); render();
+  });
+
+  // 清掉欠帳
+  document.getElementById('td-clear').addEventListener('click',function(){
+    if(!confirm('清掉所有欠帳？娛樂時間會恢復正常。')) return;
+    st.list=st.list.filter(function(x){return !x.bk;});
+    st.backlog=[]; save(SK,st); render();
+  });
+
+  // 範本編輯器
+  function edRow(x){
+    var row=document.createElement('div'); row.className='ed-row';
+    var a=document.createElement('input'); a.className='mono'; a.value=x.t||''; a.placeholder='09:00–10:30';
+    var b=document.createElement('input'); b.value=x.n||''; b.placeholder='任務名稱';
+    var c=document.createElement('input'); c.className='mono'; c.type='number'; c.value=x.m||60; c.min=1;
+    var d=document.createElement('button'); d.type='button'; d.className='tk-del'; d.textContent='×';
+    d.addEventListener('click',function(){ row.remove(); });
+    row.dataset.f = x.f?1:0; row.dataset.e = x.e?1:0;
+    row.appendChild(a); row.appendChild(b); row.appendChild(c); row.appendChild(d);
+    return row;
+  }
+  function openEd(){
+    elTitle.textContent='編輯範本：'+(LABEL[ctx.pf]||ctx.pf);
+    elRows.innerHTML='';
+    tplFor(ctx.pf).forEach(function(x){ elRows.appendChild(edRow(x)); });
+    elEd.hidden=false;
+  }
+  document.getElementById('td-edit').addEventListener('click',openEd);
+  document.getElementById('ed-addrow').addEventListener('click',function(){ elRows.appendChild(edRow({t:'',n:'',m:60})); });
+  document.getElementById('ed-cancel').addEventListener('click',function(){ elEd.hidden=true; });
+  document.getElementById('ed-reset').addEventListener('click',function(){
+    if(!confirm('這類日子的範本恢復成預設？')) return;
+    delete tpl[ctx.pf]; save(TK,tpl); elEd.hidden=true;
+    st.list=buildList(ctx.pf, st.backlog||[]); save(SK,st); render();
+  });
+  document.getElementById('ed-save').addEventListener('click',function(){
+    var rows=[];
+    Array.prototype.forEach.call(elRows.children,function(r){
+      var i=r.querySelectorAll('input');
+      var n=i[1].value.trim(); if(!n) return;
+      var o={t:i[0].value.trim()||'—', n:n, m:parseInt(i[2].value,10)||60};
+      if(r.dataset.f==='1') o.f=1;
+      if(r.dataset.e==='1') o.e=1;
+      rows.push(o);
+    });
+    tpl[ctx.pf]=rows; save(TK,tpl); elEd.hidden=true;
+    st.list=buildList(ctx.pf, st.backlog||[]); save(SK,st); render();
+  });
+
+  render();
+  var stamp=new Date().toDateString();
+  setInterval(function(){
+    var n=new Date().toDateString();
+    if(n!==stamp){ stamp=n; render(); }
+  },60000);
+})();
+</script>
 </body>
+
 </html>
