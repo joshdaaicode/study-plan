@@ -251,7 +251,7 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
   padding:7px 0;color:var(--ink-faint)}
 .cal-head span.we{color:var(--sci)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
-.cal-d{min-height:66px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;padding:5px 4px 6px}
+.cal-d{cursor:pointer;min-height:66px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;padding:5px 4px 6px}
 .cal-d:nth-child(7n){border-right:0}
 .cal-d.void{background:#FAFBFB}
 .cal-n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);display:block}
@@ -303,6 +303,11 @@ body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env
 tr.sumrow td{background:#FDF7EF}
 tr.sumrow td.t{color:var(--warn);font-weight:600}
 tr.sumrow.todayrow td{background:#FDEFDC}
+.dowbox{display:flex;gap:4px;flex-wrap:wrap;margin:2px 0 10px}
+.dowbox button{font-family:'IBM Plex Mono',monospace;font-size:12px;width:32px;height:32px;
+  border:1px solid var(--rule);background:var(--card);color:var(--ink-faint);border-radius:2px;cursor:pointer}
+.dowbox button.on{background:var(--sci);color:#fff;border-color:var(--sci)}
+.p-note{background:#EDF0F2;color:#131C26;font-weight:600}
 .p-h{background:#FBE7E4;color:#B03A2E;font-weight:600}
 .cal-d.holiday{background:#FEF9F8}
 .cal-d.holiday .cal-n{color:#B03A2E}
@@ -452,6 +457,7 @@ section[hidden]{display:none}
   <div class="bar-btns" style="margin:0 0 14px">
     <button class="btn" id="nt-on" type="button">開啟時段提醒</button>
   </div>
+  <div class="td-budget" id="td-note2" hidden style="border-left:3px solid var(--warn)"></div>
   <div class="td-budget" id="td-budget"></div>
   <div class="todo" id="td-list"></div>
 
@@ -464,6 +470,8 @@ section[hidden]{display:none}
   <div class="td-editor" id="td-editor" hidden>
     <p class="ed-head"><b id="ed-title">編輯範本</b><span>改動會套用到所有同類型的日子（例如所有暑假平日）。</span></p>
     <div id="ed-rows"></div>
+    <p class="sub" style="margin:14px 0 4px"><b>套用到哪幾天</b>　勾起來的日子會一起套用這份範本（只影響同一個時期：暑假／學期／寒假）。</p>
+    <div class="dowbox" id="ed-dow"></div>
     <div class="td-bar">
       <button class="td-btn" id="ed-addrow" type="button">＋ 加一列</button>
       <button class="td-btn solid" id="ed-save" type="button">儲存</button>
@@ -631,7 +639,7 @@ section[hidden]{display:none}
 
 <section>
   <div class="sec-head"><h2>日程表</h2><span class="eyebrow">2026.08 → 2027.05</span></div>
-  <p class="sec-note">十個月的完整月曆。開啟時自動跳到當月、標出今天，過去的日子自動淡出。固定行程（補習、資優數學）已經填好，考試日期直接標在格子裡。</p>
+  <p class="sec-note"><b>點任何一天可以加行事曆記事。</b>十個月的完整月曆。開啟時自動跳到當月、標出今天，過去的日子自動淡出。固定行程（補習、資優數學）已經填好，考試日期直接標在格子裡。</p>
 
   <div class="cal-tabs" id="cal-tabs" role="tablist"></div>
   <div class="cal">
@@ -648,6 +656,17 @@ section[hidden]{display:none}
     <span><i style="background:#B03A2E"></i>假日／不排課表（國定假日、畢旅）</span>
   </div>
   <p class="w-note">國定假日依人事行政總處 115／116 年辦公日曆表；畢旅為暫定（10/14–16），確定後請更新。假日當天不顯示補習與輔導，實際是否停課請向補習班確認。<b>唯一例外：考前 7 天內的假日不跳過</b>——10/9–11 和 4/30–5/2 這兩段連假都緊貼段考，照休會直接反映在成績上。</p>
+  <div class="card" id="note-panel" hidden style="margin-top:14px">
+    <h3 style="margin-bottom:4px" id="note-date">—</h3>
+    <p class="sub">這一天的行程或記事。填了會出現在月曆格子裡，也會出現在「今天」。</p>
+    <div class="fld" style="margin-bottom:9px"><label>標題（月曆上顯示）</label><input type="text" id="note-title" maxlength="10" placeholder="例：校慶、看牙醫"></div>
+    <div class="fld"><label>記事</label><textarea id="note-body" style="min-height:80px" placeholder="細節、要帶什麼、幾點到哪"></textarea></div>
+    <div class="bar-btns">
+      <button class="btn solid" id="note-save" type="button">儲存</button>
+      <button class="btn ghost" id="note-del" type="button">刪除這則</button>
+      <button class="btn ghost" id="note-close" type="button">關閉</button>
+    </div>
+  </div>
   <div class="cal-focus" id="cal-focus"></div>
 </section>
 
@@ -869,6 +888,27 @@ section[hidden]{display:none}
 <section>
   <div class="sec-head"><h2>成績紀錄</h2><span class="eyebrow">看趨勢，不看單次</span></div>
   <p class="sec-note">每次段考、模考完把分數填進來。單次考差沒有意義，有意義的是三次以上的走勢——所以下面的圖是平均分的變化，不是排名。</p>
+  <div class="card" style="margin-bottom:14px">
+    <h3 style="margin-bottom:6px">小考／大考登記</h3>
+    <p class="sub">填分數按登記，點數自動加減並記進商店。加減規則可在「設定」改。</p>
+    <div class="set-grid" style="margin-bottom:10px">
+      <div class="fld"><label>類型</label>
+        <select id="qz-kind">
+          <option value="gq">資優小考</option>
+          <option value="q">一般小考</option>
+          <option value="e">大考（段考／模考）</option>
+        </select>
+      </div>
+      <div class="fld"><label>分數</label><input type="number" id="qz-score" min="0" max="100" step="1" placeholder="0–100"></div>
+      <div class="fld"><label>備註（選填）</label><input type="text" id="qz-note" placeholder="例：理化 3-2"></div>
+    </div>
+    <div class="bar-btns" style="margin-top:0">
+      <button class="btn solid" id="qz-go" type="button">登記</button>
+      <span class="sub" id="qz-msg" style="align-self:center;margin:0"></span>
+    </div>
+    <p class="sub" id="qz-rule" style="margin:11px 0 0"></p>
+  </div>
+
   <div class="td-budget" id="sc-summary"></div>
   <div id="sc-chart" class="card" style="padding:14px 16px;margin-bottom:14px"></div>
   <div class="tbl-scroll"><table id="sc-table">
@@ -881,7 +921,7 @@ section[hidden]{display:none}
 
 <section>
   <div class="sec-head"><h2>許願商店</h2><span class="eyebrow">做完事才換得到</span></div>
-  <p class="sec-note">完成一項任務 +10 點，一顆番茄鐘 +5 點，當天全部清完再 +30 點。點數拿來兌換你自己設定的獎勵。品項和價格都可以改——標準訂在「有點難拿到但拿得到」最有用。</p>
+  <p class="sec-note">完成一項任務 +5 點，一顆番茄鐘 +5 點，當天全部清完再 +15 點，小考大考另外加減。點數拿來兌換你自己設定的獎勵。品項和價格都可以改——標準訂在「有點難拿到但拿得到」最有用。</p>
   <div class="td-budget" id="sh-pts"></div>
   <div class="todo" id="sh-list"></div>
   <div class="bar-btns">
@@ -909,6 +949,29 @@ section[hidden]{display:none}
     <p class="sub" style="margin:10px 0 0">已勾選的紀錄會清掉，欠帳保留。改完範本後用這個讓今天立刻套用。</p>
   </div>
 
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">點數規則</h3>
+    <p class="sub">改完按儲存。負數代表扣點，填 0 就是不加不扣。</p>
+    <div class="set-grid">
+      <div class="fld"><label>完成一項任務</label><input type="number" id="r-task"></div>
+      <div class="fld"><label>當天全清</label><input type="number" id="r-allclear"></div>
+      <div class="fld"><label>一顆番茄鐘</label><input type="number" id="r-pomo"></div>
+      <div class="fld"><label>資優小考 ≥50</label><input type="number" id="r-gq50"></div>
+      <div class="fld"><label>資優小考 ≥90</label><input type="number" id="r-gq90"></div>
+      <div class="fld"><label>資優小考 100</label><input type="number" id="r-gq100"></div>
+      <div class="fld"><label>一般小考 ≥90</label><input type="number" id="r-q90"></div>
+      <div class="fld"><label>一般小考 &lt;70</label><input type="number" id="r-qU70"></div>
+      <div class="fld"><label>一般小考 &lt;60</label><input type="number" id="r-qU60"></div>
+      <div class="fld"><label>大考 ≥90</label><input type="number" id="r-e90"></div>
+      <div class="fld"><label>大考 100</label><input type="number" id="r-e100"></div>
+    </div>
+    <div class="bar-btns">
+      <button class="btn solid" id="r-save" type="button">儲存規則</button>
+      <button class="btn ghost" id="r-reset" type="button">恢復預設</button>
+      <span class="sub" id="r-msg" style="align-self:center;margin:0"></span>
+    </div>
+  </div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">備份與轉移</h3>
     <p class="sub">所有資料（範本、任務、欠帳、番茄鐘、點數、商店、成績）都存在這台裝置的瀏覽器裡。換手機或清除瀏覽資料會消失，記得定期備份。</p>
@@ -924,7 +987,7 @@ section[hidden]{display:none}
 
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">雲端同步（GitHub Gist）</h3>
-    <p class="sub">把資料存到你自己的 secret gist，換裝置不用重填。Token 只存在這台裝置，<b>不會寫進網頁原始碼</b>，所以 public repo 也看不到。</p>
+    <p class="sub">同步範圍：<b>日程範本、今天的任務與欠帳、番茄鐘紀錄、點數與商店、成績、點數規則、月曆記事</b>——所有你編輯過的東西都在內。<br>Token 只存在這台裝置，<b>不會寫進網頁原始碼也不會存進 gist</b>，所以 public repo 看不到。換裝置時 token 要再貼一次（那就是鑰匙，沒有它讀不到雲端），之後就會一直記著。</p>
     <div class="set-grid" style="margin-bottom:10px">
       <div class="fld"><label>TOKEN</label><input type="password" id="cl-token" placeholder="github_pat_..." autocomplete="off"></div>
       <div class="fld"><label>GIST ID（留空自動建立）</label><input type="text" id="cl-gist" placeholder="第一次上傳後自動填入" autocomplete="off"></div>
@@ -1229,6 +1292,39 @@ section[hidden]{display:none}
     '2027-5':'5/3、5/7 下學期二段｜5/15–16 會考｜考前一週不讀新內容，只做錯題本第三輪｜5/17 之後時間全還給你自己'
   };
 
+
+  /* ---------- 月曆記事 ---------- */
+  var NK='plan.notes.v1';
+  function loadNotes(){ try{ return JSON.parse(localStorage.getItem(NK))||{}; }catch(e){ return {}; } }
+  var notes=loadNotes();
+  window.__notes=function(){ return notes; };
+  var np=document.getElementById('note-panel'), nd=document.getElementById('note-date'),
+      nt=document.getElementById('note-title'), nb=document.getElementById('note-body');
+  var editKey=null;
+  function openNote(k, y, m, d){
+    editKey=k; nd.textContent=y+' 年 '+m+' 月 '+d+' 日';
+    var o=notes[k]||{};
+    nt.value=o.t||''; nb.value=o.b||'';
+    np.hidden=false;
+    np.scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  if(np){
+    document.getElementById('note-save').addEventListener('click',function(){
+      if(!editKey) return;
+      var t=nt.value.trim(), b=nb.value.trim();
+      if(!t&&!b) delete notes[editKey]; else notes[editKey]={t:t||'記事',b:b};
+      try{ localStorage.setItem(NK, JSON.stringify(notes)); }catch(e){}
+      np.hidden=true; draw(curIdx);
+    });
+    document.getElementById('note-del').addEventListener('click',function(){
+      if(!editKey) return;
+      delete notes[editKey];
+      try{ localStorage.setItem(NK, JSON.stringify(notes)); }catch(e){}
+      np.hidden=true; draw(curIdx);
+    });
+    document.getElementById('note-close').addEventListener('click',function(){ np.hidden=true; });
+  }
+
   var grid = document.getElementById('cal-grid'),
       tabs = document.getElementById('cal-tabs'),
       focus = document.getElementById('cal-focus');
@@ -1237,7 +1333,9 @@ section[hidden]{display:none}
   function key(y,m,d){ return y+'-'+m+'-'+d; }
   function today0(){ var t=new Date(); t.setHours(0,0,0,0); return t; }
 
+  var curIdx=0;
   function draw(idx){
+    curIdx=idx;
     var y = MONTHS[idx][0], m = MONTHS[idx][1], t = today0();
     var first = new Date(y, m-1, 1), len = new Date(y, m, 0).getDate(), lead = first.getDay();
     var html = '';
@@ -1250,7 +1348,7 @@ section[hidden]{display:none}
       if (hol) cls += ' holiday';
       if (cur.getTime() === t.getTime()) cls += ' today';
       else if (cur < t) cls += ' pastday';
-      html += '<div class="' + cls + '"><span class="cal-n">' + d + '</span>';
+      html += '<div class="' + cls + '" data-k="' + kk + '" data-y="' + y + '" data-m="' + m + '" data-d="' + d + '"><span class="cal-n">' + d + '</span>';
 
       MARKS.forEach(function(k){
         if (k[0]===y && k[1]===m && k[2]===d) html += '<span class="pill '+k[3]+'">'+k[4]+'</span>';
@@ -1269,6 +1367,11 @@ section[hidden]{display:none}
     for (var j = 0; j < tail; j++) html += '<div class="cal-d void"></div>';
 
     grid.innerHTML = html;
+    Array.prototype.forEach.call(grid.querySelectorAll('.cal-d[data-k]'),function(cell){
+      cell.addEventListener('click',function(){
+        openNote(cell.dataset.k, cell.dataset.y, cell.dataset.m, cell.dataset.d);
+      });
+    });
     if (focus) focus.innerHTML = '<b>' + y + ' 年 ' + m + ' 月　本月重點</b>' + (FOCUS[y+'-'+m] || '');
 
     Array.prototype.forEach.call(tabs.children, function(b, i){
@@ -1358,11 +1461,12 @@ section[hidden]{display:none}
     // ── 暑假：一三五有補課 3 小時，研發縮短 ──
     'summer-1': cat(S_AM,[{t:'13:30–16:30',n:'補習班補課',m:180,f:1},
                           {t:'16:45–18:45',n:'研發區塊',m:120},
-                          {t:'19:30–21:00',n:'會考複習（輪科）',m:90},
+                          {t:'19:30–21:00',n:'會考｜國文（課文＋字音字形＋閱讀）',m:90},
                           {t:'21:00–23:00',n:'娛樂',m:120,e:1}]),
     'summer-2': cat(S_AM,[{t:'13:30–17:30',n:'研發主區塊',m:240},
                           {t:'18:30–18:50',n:'英文單字',m:20},
-                          {t:'18:50–21:00',n:'會考複習（輪科）',m:130},
+                          {t:'18:50–20:00',n:'會考｜數學（計算＋訂正）',m:70},
+                          {t:'20:10–21:00',n:'會考｜自然（生物／理化）',m:50},
                           {t:'21:00–23:00',n:'娛樂',m:120,e:1}]),
     'summer-3': cat(S_AM,[{t:'13:30–16:30',n:'補習班補課',m:180,f:1},
                           {t:'16:30–17:40',n:'研發區塊',m:70},
@@ -1370,11 +1474,12 @@ section[hidden]{display:none}
                           {t:'21:30–23:00',n:'娛樂',m:90,e:1}]),
     'summer-4': cat(S_AM,[{t:'13:30–17:30',n:'研發主區塊',m:240},
                           {t:'18:30–18:50',n:'英文單字',m:20},
-                          {t:'18:50–21:00',n:'會考複習（輪科）',m:130},
+                          {t:'18:50–20:00',n:'會考｜社會（歷史＋地理）',m:70},
+                          {t:'20:10–21:00',n:'會考｜公民',m:50},
                           {t:'21:00–23:00',n:'娛樂',m:120,e:1}]),
     'summer-5': cat(S_AM,[{t:'13:30–16:30',n:'補習班補課',m:180,f:1},
                           {t:'16:45–18:45',n:'研發區塊',m:120},
-                          {t:'19:30–21:00',n:'會考複習（輪科）',m:90},
+                          {t:'19:30–21:00',n:'會考｜英文（單字＋文法＋閱讀）',m:90},
                           {t:'21:00–23:00',n:'娛樂',m:120,e:1}]),
     'summer-6': cat(S_AM,[{t:'13:00–16:20',n:'研發',m:200},
                           {t:'17:00–22:00',n:'雄科班補習',m:300,f:1},
@@ -1386,14 +1491,14 @@ section[hidden]{display:none}
     'term-1':[{t:'18:00–21:00',n:'補習班補課',m:180,f:1},
               {t:'21:15–22:00',n:'輕量區：英單＋錯題訂正',m:45},
               {t:'22:00–22:45',n:'娛樂',m:45,e:1}],
-    'term-2':[{t:'18:00–19:30',n:'會考｜主戰場一',m:90},
-              {t:'19:45–21:00',n:'科學班｜主戰場二',m:75},
+    'term-2':[{t:'18:00–19:30',n:'會考｜數學（計算＋訂正）',m:90},
+              {t:'19:45–21:00',n:'科學班｜理化',m:75},
               {t:'21:00–21:45',n:'輕量區：英單＋錯題訂正',m:45},
               {t:'21:45–22:45',n:'娛樂',m:60,e:1}],
     'term-3':[{t:'18:00–21:30',n:'資優數學輔導',m:210,f:1},
               {t:'21:45–22:05',n:'輔導內容訂正',m:20},
               {t:'22:05–22:45',n:'娛樂',m:40,e:1}],
-    'term-4':[{t:'18:00–19:30',n:'會考｜主戰場一',m:90},
+    'term-4':[{t:'18:00–19:30',n:'會考｜社會＋國文（交錯練）',m:90},
               {t:'19:45–21:00',n:'科學班｜考古題限時',m:75},
               {t:'21:00–21:45',n:'輕量區：英單＋錯題訂正',m:45},
               {t:'21:45–22:45',n:'娛樂',m:60,e:1}],
@@ -1404,7 +1509,8 @@ section[hidden]{display:none}
               {t:'13:00–15:00',n:'機動區（掉進度就拿來補）',m:120},
               {t:'15:00–16:20',n:'娛樂／運動',m:80,e:1},
               {t:'17:00–22:00',n:'雄科班補習',m:300,f:1}],
-    'term-0':[{t:'09:00–12:15',n:'會考複習 A＋B',m:195},
+    'term-0':[{t:'09:00–10:30',n:'會考｜英文（單字＋閱讀）',m:90},
+              {t:'10:45–12:15',n:'會考｜自然（本期模考範圍）',m:90},
               {t:'13:00–15:00',n:'錯題本整理＋本週檢討',m:120},
               {t:'15:00–16:20',n:'完全空白（不准被佔用）',m:80,e:1},
               {t:'17:00–22:00',n:'雄科班補習',m:300,f:1}],
@@ -1475,9 +1581,12 @@ section[hidden]{display:none}
   function render(){
     D=rollover();
     var pf=profileOf(D), extra='';
+    var nt=null; try{ nt=(JSON.parse(localStorage.getItem('plan.notes.v1'))||{})[key(D)]; }catch(e){}
     if (CLOSED[key(D)]) extra='　補習班停課';
     else if (isWeekendLite(D)) extra='　例假日精簡（剩 '+daysTo(SCI,D)+' 天，'+BIND_AT+' 天內恢復完整）';
-    elWhen.textContent=(D.getMonth()+1)+'/'+D.getDate()+'　週'+WD[D.getDay()]+'　'+label(pf)+extra;
+    elWhen.textContent=(D.getMonth()+1)+'/'+D.getDate()+'　週'+WD[D.getDay()]+'　'+label(pf)+extra+(nt?'　'+nt.t:'');
+    var nEl=document.getElementById('td-note2');
+    if(nEl){ if(nt&&(nt.b||nt.t)){ nEl.hidden=false; nEl.innerHTML='<b>'+(nt.t||'記事')+'</b>'+(nt.b?'<br>'+nt.b.replace(/</g,'&lt;').replace(/\n/g,'<br>'):''); } else nEl.hidden=true; }
 
     elList.innerHTML='';
     st.list.forEach(function(x){
@@ -1486,8 +1595,8 @@ section[hidden]{display:none}
       var cb=document.createElement('input');
       cb.type='checkbox'; cb.checked=!!st.done[x.id]; cb.disabled=!!x.f;
       cb.addEventListener('change',function(){
-        if(cb.checked){ st.done[x.id]=1; if(window.__award) window.__award(10,'完成：'+x.n); }
-        else { delete st.done[x.id]; if(window.__award) window.__award(-10,'取消勾選'); }
+        if(cb.checked){ st.done[x.id]=1; if(window.__award) window.__award((window.__rules?window.__rules().task:5),'完成：'+x.n); }
+        else { delete st.done[x.id]; if(window.__award) window.__award(-(window.__rules?window.__rules().task:5),'取消勾選'); }
         save(SK,st); paintBudget();
       });
       var sp=document.createElement('span');
@@ -1513,7 +1622,7 @@ section[hidden]{display:none}
     var all=st.list.filter(function(x){return !x.f;}).length;
     var done=st.list.filter(function(x){return !x.f && st.done[x.id];}).length;
     var pct=all?Math.round(done/all*100):100;
-    if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st); if(window.__award) window.__award(30,'今日全清'); }
+    if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st); if(window.__award) window.__award((window.__rules?window.__rules().allclear:15),'今日全清'); }
     var m='<b>今日進度 '+done+' / '+all+'</b>（'+pct+'%）<div class="bar"><i style="width:'+pct+'%"></i></div>娛樂時間 <b>'+left+' 分</b>';
     if(cut>0) m+='　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+cut+' 分）</span>';
     if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項，不要靠熬夜追。';
@@ -1545,13 +1654,31 @@ section[hidden]{display:none}
   document.getElementById('td-edit').addEventListener('click',function(){
     elTitle.textContent='編輯範本：'+label(profileOf(D));
     elRows.innerHTML=''; dayTpl(D).forEach(function(x){ elRows.appendChild(edRow(x)); });
+    buildDow(D.getDay());
     elEd.hidden=false;
   });
+  var dowSel=[];
+  function buildDow(def){
+    var box=document.getElementById('ed-dow'); if(!box) return;
+    dowSel=[def]; box.innerHTML='';
+    for(var i=0;i<7;i++){(function(i){
+      var b=document.createElement('button'); b.type='button'; b.textContent=WD[i];
+      if(i===def) b.classList.add('on');
+      b.addEventListener('click',function(){
+        var p=dowSel.indexOf(i);
+        if(p===-1) dowSel.push(i); else dowSel.splice(p,1);
+        b.classList.toggle('on');
+      });
+      box.appendChild(b);
+    })(i);}
+  }
   document.getElementById('ed-addrow').addEventListener('click',function(){ elRows.appendChild(edRow({t:'',n:'',m:60})); });
   document.getElementById('ed-cancel').addEventListener('click',function(){ elEd.hidden=true; });
   document.getElementById('ed-reset').addEventListener('click',function(){
-    if(!confirm('這一天的範本恢復成預設？')) return;
-    delete tpl[profileOf(D)]; save(TK,tpl); elEd.hidden=true;
+    if(!confirm('勾選的那幾天恢復成預設？')) return;
+    var ph2=phaseOf(D), tg=(dowSel.length?dowSel:[D.getDay()]);
+    tg.forEach(function(w){ delete tpl[ph2+'-'+w]; });
+    save(TK,tpl); elEd.hidden=true;
     st.list=buildList(D, st.backlog||[]); save(SK,st); render();
   });
   document.getElementById('ed-save').addEventListener('click',function(){
@@ -1562,7 +1689,10 @@ section[hidden]{display:none}
       if(r.dataset.f==='1') o.f=1; if(r.dataset.e==='1') o.e=1;
       rows.push(o);
     });
-    tpl[profileOf(D)]=rows; save(TK,tpl); elEd.hidden=true;
+    var ph=phaseOf(D);
+    var targets = dowSel.length ? dowSel : [D.getDay()];
+    targets.forEach(function(w){ tpl[ph+'-'+w]=JSON.parse(JSON.stringify(rows)); });
+    save(TK,tpl); elEd.hidden=true;
     st.list=buildList(D, st.backlog||[]); save(SK,st); render();
   });
 
@@ -1699,7 +1829,7 @@ section[hidden]{display:none}
   }
   function nextPhase(){
     if(mode==='work'){
-      P.done++; P.seq++; s(PK,P); if(window.__award) window.__award(5,'完成一顆番茄鐘');
+      P.done++; P.seq++; s(PK,P); if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘');
       var lng = P.seq%4===0;
       mode = lng?'long':'break';
       left = (lng?15:P.b)*60;
@@ -1752,6 +1882,16 @@ section[hidden]{display:none}
 
   /* ---------- 許願商店 ---------- */
   var SHK='plan.shop.v1';
+  var RLK='plan.rules.v1';
+  var DEFRULES={
+    task:5, allclear:15, pomo:5,
+    gq50:10, gq90:20, gq100:40,        // 資優小考
+    q90:15, qU70:-10, qU60:-20,        // 一般小考
+    e90:20, e100:40                    // 大考
+  };
+  var rules = Object.assign({}, DEFRULES, ls(RLK)||{});
+  window.__rules=function(){ return rules; };
+
   var DEFSHOP={pts:0, items:[
     {n:'一集動畫／影集', c:40},
     {n:'一小時遊戲', c:80},
@@ -1781,7 +1921,7 @@ section[hidden]{display:none}
       +(afford? '<span style="color:var(--cap)">可以兌換 '+afford+' 項</span>'
               : '<span style="color:var(--ink-faint)">還換不到東西，再做幾項</span>')
       +'<div class="bar"><i style="width:'+Math.min(100, shop.items.length? Math.round(shop.pts/Math.max.apply(null,shop.items.map(function(i){return i.c;}))*100):0)+'%"></i></div>'
-      +'<span style="font-size:12.5px;color:var(--ink-faint)">任務 +10　番茄鐘 +5　當天全清 +30</span>';
+      +'<span style="font-size:12.5px;color:var(--ink-faint)">任務 +'+rules.task+'　番茄鐘 +'+rules.pomo+'　當天全清 +'+rules.allclear+'　小考另計</span>';
     elShop.innerHTML='';
     shop.items.forEach(function(it,idx){
       var row=document.createElement('label');
@@ -1837,6 +1977,53 @@ section[hidden]{display:none}
     shop.items=JSON.parse(JSON.stringify(DEFSHOP.items)); save(SHK,shop); paintShop();
   });
   paintShop();
+
+
+  /* ---------- 小考／大考登記 ---------- */
+  function ruleText(){
+    return '資優小考：≥50 '+sg(rules.gq50)+'、≥90 '+sg(rules.gq90)+'、100 '+sg(rules.gq100)
+      +'　｜　一般小考：≥90 '+sg(rules.q90)+'、<70 '+sg(rules.qU70)+'、<60 '+sg(rules.qU60)
+      +'　｜　大考：≥90 '+sg(rules.e90)+'、100 '+sg(rules.e100);
+  }
+  function sg(n){ return (n>0?'+':'')+n+' 點'; }
+  function quizPts(kind,s){
+    if(kind==='gq'){ if(s>=100) return rules.gq100; if(s>=90) return rules.gq90; if(s>=50) return rules.gq50; return 0; }
+    if(kind==='q'){ if(s>=90) return rules.q90; if(s<60) return rules.qU60; if(s<70) return rules.qU70; return 0; }
+    if(s>=100) return rules.e100; if(s>=90) return rules.e90; return 0;
+  }
+  var KNAME={gq:'資優小考',q:'一般小考',e:'大考'};
+  var qzRule=document.getElementById('qz-rule');
+  if(qzRule) qzRule.textContent=ruleText();
+  var qzGo=document.getElementById('qz-go');
+  if(qzGo) qzGo.addEventListener('click',function(){
+    var kind=document.getElementById('qz-kind').value;
+    var sEl=document.getElementById('qz-score');
+    var s=parseFloat(sEl.value);
+    if(isNaN(s)||s<0||s>100){ alert('分數要填 0 到 100。'); return; }
+    var note=document.getElementById('qz-note').value.trim();
+    var p=quizPts(kind,s);
+    window.__award(p, KNAME[kind]+' '+s+' 分'+(note?'（'+note+'）':''));
+    var m=document.getElementById('qz-msg');
+    if(m){ m.textContent=(p>0?'+':'')+p+' 點 ✓'; m.style.color=(p>0?'var(--cap)':(p<0?'var(--warn)':'var(--ink-faint)')); setTimeout(function(){m.textContent='';},4000); }
+    sEl.value=''; document.getElementById('qz-note').value='';
+  });
+
+  /* ---------- 點數規則編輯 ---------- */
+  var RK=['task','allclear','pomo','gq50','gq90','gq100','q90','qU70','qU60','e90','e100'];
+  function fillRules(){ RK.forEach(function(k){ var el=document.getElementById('r-'+k); if(el) el.value=rules[k]; }); }
+  fillRules();
+  var rs=document.getElementById('r-save');
+  if(rs) rs.addEventListener('click',function(){
+    RK.forEach(function(k){ var el=document.getElementById('r-'+k); if(el){ var v=parseInt(el.value,10); rules[k]=isNaN(v)?DEFRULES[k]:v; } });
+    save(RLK,rules); paintShop(); if(qzRule) qzRule.textContent=ruleText();
+    var m=document.getElementById('r-msg'); if(m){ m.textContent='已儲存 ✓'; setTimeout(function(){m.textContent='';},2500); }
+  });
+  var rr=document.getElementById('r-reset');
+  if(rr) rr.addEventListener('click',function(){
+    if(!confirm('點數規則恢復預設？')) return;
+    rules=Object.assign({},DEFRULES); save(RLK,rules); fillRules(); paintShop();
+    if(qzRule) qzRule.textContent=ruleText();
+  });
 
   /* ---------- 成績紀錄 ---------- */
   var SCK='plan.scores.v1';
@@ -1921,7 +2108,7 @@ section[hidden]{display:none}
   drawScores();
 
   /* ---------- 備份 ---------- */
-  var KEYS=['plan.tpl.v3','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan-tab'];
+  var KEYS=['plan.tpl.v3','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1','plan.notes.v1','plan-tab'];
   function dump(){
     var o={_v:1,_at:new Date().toISOString()};
     KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} });
