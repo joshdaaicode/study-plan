@@ -79,12 +79,12 @@ section{padding:52px 0 0}
 /* ---------- timeline (signature) ---------- */
 .tl{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
 .tl-head{display:grid;grid-template-columns:62px 1fr 1fr;border-bottom:1px solid var(--rule);
-  background:#FBFCFC}
+  background:var(--card2)}
 .tl-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.13em;
   padding:9px 10px;color:var(--ink-faint)}
 .tl-head .h-sci{color:var(--sci);border-left:1px solid var(--rule)}
 .tl-head .h-cap{color:var(--cap);border-left:1px solid var(--rule)}
-.tl-row{display:grid;grid-template-columns:62px 1fr 1fr;border-bottom:1px solid #EDF0F2;min-height:64px}
+.tl-row{display:grid;grid-template-columns:62px 1fr 1fr;border-bottom:1px solid var(--rule2);min-height:64px}
 .tl-row:last-child{border-bottom:0}
 .tl-mon{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-faint);
   padding:12px 8px 12px 12px;white-space:nowrap}
@@ -108,7 +108,7 @@ section{padding:52px 0 0}
 .chip.est .dt::after{content:" 推估";font-weight:400;opacity:.75}
 .chip.clash .dt{background:var(--warn-tint);color:var(--warn)}
 .chip.clash{color:var(--warn);font-weight:700}
-.tl-empty{font-size:12px;color:#C4CCD3;font-family:'IBM Plex Mono',monospace}
+.tl-empty{font-size:12px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace}
 
 /* ---------- phase cards ---------- */
 .phases{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:3px}
@@ -122,20 +122,20 @@ section{padding:52px 0 0}
 .mix{display:flex;gap:4px;margin-top:12px;height:9px;border-radius:2px;overflow:hidden;max-width:340px}
 .mix i{display:block}
 .mix .m-sci{background:var(--sci)} .mix .m-cap{background:var(--cap)}
-.mix .m-dev{background:var(--slate)} .mix .m-fun{background:#C3CBD3}
+.mix .m-dev{background:var(--slate)} .mix .m-fun{background:var(--slate-tint)}
 .mix-key{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint)}
 .mix-key i{display:inline-block;width:8px;height:8px;border-radius:1px;margin-right:5px}
 
 /* ---------- tables ---------- */
 .tbl-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card)}
 table{border-collapse:collapse;width:100%;min-width:520px;font-size:13.5px}
-th,td{text-align:left;padding:9px 12px;border-bottom:1px solid #EDF0F2;vertical-align:top}
-thead th{background:#FBFCFC;font-weight:700;font-size:12px;letter-spacing:.04em;
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule2);vertical-align:top}
+thead th{background:var(--card2);font-weight:700;font-size:12px;letter-spacing:.04em;
   color:var(--ink-soft);border-bottom:1px solid var(--rule);white-space:nowrap}
 tbody tr:last-child td{border-bottom:0}
 td.t{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--ink-faint);white-space:nowrap}
 td.sci-c{color:var(--sci)} td.cap-c{color:var(--cap)} td.dev-c{color:var(--slate)}
-tr.fix td{background:#FBFAFD}
+tr.fix td{background:var(--hi3)}
 tr.fix td.t{color:var(--sci);font-weight:600}
 .w-note{font-size:12.5px;color:var(--ink-faint);margin:10px 0 0}
 
@@ -148,7 +148,7 @@ tr.fix td.t{color:var(--sci);font-weight:600}
 
 /* ---------- rules / floor ---------- */
 .floor{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
-.floor li{list-style:none;padding:18px 22px;border-bottom:1px solid #EDF0F2;display:grid;
+.floor li{list-style:none;padding:18px 22px;border-bottom:1px solid var(--rule2);display:grid;
   grid-template-columns:34px 1fr;gap:16px;align-items:start}
 .floor li:last-child{border-bottom:0}
 .floor ul{margin:0;padding:0}
@@ -160,7 +160,7 @@ tr.fix td.t{color:var(--sci);font-weight:600}
 /* ---------- checklist ---------- */
 .todo{border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:6px 4px}
 .todo label{display:grid;grid-template-columns:22px 1fr;gap:12px;padding:13px 18px;
-  border-bottom:1px solid #EDF0F2;cursor:pointer;align-items:start}
+  border-bottom:1px solid var(--rule2);cursor:pointer;align-items:start}
 .todo label:last-child{border-bottom:0}
 .todo input{margin-top:5px;width:15px;height:15px;accent-color:var(--sci)}
 .todo .when{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
@@ -222,7 +222,7 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
   padding:2px 7px;margin-left:9px;vertical-align:2px;font-weight:600}
 .phase.past{opacity:.5}
 .phase .left{display:block;font-size:11px;color:var(--warn);margin-top:5px}
-.tl-row.now-row{background:#FEFAF4}
+.tl-row.now-row{background:var(--hi2)}
 .tl-row.now-row .tl-mon{color:var(--warn);font-weight:600}
 .tl-row.now-row .tl-mon::after{content:"●";display:block;font-size:8px;color:var(--warn);margin-top:2px}
 .chip.past{opacity:.34}
@@ -246,16 +246,16 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
 .cal-tab.is-now{box-shadow:inset 0 -2px 0 var(--warn)}
 .cal-tab:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 .cal{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
-.cal-head{display:grid;grid-template-columns:repeat(7,1fr);background:#FBFCFC;border-bottom:1px solid var(--rule)}
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);background:var(--card2);border-bottom:1px solid var(--rule)}
 .cal-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;text-align:center;
   padding:7px 0;color:var(--ink-faint)}
 .cal-head span.we{color:var(--sci)}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
-.cal-d{cursor:pointer;min-height:66px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;padding:5px 4px 6px}
+.cal-d{cursor:pointer;min-height:66px;border-right:1px solid var(--rule2);border-bottom:1px solid var(--rule2);padding:5px 4px 6px}
 .cal-d:nth-child(7n){border-right:0}
-.cal-d.void{background:#FAFBFB}
+.cal-d.void{background:var(--card2)}
 .cal-n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);display:block}
-.cal-d.today{background:#FEF6EC;box-shadow:inset 0 0 0 2px var(--warn)}
+.cal-d.today{background:var(--hi);box-shadow:inset 0 0 0 2px var(--warn)}
 .cal-d.today .cal-n{color:var(--warn);font-weight:700}
 .cal-d.pastday{opacity:.42}
 .pill{display:block;font-size:9.5px;line-height:1.4;margin-top:3px;padding:1px 4px;border-radius:2px;
@@ -273,7 +273,7 @@ footer{margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
   background:var(--card);font-size:13.5px;color:var(--ink-soft)}
 .cal-focus b{display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.13em;
   color:var(--ink-faint);margin-bottom:5px}
-tr.todayrow td{background:#FEF6EC}
+tr.todayrow td{background:var(--hi)}
 tr.todayrow td.t{color:var(--warn);font-weight:700}
 tr.pastrow td{opacity:.45}
 @media (max-width:640px){
@@ -298,24 +298,28 @@ body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env
 }
 .tbl-scroll{position:relative}
 .tbl-scroll::after{content:"";position:absolute;top:0;right:0;bottom:0;width:22px;pointer-events:none;
-  background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.95))}
+  background:linear-gradient(90deg,transparent,var(--card))}
 @media (min-width:760px){.tbl-scroll::after{display:none}}
-tr.sumrow td{background:#FDF7EF}
+tr.sumrow td{background:var(--hi2)}
 tr.sumrow td.t{color:var(--warn);font-weight:600}
-tr.sumrow.todayrow td{background:#FDEFDC}
+tr.sumrow.todayrow td{background:var(--hi)}
 .dowbox{display:flex;gap:4px;flex-wrap:wrap;margin:2px 0 10px}
 .dowbox button{font-family:'IBM Plex Mono',monospace;font-size:12px;width:32px;height:32px;
   border:1px solid var(--rule);background:var(--card);color:var(--ink-faint);border-radius:2px;cursor:pointer}
 .dowbox button.on{background:var(--sci);color:#fff;border-color:var(--sci)}
-.p-note{background:#EDF0F2;color:#131C26;font-weight:600}
-.p-h{background:#FBE7E4;color:#B03A2E;font-weight:600}
-.cal-d.holiday{background:#FEF9F8}
-.cal-d.holiday .cal-n{color:#B03A2E}
+.p-note{background:var(--rule2);color:#131C26;font-weight:600}
+.p-h{background:var(--rest-tint);color:var(--rest);font-weight:600}
+.cal-d.holiday{background:var(--hi2)}
+.cal-d.holiday .cal-n{color:var(--rest)}
 /* ---------- 主分頁 ---------- */
 .tabs{position:sticky;top:0;z-index:20;display:flex;gap:2px;overflow-x:auto;
   background:var(--paper);padding:10px 0 9px;margin-bottom:2px;
   border-bottom:1px solid var(--rule);-webkit-overflow-scrolling:touch}
 .tabs::-webkit-scrollbar{display:none}
+.tabs-wrap{position:relative}
+.tabs-wrap::after{content:"";position:absolute;top:0;right:0;bottom:1px;width:26px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,var(--paper))}
+@media (min-width:900px){.tabs-wrap::after{display:none}}
 .tab-btn{flex:0 0 auto;font-family:'Noto Sans TC',sans-serif;font-size:14px;font-weight:500;
   padding:8px 15px;border:0;background:none;color:var(--ink-faint);cursor:pointer;
   border-radius:3px;white-space:nowrap}
@@ -344,7 +348,7 @@ section[hidden]{display:none}
 .todo .tk-m{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
   display:block;margin-top:3px;letter-spacing:.05em}
 .todo .tk-fix{opacity:.6}
-.todo .tk-bk{background:#FEF6EC}
+.todo .tk-bk{background:var(--hi)}
 .todo .tk-bk .tk-m{color:var(--warn)}
 .tk-del{border:0;background:none;color:var(--ink-faint);font-size:15px;cursor:pointer;padding:0 4px;line-height:1}
 .todo label.tk{grid-template-columns:22px 1fr 26px}
@@ -381,7 +385,7 @@ section[hidden]{display:none}
 .pm-note{margin:8px 0 0;font-size:11px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace}
 .rem-banner{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;
   background:var(--ink);color:#fff;padding:13px 15px;border-radius:4px;font-size:13.5px;
-  box-shadow:0 8px 24px rgba(19,28,38,.22);display:none;align-items:center;gap:12px}
+  box-shadow:0 10px 30px rgba(0,0,0,.24);display:none;align-items:center;gap:12px}
 .rem-banner b{color:#fff}
 .rem-banner button{margin-left:auto;border:0;background:rgba(255,255,255,.18);color:#fff;
   border-radius:3px;padding:5px 10px;font-family:inherit;font-size:12.5px;cursor:pointer;flex:0 0 auto}
@@ -389,6 +393,103 @@ section[hidden]{display:none}
   .nowcard{grid-template-columns:1fr;gap:14px}
   .nc-right{border-left:0;border-top:1px solid var(--rule);padding-left:0;padding-top:13px}
   .nc-clock{font-size:30px}
+}
+
+/* ---------- 主題與圓潤化 ---------- */
+:root{
+  --card2:#FBFCFC; --rule2:#EDF0F2;
+  --hi:#FEF6EC; --hi2:#FEF9F8; --hi3:#FBFAFD;
+  --rest:#B03A2E; --rest-tint:#FBE7E4;
+  --r-btn:999px; --r-card:14px; --r-pill:7px; --r-in:10px;
+}
+.btn,.td-btn,.tab-btn,.cal-tab,.daytab,.dowbox button{border-radius:var(--r-btn)}
+.td-btn{padding:9px 16px;transition:transform .12s ease,background .18s ease}
+.td-btn:hover{transform:translateY(-1px)}
+.btn{padding:9px 18px;transition:transform .12s ease, box-shadow .18s ease, background .18s ease}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.solid{box-shadow:0 3px 10px color-mix(in srgb, var(--ink) 22%, transparent)}
+.tab-btn{padding:9px 17px}
+.card,.tl,.cal,.floor,.method,.tbl-scroll,.todo,.now,.counts,.phases,.td-budget,.cal-focus,.td-editor,.nowcard{
+  border-radius:var(--r-card)}
+.tl,.cal,.tbl-scroll,.floor,.method,.phases,.counts{overflow:hidden}
+.pill{border-radius:var(--r-pill)}
+input,select,textarea{border-radius:var(--r-in)!important}
+.ed-row input,.row input,.row select{border-radius:var(--r-in)}
+.bar,.bar i{border-radius:999px}
+.count .tag,.chip .dt{border-radius:var(--r-pill)}
+.tk-del{border-radius:999px}
+.rem-banner{border-radius:16px}
+.todo label:first-child{border-top-left-radius:var(--r-card);border-top-right-radius:var(--r-card)}
+.todo label:last-child{border-bottom-left-radius:var(--r-card);border-bottom-right-radius:var(--r-card)}
+.swatches{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 12px}
+.sw{width:38px;height:38px;border-radius:999px;border:2px solid var(--rule);cursor:pointer;padding:0}
+.sw.on{border-color:var(--ink);box-shadow:0 0 0 3px color-mix(in srgb, var(--ink) 12%, transparent)}
+.theme-now{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-faint)}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:hover{transform:none}}
+.tk-meta{padding:0 16px 10px;margin-top:-6px}
+.tk-more{border:0;background:none;color:var(--ink-faint);font-family:inherit;font-size:11.5px;cursor:pointer;padding:2px 0}
+.tk-more:hover{color:var(--sci)}
+.tk-body{display:grid;grid-template-columns:1fr 96px 108px;gap:7px;margin-top:7px}
+.tk-body input,.tk-body select{font-family:inherit;font-size:12.5px;padding:7px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+@media (max-width:640px){.tk-body{grid-template-columns:1fr 1fr}.tk-body input:first-child{grid-column:1/-1}}
+.no-motion *{animation:none!important;transition:none!important}
+.mood-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.mood-row button{font-family:inherit;font-size:13px;padding:9px 14px;border:1px solid var(--rule);
+  background:var(--card);color:var(--ink-soft);border-radius:999px;cursor:pointer}
+.mood-row button.on{background:var(--sci);color:#fff;border-color:var(--sci)}
+.ul-item{display:grid;grid-template-columns:1fr auto;gap:12px;padding:13px 16px;border:1px solid var(--rule);
+  border-radius:var(--r-card);background:var(--card);margin-bottom:9px;align-items:center}
+.ul-item.locked{opacity:.6}
+.ul-item .ub{height:5px;background:var(--slate-tint);border-radius:999px;overflow:hidden;margin-top:7px;max-width:280px}
+.ul-item .ub i{display:block;height:100%;background:var(--cap)}
+.ul-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.ul-badge.open{background:var(--cap-tint);color:var(--cap);font-weight:600}
+.ul-badge.shut{background:var(--slate-tint);color:var(--ink-faint)}
+
+/* ---------- 動畫 ---------- */
+@keyframes fxPop{0%{transform:scale(1)}38%{transform:scale(1.055)}100%{transform:scale(1)}}
+@keyframes fxFlash{0%{background:var(--cap-tint)}100%{background:transparent}}
+@keyframes fxFloat{0%{opacity:0;transform:translateY(6px) scale(.9)}
+  18%{opacity:1;transform:translateY(-2px) scale(1.06)}
+  100%{opacity:0;transform:translateY(-44px) scale(1)}}
+@keyframes fxFall{0%{opacity:1;transform:translate3d(0,-12vh,0) rotate(0) scale(1)}
+  100%{opacity:0;transform:translate3d(var(--dx),104vh,0) rotate(var(--rot)) scale(.7)}}
+@keyframes fxRise{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+@keyframes fxBanner{0%{opacity:0;transform:translate(-50%,14px) scale(.94)}
+  12%{opacity:1;transform:translate(-50%,0) scale(1)}
+  85%{opacity:1;transform:translate(-50%,0) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-10px) scale(.98)}}
+@keyframes fxRing{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--warn) 34%,transparent)}
+  50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--warn) 0%,transparent)}}
+@keyframes fxShine{0%{background-position:-180% 0}100%{background-position:180% 0}}
+@keyframes fxCheck{0%{transform:scale(.6) rotate(-12deg);opacity:0}
+  55%{transform:scale(1.25) rotate(3deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
+
+.todo label{transition:background .35s ease}
+.todo label.fx-done{animation:fxPop .34s cubic-bezier(.3,1.4,.5,1), fxFlash 1s ease .1s}
+.todo input[type=checkbox]:checked{animation:fxCheck .3s cubic-bezier(.3,1.5,.5,1)}
+.fx-chip{position:absolute;z-index:70;pointer-events:none;font-family:'IBM Plex Mono',monospace;
+  font-size:14px;font-weight:600;color:var(--cap);animation:fxFloat 1.15s cubic-bezier(.2,.8,.3,1) forwards;
+  text-shadow:0 1px 0 var(--card)}
+.fx-chip.minus{color:var(--warn)}
+#fx-layer{position:fixed;inset:0;pointer-events:none;z-index:80;overflow:hidden}
+.fx-bit{position:absolute;top:0;width:9px;height:14px;border-radius:2px;
+  animation:fxFall var(--dur) cubic-bezier(.25,.6,.5,1) forwards}
+.fx-banner{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom));z-index:85;
+  background:var(--ink);color:var(--paper);padding:13px 22px;border-radius:999px;font-size:14px;font-weight:700;
+  box-shadow:0 12px 32px rgba(0,0,0,.26);animation:fxBanner 3.4s ease forwards;white-space:nowrap;max-width:92vw;
+  overflow:hidden;text-overflow:ellipsis}
+section:not([hidden]){animation:fxRise .3s ease both}
+.pm-time.run{animation:fxRing 2s ease-in-out infinite}
+.ul-item.just-open{position:relative;overflow:hidden}
+.ul-item.just-open::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent 38%,color-mix(in srgb,var(--cap) 26%,transparent) 50%,transparent 62%);
+  background-size:220% 100%;animation:fxShine 1.5s ease 2}
+.bar i{transition:width .85s cubic-bezier(.2,.8,.3,1)}
+.no-motion *,.no-motion *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){
+  .todo label.fx-done,.fx-chip,.fx-bit,.fx-banner,section:not([hidden]),.pm-time.run{animation:none!important}
 }
 </style>
 </head>
@@ -427,7 +528,7 @@ section[hidden]{display:none}
   </div>
 </header>
 
-<nav class="tabs" id="main-tabs" role="tablist" aria-label="區塊切換"></nav>
+<div class="tabs-wrap"><nav class="tabs" id="main-tabs" role="tablist" aria-label="區塊切換"></nav></div>
 
 <section>
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
@@ -465,6 +566,20 @@ section[hidden]{display:none}
     <button class="td-btn" id="td-add" type="button">＋ 新增任務</button>
     <button class="td-btn" id="td-edit" type="button">編輯這類日子的範本</button>
     <button class="td-btn ghost" id="td-clear" type="button">清掉欠帳</button>
+    <button class="td-btn ghost" id="td-easy" type="button">今天狀況不好</button>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="sec-head" style="margin-bottom:6px"><h3>要問老師</h3><span class="eyebrow" id="ask-count">—</span></div>
+    <p class="sub">卡住的當下記一行，隔天到學校問。問完打勾，把答案補上去。</p>
+    <div class="set-grid" style="margin-bottom:9px">
+      <div class="fld"><label>科目</label>
+        <select id="ask-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option></select>
+      </div>
+      <div class="fld" style="grid-column:span 2"><label>卡在哪</label><input type="text" id="ask-q" placeholder="第 3 章例 5 為什麼要先平方？"></div>
+    </div>
+    <div class="bar-btns" style="margin-top:0"><button class="btn" id="ask-add" type="button">記下來</button></div>
+    <div id="ask-list" style="margin-top:12px"></div>
   </div>
 
   <div class="td-editor" id="td-editor" hidden>
@@ -633,7 +748,7 @@ section[hidden]{display:none}
     <span><i style="background:var(--sci)"></i>科學班</span>
     <span><i style="background:var(--cap)"></i>會考／校內</span>
     <span><i style="background:var(--slate)"></i>軟體開發</span>
-    <span><i style="background:#C3CBD3"></i>娛樂／運動</span>
+    <span><i style="background:var(--slate-tint)"></i>娛樂／運動</span>
   </div>
 </section>
 
@@ -653,7 +768,7 @@ section[hidden]{display:none}
     <span><i style="background:var(--slate)"></i>資優數學 18:00–21:30</span>
     <span><i style="background:var(--cap)"></i>模考／段考</span>
     <span><i style="background:var(--warn)"></i>科學班考試（推估）</span>
-    <span><i style="background:#B03A2E"></i>假日／不排課表（國定假日、畢旅）</span>
+    <span><i style="background:var(--rest)"></i>假日／不排課表（國定假日、畢旅）</span>
   </div>
   <p class="w-note">國定假日依人事行政總處 115／116 年辦公日曆表；畢旅為暫定（10/14–16），確定後請更新。假日當天不顯示補習與輔導，實際是否停課請向補習班確認。<b>唯一例外：考前 7 天內的假日不跳過</b>——10/9–11 和 4/30–5/2 這兩段連假都緊貼段考，照休會直接反映在成績上。</p>
   <div class="card" id="note-panel" hidden style="margin-top:14px">
@@ -746,12 +861,12 @@ section[hidden]{display:none}
       <tbody>
         <tr><td class="t">–17:00</td><td colspan="5">學校（17:00 放學）</td></tr>
         <tr><td class="t">17:00–18:00</td><td colspan="2">回家、晚餐、放空（不要在這格塞讀書）</td><td>移動＋晚餐</td><td colspan="2">回家、晚餐、放空</td></tr>
-        <tr><td class="t">18:00–19:30</td><td class="cap-c">會考數學</td><td class="cap-c">會考自然</td><td rowspan="3" class="sci-c" style="background:#FBFAFD">18:00–21:30<br>資優數學輔導<br><span style="font-size:12px;color:var(--ink-faint)">回家後只做 20 分訂正</span></td><td class="cap-c">會考國文＋社會</td><td class="sci-c">科學班數學</td></tr>
+        <tr><td class="t">18:00–19:30</td><td class="cap-c">會考數學</td><td class="cap-c">會考自然</td><td rowspan="3" class="sci-c" style="background:var(--hi3)">18:00–21:30<br>資優數學輔導<br><span style="font-size:12px;color:var(--ink-faint)">回家後只做 20 分訂正</span></td><td class="cap-c">會考國文＋社會</td><td class="sci-c">科學班數學</td></tr>
         <tr><td class="t">19:45–21:00</td><td class="sci-c">科學班理化</td><td class="sci-c">科學班數學</td><td class="sci-c">科學班｜考古題限時</td><td>娛樂（週五放鬆）</td></tr>
         <tr><td class="t">21:00–21:45</td><td colspan="2">輕量區：英單 20 分＋當日錯題訂正</td><td colspan="2">同左</td></tr>
-        <tr><td class="t">21:45–22:45</td><td colspan="5">娛樂／自由</td></tr>
-        <tr><td class="t">22:45–23:00</td><td colspan="5">洗漱、隔天書包</td></tr>
-        <tr><td class="t">23:00</td><td colspan="5">就寢　<span style="font-size:12px;color:var(--ink-faint)">上學日約 06:30 起床＝睡 7.5 小時</span></td></tr>
+        <tr><td class="t">21:45–22:30</td><td colspan="5">娛樂／自由</td></tr>
+        <tr><td class="t">22:30–22:45</td><td colspan="5">洗漱、隔天書包（螢幕在這裡關掉）</td></tr>
+        <tr><td class="t">22:45</td><td colspan="5">就寢　<span style="font-size:12px;color:var(--warn)">06:30 起床＝7.75 小時，仍略低於 8–10 小時的建議區間</span></td></tr>
       </tbody>
     </table></div>
     <div class="tbl-scroll" style="margin-top:12px"><table>
@@ -765,7 +880,7 @@ section[hidden]{display:none}
         <tr class="fix"><td class="t">17:00–22:00</td><td colspan="2">雄科班補習</td></tr>
       </tbody>
     </table></div>
-    <p class="w-note">每週時數：會考／校內 ≈ 11h　科學班自習 ≈ 10h（另加補習 10h＋資優數學 3.5h）　軟體開發 0h　娛樂 ≈ 9h<br>17:00 放學比原本估的 16:30 少掉每天 30 分鐘，一週少 2.5 小時，這是省不回來的——所以週末那兩個上午更不能睡掉。</p>
+    <p class="w-note" style="color:var(--warn)"><b>睡眠是這份計畫唯一沒達標的地方。</b>美國睡眠醫學會建議 13–18 歲每天睡 8–10 小時，你排到的是 7.75。真的擠不出來的話，優先砍「輕量區」而不是睡眠——輕量區的 45 分鐘可以隔天補，睡眠不行。<br>每週時數：會考／校內 ≈ 11h　科學班自習 ≈ 10h（另加補習 10h＋資優數學 3.5h）　軟體開發 0h　娛樂 ≈ 9h<br>17:00 放學比原本估的 16:30 少掉每天 30 分鐘，一週少 2.5 小時，這是省不回來的——所以週末那兩個上午更不能睡掉。</p>
   </div>
 
   <div class="wk">
@@ -857,7 +972,7 @@ section[hidden]{display:none}
   <div class="method">
     <div><b>提取，而不是重讀</b><p>闔上書本先默寫你記得的，再打開對答案。重讀和劃線感覺很順，但那是熟悉感不是記憶。每個讀書區塊的最後 10 分鐘拿來做這件事。</p></div>
     <div><b>分散，而不是集中</b><p>同樣五小時，分五天各一小時遠勝一天讀完。你的模考範圍已經內建這個結構了。</p></div>
-    <div><b>交錯，而不是分堆</b><p>一節課裡混著練不同題型，比連做二十題同類型難、但學得牢。段考前尤其要這樣練。</p></div>
+    <div><b>交錯，而不是分堆</b><p>混著練不同題型，比連做二十題同類型難得多——但一項 787 名七年級生的隨機對照試驗顯示，一個月後的測驗成績交錯組 61% 對分堆組 38%。當下覺得卡，正是它有效的原因。錯題本的每日複習已經幫你自動交錯排序。</p></div>
     <div><b>錯題本是你的私人題庫</b><p>整年最有價值的一本。只收「訂正過還會再錯」的題，每題寫一行「我當時為什麼會錯」。四月的第三輪就靠它。</p></div>
   </div>
 </section>
@@ -886,6 +1001,61 @@ section[hidden]{display:none}
 </section>
 
 <section>
+  <div class="sec-head"><h2>錯題本</h2><span class="eyebrow">整年最有價值的一本</span></div>
+  <p class="sec-note">只收「訂正過還會再錯」的題。複習時<b>先闔上答案重做一次</b>——照抄正確解法會產生「我懂了」的錯覺，但考場上重現不出來。做對就往後排（1→3→7→14→30 天），做錯就退回明天。</p>
+
+  <div class="td-budget" id="wr-stat"></div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="set-grid">
+      <div class="fld"><label>複習間隔</label>
+        <select id="wr-mode">
+          <option value="fib">費氏（1·2·3·5·8·13·21·34 天）</option>
+          <option value="fix">固定（1·3·7·14·30 天）</option>
+        </select>
+      </div>
+      <div class="fld" style="grid-column:span 2"><label>快速標記：這題我不會</label>
+        <div style="display:flex;gap:7px">
+          <select id="qk-sub" style="flex:0 0 96px"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option></select>
+          <input type="text" id="qk-t" placeholder="題號或一句話，之後再補細節">
+          <button class="btn solid" id="qk-go" type="button" style="flex:0 0 auto">標記</button>
+        </div>
+      </div>
+    </div>
+    <p class="sub" style="margin:10px 0 0">到期時會跳通知（需先在「今天」開啟時段提醒）。<br>費氏間隔拉得比固定間隔長，適合已經有點熟的題；剛學會的題用固定間隔比較穩。研究上兩者沒有明顯高下，順手就好。</p>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h3 style="margin-bottom:8px">今日待複習</h3>
+    <div id="wr-due"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h3 style="margin-bottom:8px">新增一題</h3>
+    <div class="set-grid" style="margin-bottom:9px">
+      <div class="fld"><label>科目</label>
+        <select id="wr-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option></select>
+      </div>
+      <div class="fld"><label>錯因</label>
+        <select id="wr-why"><option>觀念不熟</option><option>會但想不到</option><option>讀題錯誤</option><option>計算失誤</option><option>時間不夠</option></select>
+      </div>
+      <div class="fld"><label>出處</label><input type="text" id="wr-src" placeholder="例：翰林 3-2 第 14 題"></div>
+    </div>
+    <div class="fld" style="margin-bottom:9px"><label>我當時為什麼會錯（一句話就好）</label><input type="text" id="wr-note" placeholder="把平方差公式看成完全平方"></div>
+    <div class="bar-btns" style="margin-top:0"><button class="btn solid" id="wr-add" type="button">加入錯題本</button><span class="sub" id="wr-msg" style="align-self:center;margin:0"></span></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-head" style="margin-bottom:10px"><h3>全部錯題</h3>
+      <select id="wr-filter" style="font-size:12.5px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)">
+        <option value="">全部科目</option><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option>
+      </select>
+    </div>
+    <div id="wr-all"></div>
+  </div>
+</section>
+
+<section>
   <div class="sec-head"><h2>成績紀錄</h2><span class="eyebrow">看趨勢，不看單次</span></div>
   <p class="sec-note">每次段考、模考完把分數填進來。單次考差沒有意義，有意義的是三次以上的走勢——所以下面的圖是平均分的變化，不是排名。</p>
   <div class="card" style="margin-bottom:14px">
@@ -907,6 +1077,21 @@ section[hidden]{display:none}
       <span class="sub" id="qz-msg" style="align-self:center;margin:0"></span>
     </div>
     <p class="sub" id="qz-rule" style="margin:11px 0 0"></p>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <h3 style="margin-bottom:6px">配速紀錄</h3>
+    <p class="sub">模考真正該診斷的往往不是分數，是時間分配。哪科寫不完？哪科提早交卷卻錯一堆？記三次就看得出來。</p>
+    <div class="set-grid" style="margin-bottom:9px">
+      <div class="fld"><label>考試</label><select id="pc-exam"></select></div>
+      <div class="fld"><label>科目</label><select id="pc-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option></select></div>
+      <div class="fld"><label>結果</label>
+        <select id="pc-fin"><option value="2">寫完還有時間檢查</option><option value="1">剛好寫完</option><option value="0">沒寫完</option></select>
+      </div>
+      <div class="fld"><label>剩幾分鐘</label><input type="number" id="pc-left" placeholder="沒寫完填 0" min="0" max="80"></div>
+    </div>
+    <div class="bar-btns" style="margin-top:0"><button class="btn solid" id="pc-add" type="button">記錄</button><span class="sub" id="pc-msg" style="align-self:center;margin:0"></span></div>
+    <div id="pc-out" style="margin-top:12px"></div>
   </div>
 
   <div class="td-budget" id="sc-summary"></div>
@@ -950,6 +1135,38 @@ section[hidden]{display:none}
   </div>
 
 
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">配色</h3>
+    <p class="sub">選一個主題，或讓它依日期自己變。</p>
+    <div class="swatches" id="th-sw"></div>
+    <div class="set-grid" style="margin-bottom:10px">
+      <div class="fld"><label>模式</label>
+        <select id="th-mode">
+          <option value="fixed">固定用我選的</option>
+          <option value="auto">自動（依急迫性換色）</option>
+        </select>
+      </div>
+      <div class="fld"><label>自訂主色</label><input type="color" id="th-accent" style="height:42px;padding:4px"></div>
+      <div class="fld"><label>圓角</label>
+        <select id="th-round">
+          <option value="soft">圓潤</option>
+          <option value="round">超圓</option>
+          <option value="sharp">方正</option>
+        </select>
+      </div>
+    </div>
+    <label style="display:flex;gap:9px;align-items:center;font-size:13.5px;color:var(--ink-soft);margin-bottom:6px;cursor:pointer">
+      <input type="checkbox" id="th-night" style="width:15px;height:15px;accent-color:var(--sci)">
+      入夜自動轉深色（21:00–06:00），減少睡前光線刺激
+    </label>
+    <p class="theme-now" id="th-now">—</p>
+    <div class="bar-btns">
+      <button class="btn solid" id="th-save" type="button">套用</button>
+      <button class="btn ghost" id="th-reset" type="button">恢復預設</button>
+    </div>
+    <p class="sub" style="margin:12px 0 0"><b>自動模式怎麼換色：</b>離下一場考試 30 天以上是平靜的藍；8–30 天轉成你選的主色；4–7 天轉琥珀；3 天內轉暖紅。顏色只是提示，不會改變任何排程。</p>
+  </div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">點數規則</h3>
     <p class="sub">改完按儲存。負數代表扣點，填 0 就是不加不扣。</p>
@@ -972,6 +1189,49 @@ section[hidden]{display:none}
       <span class="sub" id="r-msg" style="align-self:center;margin:0"></span>
     </div>
   </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">時間校準</h3>
+    <p class="sub">在「今天」每項任務下面填實際花了幾分鐘，累積三筆以上就會算出你的高估／低估幅度。知道自己平均低估多少，排表才會準。</p>
+    <p id="cal-out" style="margin:0;font-size:14px;color:var(--ink-soft)">還沒有足夠資料。</p>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">顯示與無障礙</h3>
+    <div class="set-grid">
+      <div class="fld"><label>字級</label>
+        <select id="a11y-size"><option value="14">小</option><option value="15">標準</option><option value="16.5">大</option><option value="18">特大</option></select>
+      </div>
+      <div class="fld"><label>行距</label>
+        <select id="a11y-lh"><option value="1.6">緊湊</option><option value="1.75">標準</option><option value="1.95">寬鬆</option></select>
+      </div>
+    </div>
+    <label style="display:flex;gap:9px;align-items:center;font-size:13.5px;color:var(--ink-soft);margin-top:10px;cursor:pointer">
+      <input type="checkbox" id="a11y-motion" style="width:15px;height:15px;accent-color:var(--sci)"> 關閉所有動畫
+    </label>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">匯出到手機行事曆</h3>
+    <p class="sub">產生 .ics 檔，匯入手機內建行事曆後就有<b>系統級鬧鐘</b>——網頁關掉也會響，補上目前提醒的最大弱點。含所有考試日、固定行程與月曆記事。</p>
+    <div class="bar-btns" style="margin-top:0">
+      <button class="btn solid" id="ics-go" type="button">下載 .ics</button>
+      <button class="btn ghost" id="sw-status" type="button">離線狀態</button>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">教材對照</h3>
+    <p class="sub">每科綁一本主要教材和目前推到的頁數。「今天」的任務會直接顯示「《翰林》p.120」，打開就知道從哪繼續，不用每天花三分鐘決定。</p>
+    <div id="bk-rows"></div>
+    <div class="bar-btns"><button class="btn solid" id="bk-save" type="button">儲存教材</button><span class="sub" id="bk-msg" style="align-self:center;margin:0"></span></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">本機快照</h3>
+    <p class="sub">每天自動留一份，最多保留三份。誤刪或資料壞掉時可以救回來。</p>
+    <div id="snap-list"></div>
+  </div>
+
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">備份與轉移</h3>
     <p class="sub">所有資料（範本、任務、欠帳、番茄鐘、點數、商店、成績）都存在這台裝置的瀏覽器裡。換手機或清除瀏覽資料會消失，記得定期備份。</p>
@@ -1005,6 +1265,78 @@ section[hidden]{display:none}
     <p class="sub" id="cl-status" style="margin:12px 0 0">尚未設定。</p>
   </div>
 
+</section>
+
+<section>
+  <div class="sec-head"><h2>每日日誌</h2><span class="eyebrow">兩分鐘就好</span></div>
+  <p class="sec-note">三個問題，寫完就關掉。第三題是明天的「幾點在哪做」——研究顯示明確指定時間地點能同時提高完成率、降低對完成時間的樂觀偏誤。</p>
+
+  <div class="card" style="margin-bottom:14px">
+    <h3 style="margin-bottom:8px">今天的狀態</h3>
+    <p class="sub">心情</p>
+    <div class="mood-row" id="md-mood"></div>
+    <p class="sub" style="margin-top:10px">體力</p>
+    <div class="mood-row" id="md-energy"></div>
+    <p class="sub" id="md-hint" style="margin:12px 0 0"></p>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="fld" style="margin-bottom:10px"><label>今天最有進展的一件事</label><textarea id="jr-win" style="min-height:60px" placeholder="不用是大事。「終於搞懂平方差」也算"></textarea></div>
+    <div class="fld" style="margin-bottom:10px"><label>卡住的地方（寫下來就好，不用馬上解決）</label><textarea id="jr-stuck" style="min-height:60px"></textarea></div>
+    <div class="fld" style="margin-bottom:10px"><label>明天的第一件事：幾點、在哪、做什麼</label><input type="text" id="jr-next" placeholder="09:00 在書房，先寫數學第 3 章的錯題"></div>
+    <div class="bar-btns" style="margin-top:0">
+      <button class="btn solid" id="jr-save" type="button">存起來</button>
+      <button class="btn ghost" id="jr-past" type="button">看以前寫的</button>
+      <span class="sub" id="jr-msg" style="align-self:center;margin:0"></span>
+    </div>
+  </div>
+
+  <div class="card" id="jr-list" hidden></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>進度回測</h2><span class="eyebrow">看趨勢，不看單日</span></div>
+  <p class="sec-note">138 項研究、近 2 萬名參與者的統合分析顯示，監控目標進度確實能提升達成率（d = 0.40），而且<b>把進度實際記錄下來</b>時效果更強。這頁就是那個記錄。</p>
+  <div class="td-budget" id="bt-sum"></div>
+  <div class="card" id="bt-chart" style="padding:14px 16px;margin-bottom:14px"></div>
+  <div class="tbl-scroll"><table id="bt-table">
+    <thead><tr><th>日期</th><th>完成</th><th>比例</th><th>心情</th><th>體力</th></tr></thead><tbody></tbody>
+  </table></div>
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">每週回顧</h3>
+    <p class="sub">週日晚上十五分鐘，照著走完就好。靠自覺的回顧通常撐不過三週，有流程才撐得久。</p>
+    <div id="rv-flow"></div>
+    <div class="bar-btns"><button class="btn solid" id="rv-start" type="button">開始本週回顧</button><button class="btn ghost" id="rv-hist" type="button">看以前的</button></div>
+    <div id="rv-list" hidden style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">給爸媽的週報</h3>
+    <p class="sub">三行摘要，省掉「你到底有沒有在讀書」這種對話。按了會複製到剪貼簿。</p>
+    <div class="bar-btns" style="margin-top:0"><button class="btn" id="pr-go" type="button">產生並複製</button></div>
+    <pre id="pr-out" style="margin:12px 0 0;white-space:pre-wrap;font-family:inherit;font-size:13.5px;color:var(--ink-soft)"></pre>
+  </div>
+
+  <p class="w-note">連續達標以「當天完成 60% 以上」計算，每 7 天有 1 天寬限——斷掉一天不會歸零。<br>研究也指出，斷掉的連續紀錄反而會降低後續參與度，所以這裡不做「連續中斷」的懲罰。</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>解鎖獎勵</h2><span class="eyebrow">累積就會開，不會被收回</span></div>
+  <p class="sec-note">這區跟商店不同：商店是花點數換，這裡是<b>累積到就永久解鎖</b>，不用消耗任何東西。門檻算的是投入（番茄鐘、完成的任務、精熟的錯題），不是分數——分數不完全由你控制，努力可以。</p>
+  <div class="td-budget" id="ul-sum"></div>
+  <div id="ul-list"></div>
+  <div class="card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">自己加一個</h3>
+    <p class="sub">研究顯示，遊戲化真正有效的部分是<b>自主感</b>——自己訂的獎勵比系統給的有用得多。</p>
+    <div class="set-grid" style="margin-bottom:9px">
+      <div class="fld"><label>解鎖條件</label>
+        <select id="ul-kind"><option value="pomo">累積番茄鐘</option><option value="task">累積完成任務</option><option value="wrong">錯題精熟數</option><option value="day">連續達標天數</option></select>
+      </div>
+      <div class="fld"><label>數量</label><input type="number" id="ul-need" value="50" min="1"></div>
+      <div class="fld"><label>獎勵</label><input type="text" id="ul-name" placeholder="例：買那副耳機"></div>
+    </div>
+    <div class="bar-btns" style="margin-top:0"><button class="btn solid" id="ul-add" type="button">加入</button></div>
+  </div>
 </section>
 
 <footer>
@@ -1065,7 +1397,57 @@ section[hidden]{display:none}
     '休息也要排進表裡。',
     '五月十五號那天，<br>你會感謝八月的自己。',
     '今天只要贏一點點。',
-    '做完再說，<br>不要先想結果。'
+    '做完再說，<br>不要先想結果。',
+    '今天不是為了考試，<br>是為了不後悔。',
+    '五分鐘也算數。',
+    '狀態爛的時候，<br>做最簡單的那項就好。',
+    '進度會回來，<br>健康不一定。',
+    '把「等一下」換成「先做十分鐘」。',
+    '你不需要每天都很強，<br>只需要每天都在。',
+    '難的題目值得多花時間，<br>會的題目不值得。',
+    '寫不完不是實力問題，<br>先看是不是配速問題。',
+    '把卡住的地方寫下來，<br>明天問老師。',
+    '桌上只留這一科。',
+    '先關通知，再開始。',
+    '不知道從哪開始，<br>就從最小的那件開始。',
+    '你已經比昨天多會一題了。',
+    '休息不是獎勵，<br>是燃料。',
+    '不要在最累的時候<br>決定要不要放棄。',
+    '今天的目標：<br>坐下來，翻開，開始。',
+    '進度落後的隔天，<br>最需要的是睡飽。',
+    '把大題目切成三塊，<br>就沒那麼可怕了。',
+    '重點不是讀多久，<br>是讀進去多少。',
+    '想睡就去睡，<br>撐著讀等於沒讀。',
+    '每一題訂正，<br>都是未來的分數。',
+    '別人的進度不是你的進度。',
+    '會考不會考你今天有多焦慮。',
+    '寫下來，<br>腦袋就不用一直記著。',
+    '完成一項，<br>就少一項壓在心上。',
+    '你今天已經做了一個選擇：<br>打開這一頁。',
+    '慢一點沒關係，<br>停下來才要注意。',
+    '把最難的排在最清醒的時候。',
+    '一次專注一件事，<br>比同時做三件快。',
+    '不用等狀態好，<br>開始了狀態才會來。',
+    '你不是懶，<br>只是計畫排太滿。',
+    '砍掉一項，<br>換其他都做完。',
+    '目標小到不可能失敗。',
+    '今天做的每一題，<br>五月都算數。',
+    '進步是回頭才看得見的。',
+    '別跟三月比，<br>跟上禮拜比。',
+    '沒有人是準備好才開始的。',
+    '你可以做不完，<br>但別不開始。',
+    '把手機放到另一個房間。',
+    '錯了才知道哪裡不會，<br>這是好事。',
+    '三次同方向才叫趨勢，<br>一次只是波動。',
+    '考完就放下，<br>訂正完更要放下。',
+    '心情差的那幾天，<br>撐過去就好，不用檢討。',
+    '你不必贏過所有人，<br>只要贏過想放棄的自己。',
+    '今天的第一件事：<br>幾點、在哪、做什麼。',
+    '累了就寫日誌，<br>比硬讀有用。',
+    '兩個終點，<br>你都走得到。',
+    '剩下的路，<br>一天一天走就好。',
+    '八月的你，<br>正在幫五月的你。',
+    '現在開始，<br>剛剛好。'
   ];
   var h1 = document.querySelector('header h1');
   if (h1) h1.innerHTML = LINES[Math.floor(Math.random() * LINES.length)];
@@ -1075,12 +1457,11 @@ section[hidden]{display:none}
     ['今天',  [0]],
     ['日程',  [3,4]],
     ['週表',  [6,7]],
-    ['成績',  [13]],
-    ['商店',  [14]],
-    ['進度',  [8,9]],
-    ['全年',  [1,2]],
-    ['備忘',  [5,10,11,12]],
-    ['設定',  [15]]
+    ['錯題',  [13]],
+    ['紀錄',  [14,17,18]],
+    ['獎勵',  [15,19]],
+    ['計畫',  [1,2,5,8,9,10,11,12]],
+    ['設定',  [16]]
   ];
   var secs = document.querySelectorAll('body > .wrap > section');
   var nav = document.getElementById('main-tabs');
@@ -1093,7 +1474,7 @@ section[hidden]{display:none}
       b.setAttribute('aria-selected', i === gi ? 'true' : 'false');
     });
     try { localStorage.setItem('plan-tab', gi); } catch(e){}
-    window.scrollTo({top:0, behavior:'instant'});
+    try{ window.scrollTo(0,0); }catch(e){}
   }
 
   GROUPS.forEach(function(g, i){
@@ -1306,7 +1687,7 @@ section[hidden]{display:none}
     var o=notes[k]||{};
     nt.value=o.t||''; nb.value=o.b||'';
     np.hidden=false;
-    np.scrollIntoView({block:'nearest',behavior:'smooth'});
+    try{ np.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){}
   }
   if(np){
     document.getElementById('note-save').addEventListener('click',function(){
@@ -1393,7 +1774,7 @@ section[hidden]{display:none}
   });
 
   draw(nowIdx);
-  if (tabs.children[nowIdx]) tabs.children[nowIdx].scrollIntoView({block:'nearest', inline:'center'});
+  try{ if(tabs.children[nowIdx]) tabs.children[nowIdx].scrollIntoView({block:'nearest', inline:'center'}); }catch(e){}
 
   // 11 天逐日表：標今天、標暑輔、淡化過去
   function markSprint(){
@@ -1429,7 +1810,15 @@ section[hidden]{display:none}
 (function(){
   var TK='plan.tpl.v3', SK='plan.state.v3';
   function ls(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
-  function save(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function save(k,v){
+    try{ localStorage.setItem(k, JSON.stringify(v)); }
+    catch(e){
+      if(!window.__quotaWarned){
+        window.__quotaWarned=1;
+        alert('瀏覽器儲存空間滿了，資料沒存進去。\n\n請到「設定 → 本機快照」刪掉舊快照，或先「下載成檔案」備份後清一些資料。');
+      }
+    }
+  }
   function today0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
   function key(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
   var WD=['日','一','二','三','四','五','六'];
@@ -1539,12 +1928,57 @@ section[hidden]{display:none}
     var w=d.getDay();
     return (w===0||w===6) && daysTo(SCI,d) > BIND_AT;
   }
+  // 考試日與國定假日
+  var EXAMDAY={};
+  [[2026,9,8],[2026,9,9],[2026,10,12],[2026,10,13],[2026,10,28],[2026,10,29],
+   [2026,11,23],[2026,11,24],[2026,12,23],[2026,12,24],[2027,1,14],[2027,1,15],
+   [2027,2,18],[2027,2,19],[2027,3,13],[2027,3,20],[2027,3,21],[2027,3,22],[2027,3,23],
+   [2027,4,15],[2027,4,16],[2027,5,3],[2027,5,7],[2027,5,15],[2027,5,16]]
+   .forEach(function(e){ EXAMDAY[e[0]+'-'+e[1]+'-'+e[2]]=1; });
+  var HOL={};
+  ['2026-9-25','2026-9-26','2026-9-27','2026-9-28','2026-10-9','2026-10-10','2026-10-11',
+   '2026-10-24','2026-10-25','2026-10-26','2026-12-25','2026-12-26','2026-12-27',
+   '2027-1-1','2027-1-2','2027-1-3','2027-2-4','2027-2-5','2027-2-6','2027-2-7','2027-2-8',
+   '2027-2-9','2027-2-10','2027-2-27','2027-2-28','2027-3-1','2027-4-3','2027-4-4','2027-4-5',
+   '2027-4-6','2027-4-30','2027-5-1','2027-5-2','2026-10-14','2026-10-15','2026-10-16']
+   .forEach(function(k){ HOL[k]=1; });
+
+  var EXAM_TPL=[{t:'07:00–07:40',n:'起床、早餐（別看新東西）',m:40},
+                {t:'07:40–08:00',n:'只翻錯題本和重點卡',m:20},
+                {t:'08:00–16:00',n:'考試',m:480,f:1},
+                {t:'17:00–18:00',n:'訂正：把錯的立刻登記進錯題本',m:60},
+                {t:'19:00–22:00',n:'休息（考完當天不排新進度）',m:180,e:1}];
+  var HOL_TPL=[{t:'—',n:'國定假日，整天休息',m:0,e:1},
+               {t:'09:00–21:00',n:'自由時間',m:720,e:1}];
+
+  // 考前 7 天內的假日不跳過
+  function nearExam(d){
+    for(var i=0;i<=7;i++){
+      var t=new Date(d.getTime()+i*86400000);
+      if(EXAMDAY[key(t)]) return true;
+    }
+    return false;
+  }
+
   function dayTpl(d){
-    var pf=profileOf(d), out;
+    var pf=profileOf(d), k=key(d), out;
+    if (EXAMDAY[k]) return EXAM_TPL.slice();
+    if (HOL[k] && !nearExam(d)) return HOL_TPL.slice();
     if (tpl[pf]) out=tpl[pf];
-    else if (isWeekendLite(d)) out=LITE;
+    else if (isWeekendLite(d) && !CLOSED[k]) out=LITE;
     else out=DEF[pf]||[];
-    if (CLOSED[key(d)]) out=out.filter(function(x){ return !/補習/.test(x.n) || /補課/.test(x.n); });
+    if (CLOSED[k]) out=out.filter(function(x){ return !/雄科班補習|補習筆記/.test(x.n); });
+    // 3/26 放榜後科學班歸零，時間轉給會考
+    if (d >= new Date(2027,2,26)){
+      out=out.map(function(x){
+        if(/科學班|考古題/.test(x.n)){
+          var y={}; for(var kk2 in x) y[kk2]=x[kk2];
+          y.n=x.n.replace(/科學班｜?/,'會考｜').replace(/考古題限時/,'歷屆會考限時');
+          return y;
+        }
+        return x;
+      });
+    }
     return out.slice();
   }
   window.__dayTpl=dayTpl;
@@ -1558,12 +1992,27 @@ section[hidden]{display:none}
       out.push({id:'t'+(i++), n:x.n, t:x.t, m:x.m, f:x.f?1:0});
     });
     (backlog||[]).forEach(function(b){ out.push({id:'b'+(i++), n:b.n, t:'欠帳', m:b.m, bk:1}); });
+    try{
+      var due=(window.__wrongDue?window.__wrongDue():[]).length;
+      if(due) out.push({id:'w'+(i++), n:'錯題複習 '+due+' 題（闔上答案重做）', t:'錯題本', m:Math.min(60,due*6)});
+    }catch(e){}
     return out;
   }
   function rollover(){
     var d=today0(), k=key(d);
     if (st.day !== k){
-      st.backlog = (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !st.done[x.id]; })
+      var wasEasy=false; try{ wasEasy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[st.day]); }catch(e){}
+      if (st.day && st.list && st.list.length){
+        try{
+          var hist=JSON.parse(localStorage.getItem('plan.hist.v1')||'{}');
+          var real=st.list.filter(function(x){return !x.f;});
+          var dn=real.filter(function(x){return st.done[x.id];});
+          hist[st.day]=Object.assign(hist[st.day]||{}, {a:real.length, d:dn.length,
+            m:dn.reduce(function(s,x){return s+x.m;},0)});
+          localStorage.setItem('plan.hist.v1', JSON.stringify(hist));
+        }catch(e){}
+      }
+      st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !st.done[x.id]; })
         .map(function(x){ return {n:x.n, m:x.m}; });
       st.done={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
     } else if (!st.list || !st.list.length){
@@ -1582,25 +2031,41 @@ section[hidden]{display:none}
     D=rollover();
     var pf=profileOf(D), extra='';
     var nt=null; try{ nt=(JSON.parse(localStorage.getItem('plan.notes.v1'))||{})[key(D)]; }catch(e){}
-    if (CLOSED[key(D)]) extra='　補習班停課';
+    if (EXAMDAY[key(D)]) extra='　考試日';
+    else if (HOL[key(D)] && !nearExam(D)) extra='　國定假日';
+    else if (HOL[key(D)]) extra='　假日但考前 7 天內，照常';
+    else if (CLOSED[key(D)]) extra='　補習班停課（改排研發與自習）';
     else if (isWeekendLite(D)) extra='　例假日精簡（剩 '+daysTo(SCI,D)+' 天，'+BIND_AT+' 天內恢復完整）';
     elWhen.textContent=(D.getMonth()+1)+'/'+D.getDate()+'　週'+WD[D.getDay()]+'　'+label(pf)+extra+(nt?'　'+nt.t:'');
     var nEl=document.getElementById('td-note2');
     if(nEl){ if(nt&&(nt.b||nt.t)){ nEl.hidden=false; nEl.innerHTML='<b>'+(nt.t||'記事')+'</b>'+(nt.b?'<br>'+nt.b.replace(/</g,'&lt;').replace(/\n/g,'<br>'):''); } else nEl.hidden=true; }
 
     elList.innerHTML='';
+    if(!st.list.length){
+      elList.innerHTML='<div style="padding:20px 18px;color:var(--ink-faint);font-size:13.5px">'
+        +'今天沒有排定任務。'+(HOL[key(D)]?'國定假日整天休息——這是計畫的一部分，不是偷懶。':'')
+        +'<br>想做點什麼的話，「錯題」分頁看有沒有到期的題目。</div>';
+    }
     st.list.forEach(function(x){
       var lab=document.createElement('label');
       lab.className='tk'+(x.f?' tk-fix':'')+(x.bk?' tk-bk':'');
       var cb=document.createElement('input');
       cb.type='checkbox'; cb.checked=!!st.done[x.id]; cb.disabled=!!x.f;
       cb.addEventListener('change',function(){
-        if(cb.checked){ st.done[x.id]=1; if(window.__award) window.__award((window.__rules?window.__rules().task:5),'完成：'+x.n); }
-        else { delete st.done[x.id]; if(window.__award) window.__award(-(window.__rules?window.__rules().task:5),'取消勾選'); }
+        var pv=(window.__rules?window.__rules().task:5);
+        if(cb.checked){ st.done[x.id]=1; if(window.__award) window.__award(pv,'完成：'+x.n);
+          if(window.__fx) window.__fx.task(lab,pv); }
+        else { delete st.done[x.id]; if(window.__award) window.__award(-pv,'取消勾選');
+          if(window.__fx) window.__fx.undo(lab,pv); }
         save(SK,st); paintBudget();
       });
       var sp=document.createElement('span');
-      sp.innerHTML=x.n+'<span class="tk-m">'+x.t+'　'+x.m+' 分'+(x.f?'　固定行程':'')+(x.bk?'　昨日未完成':'')+'</span>';
+      var bk=''; try{
+        var B=JSON.parse(localStorage.getItem('plan.books.v1')||'{}');
+        var hit=Object.keys(B).filter(function(s){ return x.n.indexOf(s)!==-1; })[0];
+        if(hit&&B[hit].b) bk='　《'+B[hit].b+'》'+(B[hit].p?' p.'+B[hit].p:'');
+      }catch(e){}
+      sp.innerHTML=x.n+'<span class="tk-m">'+x.t+'　'+x.m+' 分'+bk+(x.f?'　固定行程':'')+(x.bk?'　昨日未完成':'')+'</span>';
       lab.appendChild(cb); lab.appendChild(sp);
       if(!x.f){
         var del=document.createElement('button');
@@ -1610,20 +2075,63 @@ section[hidden]{display:none}
         lab.appendChild(del);
       }
       elList.appendChild(lab);
+      if(!x.f) elList.appendChild(metaRow(x));
     });
     paintBudget();
   }
+
+  /* 每項任務的細節：何時何地（實施意向）、實際花費、專注度 */
+  var MK='plan.meta.v1';
+  var meta = ls(MK) || {};
+  function mkey(x){ return (st.day||'')+'|'+x.n; }
+  function metaRow(x){
+    var wrap=document.createElement('div');
+    wrap.className='tk-meta';
+    var m=meta[mkey(x)]||{};
+    var head=document.createElement('button');
+    head.type='button'; head.className='tk-more';
+    head.textContent=(m.plan||m.act||m.foc)?'✎ 已填細節':'＋ 幾點在哪做 · 實際花多久';
+    var body=document.createElement('div'); body.className='tk-body'; body.hidden=true;
+    var p1=document.createElement('input'); p1.placeholder='例：19:00 在書房，桌上只留這一科'; p1.value=m.plan||'';
+    var p2=document.createElement('input'); p2.type='number'; p2.placeholder='實際幾分鐘'; p2.value=(m.act||'');
+    var p3=document.createElement('select');
+    p3.innerHTML='<option value="">專注度</option><option value="1">1 很散</option><option value="2">2</option><option value="3">3 普通</option><option value="4">4</option><option value="5">5 很專注</option>';
+    p3.value=m.foc||'';
+    [p1,p2,p3].forEach(function(el){
+      el.addEventListener('change',function(){
+        meta[mkey(x)]={plan:p1.value.trim(), act:parseInt(p2.value,10)||0, foc:parseInt(p3.value,10)||0, m:x.m};
+        save(MK,meta);
+        head.textContent='✎ 已填細節';
+      });
+    });
+    body.appendChild(p1); body.appendChild(p2); body.appendChild(p3);
+    head.addEventListener('click',function(){ body.hidden=!body.hidden; });
+    wrap.appendChild(head); wrap.appendChild(body);
+    return wrap;
+  }
+  window.__calib=function(){
+    var pairs=[];
+    for(var k in meta){ var v=meta[k]; if(v.act&&v.m) pairs.push(v.act/v.m); }
+    if(pairs.length<3) return null;
+    var avg=pairs.reduce(function(a,b){return a+b;},0)/pairs.length;
+    var focs=[]; for(var k2 in meta){ if(meta[k2].foc) focs.push(meta[k2].foc); }
+    return {n:pairs.length, ratio:avg, foc: focs.length? (focs.reduce(function(a,b){return a+b;},0)/focs.length) : 0};
+  };
 
   var CAP=60, FLOOR=30, ALERT=90;
   function paintBudget(){
     var base=0; dayTpl(D).forEach(function(x){ if(x.e) base+=x.m; });
     var owed=0; st.list.forEach(function(x){ if(x.bk) owed+=x.m; });
-    var cut=Math.min(CAP,owed), left=Math.max(FLOOR,base-cut);
+    var easy=false; try{ easy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[key(D)]); }catch(e){}
+    var cut=easy?0:Math.min(CAP,owed), left=Math.max(FLOOR,base-cut);
     var all=st.list.filter(function(x){return !x.f;}).length;
     var done=st.list.filter(function(x){return !x.f && st.done[x.id];}).length;
     var pct=all?Math.round(done/all*100):100;
-    if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st); if(window.__award) window.__award((window.__rules?window.__rules().allclear:15),'今日全清'); }
-    var m='<b>今日進度 '+done+' / '+all+'</b>（'+pct+'%）<div class="bar"><i style="width:'+pct+'%"></i></div>娛樂時間 <b>'+left+' 分</b>';
+    if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st);
+      if(window.__award) window.__award((window.__rules?window.__rules().allclear:15),'今日全清');
+      if(window.__fx) setTimeout(function(){ window.__fx.allClear(); },260); }
+    var m=(easy?'<b style="color:var(--warn)">降級模式</b>　只做最重要的一項就算數，今天不計欠帳、不扣娛樂、不斷連續紀錄。<br>':'')
+      +'<b>今日進度 '+done+' / '+all+'</b>（'+pct+'%）<div class="bar"><i style="width:'+pct+'%"></i></div>娛樂時間 <b>'+left+' 分</b>';
     if(cut>0) m+='　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+cut+' 分）</span>';
     if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項，不要靠熬夜追。';
     else if(cut>0) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">每天最多扣 '+CAP+' 分，娛樂不低於 '+FLOOR+' 分，睡眠一律不動。</span>';
@@ -1704,6 +2212,11 @@ section[hidden]{display:none}
     });
     out.sort(function(p,q){return p.a-q.a;});
     return out;
+  };
+  window.__todayStat=function(){
+    var real=st.list.filter(function(x){return !x.f;});
+    var dn=real.filter(function(x){return st.done[x.id];});
+    return {day:st.day, a:real.length, d:dn.length, m:dn.reduce(function(s,x){return s+x.m;},0)};
   };
   window.__regenToday=function(){ st.list=buildList(today0(), st.backlog||[]); st.done={}; st.bonus=0; save(SK,st); render(); };
 
@@ -1829,7 +2342,7 @@ section[hidden]{display:none}
   }
   function nextPhase(){
     if(mode==='work'){
-      P.done++; P.seq++; s(PK,P); if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘');
+      P.done++; P.seq++; P.total=(P.total||0)+1; s(PK,P); if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘');
       var lng = P.seq%4===0;
       mode = lng?'long':'break';
       left = (lng?15:P.b)*60;
@@ -1965,7 +2478,7 @@ section[hidden]{display:none}
     if(!shop.log.length){ elLog.innerHTML='<p class="sub" style="margin:0">還沒有紀錄。</p>'; return; }
     elLog.innerHTML='<h3 style="margin-bottom:10px">最近的紀錄</h3>'+shop.log.slice(0,40).map(function(l){
       var d=new Date(l.t);
-      return '<div style="display:flex;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px solid #EDF0F2">'
+      return '<div style="display:flex;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px solid var(--rule2)">'
         +'<span class="mono" style="color:var(--ink-faint);font-size:11.5px;flex:0 0 82px">'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+'</span>'
         +'<span class="mono" style="flex:0 0 44px;color:'+(l.n[0]==='＋'?'var(--cap)':'var(--warn)')+'">'+l.n+'</span>'
         +'<span style="color:var(--ink-soft)">'+l.w+'</span></div>';
@@ -2108,7 +2621,7 @@ section[hidden]{display:none}
   drawScores();
 
   /* ---------- 備份 ---------- */
-  var KEYS=['plan.tpl.v3','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1','plan.notes.v1','plan-tab'];
+  var KEYS=['plan.tpl.v3','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan-tab'];
   function dump(){
     var o={_v:1,_at:new Date().toISOString()};
     KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} });
@@ -2268,6 +2781,841 @@ section[hidden]{display:none}
     if(window.__regenToday) window.__regenToday();
     alert('已重新產生，回「今天」看看。');
   });
+})();
+</script>
+<script>
+/* ===== 配色主題 ===== */
+(function(){
+  var THK='plan.theme.v1';
+  function ls(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+  function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+  var THEMES={
+    sky:{n:'天空藍',light:{paper:'#F2F7FB',card:'#FFFFFF',card2:'#F7FAFD',rule:'#D4E2EE',rule2:'#E8F0F6',
+      ink:'#10202C',soft:'#42596B',faint:'#7B93A5',acc:'#1E88C7',accT:'#E2F0FA',
+      cap:'#0E7C8C',capT:'#DEF1F3',warn:'#B5620D',warnT:'#FBEEDF',slate:'#54677A',slateT:'#E9EFF4',
+      rest:'#B03A2E',restT:'#FBE7E4',hi:'#FDF3E4',hi2:'#F3F9FD',hi3:'#EEF6FC'}},
+    aqua:{n:'水藍',light:{paper:'#F0F8F8',card:'#FFFFFF',card2:'#F6FBFB',rule:'#CFE5E6',rule2:'#E5F1F2',
+      ink:'#0F2326',soft:'#3E5D61',faint:'#77949A',acc:'#0E9AAE',accT:'#DDF2F5',
+      cap:'#0D8A6A',capT:'#DDF1EA',warn:'#B06A10',warnT:'#FBF0DE',slate:'#4F6A6E',slateT:'#E7EFF0',
+      rest:'#AF3E33',restT:'#FBE8E5',hi:'#FCF4E6',hi2:'#F1FAFB',hi3:'#EBF7F8'}},
+    mint:{n:'薄荷',light:{paper:'#F2F8F4',card:'#FFFFFF',card2:'#F7FBF8',rule:'#D3E6D9',rule2:'#E8F2EB',
+      ink:'#14251B',soft:'#425A4A',faint:'#7C9587',acc:'#2E9464',accT:'#E1F2E9',
+      cap:'#1C7E9B',capT:'#DEEEF4',warn:'#A96A12',warnT:'#F9F0DE',slate:'#546B5C',slateT:'#E9F0EB',
+      rest:'#AC4034',restT:'#FAE8E6',hi:'#FBF4E6',hi2:'#F2FAF5',hi3:'#EDF7F1'}},
+    paper:{n:'紙白',light:{paper:'#F4F6F7',card:'#FFFFFF',card2:'#FBFCFC',rule:'#D6DCE1',rule2:'#EDF0F2',
+      ink:'#131C26',soft:'#4E5B67',faint:'#7C8894',acc:'#4A3DB8',accT:'#EDEBF9',
+      cap:'#0D7F63',capT:'#E5F2EE',warn:'#B5620D',warnT:'#FBEEDF',slate:'#5A6673',slateT:'#EDEFF1',
+      rest:'#B03A2E',restT:'#FBE7E4',hi:'#FEF6EC',hi2:'#FEF9F8',hi3:'#FBFAFD'}},
+    dusk:{n:'夜間',light:{paper:'#0E1620',card:'#16212C',card2:'#1B2733',rule:'#2A3947',rule2:'#22303C',
+      ink:'#E6EDF3',soft:'#AEBECC',faint:'#7B8C9B',acc:'#4FB3E8',accT:'#16303F',
+      cap:'#3FBFA0',capT:'#123028',warn:'#E0973F',warnT:'#33260F',slate:'#8798A7',slateT:'#22303C',
+      rest:'#E2685A',restT:'#361A17',hi:'#2A2418',hi2:'#241A19',hi3:'#1B2436'}}
+  };
+  var URGENT={
+    calm:{acc:'#3A93C9',accT:'#E3F0F9'},
+    soon:{acc:'#C07C13',accT:'#FAEEDA'},
+    near:{acc:'#B5451F',accT:'#FBE7DF'}
+  };
+
+  var cfg = Object.assign({key:'sky',mode:'auto',accent:'',round:'soft',night:true}, ls(THK)||{});
+
+  function urgency(){
+    try{
+      var bl=document.getElementById('next-l');
+      var n=document.getElementById('next-n');
+      var m=n&&n.textContent.match(/(\d+)/);
+      if(!m) return 'none';
+      var d=+m[1];
+      if(d<=3) return 'near';
+      if(d<=7) return 'soon';
+      if(d<=30) return 'main';
+      return 'calm';
+    }catch(e){ return 'none'; }
+  }
+  function isNight(){ var hr=new Date().getHours(); return hr>=21||hr<6; }
+
+  function apply(){
+    var t=THEMES[cfg.key]||THEMES.sky;
+    var base = (cfg.night && isNight()) ? THEMES.dusk.light : t.light;
+    var p=Object.assign({},base);
+    var note='';
+    if(cfg.mode==='auto'){
+      var u=urgency();
+      if(u==='calm'){ p.acc=URGENT.calm.acc; p.accT=URGENT.calm.accT; note='距下一關 30 天以上——平靜藍'; }
+      else if(u==='soon'){ p.acc=URGENT.soon.acc; p.accT=URGENT.soon.accT; note='剩 4–7 天——琥珀'; }
+      else if(u==='near'){ p.acc=URGENT.near.acc; p.accT=URGENT.near.accT; note='剩 3 天內——暖紅'; }
+      else note='考前 8–30 天——主色';
+    } else note='固定：'+t.n;
+    if(cfg.accent){ p.acc=cfg.accent; }
+    var R={soft:['999px','14px','7px','10px'],round:['999px','22px','10px','14px'],sharp:['3px','3px','2px','2px']}[cfg.round]||['999px','14px','7px','10px'];
+    var s=document.documentElement.style;
+    var map={'--paper':p.paper,'--card':p.card,'--card2':p.card2,'--rule':p.rule,'--rule2':p.rule2,
+      '--ink':p.ink,'--ink-soft':p.soft,'--ink-faint':p.faint,
+      '--sci':p.acc,'--sci-tint':p.accT,'--cap':p.cap,'--cap-tint':p.capT,
+      '--warn':p.warn,'--warn-tint':p.warnT,'--slate':p.slate,'--slate-tint':p.slateT,
+      '--rest':p.rest,'--rest-tint':p.restT,'--hi':p.hi,'--hi2':p.hi2,'--hi3':p.hi3,
+      '--r-btn':R[0],'--r-card':R[1],'--r-pill':R[2],'--r-in':R[3]};
+    for(var k in map) s.setProperty(k,map[k]);
+    var mt=document.querySelector('meta[name="theme-color"]');
+    if(mt) mt.setAttribute('content',p.paper);
+    var el=document.getElementById('th-now');
+    if(el) el.textContent='目前：'+t.n+(cfg.night&&isNight()?'（夜間深色）':'')+'　'+note;
+    Array.prototype.forEach.call(document.querySelectorAll('#th-sw .sw'),function(b){
+      b.classList.toggle('on', b.dataset.k===cfg.key);
+    });
+  }
+  window.__applyTheme=apply;
+
+  var sw=document.getElementById('th-sw');
+  if(sw){
+    Object.keys(THEMES).forEach(function(k){
+      var b=document.createElement('button');
+      b.type='button'; b.className='sw'; b.dataset.k=k; b.title=THEMES[k].n;
+      b.style.background='linear-gradient(135deg,'+THEMES[k].light.acc+' 50%,'+THEMES[k].light.paper+' 50%)';
+      b.addEventListener('click',function(){ cfg.key=k; cfg.accent=''; sv(THK,cfg); apply(); });
+      sw.appendChild(b);
+    });
+    var mo=document.getElementById('th-mode'), ac=document.getElementById('th-accent'),
+        ro=document.getElementById('th-round'), ni=document.getElementById('th-night');
+    mo.value=cfg.mode; ro.value=cfg.round; ni.checked=!!cfg.night;
+    ac.value=cfg.accent||THEMES[cfg.key].light.acc;
+    document.getElementById('th-save').addEventListener('click',function(){
+      cfg.mode=mo.value; cfg.round=ro.value; cfg.night=ni.checked;
+      cfg.accent = (ac.value.toLowerCase()===THEMES[cfg.key].light.acc.toLowerCase()) ? '' : ac.value;
+      sv(THK,cfg); apply();
+    });
+    document.getElementById('th-reset').addEventListener('click',function(){
+      cfg={key:'sky',mode:'auto',accent:'',round:'soft',night:true}; sv(THK,cfg);
+      mo.value='auto'; ro.value='soft'; ni.checked=true; ac.value=THEMES.sky.light.acc; apply();
+    });
+  }
+  apply();
+  setInterval(apply,60000);
+})();
+</script>
+<script>
+/* ===== 錯題本 + 間隔複習 ===== */
+(function(){
+  var WK='plan.wrong.v1';
+  var IV=(function(){try{var c=JSON.parse(localStorage.getItem('plan.wrongcfg.v1')||'{"mode":"fib"}');return c.mode==='fix'?[1,3,7,14,30]:[1,2,3,5,8,13,21,34];}catch(e){return [1,2,3,5,8,13,21,34];}})();
+  function ls(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+  function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function d0(){var d=new Date();d.setHours(0,0,0,0);return d;}
+  function kk(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+  function plus(n){var d=d0();d.setDate(d.getDate()+n);return kk(d);}
+  function parse(s){var p=(s||'').split('-');return new Date(+p[0],(+p[1]||1)-1,+p[2]||1);}
+
+  var W=ls(WK)||[];
+  function save(){ sv(WK,W); }
+  window.__wrongDue=function(){ var t=d0(); return W.filter(function(x){ return x.lv<IV.length && parse(x.due)<=t; }); };
+
+  var elDue=document.getElementById('wr-due'), elAll=document.getElementById('wr-all'), elStat=document.getElementById('wr-stat');
+  if(!elDue) return;
+
+  function card(x, mode){
+    var box=document.createElement('div');
+    box.style.cssText='padding:12px 0;border-bottom:1px solid var(--rule2)';
+    var top=document.createElement('div');
+    top.style.cssText='display:flex;gap:9px;align-items:baseline;flex-wrap:wrap;margin-bottom:4px';
+    top.innerHTML='<span class="pill p-seg" style="display:inline-block">'+x.s+'</span>'
+      +'<b style="font-size:14px">'+(x.src||'（未填出處）')+'</b>'
+      +'<span class="tk-m" style="display:inline">'+x.why+'　第 '+(x.lv+1)+' 輪'
+      +(x.lv>=IV.length?'　已精熟':'　下次 '+x.due)+'</span>';
+    box.appendChild(top);
+    if(x.note){
+      var n=document.createElement('p');
+      n.style.cssText='margin:0 0 8px;font-size:13px;color:var(--ink-soft)';
+      n.textContent='錯因：'+x.note;
+      box.appendChild(n);
+    }
+    var bar=document.createElement('div'); bar.className='bar-btns'; bar.style.marginTop='4px';
+    if(mode==='due'){
+      var ok=document.createElement('button'); ok.type='button'; ok.className='btn solid'; ok.textContent='重做對了';
+      ok.addEventListener('click',function(){
+        x.lv=Math.min(IV.length,x.lv+1);
+        x.due=x.lv<IV.length?plus(IV[x.lv]):'—';
+        (x.hist=x.hist||[]).push({d:kk(d0()),r:1});
+        save(); paint(); if(window.__award) window.__award(3,'錯題複習：'+(x.src||x.s));
+        if(window.__fx){ if(x.lv>=IV.length) window.__fx.unlock(null,'一題精熟：'+(x.src||x.s)); else window.__fx.task(null,3); }
+      });
+      var no=document.createElement('button'); no.type='button'; no.className='btn'; no.textContent='還是錯';
+      no.addEventListener('click',function(){
+        x.lv=0; x.due=plus(1); (x.hist=x.hist||[]).push({d:kk(d0()),r:0});
+        save(); paint();
+      });
+      bar.appendChild(ok); bar.appendChild(no);
+    }
+    var del=document.createElement('button'); del.type='button'; del.className='btn ghost'; del.textContent='刪除';
+    del.addEventListener('click',function(){
+      if(!confirm('刪掉這一題？')) return;
+      W=W.filter(function(y){return y.id!==x.id;}); save(); paint();
+    });
+    bar.appendChild(del);
+    box.appendChild(bar);
+    return box;
+  }
+
+  function paint(){
+    var due=window.__wrongDue();
+    elDue.innerHTML='';
+    if(!due.length) elDue.innerHTML='<p class="sub" style="margin:0">今天沒有待複習的題目。做完新的題目後把錯的加進來。</p>';
+    else {
+      // 交錯：不同科目穿插排列，同科不連續
+      var by={}; due.forEach(function(x){ (by[x.s]=by[x.s]||[]).push(x); });
+      var keys=Object.keys(by), mixed=[], i=0;
+      while(mixed.length<due.length){ var k=keys[i++%keys.length]; if(by[k]&&by[k].length) mixed.push(by[k].shift()); }
+      var hint=document.createElement('p');
+      hint.className='sub'; hint.style.margin='0 0 8px';
+      hint.textContent='已依科目交錯排序（同科不連續）——這比一科做完再換一科難，但記得比較久。';
+      elDue.appendChild(hint);
+      mixed.forEach(function(x){ elDue.appendChild(card(x,'due')); });
+    }
+    var f=document.getElementById('wr-filter').value;
+    var list=W.filter(function(x){ return !f||x.s===f; })
+              .sort(function(a,b){ return parse(a.due)-parse(b.due); });
+    elAll.innerHTML='';
+    if(!list.length) elAll.innerHTML='<p class="sub" style="margin:0">還沒有錯題。</p>';
+    else list.forEach(function(x){ elAll.appendChild(card(x,'all')); });
+
+    var act=W.filter(function(x){return x.lv<IV.length;}).length;
+    var done=W.length-act;
+    var whyC={}; W.forEach(function(x){ whyC[x.why]=(whyC[x.why]||0)+1; });
+    var top=Object.keys(whyC).sort(function(a,b){return whyC[b]-whyC[a];})[0];
+    var subC={}; W.forEach(function(x){ if(x.lv<IV.length) subC[x.s]=(subC[x.s]||0)+1; });
+    var subs=Object.keys(subC).sort(function(a,b){return subC[b]-subC[a];})
+      .map(function(k){return k+' '+subC[k];}).join('　');
+    elStat.innerHTML='<b>待攻克 '+act+' 題</b>　已精熟 '+done+' 題　今日到期 <b>'+window.__wrongDue().length+'</b> 題'
+      +(subs?'<br><span style="font-size:12.5px;color:var(--ink-faint)">'+subs+'</span>':'')
+      +(top?'<br><span style="font-size:12.5px;color:var(--warn)">最常見的錯因：'+top+'（'+whyC[top]+' 次）</span>':'');
+  }
+
+  document.getElementById('wr-add').addEventListener('click',function(){
+    var s=document.getElementById('wr-sub').value, why=document.getElementById('wr-why').value,
+        src=document.getElementById('wr-src').value.trim(), note=document.getElementById('wr-note').value.trim();
+    W.unshift({id:'w'+Date.now(), s:s, why:why, src:src, note:note, lv:0, due:plus(1), hist:[]});
+    save(); paint();
+    document.getElementById('wr-src').value=''; document.getElementById('wr-note').value='';
+    var m=document.getElementById('wr-msg'); m.textContent='已加入，明天複習 ✓';
+    setTimeout(function(){m.textContent='';},3000);
+  });
+  document.getElementById('wr-filter').addEventListener('change',paint);
+  paint();
+  setInterval(paint,60000);
+})();
+</script>
+<script>
+/* ===== 校準 · 無障礙 · ICS · 離線 ===== */
+(function(){
+  function ls(k){try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;}}
+  function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+  /* 校準 */
+  function paintCal(){
+    var el=document.getElementById('cal-out'); if(!el) return;
+    var c=window.__calib?window.__calib():null;
+    if(!c){ el.textContent='還沒有足夠資料（需要至少 3 筆實際時間）。'; return; }
+    var pct=Math.round((c.ratio-1)*100);
+    var txt = pct>5 ? '你平均<b style="color:var(--warn)">低估 '+pct+'%</b>——排表時每項多抓 '+pct+'% 的時間會準很多。'
+            : (pct<-5 ? '你平均<b style="color:var(--cap)">高估 '+Math.abs(pct)+'%</b>——其實可以再多排一點，或把區塊縮短。'
+                      : '你的時間估計<b style="color:var(--cap)">很準</b>（誤差 5% 以內），照現在的排法就好。');
+    el.innerHTML='已記錄 '+c.n+' 筆。'+txt+(c.foc?'<br><span style="font-size:12.5px;color:var(--ink-faint)">平均專注度 '+c.foc.toFixed(1)+' / 5</span>':'');
+  }
+  paintCal(); setInterval(paintCal,30000);
+
+  /* 無障礙 */
+  var AK='plan.a11y.v1';
+  var a=Object.assign({size:'15',lh:'1.75',motion:false}, ls(AK)||{});
+  function applyA(){
+    var s=document.documentElement.style;
+    document.body.style.fontSize=a.size+'px';
+    document.body.style.lineHeight=a.lh;
+    document.documentElement.classList.toggle('no-motion',!!a.motion);
+  }
+  var sz=document.getElementById('a11y-size'), lh=document.getElementById('a11y-lh'), mo=document.getElementById('a11y-motion');
+  if(sz){
+    sz.value=a.size; lh.value=a.lh; mo.checked=!!a.motion;
+    [sz,lh,mo].forEach(function(el){ el.addEventListener('change',function(){
+      a={size:sz.value,lh:lh.value,motion:mo.checked}; sv(AK,a); applyA();
+    });});
+  }
+  applyA();
+
+  /* ICS 匯出 */
+  function pad(n){return (n<10?'0':'')+n;}
+  function icsDate(y,m,d){ return y+pad(m)+pad(d); }
+  function icsGo(){
+    var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//study-plan//TW','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:國三作戰計畫'];
+    function ev(uid,y,m,d,title,desc,alarm){
+      var nd=new Date(y,m-1,d+1);
+      L.push('BEGIN:VEVENT','UID:'+uid+'@study-plan','DTSTAMP:'+icsDate(2026,8,1)+'T000000Z',
+        'DTSTART;VALUE=DATE:'+icsDate(y,m,d),
+        'DTEND;VALUE=DATE:'+icsDate(nd.getFullYear(),nd.getMonth()+1,nd.getDate()),
+        'SUMMARY:'+title.replace(/[,;]/g,' '));
+      if(desc) L.push('DESCRIPTION:'+desc.replace(/[,;]/g,' ').replace(/\n/g,'\\n'));
+      if(alarm) L.push('BEGIN:VALARM','TRIGGER:-P1D','ACTION:DISPLAY','DESCRIPTION:'+title.replace(/[,;]/g,' '),'END:VALARM');
+      L.push('END:VEVENT');
+    }
+    // 考試（來自時間軸的固定清單）
+    var EX=[[2026,9,8,'一模'],[2026,9,9,'一模'],[2026,10,12,'上學期一段'],[2026,10,13,'上學期一段'],
+      [2026,10,14,'畢旅（暫定）'],[2026,10,15,'畢旅（暫定）'],[2026,10,16,'畢旅（暫定）'],
+      [2026,10,28,'二模'],[2026,10,29,'二模'],[2026,11,23,'上學期二段'],[2026,11,24,'上學期二段'],
+      [2026,12,23,'三模'],[2026,12,24,'三模'],[2027,1,14,'上學期三段'],[2027,1,15,'上學期三段'],
+      [2027,2,18,'四模'],[2027,2,19,'四模'],[2027,3,13,'雄科班初試（推估）'],[2027,3,20,'雄科班複試（推估）'],
+      [2027,3,22,'下學期一段'],[2027,3,23,'下學期一段'],[2027,4,15,'五模'],[2027,4,16,'五模'],
+      [2027,5,3,'下學期二段'],[2027,5,7,'下學期二段'],[2027,5,15,'國中教育會考'],[2027,5,16,'國中教育會考']];
+    EX.forEach(function(e,i){ ev('ex'+i,e[0],e[1],e[2],e[3],'',true); });
+    // 月曆記事
+    var notes=ls('plan.notes.v1')||{};
+    Object.keys(notes).forEach(function(k,i){
+      var p=k.split('-'); ev('nt'+i,+p[0],+p[1],+p[2],notes[k].t||'記事',notes[k].b||'',false);
+    });
+    L.push('END:VCALENDAR');
+    var blob=new Blob([L.join('\r\n')],{type:'text/calendar;charset=utf-8'});
+    var url=URL.createObjectURL(blob), aEl=document.createElement('a');
+    aEl.href=url; aEl.download='作戰計畫.ics'; document.body.appendChild(aEl); aEl.click(); aEl.remove();
+  }
+  var ig=document.getElementById('ics-go'); if(ig) ig.addEventListener('click',icsGo);
+
+  /* 離線 */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',function(){
+      navigator.serviceWorker.register('sw.js').catch(function(){});
+    });
+  }
+  var ss=document.getElementById('sw-status');
+  if(ss) ss.addEventListener('click',function(){
+    if(!('serviceWorker' in navigator)){ alert('這個瀏覽器不支援離線快取。'); return; }
+    navigator.serviceWorker.getRegistration().then(function(r){
+      alert(r? '離線已啟用。沒網路時一樣打得開，資料都在本機。' : '離線尚未啟用——請重新整理一次頁面。');
+    });
+  });
+})();
+</script>
+<script>
+/* ===== 日誌 · 心情 · 回測 · 解鎖 ===== */
+(function(){
+  function ls(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch(e){return d;}}
+  function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function d0(){var d=new Date();d.setHours(0,0,0,0);return d;}
+  function kk(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+  function pad(n){return (n<10?'0':'')+n;}
+
+  var HK='plan.hist.v1', JK='plan.journal.v1', UK='plan.unlock.v1';
+  var hist=ls(HK,{}), jr=ls(JK,{}), ul=ls(UK,{seen:[],custom:[]});
+
+  /* ---------- 心情 / 體力 ---------- */
+  var MOOD=['很低','偏低','普通','不錯','很好'], ENER=['很累','有點累','普通','有精神','充沛'];
+  function buildRow(id, labels, field){
+    var box=document.getElementById(id); if(!box) return;
+    box.innerHTML='';
+    labels.forEach(function(t,i){
+      var b=document.createElement('button'); b.type='button'; b.textContent=(i+1)+' '+t;
+      b.addEventListener('click',function(){
+        var k=kk(d0()); hist[k]=hist[k]||{}; hist[k][field]=i+1; sv(HK,hist);
+        buildRow(id,labels,field); moodHint(); paintBT();
+      });
+      if((hist[kk(d0())]||{})[field]===i+1) b.classList.add('on');
+      box.appendChild(b);
+    });
+  }
+  function moodHint(){
+    var el=document.getElementById('md-hint'); if(!el) return;
+    var ks=Object.keys(hist).sort(function(a,b){return new Date(a)-new Date(b);});
+    var last=ks.slice(-5).map(function(k){return hist[k].mood;}).filter(function(x){return x;});
+    var t=hist[kk(d0())]||{};
+    if(!t.mood){ el.textContent='點一下就好，不用想太久。'; el.style.color='var(--ink-faint)'; return; }
+    if(last.length>=4 && last.reduce(function(a,b){return a+b;},0)/last.length<=2){
+      el.innerHTML='最近幾天狀態都偏低。這種時候跟信任的大人或朋友講一下，通常比自己撐著有用——而且不是軟弱，是省時間。如果連睡眠或食慾都受影響了，記得跟家人說一聲。';
+      el.style.color='var(--warn)';
+    } else if(t.mood<=2 || (t.energy&&t.energy<=2)){
+      el.innerHTML='今天狀態不好。把最難的那項往後挪，只做最簡單的一項就算數——這是計畫裡本來就允許的。<br>真的撐不住就按「今天狀況不好」，不計欠帳也不扣娛樂。';
+      el.style.color='var(--warn)';
+    } else {
+      el.textContent='記下來了。狀態會起伏，看的是月份不是單日。';
+      el.style.color='var(--ink-faint)';
+    }
+  }
+  buildRow('md-mood',MOOD,'mood'); buildRow('md-energy',ENER,'energy'); moodHint();
+
+  /* ---------- 小日誌 ---------- */
+  var w=document.getElementById('jr-win'), s=document.getElementById('jr-stuck'), n=document.getElementById('jr-next');
+  if(w){
+    var today=jr[kk(d0())]||{};
+    w.value=today.w||''; s.value=today.s||''; n.value=today.n||'';
+    document.getElementById('jr-save').addEventListener('click',function(){
+      var k=kk(d0());
+      if(!w.value.trim()&&!s.value.trim()&&!n.value.trim()) return;
+      jr[k]={w:w.value.trim(), s:s.value.trim(), n:n.value.trim()};
+      sv(JK,jr);
+      var m=document.getElementById('jr-msg'); m.textContent='存好了 ✓';
+      setTimeout(function(){m.textContent='';},2500);
+      if(window.__award) window.__award(3,'寫了日誌');
+    });
+    document.getElementById('jr-past').addEventListener('click',function(){
+      var box=document.getElementById('jr-list');
+      box.hidden=!box.hidden; if(box.hidden) return;
+      var ks=Object.keys(jr).sort(function(a,b){return new Date(b)-new Date(a);}).slice(0,30);
+      if(!ks.length){ box.innerHTML='<p class="sub" style="margin:0">還沒有紀錄。</p>'; return; }
+      box.innerHTML='<h3 style="margin-bottom:10px">最近 30 篇</h3>'+ks.map(function(k){
+        var e=jr[k], p=k.split('-');
+        return '<div style="padding:11px 0;border-bottom:1px solid var(--rule2)">'
+          +'<b class="mono" style="font-size:12px;color:var(--ink-faint)">'+p[1]+'/'+p[2]+'</b>'
+          +(e.w?'<p style="margin:5px 0 0;font-size:13.5px"><span style="color:var(--cap)">進展</span>　'+e.w+'</p>':'')
+          +(e.s?'<p style="margin:3px 0 0;font-size:13.5px;color:var(--ink-soft)"><span style="color:var(--warn)">卡住</span>　'+e.s+'</p>':'')
+          +(e.n?'<p style="margin:3px 0 0;font-size:12.5px;color:var(--ink-faint)">明天：'+e.n+'</p>':'')
+          +'</div>';
+      }).join('');
+    });
+  }
+
+  /* ---------- 回測 ---------- */
+  function allDays(){
+    var t=window.__todayStat?window.__todayStat():null;
+    var merged=JSON.parse(JSON.stringify(hist));
+    if(t&&t.day){ merged[t.day]=Object.assign(merged[t.day]||{},{a:t.a,d:t.d,m:t.m}); }
+    return merged;
+  }
+  function streak(m){
+    var ks=Object.keys(m).filter(function(k){return m[k].a;}).sort(function(a,b){return new Date(b)-new Date(a);});
+    var run=0, grace=0;
+    for(var i=0;i<ks.length;i++){
+      var e=m[ks[i]], r=e.a?e.d/e.a:0;
+      if(r>=0.6){ run++; }
+      else if(grace<Math.floor(run/7)+1){ grace++; }
+      else break;
+    }
+    return run;
+  }
+  function paintBT(){
+    var m=allDays();
+    var ks=Object.keys(m).filter(function(k){return m[k].a;}).sort(function(a,b){return new Date(a)-new Date(b);});
+    var sum=document.getElementById('bt-sum'); if(!sum) return;
+    if(!ks.length){ sum.innerHTML='還沒有資料。在「今天」勾任務，隔天這裡就會開始累積。'; return; }
+    var last7=ks.slice(-7), last30=ks.slice(-30);
+    function rate(list){ var a=0,d=0; list.forEach(function(k){a+=m[k].a;d+=m[k].d;}); return a?Math.round(d/a*100):0; }
+    var mins=last7.reduce(function(x,k){return x+(m[k].m||0);},0);
+    sum.innerHTML='<b>近 7 天完成率 '+rate(last7)+'%</b>　近 30 天 '+rate(last30)+'%　'
+      +'連續達標 <b>'+streak(m)+'</b> 天'
+      +'<div class="bar"><i style="width:'+rate(last7)+'%"></i></div>'
+      +'<span style="font-size:12.5px;color:var(--ink-faint)">近 7 天實際投入約 '+(mins/60).toFixed(1)+' 小時　共記錄 '+ks.length+' 天</span>';
+
+    // 折線圖
+    var box=document.getElementById('bt-chart');
+    var pts=last30.map(function(k){ return {k:k, v:m[k].a?Math.round(m[k].d/m[k].a*100):0}; });
+    if(pts.length<2){ box.innerHTML='<p class="sub" style="margin:0">累積兩天以上會出現走勢圖。</p>'; }
+    else{
+      var W=640,H=150,P=28;
+      function X(i){return P+i*((W-P*2)/(pts.length-1));}
+      function Y(v){return H-P-(v/100)*(H-P*2);}
+      var d=pts.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1);}).join(' ');
+      var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">';
+      [0,60,100].forEach(function(g){
+        svg+='<line x1="'+P+'" y1="'+Y(g)+'" x2="'+(W-P)+'" y2="'+Y(g)+'" stroke="'+(g===60?'#B5620D':'#D6DCE1')+'" stroke-width="1" stroke-dasharray="'+(g===60?'4 4':'0')+'"/>';
+        svg+='<text x="4" y="'+(Y(g)+4)+'" font-size="9.5" fill="#7C8894">'+g+'</text>';
+      });
+      svg+='<path d="'+d+'" fill="none" stroke="var(--cap)" stroke-width="2.5" stroke-linejoin="round"/>';
+      pts.forEach(function(p,i){ svg+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.v).toFixed(1)+'" r="3" fill="var(--card)" stroke="var(--cap)" stroke-width="2"/>'; });
+      svg+='</svg><p class="sub" style="margin:6px 0 0">近 '+pts.length+' 天每日完成率，虛線是 60% 達標線。</p>';
+      box.innerHTML=svg;
+    }
+
+    var tb=document.querySelector('#bt-table tbody'); tb.innerHTML='';
+    ks.slice(-21).reverse().forEach(function(k){
+      var e=m[k], p=k.split('-'), r=e.a?Math.round(e.d/e.a*100):0;
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td class="t">'+p[1]+'/'+p[2]+'</td><td>'+e.d+' / '+e.a+'</td>'
+        +'<td class="t" style="color:'+(r>=60?'var(--cap)':'var(--warn)')+'">'+r+'%</td>'
+        +'<td class="t">'+(e.mood?e.mood:'—')+'</td><td class="t">'+(e.energy?e.energy:'—')+'</td>';
+      tb.appendChild(tr);
+    });
+  }
+
+  /* ---------- 解鎖獎勵 ---------- */
+  var DEFUL=[
+    {k:'pomo', need:10,  n:'徽章：第一個十顆'},
+    {k:'task', need:50,  n:'徽章：五十項任務'},
+    {k:'wrong',need:10,  n:'徽章：錯題獵人'},
+    {k:'pomo', need:50,  n:'徽章：五十顆番茄'},
+    {k:'day',  need:14,  n:'徽章：兩週不斷線'},
+    {k:'pomo', need:150, n:'徽章：一百五十顆'},
+    {k:'wrong',need:50,  n:'徽章：五十題精熟'},
+    {k:'day',  need:60,  n:'徽章：兩個月'}
+  ];
+  var KN={pomo:'番茄鐘',task:'完成任務',wrong:'錯題精熟',day:'連續達標'};
+  function counts(){
+    var m=allDays();
+    var pomo=0; try{ var pm=JSON.parse(localStorage.getItem('plan.pomo.v1')||'{}'); pomo=pm.total||pm.done||0; }catch(e){}
+    var task=0; Object.keys(m).forEach(function(k){ task+=(m[k].d||0); });
+    var wrong=0; try{ var W=JSON.parse(localStorage.getItem('plan.wrong.v1')||'[]'); var ivl=(window.__wrongIV?window.__wrongIV().length:5); wrong=W.filter(function(x){return x.lv>=ivl;}).length; }catch(e){}
+    return {pomo:pomo, task:task, wrong:wrong, day:streak(m)};
+  }
+  function paintUL(){
+    var box=document.getElementById('ul-list'); if(!box) return;
+    var c=counts(), items=DEFUL.concat(ul.custom||[]);
+    var got=items.filter(function(it){ return c[it.k]>=it.need; }).length;
+    document.getElementById('ul-sum').innerHTML='<b>已解鎖 '+got+' / '+items.length+'</b>　'
+      +'<span style="font-size:12.5px;color:var(--ink-faint)">番茄鐘 '+c.pomo+'　完成任務 '+c.task+'　錯題精熟 '+c.wrong+'　連續達標 '+c.day+' 天</span>'
+      +'<div class="bar"><i style="width:'+(items.length?Math.round(got/items.length*100):0)+'%"></i></div>';
+    box.innerHTML='';
+    items.forEach(function(it,idx){
+      var have=c[it.k]||0, open=have>=it.need;
+      var row=document.createElement('div'); row.className='ul-item'+(open?'':' locked');
+      var left=document.createElement('div');
+      left.innerHTML='<b style="font-size:14px">'+it.n+'</b>'
+        +'<span class="tk-m" style="display:block">'+KN[it.k]+' '+Math.min(have,it.need)+' / '+it.need+'</span>'
+        +'<div class="ub"><i style="width:'+Math.min(100,Math.round(have/it.need*100))+'%"></i></div>';
+      var b=document.createElement('span');
+      b.className='ul-badge '+(open?'open':'shut'); b.textContent=open?'已解鎖':'還差 '+(it.need-have);
+      row.appendChild(left); row.appendChild(b);
+      if(open && (ul.seen||[]).indexOf(it.n)===-1){
+        ul.seen=(ul.seen||[]).concat([it.n]); sv(UK,ul);
+        (function(rr,nn){ setTimeout(function(){ if(window.__fx) window.__fx.unlock(rr,nn); },400); })(row,it.n);
+      }
+      if(idx>=DEFUL.length){
+        row.style.cursor='pointer';
+        row.title='點兩下刪除';
+        row.addEventListener('dblclick',function(){
+          if(!confirm('刪掉「'+it.n+'」？')) return;
+          ul.custom.splice(idx-DEFUL.length,1); sv(UK,ul); paintUL();
+        });
+      }
+      box.appendChild(row);
+    });
+  }
+  var ua=document.getElementById('ul-add');
+  if(ua) ua.addEventListener('click',function(){
+    var name=document.getElementById('ul-name').value.trim();
+    if(!name){ alert('先填獎勵是什麼。'); return; }
+    ul.custom=ul.custom||[];
+    ul.custom.push({k:document.getElementById('ul-kind').value,
+      need:parseInt(document.getElementById('ul-need').value,10)||50, n:name});
+    sv(UK,ul); document.getElementById('ul-name').value=''; paintUL();
+  });
+
+  paintBT(); paintUL();
+  setInterval(function(){ paintBT(); paintUL(); },30000);
+})();
+</script>
+<script>
+/* ===== 問老師 · 降級 · 費氏 · 配速 · 教材 · 週回顧 · 週報 · 快照 ===== */
+(function(){
+  function ls(k,d){try{var v=JSON.parse(localStorage.getItem(k));return v===null||v===undefined?d:v;}catch(e){return d;}}
+  function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function d0(){var d=new Date();d.setHours(0,0,0,0);return d;}
+  function kk(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
+  function pad(n){return (n<10?'0':'')+n;}
+
+  /* ---------- 要問老師 ---------- */
+  var AK='plan.ask.v1', ask=ls(AK,[]);
+  var aList=document.getElementById('ask-list'), aCount=document.getElementById('ask-count');
+  function paintAsk(){
+    if(!aList) return;
+    var open=ask.filter(function(x){return !x.done;});
+    var w=new Date().getDay(), school=(w>=1&&w<=5);
+    aCount.textContent=open.length?open.length+' 題待問':'目前沒有';
+    aList.innerHTML='';
+    if(school && open.length){
+      var b=document.createElement('p');
+      b.style.cssText='margin:0 0 10px;padding:9px 12px;border-radius:var(--r-in);background:var(--warn-tint);color:var(--warn);font-size:13px;font-weight:600';
+      b.textContent='今天要上學——這 '+open.length+' 題記得問，問完打勾。';
+      aList.appendChild(b);
+    }
+    if(!ask.length){ aList.insertAdjacentHTML('beforeend','<p class="sub" style="margin:0">還沒有紀錄。</p>'); return; }
+    ask.slice(0,25).forEach(function(x,i){
+      var row=document.createElement('div');
+      row.style.cssText='display:grid;grid-template-columns:20px 1fr 24px;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule2);align-items:start';
+      var cb=document.createElement('input'); cb.type='checkbox'; cb.checked=!!x.done; cb.style.cssText='margin-top:4px;accent-color:var(--cap)';
+      cb.addEventListener('change',function(){
+        x.done=cb.checked;
+        if(cb.checked){
+          var a=prompt('老師怎麼說？（可留空）');
+          if(a) x.a=a.trim();
+          if(window.__award) window.__award(3,'問到答案：'+x.q.slice(0,10));
+        }
+        sv(AK,ask); paintAsk();
+      });
+      var sp=document.createElement('span');
+      sp.innerHTML='<span class="pill p-seg" style="display:inline-block;margin-right:6px">'+x.s+'</span>'
+        +(x.done?'<s style="opacity:.55">'+x.q+'</s>':x.q)
+        +(x.a?'<span class="tk-m" style="color:var(--cap)">老師：'+x.a+'</span>':'');
+      var del=document.createElement('button'); del.type='button'; del.className='tk-del'; del.textContent='×';
+      del.addEventListener('click',function(){ ask.splice(i,1); sv(AK,ask); paintAsk(); });
+      row.appendChild(cb); row.appendChild(sp); row.appendChild(del);
+      aList.appendChild(row);
+    });
+  }
+  var aAdd=document.getElementById('ask-add');
+  if(aAdd) aAdd.addEventListener('click',function(){
+    var q=document.getElementById('ask-q').value.trim(); if(!q) return;
+    ask.unshift({s:document.getElementById('ask-sub').value, q:q, done:false, d:kk(d0())});
+    sv(AK,ask); document.getElementById('ask-q').value=''; paintAsk();
+  });
+  paintAsk();
+
+  /* ---------- 緊急降級 ---------- */
+  var EK='plan.easy.v1';
+  var te=document.getElementById('td-easy');
+  if(te) te.addEventListener('click',function(){
+    var e=ls(EK,{}), k=kk(d0());
+    if(e[k]){ if(!confirm('取消今天的降級模式？')) return; delete e[k]; }
+    else{
+      if(!confirm('啟動降級模式？\n\n今天只要做最重要的一項就算數：\n· 沒做完的不會變成欠帳\n· 娛樂時間不扣\n· 連續達標不會斷\n\n生病、家裡有事、狀態真的爛的時候用。')) return;
+      e[k]=1;
+    }
+    sv(EK,e);
+    if(window.__regenToday) window.__regenToday(); else location.reload();
+  });
+
+  /* ---------- 錯題：費氏間隔 + 快速標記 + 到期通知 ---------- */
+  var CK='plan.wrongcfg.v1', cfg=ls(CK,{mode:'fib'});
+  var FIB=[1,2,3,5,8,13,21,34], FIX=[1,3,7,14,30];
+  window.__wrongIV=function(){ return cfg.mode==='fib'?FIB:FIX; };
+  var wm=document.getElementById('wr-mode');
+  if(wm){ wm.value=cfg.mode; wm.addEventListener('change',function(){ cfg.mode=wm.value; sv(CK,cfg); location.reload(); }); }
+  var qk=document.getElementById('qk-go');
+  if(qk) qk.addEventListener('click',function(){
+    var t=document.getElementById('qk-t').value.trim(); if(!t){ alert('填一下題號或關鍵字。'); return; }
+    var W=ls('plan.wrong.v1',[]);
+    var d=d0(); d.setDate(d.getDate()+1);
+    W.unshift({id:'w'+Date.now(), s:document.getElementById('qk-sub').value, why:'觀念不熟',
+      src:t, note:'', lv:0, due:kk(d), hist:[]});
+    sv('plan.wrong.v1',W);
+    document.getElementById('qk-t').value='';
+    location.reload();
+  });
+  // 到期通知（一天一次）
+  (function(){
+    var NK='plan.wrongnotif.v1';
+    setTimeout(function(){
+      try{
+        var due=(window.__wrongDue?window.__wrongDue():[]).length;
+        if(!due) return;
+        if(ls(NK,'')===kk(d0())) return;
+        sv(NK,kk(d0()));
+        if(window.Notification && Notification.permission==='granted')
+          new Notification('今天有 '+due+' 題錯題到期', {body:'闔上答案重做一次，做對就往後排', tag:'wrong'});
+      }catch(e){}
+    },4000);
+  })();
+
+  /* ---------- 配速紀錄 ---------- */
+  var PK='plan.pace.v1', pace=ls(PK,[]);
+  var EXAMS=['一模','上一段','二模','上二段','三模','上三段','四模','下一段','五模','下二段','會考'];
+  var pe=document.getElementById('pc-exam');
+  if(pe){
+    EXAMS.forEach(function(e){ var o=document.createElement('option'); o.textContent=e; pe.appendChild(o); });
+    document.getElementById('pc-add').addEventListener('click',function(){
+      pace.unshift({e:pe.value, s:document.getElementById('pc-sub').value,
+        f:+document.getElementById('pc-fin').value, l:parseInt(document.getElementById('pc-left').value,10)||0, d:kk(d0())});
+      sv(PK,pace); paintPace();
+      var m=document.getElementById('pc-msg'); m.textContent='已記錄 ✓'; setTimeout(function(){m.textContent='';},2500);
+    });
+  }
+  function paintPace(){
+    var box=document.getElementById('pc-out'); if(!box) return;
+    if(!pace.length){ box.innerHTML='<p class="sub" style="margin:0">還沒有紀錄。</p>'; return; }
+    var by={};
+    pace.forEach(function(x){ (by[x.s]=by[x.s]||[]).push(x); });
+    var rows=Object.keys(by).map(function(s){
+      var a=by[s], unf=a.filter(function(x){return x.f===0;}).length;
+      var avgL=Math.round(a.reduce(function(t,x){return t+x.l;},0)/a.length);
+      var note = unf>=2 ? '<span style="color:var(--warn)">常寫不完——要練配速，不是多讀</span>'
+               : (avgL>=15 ? '<span style="color:var(--warn)">平均剩 '+avgL+' 分——可能寫太快，多花時間檢查</span>'
+                           : '<span style="color:var(--cap)">配速正常</span>');
+      return '<div style="padding:8px 0;border-bottom:1px solid var(--rule2);font-size:13.5px">'
+        +'<b>'+s+'</b>　'+a.length+' 次　沒寫完 '+unf+' 次　平均剩 '+avgL+' 分<br>'+note+'</div>';
+    }).join('');
+    box.innerHTML=rows+'<p class="sub" style="margin:10px 0 0">同一科記滿三次以上，上面的判斷才有參考價值。</p>';
+  }
+  paintPace();
+
+  /* ---------- 教材對照 ---------- */
+  var BK='plan.books.v1', books=ls(BK,{});
+  var SUBS=['國文','數學','英文','自然','社會','科學班','研發'];
+  var br=document.getElementById('bk-rows');
+  if(br){
+    SUBS.forEach(function(s){
+      var row=document.createElement('div'); row.className='row'; row.style.gridTemplateColumns='72px 1fr 92px';
+      var lab=document.createElement('span'); lab.style.cssText='font-size:13.5px;color:var(--ink-soft)'; lab.textContent=s;
+      var b=document.createElement('input'); b.placeholder='教材名稱'; b.value=(books[s]||{}).b||''; b.dataset.s=s; b.dataset.f='b';
+      var pg=document.createElement('input'); pg.type='number'; pg.placeholder='頁'; pg.value=(books[s]||{}).p||''; pg.dataset.s=s; pg.dataset.f='p';
+      row.appendChild(lab); row.appendChild(b); row.appendChild(pg);
+      br.appendChild(row);
+    });
+    document.getElementById('bk-save').addEventListener('click',function(){
+      Array.prototype.forEach.call(br.querySelectorAll('input'),function(i){
+        books[i.dataset.s]=books[i.dataset.s]||{};
+        books[i.dataset.s][i.dataset.f]= i.dataset.f==='p' ? (parseInt(i.value,10)||0) : i.value.trim();
+      });
+      sv(BK,books);
+      var m=document.getElementById('bk-msg'); m.textContent='已儲存 ✓'; setTimeout(function(){m.textContent='';},2500);
+      if(window.__regenToday) window.__regenToday();
+    });
+  }
+
+  /* ---------- 每週回顧 ---------- */
+  var RK='plan.review.v1', rev=ls(RK,{});
+  var QS=[
+    ['本週完成率多少？跟上週比是升是降？','看上面的回測數字，寫一句就好'],
+    ['哪一科最落後？','誠實寫，這格沒有人會看'],
+    ['下週要砍掉哪一項？','排太滿是常態，砍東西不是失敗'],
+    ['下週最重要的一件事是什麼？','只能寫一件']
+  ];
+  var rs=document.getElementById('rv-start'), rf=document.getElementById('rv-flow');
+  function weekKey(){ var d=d0(); d.setDate(d.getDate()-d.getDay()); return kk(d); }
+  if(rs){
+    rs.addEventListener('click',function(){
+      rf.innerHTML='';
+      var cur=rev[weekKey()]||{};
+      QS.forEach(function(q,i){
+        var f=document.createElement('div'); f.className='fld'; f.style.marginBottom='10px';
+        f.innerHTML='<label>'+(i+1)+'. '+q[0]+'</label>';
+        var ta=document.createElement('textarea'); ta.style.minHeight='52px'; ta.placeholder=q[1]; ta.value=cur['q'+i]||'';
+        ta.dataset.i=i; f.appendChild(ta); rf.appendChild(f);
+      });
+      var b=document.createElement('button'); b.className='btn solid'; b.type='button'; b.textContent='完成回顧';
+      b.addEventListener('click',function(){
+        var o={};
+        Array.prototype.forEach.call(rf.querySelectorAll('textarea'),function(t){ o['q'+t.dataset.i]=t.value.trim(); });
+        rev[weekKey()]=o; sv(RK,rev);
+        rf.innerHTML='<p class="sub" style="margin:0;color:var(--cap)">本週回顧已完成 ✓</p>';
+        if(window.__award) window.__award(10,'完成每週回顧');
+      });
+      rf.appendChild(b);
+    });
+    document.getElementById('rv-hist').addEventListener('click',function(){
+      var box=document.getElementById('rv-list'); box.hidden=!box.hidden; if(box.hidden) return;
+      var ks=Object.keys(rev).sort().reverse().slice(0,10);
+      box.innerHTML=ks.length? ks.map(function(k){
+        var e=rev[k], p=k.split('-');
+        return '<div style="padding:10px 0;border-bottom:1px solid var(--rule2);font-size:13px">'
+          +'<b class="mono" style="font-size:12px;color:var(--ink-faint)">'+p[1]+'/'+p[2]+' 那週</b>'
+          +QS.map(function(q,i){ return e['q'+i]?'<p style="margin:4px 0 0">'+q[0].slice(0,8)+'：'+e['q'+i]+'</p>':''; }).join('')
+          +'</div>';
+      }).join('') : '<p class="sub" style="margin:0">還沒有紀錄。</p>';
+    });
+  }
+
+  /* ---------- 家長週報 ---------- */
+  var pr=document.getElementById('pr-go');
+  if(pr) pr.addEventListener('click',function(){
+    var hist=ls('plan.hist.v1',{});
+    var t=window.__todayStat?window.__todayStat():null;
+    if(t&&t.day) hist[t.day]=Object.assign(hist[t.day]||{},{a:t.a,d:t.d,m:t.m});
+    var ks=Object.keys(hist).filter(function(k){return hist[k].a;}).sort(function(a,b){return new Date(b)-new Date(a);}).slice(0,7);
+    var a=0,dn=0,mins=0;
+    ks.forEach(function(k){ a+=hist[k].a; dn+=hist[k].d; mins+=(hist[k].m||0); });
+    var rate=a?Math.round(dn/a*100):0;
+    var EX=[[2026,9,8,'一模'],[2026,10,12,'上學期一段'],[2026,10,28,'二模'],[2026,11,23,'上學期二段'],
+      [2026,12,23,'三模'],[2027,1,14,'上學期三段'],[2027,2,18,'四模'],[2027,3,13,'雄科班初試'],
+      [2027,3,22,'下學期一段'],[2027,4,15,'五模'],[2027,5,3,'下學期二段'],[2027,5,15,'會考']];
+    var now=d0(), nx=null;
+    for(var i=0;i<EX.length;i++){ var e=EX[i], dd=new Date(e[0],e[1]-1,e[2]); if(dd>=now){ nx={n:e[3],d:dd}; break; } }
+    var W=ls('plan.wrong.v1',[]);
+    var txt='【本週學習回報】\n'
+      +'· 任務完成率 '+rate+'%（'+dn+'/'+a+' 項），實際投入約 '+(mins/60).toFixed(1)+' 小時\n'
+      +'· 錯題本累積 '+W.length+' 題，已精熟 '+W.filter(function(x){return x.lv>=(window.__wrongIV?window.__wrongIV().length:5);}).length+' 題\n'
+      +'· 下一個考試：'+(nx? nx.n+'（'+(nx.d.getMonth()+1)+'/'+nx.d.getDate()+'，還有 '+Math.round((nx.d-now)/86400000)+' 天）' : '無');
+    document.getElementById('pr-out').textContent=txt;
+    try{ navigator.clipboard.writeText(txt); }catch(e){}
+  });
+
+  /* ---------- 本機快照 ---------- */
+  var SNK='plan.snap.v1';
+  var KEYS=['plan.tpl.v3','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1',
+    'plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1',
+    'plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1'];
+  function dumpAll(){ var o={_at:new Date().toISOString()}; KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }); return o; }
+  (function(){
+    var snaps=ls(SNK,[]), today=kk(d0());
+    if(!snaps.length || snaps[0].d!==today){
+      snaps.unshift({d:today, o:dumpAll()});
+      snaps=snaps.slice(0,3); sv(SNK,snaps);
+    }
+    var box=document.getElementById('snap-list'); if(!box) return;
+    box.innerHTML=snaps.map(function(s,i){
+      var p=s.d.split('-');
+      return '<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule2)">'
+        +'<span class="mono" style="font-size:12.5px;flex:1">'+p[0]+'/'+p[1]+'/'+p[2]+'　'+Math.round(JSON.stringify(s.o).length/1024)+' KB</span>'
+        +'<button class="btn ghost" data-i="'+i+'" style="padding:5px 12px;font-size:12.5px">還原</button></div>';
+    }).join('');
+    Array.prototype.forEach.call(box.querySelectorAll('button'),function(b){
+      b.addEventListener('click',function(){
+        var s=snaps[+b.dataset.i];
+        if(!confirm('還原到 '+s.d+' 的狀態？目前的資料會被覆蓋。')) return;
+        KEYS.forEach(function(k){ if(s.o[k]!==undefined) localStorage.setItem(k,s.o[k]); });
+        location.reload();
+      });
+    });
+  })();
+})();
+</script>
+<script>
+/* ===== 動效 ===== */
+(function(){
+  var layer=document.createElement('div'); layer.id='fx-layer'; document.body.appendChild(layer);
+  function reduced(){
+    if(document.documentElement.classList.contains('no-motion')) return true;
+    try{ return window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; }
+  }
+  var PAL=['#1E88C7','#0D7F63','#B5620D','#4A3DB8','#0E9AAE','#2E9464','#E0973F'];
+
+  function confetti(n, strong){
+    if(reduced()) return;
+    for(var i=0;i<n;i++){
+      var b=document.createElement('div'); b.className='fx-bit';
+      var x=Math.random()*100;
+      b.style.left=x+'vw';
+      b.style.background=PAL[(Math.random()*PAL.length)|0];
+      b.style.setProperty('--dx',((Math.random()*2-1)*(strong?26:14)).toFixed(1)+'vw');
+      b.style.setProperty('--rot',((Math.random()*2-1)*720).toFixed(0)+'deg');
+      b.style.setProperty('--dur',(1.5+Math.random()*1.4).toFixed(2)+'s');
+      b.style.animationDelay=(Math.random()*(strong?0.5:0.22)).toFixed(2)+'s';
+      if(Math.random()<0.35){ b.style.width='7px'; b.style.height='7px'; b.style.borderRadius='50%'; }
+      layer.appendChild(b);
+      setTimeout(function(el){return function(){ el.remove(); };}(b), 3400);
+    }
+  }
+  function chip(el, text, minus){
+    if(reduced()||!el) return;
+    var r=el.getBoundingClientRect();
+    var c=document.createElement('div');
+    c.className='fx-chip'+(minus?' minus':'');
+    c.textContent=text;
+    c.style.left=(r.right-56)+'px';
+    c.style.top=(r.top+window.scrollY+4)+'px';
+    document.body.appendChild(c);
+    setTimeout(function(){ c.remove(); },1250);
+  }
+  function banner(text){
+    var b=document.createElement('div'); b.className='fx-banner'; b.textContent=text;
+    document.body.appendChild(b);
+    setTimeout(function(){ b.remove(); },3500);
+  }
+  function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+
+  var CHEER=['做完一項了','一項下去','推進中','漂亮','記上一筆','又少一項','穩','有在走'];
+  window.__fx={
+    task:function(el, pts){
+      if(el){ el.classList.remove('fx-done'); void el.offsetWidth; el.classList.add('fx-done'); }
+      chip(el, '+'+pts);
+      confetti(9,false);
+      buzz(18);
+    },
+    undo:function(el, pts){ chip(el,'−'+pts,true); },
+    allClear:function(){
+      confetti(70,true);
+      banner('今天全部清完了 🎉');
+      buzz([25,45,25]);
+    },
+    unlock:function(el,name){
+      if(el){ el.classList.add('just-open'); setTimeout(function(){ el.classList.remove('just-open'); },3200); }
+      confetti(40,true); banner('解鎖：'+name); buzz([20,40,20]);
+    },
+    cheer:function(){ return CHEER[(Math.random()*CHEER.length)|0]; },
+    banner:banner
+  };
 })();
 </script>
 </body>
