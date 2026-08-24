@@ -431,7 +431,8 @@ input,select,textarea{border-radius:var(--r-in)!important}
 .tk-more{border:0;background:none;color:var(--ink-faint);font-family:inherit;font-size:11.5px;cursor:pointer;padding:2px 0}
 .tk-more:hover{color:var(--sci)}
 .tk-body{display:grid;grid-template-columns:1fr 96px 108px;gap:7px;margin-top:7px}
-.tk-body input,.tk-body select{font-family:inherit;font-size:12.5px;padding:7px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.tk-body input,.tk-body select{font-family:inherit;font-size:12.5px;padding:8px 10px;min-width:0;width:100%;
+  border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
 @media (max-width:640px){.tk-body{grid-template-columns:1fr 1fr}.tk-body input:first-child{grid-column:1/-1}}
 .no-motion *{animation:none!important;transition:none!important}
 .mood-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
@@ -491,6 +492,7 @@ section:not([hidden]){animation:fxRise .3s ease both}
 @media (prefers-reduced-motion:reduce){
   .todo label.fx-done,.fx-chip,.fx-bit,.fx-banner,section:not([hidden]),.pm-time.run{animation:none!important}
 }
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -2090,10 +2092,14 @@ section:not([hidden]){animation:fxRise .3s ease both}
     var m=meta[mkey(x)]||{};
     var head=document.createElement('button');
     head.type='button'; head.className='tk-more';
-    head.textContent=(m.plan||m.act||m.foc)?'✎ 已填細節':'＋ 幾點在哪做 · 實際花多久';
+    function headText(open){
+      var filled=(m.plan||m.act||m.foc);
+      head.textContent=(open?'▾ ':'▸ ')+(filled?'已填細節':'幾點在哪做 · 實際花多久');
+    }
+    headText(false);
     var body=document.createElement('div'); body.className='tk-body'; body.hidden=true;
-    var p1=document.createElement('input'); p1.placeholder='例：19:00 在書房，桌上只留這一科'; p1.value=m.plan||'';
-    var p2=document.createElement('input'); p2.type='number'; p2.placeholder='實際幾分鐘'; p2.value=(m.act||'');
+    var p1=document.createElement('input'); p1.placeholder='幾點、在哪做（例：19:00 書房，桌上只留這科）'; p1.value=m.plan||'';
+    var p2=document.createElement('input'); p2.type='number'; p2.min=1; p2.placeholder='實際幾分'; p2.value=(m.act||'');
     var p3=document.createElement('select');
     p3.innerHTML='<option value="">專注度</option><option value="1">1 很散</option><option value="2">2</option><option value="3">3 普通</option><option value="4">4</option><option value="5">5 很專注</option>';
     p3.value=m.foc||'';
@@ -2101,11 +2107,11 @@ section:not([hidden]){animation:fxRise .3s ease both}
       el.addEventListener('change',function(){
         meta[mkey(x)]={plan:p1.value.trim(), act:parseInt(p2.value,10)||0, foc:parseInt(p3.value,10)||0, m:x.m};
         save(MK,meta);
-        head.textContent='✎ 已填細節';
+        m=meta[mkey(x)]; headText(!body.hidden);
       });
     });
     body.appendChild(p1); body.appendChild(p2); body.appendChild(p3);
-    head.addEventListener('click',function(){ body.hidden=!body.hidden; });
+    head.addEventListener('click',function(){ body.hidden=!body.hidden; headText(!body.hidden); });
     wrap.appendChild(head); wrap.appendChild(body);
     return wrap;
   }
