@@ -830,9 +830,9 @@ section{padding-top:40px}
   </div>
 
   <div class="td-editor" id="td-editor" hidden>
-    <p class="ed-head"><b id="ed-title">編輯範本</b><span>改動會套用到所有同類型的日子（例如所有暑假平日）。</span></p>
+    <p class="ed-head"><b id="ed-title">編輯範本</b><span>只改今天這一天，其他天不受影響。</span></p>
     <div id="ed-rows"></div>
-    <p class="sub" style="margin:14px 0 4px"><b>套用到哪幾天</b>　勾起來的日子會一起套用這份範本（只影響同一個時期：暑假／學期／寒假）。</p>
+    <p class="sub" style="margin:14px 0 4px"><b>套用到哪幾天</b>　勾起來的日子會一起套用這份範本。</p>
     <div class="dowbox" id="ed-dow"></div>
     <div class="td-bar">
       <button class="td-btn" id="ed-addrow" type="button">＋ 加一列</button>
@@ -1002,7 +1002,7 @@ section{padding-top:40px}
       <div class="tl-mon">4月</div>
       <div class="tl-rail sci off"><span class="tl-empty">— 全部火力轉右軌 —</span></div>
       <div class="tl-rail cap">
-        <span class="chip"><span class="dt">4/3–6</span>連假寫模考卷第 4 回（1–5 冊）</span>
+        <span class="chip"><span class="dt">4/3–4</span>連假寫模考卷第 4 回（1–5 冊）</span>
         <span class="chip big est"><span class="dt">4/7–8</span>五模 · 全範圍</span>
         <span class="chip"><span class="dt">4/17</span>4–6 冊走完，模考卷第 5 回；接著第二本講義＋歷屆 112</span>
         <span class="chip big est"><span class="dt">4/28–29</span>六模 · 全範圍</span>
@@ -1074,7 +1074,7 @@ section{padding-top:40px}
       <div class="when"><b>PHASE 6</b>3/14 – 5/16<br>會考衝刺</div>
       <div>
         <h3>1–3 冊補完 → 4–6 冊 → 第二本講義 → 歷屆會考 → 錯題本</h3>
-        <p>3/20 前補完 1–3 冊、4/17 前走完 4–6 冊；4 冊走完寫模考卷第 3 回、4/3–4/6 連假寫第 4 回、6 冊走完寫第 5 回。之後數學（雙向溝通 1–4 冊）、英文（大滿貫）換第二本，同時寫歷屆會考 112–115 年；平日 50 分鐘那段做各科第二輪。最後一週只看錯題紙。</p>
+        <p>3/20 前補完 1–3 冊、4/17 前走完 4–6 冊；4 冊走完寫模考卷第 3 回、4/3–4/4 連假寫第 4 回、6 冊走完寫第 5 回。之後數學（雙向溝通 1–4 冊）、英文（大滿貫）換第二本，同時寫歷屆會考 112–115 年；平日 50 分鐘那段做各科第二輪。最後一週只看錯題紙。</p>
         <div class="mix"><i class="m-cap" style="flex:94"></i><i class="m-fun" style="flex:6"></i></div>
       </div>
     </div>
@@ -1304,21 +1304,22 @@ section{padding-top:40px}
 
 <section>
   <div class="sec-head"><h2>現在就要處理的事</h2><span class="eyebrow">做完就不用再想</span></div>
-  <div class="todo">
-    <label><input type="checkbox"><span>今天 13:00 開始照「日程」走；週四二模考完當晚把五科錯題登記進錯題本<span class="when">今天</span></span></label>
+  <div class="todo" id="todo-list">
+    <label><input type="checkbox"><span>二模（10/28–29）考完當晚把五科錯題登記進錯題本、模考等級填進「紀錄 → 成績」<span class="when">10/29</span></span></label>
     <label><input type="checkbox"><span>準備兩本錯題本：科班一本、會考一本（或都用「錯題」分頁）<span class="when">本週</span></span></label>
+    <label><input type="checkbox"><span>二段範圍公布後告訴我，日程裡的推估範圍要換成實際範圍<span class="when">11 月初</span></span></label>
     <label><input type="checkbox"><span>問補習班：寒假、連假、初試後到複試的課表（目前假設：連假停、上到 3/7）<span class="when">11 月內</span></span></label>
     <label><input type="checkbox"><span>問學校寒輔的實際日期（目前暫定 1/21–1/29 上午）<span class="when">12 月</span></span></label>
     <label><input type="checkbox"><span>雄中考古題本拿到後，日程裡「雄中考古題」那幾格就照年份寫<span class="when">拿到當天</span></span></label>
     <label><input type="checkbox"><span>一月底起每週查雄中科學班簡章，初試、複試日期確定後更新計畫<span class="when">1 月底起</span></span></label>
     <label><input type="checkbox"><span>從心測中心官網下載並印好歷屆會考 112–115 年試題（英文只要閱讀）<span class="when">3 月底前</span></span></label>
-    <label><input type="checkbox"><span>「設定 → 教材對照」填每科目前的頁數，任務旁邊就會顯示從哪頁開始<span class="when">本週</span></span></label>
   </div>
+  <p class="w-note">勾起來會記住（也會跟著備份、雲端同步）。</p>
 </section>
 
 <section>
   <div class="sec-head"><h2>錯題本</h2><span class="eyebrow">整年最有價值的一本</span></div>
-  <p class="sec-note">只收「訂正過還會再錯」的題。複習時<b>先闔上答案重做一次</b>——照抄正確解法會產生「我懂了」的錯覺，但考場上重現不出來。做對就往後排（1→3→7→14→30 天），做錯就退回明天。</p>
+  <p class="sec-note">只收「訂正過還會再錯」的題。複習時<b>先闔上答案重做一次</b>——照抄正確解法會產生「我懂了」的錯覺，但考場上重現不出來。做對就往後排（預設費氏間隔 1→2→3→5→8→13→21→34 天，可改成固定間隔），做錯就退回明天。</p>
 
   <div class="td-budget" id="wr-stat"></div>
 
@@ -1364,7 +1365,7 @@ section{padding-top:40px}
   <div class="card">
     <div class="sec-head" style="margin-bottom:10px"><h3>全部錯題</h3>
       <select id="wr-filter" style="font-size:12.5px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)">
-        <option value="">全部科目</option><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option><option>科學班</option>
+        <option value="">全部科目</option><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option><option value="科學班">科班全部</option>
       </select>
     </div>
     <div id="wr-all"></div>
@@ -1437,7 +1438,7 @@ section{padding-top:40px}
     <div class="bar-btns" style="margin-top:0">
       <button class="btn" id="cf-regen" type="button">用目前設定重新產生今天</button>
     </div>
-    <p class="sub" style="margin:10px 0 0">已勾選的紀錄會清掉，欠帳保留。改完範本後用這個讓今天立刻套用。</p>
+    <p class="sub" style="margin:10px 0 0">網站更新了日程、或今天的任務看起來不對時用。已勾的任務照名稱保留，欠帳保留。</p>
   </div>
 
 
@@ -1523,7 +1524,7 @@ section{padding-top:40px}
 
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">匯出到手機行事曆</h3>
-    <p class="sub">產生 .ics 檔，匯入手機內建行事曆後就有<b>系統級鬧鐘</b>——網頁關掉也會響，補上目前提醒的最大弱點。含所有考試日、固定行程與月曆記事。</p>
+    <p class="sub">產生 .ics 檔，匯入手機內建行事曆後就有<b>系統級鬧鐘</b>——網頁關掉也會響，補上目前提醒的最大弱點。含所有考試日與月曆記事（每天的讀書時段不匯出，看網站的「日程」）。</p>
     <div class="bar-btns" style="margin-top:0">
       <button class="btn solid" id="ics-go" type="button">下載 .ics</button>
       <button class="btn ghost" id="sw-status" type="button">離線狀態</button>
@@ -1650,7 +1651,7 @@ section{padding-top:40px}
 </section>
 
 <footer>
-  <p>本頁的日期、倒數、階段與週表適用版本，皆依<b>開啟當天</b>自動計算，跨日會自動重算，不需手動修改。<br>會考日期 5/15–5/16 為教育部已公告確定日期。科學班各項日期為依歷屆時程推估，實際以雄中當年度招生簡章為準（簡章通常於 1 月底至 2 月初公告）。段考日期依你提供的預定版本，實際以學校行事曆為準。</p>
+  <p>本頁的日期、倒數、階段與每日日程，皆依<b>開啟當天</b>自動計算，跨日會自動重算，不需手動修改。<br>會考日期 5/15–5/16 為教育部已公告確定日期。科學班各項日期為依歷屆時程推估，實際以雄中當年度招生簡章為準（簡章通常於 1 月底至 2 月初公告）。段考日期依你提供的預定版本，實際以學校行事曆為準。</p>
 </footer>
 
 </div>
@@ -1682,7 +1683,7 @@ section{padding-top:40px}
     '計畫是給人用的，<br>不是人給計畫用的。',
     '缺的那天補回來，<br>不要整個放掉。',
     '週五晚上不欠帳。',
-    '下午那四小時，<br>是今年唯一的。',
+    '放假日的九個半小時，<br>是平日追不回來的。',
     '今天的決定，<br>決定三月的輕鬆。',
     '別跟進度比，<br>跟昨天的自己比。',
     '訂正一題，<br>勝過多寫十題。',
@@ -1692,8 +1693,8 @@ section{padding-top:40px}
     '手機放遠一點。',
     '現在不懂的，<br>標起來，別跳過。',
     '進度表是地圖，<br>不是繩子。',
-    '十月會很擠，<br>九月就要準備好。',
-    '春節休七天，<br>手感要三天才回來。',
+    '十二月會很擠，<br>十一月就要準備好。',
+    '除夕、初一休兩天，<br>初二就把手感找回來。',
     '段考也是科學班的一部分。',
     '地科沒人會教，<br>只能自己讀。',
     '考古題要限時，<br>不然只是在看答案。',
@@ -1816,7 +1817,9 @@ section{padding-top:40px}
   var PL = window.PLAN || {exams:[], sci:[2027,3,6], cap:[2027,5,15]};
   // 所有關卡：plan.js 的考試清單，只取每場的第一天
   var EVENTS = PL.exams.filter(function(e){ return !/第二天/.test(e[3]); }).map(function(e){
-    return {date: new Date(e[0], e[1]-1, e[2]), name: e[3].replace(/ 第一天$/,''), est: e[4]};
+    var name=e[3].replace(/ 第一天$/,''), d=new Date(e[0], e[1]-1, e[2]), end=d;
+    PL.exams.forEach(function(f){ if(/第二天/.test(f[3]) && f[3].replace(/ 第二天$/,'')===name) end=new Date(f[0], f[1]-1, f[2]); });
+    return {date: d, end: end, name: name, est: e[4]};   // end：兩天的考試算到第二天，考第二天時「下一關」還是這場
   });
 
   // 六個階段，順序對應 .phase 卡片
@@ -1850,12 +1853,12 @@ section{padding-top:40px}
 
     // --- 下一關 ---
     var next = null;
-    for (var i = 0; i < EVENTS.length; i++){ if (diff(t, EVENTS[i].date) >= 0){ next = EVENTS[i]; break; } }
+    for (var i = 0; i < EVENTS.length; i++){ if (diff(t, EVENTS[i].end) >= 0){ next = EVENTS[i]; break; } }
     var nn = document.getElementById('next-n'), nl = document.getElementById('next-l');
     if (nn && nl){
       if (next){
         var g = diff(t, next.date);
-        nn.innerHTML = (g === 0 ? '今天' : g + '<small>天</small>');
+        nn.innerHTML = (g <= 0 ? '今天' : g + '<small>天</small>');
         nl.textContent = next.name + '　' + (next.date.getMonth()+1) + '/' + next.date.getDate() + (next.est ? '（推估）' : '');
       } else {
         nn.innerHTML = '<span style="font-size:19px">全部結束</span>';
@@ -1867,7 +1870,8 @@ section{padding-top:40px}
     var total = diff(START, END), gone = Math.max(0, Math.min(total, diff(START, t)));
     var bar = document.getElementById('now-bar'), bn = document.getElementById('now-barnote');
     if (bar) setTimeout(function(){ bar.style.width = (gone / total * 100).toFixed(1) + '%'; }, 120);
-    if (bn) bn.textContent = '距會考還有 ' + Math.max(0, diff(t, END)) + ' 天　·　已走完 ' + Math.round(gone / total * 100) + '%';
+    var capD = new Date(PL.cap[0], PL.cap[1]-1, PL.cap[2]);   // 和上方倒數用同一天（會考第一天）
+    if (bn) bn.textContent = '距會考還有 ' + Math.max(0, diff(t, capD)) + ' 天　·　已走完 ' + Math.round(gone / total * 100) + '%';
 
     // --- 階段卡片 ---
     var cards = document.querySelectorAll('.phase'), label = '—';
@@ -1952,7 +1956,7 @@ section{padding-top:40px}
     '2027-1':'1/1–1/3 元旦連假全給科班（補習停課）｜1/18–19 三段不另外準備｜1/21 寒假、寒輔暫定 1/21–1/29 上午｜月底起每週查雄中簡章',
     '2027-2':'2/5 除夕、2/6 初一休息｜2/11 開學｜2/13 兩本考古題寫完＋訂正｜2/15 起第二輪＋限時模擬｜2/27–3/1 連假全給科班',
     '2027-3':'3/3–4 四模（不另外準備）｜≈3/6 初試｜3/7–12 一半時間準備複試｜≈3/13 複試｜之後全面轉會考：先補完 1–3 冊（3/20），再走 4–6 冊',
-    '2027-4':'4/3–4/6 連假：模考卷第 4 回｜4/7–8 五模｜4/17 走完 4–6 冊、寫第 5 回｜第二本講義＋歷屆 112｜4/28–29 六模',
+    '2027-4':'4/3–4/4 連假：模考卷第 4 回｜4/7–8 五模｜4/17 走完 4–6 冊、寫第 5 回｜第二本講義＋歷屆 112｜4/28–29 六模',
     '2027-5':'歷屆會考 113–115＋錯題本總複習｜考前一週只看錯題紙｜5/15–16 會考｜5/17 之後時間全還給你自己'
   };
 
@@ -2067,7 +2071,16 @@ section{padding-top:40px}
   var stamp = new Date().toDateString();
   setInterval(function(){
     var n = new Date().toDateString();
-    if (n !== stamp){ stamp = n; draw(nowIdx); }
+    if (n !== stamp){
+      stamp = n;
+      var td = today0();   // 跨月時「本月」標記要跟著換
+      MONTHS.forEach(function(mm, i){
+        var on = (mm[0] === td.getFullYear() && mm[1] === td.getMonth()+1);
+        if (tabs.children[i]) tabs.children[i].classList.toggle('is-now', on);
+        if (on) nowIdx = i;
+      });
+      draw(nowIdx);
+    }
   }, 60000);
 })();
 </script>
@@ -2080,7 +2093,7 @@ section{padding-top:40px}
     catch(e){
       if(!window.__quotaWarned){
         window.__quotaWarned=1;
-        alert('瀏覽器儲存空間滿了，資料沒存進去。\n\n請到「設定 → 本機快照」刪掉舊快照，或先「下載成檔案」備份後清一些資料。');
+        alert('瀏覽器儲存空間滿了，資料沒存進去。\n\n請先到「設定 → 備份與轉移」按「下載成檔案」，再到「設定 → 本機快照」按「只留最新一份快照」騰出空間。');
       }
     }
   }
@@ -2236,6 +2249,7 @@ section{padding-top:40px}
     if (dayEdit[k]) return dayEdit[k].slice();
     var pd=planDay(d);
     if (pd) return pd.b.map(fromPlan);
+    if (PL) return [];   // 讀書計畫期間（plan.js）以外不排任務；八月版的舊範本不再使用
     if (EXAMDAY[k]) return EXAM_TPL.slice();
     if (HOL[k] && !nearExam(d)) return HOL_TPL.slice();
     if (tpl[pf]) out=tpl[pf];
@@ -2272,6 +2286,24 @@ section{padding-top:40px}
     }catch(e){}
     return out;
   }
+  function recordHist(){
+    if (!(st.day && st.list && st.list.length)) return;
+    try{
+      var hist=JSON.parse(localStorage.getItem('plan.hist.v1')||'{}');
+      var real=st.list.filter(function(x){return !x.f;});
+      var dn=real.filter(function(x){return st.done[x.id];});
+      hist[st.day]=Object.assign(hist[st.day]||{}, {a:real.length, d:dn.length,
+        m:dn.reduce(function(s,x){return s+x.m;},0)});
+      localStorage.setItem('plan.hist.v1', JSON.stringify(hist));
+    }catch(e){}
+  }
+  // 重新產生今天的任務，但保留已勾的（照任務名稱對）和自己加的任務
+  function rebuildKeep(d){
+    var was={}, mine=(st.list||[]).filter(function(x){ return /^x/.test(x.id); });
+    (st.list||[]).forEach(function(x){ if(st.done[x.id]) was[x.n]=1; });
+    st.list=buildList(d, st.backlog||[]).concat(mine); st.done={};
+    st.list.forEach(function(x){ if(was[x.n]) st.done[x.id]=1; });
+  }
   function rollover(){
     var d=today0(), k=key(d);
     // 換了新版日程：今天重新產生，舊計畫留下的欠帳一筆勾銷
@@ -2284,21 +2316,14 @@ section{padding-top:40px}
         st.list.forEach(function(x){ if(was[x.n]) st.done[x.id]=1; });
         save(SK,st); return d;
       }
+      recordHist();   // 換版前先把昨天的完成率記下來
       st.day=null; st.list=[];
     }
     if (st.day !== k){
       var wasEasy=false; try{ wasEasy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[st.day]); }catch(e){}
-      if (st.day && st.list && st.list.length){
-        try{
-          var hist=JSON.parse(localStorage.getItem('plan.hist.v1')||'{}');
-          var real=st.list.filter(function(x){return !x.f;});
-          var dn=real.filter(function(x){return st.done[x.id];});
-          hist[st.day]=Object.assign(hist[st.day]||{}, {a:real.length, d:dn.length,
-            m:dn.reduce(function(s,x){return s+x.m;},0)});
-          localStorage.setItem('plan.hist.v1', JSON.stringify(hist));
-        }catch(e){}
-      }
-      st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !st.done[x.id]; })
+      recordHist();
+      // 錯題複習（w 開頭）每天會依到期題數重新產生，沒做完不另外算欠帳
+      st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !st.done[x.id] && !/^w/.test(x.id); })
         .map(function(x){ return {n:x.n, m:x.m}; });
       st.done={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
     } else if (!st.list || !st.list.length){
@@ -2329,7 +2354,7 @@ section{padding-top:40px}
     elList.innerHTML='';
     if(!st.list.length){
       elList.innerHTML='<div style="padding:20px 18px;color:var(--ink-faint);font-size:13.5px">'
-        +'今天沒有排定任務。'+(HOL[key(D)]?'國定假日整天休息——這是計畫的一部分，不是偷懶。':'')
+        +'今天沒有排定任務。'+(PL&&!planDay(D)?'讀書計畫的範圍是 '+String(PL.from).replace(/-/g,'/')+' 到 '+String(PL.to).replace(/-/g,'/')+'。':'')+(HOL[key(D)]?'國定假日整天休息——這是計畫的一部分，不是偷懶。':'')
         +'<br>想做點什麼的話，「錯題」分頁看有沒有到期的題目。</div>';
     }
     st.list.forEach(function(x){
@@ -2424,9 +2449,12 @@ section{padding-top:40px}
       if(window.__fx) setTimeout(function(){ window.__fx.allClear(); },260); }
     var m=(easy?'<b style="color:var(--warn)">降級模式</b>　只做最重要的一項就算數，今天不計欠帳、不扣娛樂、不斷連續紀錄。<br>':'')
       +'<b>今日進度 '+done+' / '+all+'</b>（'+pct+'%）<div class="bar"><i style="width:'+pct+'%"></i></div>娛樂時間 <b>'+left+' 分</b>';
-    if(cut>0) m+='　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+cut+' 分）</span>';
+    var took=Math.max(0,base-left);   // 實際扣掉的分鐘（娛樂本來就是最低 30 分的日子扣不到）
+    if(took>0) m+='　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+took+' 分）</span>';
+    else if(owed>0 && !easy) m+='　<span class="warn">（欠帳 '+owed+' 分）</span>';
     if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項，不要靠熬夜追。';
-    else if(cut>0) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">每天最多扣 '+CAP+' 分，娛樂不低於 '+FLOOR+' 分，睡眠一律不動。</span>';
+    else if(took>0) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">每天最多扣 '+CAP+' 分，娛樂不低於 '+FLOOR+' 分，睡眠一律不動。</span>';
+    else if(owed>0 && !easy) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">今天娛樂已經是最低的 '+FLOOR+' 分，不再扣；欠帳用週日 14:40 的空檔補。</span>';
     elBud.innerHTML=m;
   }
 
@@ -2448,15 +2476,27 @@ section{padding-top:40px}
     var d=document.createElement('button'); d.type='button'; d.className='tk-del'; d.textContent='×';
     d.addEventListener('click',function(){ row.remove(); });
     row.dataset.f=x.f?1:0; row.dataset.e=x.e?1:0; row.dataset.c=x.c||'';
+    row._src=x;   // 原本的做法說明等欄位，存檔時名稱沒改就沿用
     row.appendChild(a); row.appendChild(b); row.appendChild(c); row.appendChild(d);
     return row;
   }
+  var edLife=[];   // 吃飯、通勤這類生活列不給改，存檔時原樣放回去
+  function startMin(t){ var m=String(t||'').match(/(\d{1,2}):(\d{2})/); return m? (+m[1])*60+(+m[2]) : 9999; }
+  function guessCat(n){
+    if(/科班|考古題|雄中/.test(n)) return 'kb';
+    if(/國文/.test(n)) return 'chi'; if(/英文/.test(n)) return 'eng'; if(/數學/.test(n)) return 'math';
+    if(/自然|理化|生物|地科/.test(n)) return 'sci'; if(/社會|歷史|地理|公民/.test(n)) return 'soc';
+    if(/模考/.test(n)) return 'mock'; if(/段考/.test(n)) return 'term'; if(/補習|作業/.test(n)) return 'hw';
+    return 'free';
+  }
+  window.__guessCat=guessCat;
   function perDay(){ return !!planDay(D); }
   document.getElementById('td-edit').addEventListener('click',function(){
     var pdm=perDay();
     elTitle.textContent=pdm?'編輯今天的日程：'+(D.getMonth()+1)+'/'+D.getDate()+'（週'+WD[D.getDay()]+'）':'編輯範本：'+label(profileOf(D));
     var hd=elEd.querySelector('.ed-head span'); if(hd) hd.textContent=pdm?'只改今天這一天，其他天不受影響。改完按儲存，今天的任務會重新產生。':'改動會套用到所有同類型的日子。';
-    elRows.innerHTML=''; dayTpl(D).forEach(function(x){ if(!x.l) elRows.appendChild(edRow(x)); });
+    elRows.innerHTML=''; edLife=[];
+    dayTpl(D).forEach(function(x){ if(x.l) edLife.push(x); else elRows.appendChild(edRow(x)); });
     var dw=document.getElementById('ed-dow'); if(dw){ dw.hidden=pdm; if(dw.previousElementSibling) dw.previousElementSibling.hidden=pdm; }
     if(!pdm) buildDow(D.getDay());
     elEd.hidden=false;
@@ -2482,13 +2522,13 @@ section{padding-top:40px}
     if(perDay()){
       if(!confirm('今天恢復成原本排好的日程？')) return;
       delete dayEdit[key(D)]; save(DEK,dayEdit); elEd.hidden=true;
-      st.list=buildList(D, st.backlog||[]); st.done={}; save(SK,st); render(); return;
+      rebuildKeep(D); save(SK,st); render(); return;
     }
     if(!confirm('勾選的那幾天恢復成預設？')) return;
     var ph2=phaseOf(D), tg=(dowSel.length?dowSel:[D.getDay()]);
     tg.forEach(function(w){ delete tpl[ph2+'-'+w]; });
     save(TK,tpl); elEd.hidden=true;
-    st.list=buildList(D, st.backlog||[]); save(SK,st); render();
+    rebuildKeep(D); save(SK,st); render();
   });
   document.getElementById('ed-save').addEventListener('click',function(){
     var rows=[];
@@ -2496,18 +2536,22 @@ section{padding-top:40px}
       var i=r.querySelectorAll('input'); var n=i[1].value.trim(); if(!n) return;
       var o={t:i[0].value.trim()||'—', n:n, m:parseInt(i[2].value,10)||60};
       if(r.dataset.f==='1') o.f=1; if(r.dataset.e==='1') o.e=1;
-      if(r.dataset.c) o.c=r.dataset.c;
+      o.c=r.dataset.c || guessCat(n);
+      var src=r._src||{};
+      if(src.d && src.n===n) o.d=src.d;
       rows.push(o);
     });
+    rows=rows.concat(edLife.map(function(x){ return JSON.parse(JSON.stringify(x)); }));
+    rows.sort(function(p,q){ return startMin(p.t)-startMin(q.t); });
     if(perDay()){
       dayEdit[key(D)]=rows; save(DEK,dayEdit); elEd.hidden=true;
-      st.list=buildList(D, st.backlog||[]); st.done={}; save(SK,st); render(); return;
+      rebuildKeep(D); save(SK,st); render(); return;
     }
     var ph=phaseOf(D);
     var targets = dowSel.length ? dowSel : [D.getDay()];
     targets.forEach(function(w){ tpl[ph+'-'+w]=JSON.parse(JSON.stringify(rows)); });
     save(TK,tpl); elEd.hidden=true;
-    st.list=buildList(D, st.backlog||[]); save(SK,st); render();
+    rebuildKeep(D); save(SK,st); render();
   });
 
   window.__blocks=function(){
@@ -2528,7 +2572,8 @@ section{padding-top:40px}
   window.__doneToday=function(){
     var o={}; (st.list||[]).forEach(function(x){ if(st.done[x.id]) o[x.n]=1; }); return {day:st.day, done:o};
   };
-  window.__regenToday=function(){ st.list=buildList(today0(), st.backlog||[]); st.done={}; st.bonus=0; save(SK,st); render(); };
+  // 降級模式、教材對照、設定頁「重新產生」都走這裡：已勾的照名稱保留，全清獎勵不重複發
+  window.__regenToday=function(){ rebuildKeep(today0()); save(SK,st); render(); };
 
   render();
   var stamp=new Date().toDateString();
@@ -2588,19 +2633,27 @@ section{padding-top:40px}
   bb.type='button'; bb.textContent='知道了';
   bb.addEventListener('click',function(){banner.style.display='none';});
   banner.appendChild(bt); banner.appendChild(bb); document.body.appendChild(banner);
+  function showBanner(title,body){
+    bt.innerHTML='<b>'+title+'</b>　'+body;
+    banner.style.display='flex';
+    setTimeout(function(){banner.style.display='none';},20000);
+  }
+  // Android Chrome 不允許 new Notification()，要經由 service worker 發通知
+  function sysNotify(title,body){
+    if(!(window.Notification && Notification.permission==='granted')) return false;
+    try{
+      if(navigator.serviceWorker && navigator.serviceWorker.controller){
+        navigator.serviceWorker.ready.then(function(reg){ return reg.showNotification(title,{body:body,tag:'plan'}); })
+          .catch(function(){ showBanner(title,body); });
+        return true;
+      }
+      new Notification(title,{body:body,tag:'plan'}); return true;
+    }catch(e){ return false; }
+  }
+  window.__sysNotify=sysNotify;
   function notify(title,body){
     beep(2);
-    var ok=false;
-    try{
-      if(window.Notification && Notification.permission==='granted'){
-        new Notification(title,{body:body,tag:'plan'}); ok=true;
-      }
-    }catch(e){}
-    if(!ok){
-      bt.innerHTML='<b>'+title+'</b>　'+body;
-      banner.style.display='flex';
-      setTimeout(function(){banner.style.display='none';},20000);
-    }
+    if(!sysNotify(title,body)) showBanner(title,body);
   }
   function refreshNT(){
     var st = (window.Notification ? Notification.permission : 'unsupported');
@@ -2642,7 +2695,7 @@ section{padding-top:40px}
   }
 
   /* ---- 番茄鐘 ---- */
-  var mode='work', left=P.w*60, running=false, timer=null;
+  var mode='work', left=P.w*60, running=false, timer=null, endAt=0;   // 用結束時間算剩餘秒數，背景分頁被節流也不會停
   function paintPomo(){
     elTime.textContent=pad(Math.floor(left/60))+':'+pad(left%60);
     elTime.className='pm-time mono'+(running?(mode==='work'?' run':' brk'):'');
@@ -2655,24 +2708,25 @@ section{padding-top:40px}
       P.done++; P.seq++; P.total=(P.total||0)+1; s(PK,P); if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘');
       var lng = P.seq%4===0;
       mode = lng?'long':'break';
-      left = (lng?15:P.b)*60;
+      left = (lng?15:P.b)*60; endAt=Date.now()+left*1000;
       notify('完成一顆番茄鐘', lng?'連續四顆了，休息 15 分鐘再回來':'休息 '+P.b+' 分鐘');
     } else {
-      mode='work'; left=P.w*60;
+      mode='work'; left=P.w*60; endAt=Date.now()+left*1000;
       notify('休息結束', '回到專注 '+P.w+' 分鐘');
     }
     paintPomo();
   }
   function tickPomo(){
     if(!running) return;
-    left--;
+    left=Math.max(0,Math.ceil((endAt-Date.now())/1000));
     if(left<=0){ nextPhase(); }
     paintPomo();
   }
   elGo.addEventListener('click',function(){
     running=!running;
     elGo.textContent=running?'暫停':'開始';
-    if(running){ beep(1); }
+    if(running){ endAt=Date.now()+left*1000; beep(1); }
+    else { left=Math.max(0,Math.ceil((endAt-Date.now())/1000)); }
     paintPomo();
   });
   elReset.addEventListener('click',function(){
@@ -2694,7 +2748,7 @@ section{padding-top:40px}
     if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; s(PK,P); }
     tickNow(); paintPomo();
   },15000);
-  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tickNow(); } });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tickNow(); tickPomo(); } });
 })();
 </script>
 <script>
@@ -2831,9 +2885,15 @@ section{padding-top:40px}
   var MOCK_SUB=[['ch','國文'],['en','英文'],['ma','數學'],['so','社會'],['sc','自然']];
   var GRADES=['A++','A+','A','B++','B+','B','C'];
   var GV={'A++':7,'A+':6,'A':5,'B++':4,'B+':3,'B':2,'C':1};
-  var TERM_DEF=[['2026-10-12','上一段'],['2026-11-23','上二段'],['2027-1-18','上三段']];
-  var MOCK_DEF=[['2026-9-8','一模'],['2026-10-28','二模'],['2026-12-23','三模'],['2027-3-3','四模'],
-    ['2027-4-7','五模'],['2027-4-28','六模'],['2027-5-15','會考']];
+  // [代號（也是存檔的 key）, 預設日期, plan.js 裡的考試名稱]；日期以 plan.js 為準，之後改日期不會讓成績對不上
+  var TERM_DEF=[['上一段','2026-10-12',null],['上二段','2026-11-23','二段'],['上三段','2027-1-18','三段']];
+  var MOCK_DEF=[['一模','2026-9-8',null],['二模','2026-10-28','二模'],['三模','2026-12-23','三模'],['四模','2027-3-3','四模'],
+    ['五模','2027-4-7','五模'],['六模','2027-4-28','六模'],['會考','2027-5-15','國中教育會考']];
+  function planDate(pn){
+    if(!pn||!window.PLAN||!window.PLAN.exams) return null;
+    var e=window.PLAN.exams.filter(function(x){ return x[3]===pn||x[3]===pn+' 第一天'; })[0];
+    return e? e[0]+'-'+e[1]+'-'+e[2] : null;
+  }
   var SUBHINT=['國文','英文','數學','理化','生物','地科','歷史','地理','公民','資優數學','科班自然'];
 
   var sc=ls(SC2);
@@ -2845,7 +2905,8 @@ section{padding-top:40px}
   (function migrate(){
     if(sc.migrated) return;
     var old=ls('plan.scores.v1')||{};
-    var isTerm={}; TERM_DEF.forEach(function(e){ isTerm[e[0]]=1; });
+    var isTerm={}; TERM_DEF.forEach(function(e){ isTerm[e[1]]=e[0]; });
+    var mockId={}; MOCK_DEF.forEach(function(e){ mockId[e[1]]=e[0]; });
     var NM={ch:'國文',ma:'數學',en:'英文',sc:'自然',so:'社會',wr:'作文'};
     Object.keys(old).forEach(function(id){
       var r=old[id]||{}, keys=Object.keys(r).filter(function(k){ return r[k]!==undefined && r[k]!==null && r[k]!==''; });
@@ -2855,17 +2916,28 @@ section{padding-top:40px}
         keys.forEach(function(k){ if(k==='sc'||k==='wr') rec.legacy[NM[k]]=r[k]; else rec.s[k]=r[k]; });
         rec.pts=termPts(rec.s);       // 舊版大考點數當時已經加過，不重複加
         if(!Object.keys(rec.legacy).length) delete rec.legacy;
-        sc.term[id]=rec;
+        sc.term[isTerm[id]]=rec;
       } else {
         var lg={}; keys.forEach(function(k){ lg[NM[k]]=r[k]; });
-        sc.mock[id]={g:{},pts:0,legacy:lg};
+        sc.mock[mockId[id]||id]={g:{},pts:0,legacy:lg};
       }
     });
     sc.migrated=1; save(SC2,sc);
   })();
 
+  // 10/26 晚上第一版用日期當 key，改成用名稱
+  (function(){
+    var moved=false;
+    [['term',TERM_DEF],['mock',MOCK_DEF]].forEach(function(p){
+      p[1].forEach(function(e){
+        if(sc[p[0]][e[1]] && !sc[p[0]][e[0]]){ sc[p[0]][e[0]]=sc[p[0]][e[1]]; delete sc[p[0]][e[1]]; moved=true; }
+      });
+    });
+    if(moved) save(SC2,sc);
+  })();
+
   function examList(kind){
-    var def=(kind==='term'?TERM_DEF:MOCK_DEF).map(function(e){ return {id:e[0],name:e[1],date:e[0]}; });
+    var def=(kind==='term'?TERM_DEF:MOCK_DEF).map(function(e){ return {id:e[0],name:e[0],date:planDate(e[2])||e[1]}; });
     sc.custom.forEach(function(c){ if(c.kind===kind) def.push({id:c.id,name:c.name,date:c.date,custom:1}); });
     return def.sort(function(a,b){ return dnum(a.date)-dnum(b.date); });
   }
@@ -2959,7 +3031,6 @@ section{padding-top:40px}
       + '<p class="w-note">空白＝沒考或還沒發。點數：每科 ≥90 '+sg(rules.e90)+'、100 '+sg(rules.e100)+'；之後改分數只補差額，不會重複加。</p>';
     bindPicker('term');
     document.getElementById('sc-save').addEventListener('click',function(){
-      var id=resolveExam('term'); if(!id) return;
       var ns={}, bad=false;
       entry.querySelectorAll('.sc-nums input').forEach(function(inp){
         var v=inp.value.trim(); if(v==='') return;
@@ -2967,6 +3038,7 @@ section{padding-top:40px}
       });
       if(bad){ alert('分數要在 0 到 100 之間。'); return; }
       if(!Object.keys(ns).length){ alert('至少填一科分數；要刪掉這次請按「清除這次」。'); return; }
+      var id=resolveExam('term'); if(!id) return;   // 驗證通過才新增考試，避免留下空的自訂考試
       var r=sc.term[id]||{pts:0}, np=termPts(ns), diff=np-(r.pts||0);
       sc.term[id]={s:ns,pts:np};
       save(SC2,sc);
@@ -3250,12 +3322,13 @@ section{padding-top:40px}
   document.addEventListener('plan:tab',function(){ setTimeout(refit,30); });
 
   /* ---------- 備份 ---------- */
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan-tab'];
-  function dump(){
-    var o={_v:1,_at:new Date().toISOString()};
-    KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} });
-    return JSON.stringify(o);
-  }
+  // 要備份、同步的資料（介面狀態像目前在哪個分頁不算，切分頁不該觸發上傳）
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1'];
+  window.__DATA_KEYS=KEYS;
+  function pick(){ var o={}; KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
+  function sig(){ return JSON.stringify(pick()); }
+  function dataCount(){ return Object.keys(pick()).length; }
+  function dump(){ return JSON.stringify(Object.assign({_v:1,_at:new Date().toISOString()},pick())); }
   var box=document.getElementById('io-box');
   var ex=document.getElementById('io-export');
   if(ex) ex.addEventListener('click',function(){ box.value=dump(); box.select&&box.select(); });
@@ -3275,33 +3348,36 @@ section{padding-top:40px}
       var n=0;
       KEYS.forEach(function(k){ if(o[k]!==undefined){ localStorage.setItem(k,o[k]); n++; } });
       if(!n) throw 0;
+      window.__noSync=true;
       alert('匯入成功（'+n+' 項），重新整理後生效。'); location.reload();
     }catch(e){ alert('格式不對。請確認貼上的是完整的備份文字。'); }
   });
   var wp=document.getElementById('io-wipe');
   if(wp) wp.addEventListener('click',function(){
     if(!confirm('所有資料都會刪除：範本、任務、欠帳、點數、商店、成績。\n建議先按「下載成檔案」。確定要清空嗎？')) return;
-    if(!confirm('再確認一次，這個動作無法復原。')) return;
-    KEYS.forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
+    if(!confirm('再確認一次，這個動作無法復原。\n（雲端的備份不會被動到，這台的自動同步會關掉。）')) return;
+    window.__noSync=true;
+    // 關掉自動同步、忘記「上次同步的雲端版本」，清空後的這台就不會把空資料傳上去蓋掉雲端
+    try{ var c=JSON.parse(localStorage.getItem('plan.cloud.v1')||'null'); if(c){ c.auto=false; delete c.remoteAt; c.last=0; localStorage.setItem('plan.cloud.v1',JSON.stringify(c)); } }catch(e){}
+    KEYS.concat(['plan-tab']).forEach(function(k){ try{ localStorage.removeItem(k); }catch(e){} });
     location.reload();
   });
 
   /* ---------- 雲端同步：GitHub Gist ---------- */
+  // 規則：只有確定雲端那份「是這台上次同步過的版本」才上傳；雲端比較新（別台裝置傳過）就停下來問，不覆蓋。
   var CLK='plan.cloud.v1', FILE='study-plan-backup.json';
   var cl = ls(CLK) || {token:'', gist:'', auto:false, last:0};
   var elT=document.getElementById('cl-token'), elG=document.getElementById('cl-gist'),
       elA=document.getElementById('cl-auto'), elS=document.getElementById('cl-status');
+  var held=false;   // 偵測到雲端較新 → 暫停自動上傳，等使用者決定
 
   function say(msg,kind){
     if(!elS) return;
-    var c = kind==='err' ? 'var(--rest)' : (kind==='ok' ? 'var(--cap)' : 'var(--ink-faint)');
+    var c = kind==='err' ? 'var(--rest)' : (kind==='ok' ? 'var(--cap)' : (kind==='warn' ? 'var(--warn)' : 'var(--ink-faint)'));
     elS.innerHTML='<span style="color:'+c+'">'+msg+'</span>';
   }
-  function stamp(){
-    if(!cl.last) return '尚未同步過。';
-    var d=new Date(cl.last);
-    return '上次同步：'+(d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
-  }
+  function fmt(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+  function stamp(){ return cl.last? '上次同步：'+fmt(cl.last) : '尚未同步過。'; }
   function api(path, opt){
     opt=opt||{};
     opt.headers=Object.assign({
@@ -3318,47 +3394,78 @@ section{padding-top:40px}
     });
   }
   function saveCl(){
-    cl.token=(elT&&elT.value.trim())||'';
-    cl.gist=(elG&&elG.value.trim())||'';
-    cl.auto=!!(elA&&elA.checked);
+    if(elT){ cl.token=elT.value.trim(); cl.gist=elG.value.trim(); cl.auto=!!elA.checked; }
     save(CLK,cl);
   }
-  function upload(silent){
-    saveCl();
-    if(!cl.token){ if(!silent) say('請先貼上 token。','err'); return Promise.reject(); }
+  // 雲端是不是比這台上次同步的還新：remoteAt 沒記過（這台從沒同步過）也算「不確定」
+  function remoteNewer(g){
+    if(cl.remoteAt) return g.updated_at > cl.remoteAt;
+    if(cl.last) return new Date(g.updated_at).getTime() > cl.last + 60000;   // 舊版只記了 last
+    return true;
+  }
+  function realUpload(silent){
     var body={description:'joshdaai的讀書專屬計畫 · 自動備份', files:{}};
-    body.files[FILE]={content:dump()};
+    var d=dump(); body.files[FILE]={content:d};
     var req = cl.gist
       ? api('/gists/'+cl.gist,{method:'PATCH',body:JSON.stringify(body)})
       : api('/gists',{method:'POST',body:JSON.stringify(Object.assign({public:false},body))});
     if(!silent) say('上傳中…');
     return req.then(function(g){
-      cl.gist=g.id; cl.last=Date.now(); save(CLK,cl);
+      cl.gist=g.id; cl.last=Date.now(); cl.remoteAt=g.updated_at; save(CLK,cl);
       if(elG) elG.value=g.id;
-      lastHash=dump().length+'|'+dump().slice(-80);
+      lastSig=sig(); held=false;
       say('已上傳 ✓　'+stamp(),'ok');
+    });
+  }
+  // force：使用者在確認框按了「用這台覆蓋」
+  function upload(silent,force){
+    saveCl();
+    if(!cl.token){ if(!silent) say('請先貼上 token。','err'); return Promise.reject(new Error('no token')); }
+    if(dataCount()<2){ if(!silent) say('這台幾乎沒有資料，不上傳（避免蓋掉雲端的備份）。','err'); return Promise.reject(new Error('empty')); }
+    if(!cl.gist||force) return realUpload(silent).catch(function(e){ say('上傳失敗：'+(e.message||e),'err'); throw e; });
+    return api('/gists/'+cl.gist).then(function(g){
+      if(remoteNewer(g)){
+        held=true;
+        if(silent){
+          say('⚠ 雲端有 '+fmt(g.updated_at)+' 的資料，比這台上次同步還新（可能是另一台裝置傳的）。自動上傳先暫停：要用雲端的就按「從雲端下載」，確定這台才是對的就按「上傳到雲端」。','warn');
+          return;
+        }
+        if(!confirm('雲端的資料（'+fmt(g.updated_at)+'）比這台上次同步的還新，可能是另一台裝置傳的。\n\n確定要用這台的資料覆蓋雲端嗎？\n（不確定的話按取消，先「從雲端下載」。）')){ say('已取消上傳。'+stamp()); return; }
+      }
+      return realUpload(silent);
     }).catch(function(e){ say('上傳失敗：'+(e.message||e),'err'); throw e; });
   }
   function download(){
     saveCl();
     if(!cl.token||!cl.gist){ say('需要 token 和 Gist ID。若還沒建過，先按一次「上傳到雲端」。','err'); return; }
     say('下載中…');
+    var meta=null;
     api('/gists/'+cl.gist).then(function(g){
+      meta=g;
       var f=g.files&&g.files[FILE];
       if(!f) throw new Error('這個 Gist 裡沒有備份檔');
-      var content=f.content;
       if(f.truncated&&f.raw_url) return fetch(f.raw_url).then(function(r){return r.text();});
-      return content;
+      return f.content;
     }).then(function(txt){
       var o=JSON.parse(txt);
       var at=o._at?new Date(o._at):null;
       if(!confirm('雲端備份的時間是 '+(at?at.toLocaleString():'未知')+'。\n\n匯入後會覆蓋這台裝置目前的資料，確定嗎？')) { say(stamp()); return; }
       var n=0;
       KEYS.forEach(function(k){ if(o[k]!==undefined){ localStorage.setItem(k,o[k]); n++; } });
-      cl.last=Date.now(); save(CLK,cl);
+      cl.last=Date.now(); cl.remoteAt=meta.updated_at; save(CLK,cl);
+      window.__noSync=true;
       alert('已還原 '+n+' 項，重新整理後生效。');
       location.reload();
     }).catch(function(e){ say('下載失敗：'+(e.message||e),'err'); });
+  }
+
+  var lastSig=sig(), pending=false;
+  function changed(){ return sig()!==lastSig; }
+  function autoPush(){
+    if(!cl.auto||!cl.token||!cl.gist||pending||held||window.__noSync) return;
+    if(!changed()) return;
+    pending=true;
+    upload(true).then(function(){ pending=false; },function(){ pending=false; });
   }
 
   if(elT){
@@ -3380,28 +3487,29 @@ section{padding-top:40px}
     });
     elA.addEventListener('change',function(){ saveCl(); say(cl.auto?'自動同步已開啟。'+stamp():'自動同步已關閉。'+stamp()); });
 
-    // 自動同步：每 30 秒比對一次，內容有變才上傳
-    var lastHash=dump().length+'|'+dump().slice(-80), pending=false;
-    setInterval(function(){
-      if(!cl.auto||!cl.token||pending) return;
-      var d=dump(), hash=d.length+'|'+d.slice(-80);
-      if(hash===lastHash) return;
-      pending=true;
-      upload(true).then(function(){ pending=false; }).catch(function(){ pending=false; });
-    },30000);
-    window.addEventListener('beforeunload',function(){
-      if(!cl.auto||!cl.token||!cl.gist) return;
-      var d=dump(), hash=d.length+'|'+d.slice(-80);
-      if(hash===lastHash) return;
-      try{
-        var body={files:{}}; body.files[FILE]={content:d};
-        fetch('https://api.github.com/gists/'+cl.gist,{
-          method:'PATCH', keepalive:true,
-          headers:{'Authorization':'Bearer '+cl.token,'Accept':'application/vnd.github+json'},
-          body:JSON.stringify(body)
-        });
-      }catch(e){}
-    });
+    window.__cloudNotice=function(at){
+      var b=document.createElement('div'); b.className='rem-banner'; b.style.display='flex';
+      b.innerHTML='<span><b>雲端有 '+at+' 的新資料</b>　可能是另一台裝置傳的。自動上傳先暫停，到「設定 → 雲端同步」選要用哪一份。</span>';
+      var go=document.createElement('button'); go.type='button'; go.textContent='去設定';
+      go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(7); var c=document.getElementById('cl-status'); if(c) c.scrollIntoView({block:'center'}); });
+      var ok=document.createElement('button'); ok.type='button'; ok.textContent='知道了';
+      ok.addEventListener('click',function(){ b.remove(); });
+      b.appendChild(go); b.appendChild(ok); document.body.appendChild(b);
+    };
+    // 打開網站時先看雲端有沒有別台傳的新資料
+    if(cl.token&&cl.gist){
+      api('/gists/'+cl.gist).then(function(g){
+        if(remoteNewer(g)){
+          held=true;
+          say('⚠ 雲端有 '+fmt(g.updated_at)+' 的資料，比這台上次同步還新。要用雲端的就按「從雲端下載」；確定這台才是對的就按「上傳到雲端」。自動上傳先暫停。','warn');
+          if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at));
+        }
+      }).catch(function(){});
+    }
+    // 每 30 秒看一次有沒有改動；切到背景（手機切 App、關分頁）時馬上傳
+    setInterval(autoPush,30000);
+    document.addEventListener('visibilitychange',function(){ if(document.hidden) autoPush(); });
+    window.addEventListener('pagehide',autoPush);
   }
 
   var rg=document.getElementById('cf-regen');
@@ -3453,6 +3561,7 @@ section{padding-top:40px}
     try{
       var bl=document.getElementById('next-l');
       var n=document.getElementById('next-n');
+      if(n && /今天/.test(n.textContent)) return 'near';
       var m=n&&n.textContent.match(/(\d+)/);
       if(!m) return 'none';
       var d=+m[1];
@@ -3538,6 +3647,9 @@ section{padding-top:40px}
 
   var W=ls(WK)||[];
   function save(){ sv(WK,W); }
+  window.__wrongIV=function(){ return IV; };   // 解鎖獎勵、週報在這之後才讀，要先定義
+  // 換了複習間隔（固定 5 級 ↔ 費氏 8 級）後，原本「已精熟」的題目可能又回到複習中，沒有到期日就從今天開始
+  (function(){ var fixd=false; W.forEach(function(x){ if(x.lv<IV.length && isNaN(parse(x.due).getTime())){ x.due=kk(d0()); fixd=true; } }); if(fixd) save(); })();
   window.__wrongDue=function(){ var t=d0(); return W.filter(function(x){ return x.lv<IV.length && parse(x.due)<=t; }); };
 
   var elDue=document.getElementById('wr-due'), elAll=document.getElementById('wr-all'), elStat=document.getElementById('wr-stat');
@@ -3602,7 +3714,7 @@ section{padding-top:40px}
       mixed.forEach(function(x){ elDue.appendChild(card(x,'due')); });
     }
     var f=document.getElementById('wr-filter').value;
-    var list=W.filter(function(x){ return !f||x.s===f; })
+    var list=W.filter(function(x){ return !f||x.s===f||(f==='科學班'&&/^科班/.test(x.s)); })   // 「科學班」＝所有科班科目
               .sort(function(a,b){ return parse(a.due)-parse(b.due); });
     elAll.innerHTML='';
     if(!list.length) elAll.innerHTML='<p class="sub" style="margin:0">還沒有錯題。</p>';
@@ -3725,6 +3837,7 @@ section{padding-top:40px}
   function kk(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
   function pad(n){return (n<10?'0':'')+n;}
 
+  function dnum(k){ var p=String(k).split('-'); return new Date(+p[0],+p[1]-1,+p[2]).getTime(); }
   var HK='plan.hist.v1', JK='plan.journal.v1', UK='plan.unlock.v1';
   var hist=ls(HK,{}), jr=ls(JK,{}), ul=ls(UK,{seen:[],custom:[]});
 
@@ -3736,6 +3849,7 @@ section{padding-top:40px}
     labels.forEach(function(t,i){
       var b=document.createElement('button'); b.type='button'; b.textContent=(i+1)+' '+t;
       b.addEventListener('click',function(){
+        hist=ls(HK,{});   // 頁面開過午夜時，換日程式已經寫過昨天的紀錄，先重讀再寫
         var k=kk(d0()); hist[k]=hist[k]||{}; hist[k][field]=i+1; sv(HK,hist);
         buildRow(id,labels,field); moodHint(); paintBT();
       });
@@ -3745,7 +3859,7 @@ section{padding-top:40px}
   }
   function moodHint(){
     var el=document.getElementById('md-hint'); if(!el) return;
-    var ks=Object.keys(hist).sort(function(a,b){return new Date(a)-new Date(b);});
+    var ks=Object.keys(hist).sort(function(a,b){return dnum(a)-dnum(b);});
     var last=ks.slice(-5).map(function(k){return hist[k].mood;}).filter(function(x){return x;});
     var t=hist[kk(d0())]||{};
     if(!t.mood){ el.textContent='點一下就好，不用想太久。'; el.style.color='var(--ink-faint)'; return; }
@@ -3770,16 +3884,17 @@ section{padding-top:40px}
     document.getElementById('jr-save').addEventListener('click',function(){
       var k=kk(d0());
       if(!w.value.trim()&&!s.value.trim()&&!n.value.trim()) return;
-      jr[k]={w:w.value.trim(), s:s.value.trim(), n:n.value.trim()};
+      var first=!(jr[k]&&jr[k].pt);
+      jr[k]={w:w.value.trim(), s:s.value.trim(), n:n.value.trim(), pt:1};
       sv(JK,jr);
       var m=document.getElementById('jr-msg'); m.textContent='存好了 ✓';
       setTimeout(function(){m.textContent='';},2500);
-      if(window.__award) window.__award(3,'寫了日誌');
+      if(first && window.__award) window.__award(3,'寫了日誌');   // 一天只加一次
     });
     document.getElementById('jr-past').addEventListener('click',function(){
       var box=document.getElementById('jr-list');
       box.hidden=!box.hidden; if(box.hidden) return;
-      var ks=Object.keys(jr).sort(function(a,b){return new Date(b)-new Date(a);}).slice(0,30);
+      var ks=Object.keys(jr).sort(function(a,b){return dnum(b)-dnum(a);}).slice(0,30);
       if(!ks.length){ box.innerHTML='<p class="sub" style="margin:0">還沒有紀錄。</p>'; return; }
       box.innerHTML='<h3 style="margin-bottom:10px">最近 30 篇</h3>'+ks.map(function(k){
         var e=jr[k], p=k.split('-');
@@ -3795,25 +3910,32 @@ section{padding-top:40px}
 
   /* ---------- 回測 ---------- */
   function allDays(){
+    hist=ls(HK,{});
     var t=window.__todayStat?window.__todayStat():null;
     var merged=JSON.parse(JSON.stringify(hist));
     if(t&&t.day){ merged[t.day]=Object.assign(merged[t.day]||{},{a:t.a,d:t.d,m:t.m}); }
     return merged;
   }
+  // 從今天往回一天一天數：完成 60% 以上或那天開了降級模式＝達標；沒打開網站的日子也算沒達標；
+  // 今天還沒結束，沒達標不算斷；每 7 天有 1 天寬限
   function streak(m){
-    var ks=Object.keys(m).filter(function(k){return m[k].a;}).sort(function(a,b){return new Date(b)-new Date(a);});
-    var run=0, grace=0;
-    for(var i=0;i<ks.length;i++){
-      var e=m[ks[i]], r=e.a?e.d/e.a:0;
-      if(r>=0.6){ run++; }
-      else if(grace<Math.floor(run/7)+1){ grace++; }
+    var ks=Object.keys(m).filter(function(k){return m[k].a;});
+    if(!ks.length) return 0;
+    var first=Math.min.apply(null,ks.map(dnum)), easy=ls('plan.easy.v1',{})||{};
+    var run=0, grace=0, d=d0();
+    for(var i=0;i<500 && d.getTime()>=first;i++){
+      var k=kk(d), e=m[k], ok=!!easy[k] || !!(e&&e.a&&e.d/e.a>=0.6);
+      if(ok) run++;
+      else if(i===0){ /* 今天還在進行 */ }
+      else if(grace<Math.floor(run/7)+1) grace++;
       else break;
+      d.setDate(d.getDate()-1);
     }
     return run;
   }
   function paintBT(){
     var m=allDays();
-    var ks=Object.keys(m).filter(function(k){return m[k].a;}).sort(function(a,b){return new Date(a)-new Date(b);});
+    var ks=Object.keys(m).filter(function(k){return m[k].a;}).sort(function(a,b){return dnum(a)-dnum(b);});
     var sum=document.getElementById('bt-sum'); if(!sum) return;
     if(!ks.length){ sum.innerHTML='還沒有資料。在「今天」勾任務，隔天這裡就會開始累積。'; return; }
     var last7=ks.slice(-7), last30=ks.slice(-30);
@@ -3929,6 +4051,19 @@ section{padding-top:40px}
   function d0(){var d=new Date();d.setHours(0,0,0,0);return d;}
   function kk(d){return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
   function pad(n){return (n<10?'0':'')+n;}
+  function dnum(k){ var p=String(k).split('-'); return new Date(+p[0],+p[1]-1,+p[2]).getTime(); }
+
+  /* ---------- 現在就要處理的事：勾選要記住（照項目文字對） ---------- */
+  (function(){
+    var box=document.getElementById('todo-list'); if(!box) return;
+    var TDK='plan.todo.v1', done=ls(TDK,{})||{};
+    Array.prototype.forEach.call(box.querySelectorAll('label'),function(l){
+      var cb=l.querySelector('input'), sp=l.querySelector('span'); if(!cb||!sp) return;
+      var key=(sp.firstChild?sp.firstChild.textContent:sp.textContent).trim();
+      cb.checked=!!done[key];
+      cb.addEventListener('change',function(){ if(cb.checked) done[key]=1; else delete done[key]; sv(TDK,done); });
+    });
+  })();
 
   /* ---------- 要問老師 ---------- */
   var AK='plan.ask.v1', ask=ls(AK,[]);
@@ -3955,7 +4090,7 @@ section{padding-top:40px}
         if(cb.checked){
           var a=prompt('老師怎麼說？（可留空）');
           if(a) x.a=a.trim();
-          if(window.__award) window.__award(3,'問到答案：'+x.q.slice(0,10));
+          if(!x.pt){ x.pt=1; if(window.__award) window.__award(3,'問到答案：'+x.q.slice(0,10)); }   // 同一題只加一次
         }
         sv(AK,ask); paintAsk();
       });
@@ -4016,9 +4151,8 @@ section{padding-top:40px}
         var due=(window.__wrongDue?window.__wrongDue():[]).length;
         if(!due) return;
         if(ls(NK,'')===kk(d0())) return;
-        sv(NK,kk(d0()));
-        if(window.Notification && Notification.permission==='granted')
-          new Notification('今天有 '+due+' 題錯題到期', {body:'闔上答案重做一次，做對就往後排', tag:'wrong'});
+        if(!(ls('plan.pomo.v1',{})||{}).notify) return;   // 沒開「時段提醒」就不發
+        if(window.__sysNotify && window.__sysNotify('今天有 '+due+' 題錯題到期','闔上答案重做一次，做對就往後排')) sv(NK,kk(d0()));
       }catch(e){}
     },4000);
   })();
@@ -4103,9 +4237,10 @@ section{padding-top:40px}
       b.addEventListener('click',function(){
         var o={};
         Array.prototype.forEach.call(rf.querySelectorAll('textarea'),function(t){ o['q'+t.dataset.i]=t.value.trim(); });
+        var firstRv=!(rev[weekKey()]&&rev[weekKey()].pt); o.pt=1;
         rev[weekKey()]=o; sv(RK,rev);
         rf.innerHTML='<p class="sub" style="margin:0;color:var(--cap)">本週回顧已完成 ✓</p>';
-        if(window.__award) window.__award(10,'完成每週回顧');
+        if(firstRv && window.__award) window.__award(10,'完成每週回顧');   // 一週只加一次
       });
       rf.appendChild(b);
     });
@@ -4128,7 +4263,7 @@ section{padding-top:40px}
     var hist=ls('plan.hist.v1',{});
     var t=window.__todayStat?window.__todayStat():null;
     if(t&&t.day) hist[t.day]=Object.assign(hist[t.day]||{},{a:t.a,d:t.d,m:t.m});
-    var ks=Object.keys(hist).filter(function(k){return hist[k].a;}).sort(function(a,b){return new Date(b)-new Date(a);}).slice(0,7);
+    var ks=Object.keys(hist).filter(function(k){return hist[k].a;}).sort(function(a,b){return dnum(b)-dnum(a);}).slice(0,7);
     var a=0,dn=0,mins=0;
     ks.forEach(function(k){ a+=hist[k].a; dn+=hist[k].d; mins+=(hist[k].m||0); });
     var rate=a?Math.round(dn/a*100):0;
@@ -4147,9 +4282,9 @@ section{padding-top:40px}
 
   /* ---------- 本機快照 ---------- */
   var SNK='plan.snap.v1';
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1',
+  var KEYS=window.__DATA_KEYS || ['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1',
     'plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1',
-    'plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1'];
+    'plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1'];   // 和備份共用同一份清單
   function dumpAll(){ var o={_at:new Date().toISOString()}; KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }); return o; }
   (function(){
     var snaps=ls(SNK,[]), today=kk(d0());
@@ -4169,9 +4304,20 @@ section{padding-top:40px}
         var s=snaps[+b.dataset.i];
         if(!confirm('還原到 '+s.d+' 的狀態？目前的資料會被覆蓋。')) return;
         KEYS.forEach(function(k){ if(s.o[k]!==undefined) localStorage.setItem(k,s.o[k]); });
+        window.__noSync=true;
         location.reload();
       });
     });
+    if(snaps.length>1){
+      var trim=document.createElement('button'); trim.type='button'; trim.className='btn ghost';
+      trim.style.cssText='margin-top:10px;padding:6px 14px;font-size:12.5px';
+      trim.textContent='只留最新一份快照（儲存空間不夠時用）';
+      trim.addEventListener('click',function(){
+        if(!confirm('刪掉舊的 '+(snaps.length-1)+' 份快照，只留今天這份？'+String.fromCharCode(10)+'建議先到「備份與轉移」按「下載成檔案」。')) return;
+        snaps=snaps.slice(0,1); sv(SNK,snaps); location.reload();
+      });
+      box.appendChild(trim);
+    }
   })();
 })();
 </script>
@@ -4324,7 +4470,7 @@ section{padding-top:40px}
     var ed=(ls('plan.dayedit.v1')||{})[k];
     if(ed) return {edited:true, b:ed.map(function(x){
       var m=(x.t||'').match(/(\d{1,2}:\d{2})\D+(\d{1,2}:\d{2})/);
-      return [m?m[1]:'—', m?m[2]:'—', x.c||(x.f?'fixed':(x.e?'rest':'mock')), x.n, x.d||'', x.f?1:(x.e?3:0)];
+      return [m?m[1]:'—', m?m[2]:'—', x.c||(x.f?'fixed':(x.e?'rest':(window.__guessCat?window.__guessCat(x.n):'free'))), x.n, x.d||'', x.f?1:(x.e?3:0)];
     })};
     var pd=PL.days[k];
     return {edited:false, b:pd?pd.b:[]};
