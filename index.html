@@ -684,6 +684,93 @@ section{padding-top:40px}
 .kp-tag{display:inline-block;font-size:11px;padding:0 7px;border-radius:999px;margin-right:6px;font-weight:700;
   background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
 .kp-row .kp-name{min-width:0}
+
+/* ---------- 共用元件（卡片、表單、按鈕） ---------- */
+:where(.card){background:var(--card);border:1px solid var(--rule);padding:16px 18px}
+.card>h3:first-child{margin-bottom:6px}
+.sub{font-size:13px;line-height:1.6;color:var(--ink-soft);margin:0 0 10px}
+.set-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px 12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld label{font-size:12px;font-weight:500;color:var(--ink-faint)}
+.fld input,.fld select{font:inherit;font-size:14px;padding:8px 11px;border:1px solid var(--rule);
+  background:var(--paper);color:var(--ink);width:100%;min-width:0}
+.fld input:focus-visible,.fld select:focus-visible{outline:2px solid var(--sci);outline-offset:1px}
+.bar-btns{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.btn{font-family:inherit;font-size:13.5px;font-weight:500;line-height:1.3;border:1px solid var(--rule);
+  background:var(--card);color:var(--ink);cursor:pointer}
+.btn.solid{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.btn.ghost{background:transparent;color:var(--ink-soft)}
+.btn:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+
+/* ---------- 成績紀錄 ---------- */
+.sc-seg{display:inline-flex;gap:4px;padding:4px;border:1px solid var(--rule);border-radius:var(--r-btn);
+  background:var(--card);margin:0 0 12px}
+.sc-seg button{font:inherit;font-size:14px;font-weight:500;padding:7px 20px;border:0;border-radius:var(--r-btn);
+  background:transparent;color:var(--ink-soft);cursor:pointer}
+.sc-seg button[aria-selected="true"]{background:var(--ink);color:var(--card);font-weight:700}
+.sc-seg button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.sc-entry{margin-bottom:14px}
+.sc-top{display:flex;gap:10px 12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.sc-top .fld{flex:1 1 180px;max-width:280px}
+.sc-nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.sc-nums input{font-family:'IBM Plex Mono',monospace;font-size:16px;text-align:center}
+.sc-legacy{font-size:13px;color:var(--warn);background:var(--warn-tint);padding:8px 12px;border-radius:var(--r-pill);margin:0 0 12px}
+.sc-gr{display:grid;gap:8px}
+.sc-gr-row{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:center}
+.sc-gr-row>span{font-size:14px;font-weight:700}
+.sc-chips{display:grid;grid-template-columns:repeat(7,minmax(0,54px));gap:5px}
+.sc-chips button{font-family:'IBM Plex Mono',monospace;font-size:13px;min-width:0;height:36px;padding:0 2px;white-space:nowrap;
+  border:1px solid var(--rule);border-radius:var(--r-btn);background:var(--card);color:var(--ink-soft);cursor:pointer}
+.sc-chips button[aria-checked="true"]{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:600}
+.sc-chips button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.sc-sum{font-size:14px;margin:12px 0 0;color:var(--ink-soft)}
+.sc-sum b{font-family:'IBM Plex Mono',monospace;color:var(--ink);font-size:16px}
+.sc-recent{margin-top:14px;border-top:1px solid var(--rule2);padding-top:10px}
+.sc-recent h4{margin:0 0 6px;font-size:12.5px;color:var(--ink-faint);font-weight:500}
+.sc-q{display:grid;grid-template-columns:44px minmax(0,1fr) auto 28px;gap:8px;align-items:center;
+  padding:6px 0;border-bottom:1px solid var(--rule2);font-size:13.5px}
+.sc-q:last-child{border-bottom:0}
+.sc-q .d{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-faint)}
+.sc-q .v{font-family:'IBM Plex Mono',monospace}
+.sc-q small{color:var(--ink-faint);margin-left:6px}
+.sc-trend-h{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin-bottom:10px}
+.sc-trend-h .sub{margin:0}
+.sc-grid{position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:12px}
+.sc-mini{border:1px solid var(--rule2);border-radius:calc(var(--r-card) - 4px);padding:10px 12px 6px;background:var(--card2);min-width:0}
+.sc-mini-h{display:flex;align-items:baseline;gap:8px;margin-bottom:2px}
+.sc-mini-h b{font-size:14px}
+.sc-mini-h .last{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--ink)}
+.sc-mini-h .dl{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft)}
+.sc-mini-h .dl i{font-style:normal}
+.sc-mini-h .dl.up i{color:var(--cap)} .sc-mini-h .dl.dn i{color:var(--warn)}
+.sc-mini-m{font-size:11.5px;color:var(--ink-faint);margin:0 0 2px}
+.sc-mini svg{display:block;max-width:100%;height:auto;overflow:visible}
+.sc-mini .ln{fill:none;stroke:var(--cap);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.sc-mini .pt{fill:var(--cap);stroke:var(--card2);stroke-width:2}
+.sc-mini .gl{stroke:var(--rule2);stroke-width:1}
+.sc-mini .ax{fill:var(--ink-faint);font-size:10px;font-family:'IBM Plex Mono',monospace}
+.sc-mini .xl{fill:var(--ink-faint);font-size:10px}
+.sc-mini .vl{fill:var(--ink);font-size:11px;font-weight:600;font-family:'IBM Plex Mono',monospace}
+.sc-mini .hit{fill:transparent;cursor:pointer}
+.sc-mini .hit:focus{outline:none}
+.sc-mini .hit:focus-visible{stroke:var(--warn);stroke-width:2}
+.sc-mini-e{font-size:12.5px;color:var(--ink-faint);padding:18px 0 22px;text-align:center}
+.sc-tip{position:absolute;z-index:3;pointer-events:none;background:var(--ink);color:var(--card);font-size:12.5px;line-height:1.45;
+  padding:6px 10px;border-radius:8px;white-space:nowrap;transform:translate(-50%,calc(-100% - 10px));box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.sc-empty{grid-column:1/-1;font-size:13.5px;color:var(--ink-faint);padding:6px 0}
+.sc-tbl{margin-top:14px}
+.sc-tbl summary{cursor:pointer;font-size:13px;color:var(--ink-soft);padding:4px 0}
+.sc-tbl .tbl-scroll{margin-top:8px}
+#sc-table td,#sc-table th{white-space:nowrap}
+#sc-table td.n{font-family:'IBM Plex Mono',monospace;text-align:right}
+@media (max-width:560px){
+  .sc-seg{display:flex}
+  .sc-seg button{flex:1;padding:7px 0}
+  .sc-gr-row{grid-template-columns:1fr}
+  .sc-chips{grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+  .sc-chips button{height:38px;font-size:12.5px}
+}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -1285,27 +1372,18 @@ section{padding-top:40px}
 </section>
 
 <section>
-  <div class="sec-head"><h2>成績紀錄</h2><span class="eyebrow">看趨勢，不看單次</span></div>
-  <p class="sec-note">每次段考、模考完把分數填進來。單次考差沒有意義，有意義的是三次以上的走勢——所以下面的圖是平均分的變化，不是排名。</p>
-  <div class="card" style="margin-bottom:14px">
-    <h3 style="margin-bottom:6px">小考／大考登記</h3>
-    <p class="sub">填分數按登記，點數自動加減並記進商店。加減規則可在「設定」改。</p>
-    <div class="set-grid" style="margin-bottom:10px">
-      <div class="fld"><label>類型</label>
-        <select id="qz-kind">
-          <option value="gq">資優小考</option>
-          <option value="q">一般小考</option>
-          <option value="e">大考（段考／模考）</option>
-        </select>
-      </div>
-      <div class="fld"><label>分數</label><input type="number" id="qz-score" min="0" max="100" step="1" placeholder="0–100"></div>
-      <div class="fld"><label>備註（選填）</label><input type="text" id="qz-note" placeholder="例：理化 3-2"></div>
-    </div>
-    <div class="bar-btns" style="margin-top:0">
-      <button class="btn solid" id="qz-go" type="button">登記</button>
-      <span class="sub" id="qz-msg" style="align-self:center;margin:0"></span>
-    </div>
-    <p class="sub" id="qz-rule" style="margin:11px 0 0"></p>
+  <div class="sec-head"><h2>成績紀錄</h2><span class="eyebrow">分科看走勢</span></div>
+  <p class="sec-note">段考、模考、小考分開記，每一科各有自己的走勢圖。單次考差沒有意義，同一科連續三次往同一個方向才算趨勢。</p>
+  <div class="sc-seg" id="sc-seg" role="tablist" aria-label="成績類型">
+    <button type="button" role="tab" data-k="term" aria-selected="true">段考</button>
+    <button type="button" role="tab" data-k="mock" aria-selected="false">模考</button>
+    <button type="button" role="tab" data-k="quiz" aria-selected="false">小考</button>
+  </div>
+  <div class="card sc-entry" id="sc-entry"></div>
+  <div class="card sc-trend">
+    <div class="sc-trend-h"><h3 id="sc-trend-t">走勢</h3><p class="sub" id="sc-trend-s"></p></div>
+    <div class="sc-grid" id="sc-grid"></div>
+    <details class="sc-tbl"><summary>看數字表</summary><div class="tbl-scroll"><table id="sc-table"></table></div></details>
   </div>
 
   <div class="card" style="margin-bottom:14px">
@@ -1313,7 +1391,7 @@ section{padding-top:40px}
     <p class="sub">模考真正該診斷的往往不是分數，是時間分配。哪科寫不完？哪科提早交卷卻錯一堆？記三次就看得出來。</p>
     <div class="set-grid" style="margin-bottom:9px">
       <div class="fld"><label>考試</label><select id="pc-exam"></select></div>
-      <div class="fld"><label>科目</label><select id="pc-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option></select></div>
+      <div class="fld"><label>科目</label><select id="pc-sub"><option>國文</option><option>英文</option><option>數學</option><option>自然</option><option>理化</option><option>生物</option><option>地科</option><option>社會</option></select></div>
       <div class="fld"><label>結果</label>
         <select id="pc-fin"><option value="2">寫完還有時間檢查</option><option value="1">剛好寫完</option><option value="0">沒寫完</option></select>
       </div>
@@ -1323,14 +1401,6 @@ section{padding-top:40px}
     <div id="pc-out" style="margin-top:12px"></div>
   </div>
 
-  <div class="td-budget" id="sc-summary"></div>
-  <div id="sc-chart" class="card" style="padding:14px 16px;margin-bottom:14px"></div>
-  <div class="tbl-scroll"><table id="sc-table">
-    <thead><tr><th>考試</th><th>國</th><th>數</th><th>英</th><th>自</th><th>社</th><th>作文</th><th>平均</th></tr></thead>
-    <tbody></tbody>
-  </table></div>
-  <div class="bar-btns"><button class="btn solid" id="sc-save" type="button">儲存成績</button><span class="sub" id="sc-msg" style="align-self:center"></span></div>
-  <p class="w-note">作文是級分（0–6），不計入平均。空白代表沒考或還沒填。</p>
   <div class="card" id="kp-card" style="margin-top:18px">
     <div class="sec-head" style="margin-bottom:6px"><h3>科班考古題進度</h3><span class="eyebrow">A 本 35 份＋B 本 36 份</span></div>
     <p class="sub">寫完打勾、填分數（換算成百分比）。在「今天」勾掉某份考古題的「限時作答」時，這裡會自動打勾。</p>
@@ -1416,8 +1486,12 @@ section{padding-top:40px}
       <div class="fld"><label>一般小考 ≥90</label><input type="number" id="r-q90"></div>
       <div class="fld"><label>一般小考 &lt;70</label><input type="number" id="r-qU70"></div>
       <div class="fld"><label>一般小考 &lt;60</label><input type="number" id="r-qU60"></div>
-      <div class="fld"><label>大考 ≥90</label><input type="number" id="r-e90"></div>
-      <div class="fld"><label>大考 100</label><input type="number" id="r-e100"></div>
+      <div class="fld"><label>段考每科 ≥90</label><input type="number" id="r-e90"></div>
+      <div class="fld"><label>段考每科 100</label><input type="number" id="r-e100"></div>
+      <div class="fld"><label>模考每科 A++</label><input type="number" id="r-mA2"></div>
+      <div class="fld"><label>模考每科 A+</label><input type="number" id="r-mA1"></div>
+      <div class="fld"><label>模考每科 A</label><input type="number" id="r-mA0"></div>
+      <div class="fld"><label>模考五科全 A++ 再加</label><input type="number" id="r-mAll"></div>
     </div>
     <div class="bar-btns">
       <button class="btn solid" id="r-save" type="button">儲存規則</button>
@@ -2636,7 +2710,8 @@ section{padding-top:40px}
     task:5, allclear:15, pomo:5,
     gq50:10, gq90:20, gq100:40,        // 資優小考
     q90:15, qU70:-10, qU60:-20,        // 一般小考
-    e90:20, e100:40                    // 大考
+    e90:20, e100:40,                   // 段考（每科）
+    mA2:8, mA1:4, mA0:2, mAll:20       // 模考（每科 A++／A+／A，五科全 A++ 再加）
   };
   var rules = Object.assign({}, DEFRULES, ls(RLK)||{});
   window.__rules=function(){ return rules; };
@@ -2658,7 +2733,7 @@ section{padding-top:40px}
 
   window.__award=function(n,why){
     shop.pts=Math.max(0,(shop.pts||0)+n);
-    if(n>0) shop.log.unshift({t:Date.now(), n:'＋'+n, w:why||''});
+    if(n) shop.log.unshift({t:Date.now(), n:(n>0?'＋':'－')+Math.abs(n), w:why||''});
     shop.log=shop.log.slice(0,120);
     save(SHK,shop); paintShop();
   };
@@ -2728,136 +2803,454 @@ section{padding-top:40px}
   paintShop();
 
 
-  /* ---------- 小考／大考登記 ---------- */
-  function ruleText(){
-    return '資優小考：≥50 '+sg(rules.gq50)+'、≥90 '+sg(rules.gq90)+'、100 '+sg(rules.gq100)
-      +'　｜　一般小考：≥90 '+sg(rules.q90)+'、<70 '+sg(rules.qU70)+'、<60 '+sg(rules.qU60)
-      +'　｜　大考：≥90 '+sg(rules.e90)+'、100 '+sg(rules.e100);
-  }
+  /* ---------- 點數規則 ---------- */
   function sg(n){ return (n>0?'+':'')+n+' 點'; }
   function quizPts(kind,s){
     if(kind==='gq'){ if(s>=100) return rules.gq100; if(s>=90) return rules.gq90; if(s>=50) return rules.gq50; return 0; }
     if(kind==='q'){ if(s>=90) return rules.q90; if(s<60) return rules.qU60; if(s<70) return rules.qU70; return 0; }
     if(s>=100) return rules.e100; if(s>=90) return rules.e90; return 0;
   }
-  var KNAME={gq:'資優小考',q:'一般小考',e:'大考'};
-  var qzRule=document.getElementById('qz-rule');
-  if(qzRule) qzRule.textContent=ruleText();
-  var qzGo=document.getElementById('qz-go');
-  if(qzGo) qzGo.addEventListener('click',function(){
-    var kind=document.getElementById('qz-kind').value;
-    var sEl=document.getElementById('qz-score');
-    var s=parseFloat(sEl.value);
-    if(isNaN(s)||s<0||s>100){ alert('分數要填 0 到 100。'); return; }
-    var note=document.getElementById('qz-note').value.trim();
-    var p=quizPts(kind,s);
-    window.__award(p, KNAME[kind]+' '+s+' 分'+(note?'（'+note+'）':''));
-    var m=document.getElementById('qz-msg');
-    if(m){ m.textContent=(p>0?'+':'')+p+' 點 ✓'; m.style.color=(p>0?'var(--cap)':(p<0?'var(--warn)':'var(--ink-faint)')); setTimeout(function(){m.textContent='';},4000); }
-    sEl.value=''; document.getElementById('qz-note').value='';
-  });
-
-  /* ---------- 點數規則編輯 ---------- */
-  var RK=['task','allclear','pomo','gq50','gq90','gq100','q90','qU70','qU60','e90','e100'];
+  var RK=['task','allclear','pomo','gq50','gq90','gq100','q90','qU70','qU60','e90','e100','mA2','mA1','mA0','mAll'];
   function fillRules(){ RK.forEach(function(k){ var el=document.getElementById('r-'+k); if(el) el.value=rules[k]; }); }
   fillRules();
   var rs=document.getElementById('r-save');
   if(rs) rs.addEventListener('click',function(){
     RK.forEach(function(k){ var el=document.getElementById('r-'+k); if(el){ var v=parseInt(el.value,10); rules[k]=isNaN(v)?DEFRULES[k]:v; } });
-    save(RLK,rules); paintShop(); if(qzRule) qzRule.textContent=ruleText();
+    save(RLK,rules); paintShop(); renderEntry();
     var m=document.getElementById('r-msg'); if(m){ m.textContent='已儲存 ✓'; setTimeout(function(){m.textContent='';},2500); }
   });
   var rr=document.getElementById('r-reset');
   if(rr) rr.addEventListener('click',function(){
     if(!confirm('點數規則恢復預設？')) return;
-    rules=Object.assign({},DEFRULES); save(RLK,rules); fillRules(); paintShop();
-    if(qzRule) qzRule.textContent=ruleText();
+    rules=Object.assign({},DEFRULES); save(RLK,rules); fillRules(); paintShop(); renderEntry();
   });
 
-  /* ---------- 成績紀錄 ---------- */
-  var SCK='plan.scores.v1';
-  var EXAMS=[
-    ['2026-9-8','一模'],['2026-10-12','上一段'],['2026-10-28','二模'],['2026-11-23','上二段'],
-    ['2026-12-23','三模'],['2027-1-18','上三段'],['2027-3-3','四模'],['2027-4-7','五模'],
-    ['2027-4-28','六模'],['2027-5-15','會考']
-  ];
-  var SUBS=['ch','ma','en','sc','so','wr'];
-  var scores = ls(SCK) || {};
-  var tb=document.querySelector('#sc-table tbody');
-  function avg(r){
-    var v=['ch','ma','en','sc','so'].map(function(k){return parseFloat(r&&r[k]);}).filter(function(x){return !isNaN(x);});
+  /* ---------- 成績紀錄：段考／模考／小考 ---------- */
+  var SC2='plan.scores.v2', QZK='plan.quiz.v1', SCT='plan.sctab.v1';
+  var TERM_SUB=[['ch','國文'],['en','英文'],['ma','數學'],['ph','理化'],['bi','生物'],['ea','地科'],['so','社會']];
+  var MOCK_SUB=[['ch','國文'],['en','英文'],['ma','數學'],['so','社會'],['sc','自然']];
+  var GRADES=['A++','A+','A','B++','B+','B','C'];
+  var GV={'A++':7,'A+':6,'A':5,'B++':4,'B+':3,'B':2,'C':1};
+  var TERM_DEF=[['2026-10-12','上一段'],['2026-11-23','上二段'],['2027-1-18','上三段']];
+  var MOCK_DEF=[['2026-9-8','一模'],['2026-10-28','二模'],['2026-12-23','三模'],['2027-3-3','四模'],
+    ['2027-4-7','五模'],['2027-4-28','六模'],['2027-5-15','會考']];
+  var SUBHINT=['國文','英文','數學','理化','生物','地科','歷史','地理','公民','資優數學','科班自然'];
+
+  var sc=ls(SC2);
+  if(!sc||typeof sc!=='object') sc={term:{},mock:{},custom:[]};
+  sc.term=sc.term||{}; sc.mock=sc.mock||{}; sc.custom=sc.custom||[];
+  var quiz=ls(QZK); if(!Array.isArray(quiz)) quiz=[];
+
+  // 舊版成績表（國數英自社＋作文混在一起）只搬能對上的欄位，其他數字留著提醒重填；舊資料本身不刪
+  (function migrate(){
+    if(sc.migrated) return;
+    var old=ls('plan.scores.v1')||{};
+    var isTerm={}; TERM_DEF.forEach(function(e){ isTerm[e[0]]=1; });
+    var NM={ch:'國文',ma:'數學',en:'英文',sc:'自然',so:'社會',wr:'作文'};
+    Object.keys(old).forEach(function(id){
+      var r=old[id]||{}, keys=Object.keys(r).filter(function(k){ return r[k]!==undefined && r[k]!==null && r[k]!==''; });
+      if(!keys.length) return;
+      if(isTerm[id]){
+        var rec={s:{},pts:0,legacy:{}};
+        keys.forEach(function(k){ if(k==='sc'||k==='wr') rec.legacy[NM[k]]=r[k]; else rec.s[k]=r[k]; });
+        rec.pts=termPts(rec.s);       // 舊版大考點數當時已經加過，不重複加
+        if(!Object.keys(rec.legacy).length) delete rec.legacy;
+        sc.term[id]=rec;
+      } else {
+        var lg={}; keys.forEach(function(k){ lg[NM[k]]=r[k]; });
+        sc.mock[id]={g:{},pts:0,legacy:lg};
+      }
+    });
+    sc.migrated=1; save(SC2,sc);
+  })();
+
+  function examList(kind){
+    var def=(kind==='term'?TERM_DEF:MOCK_DEF).map(function(e){ return {id:e[0],name:e[1],date:e[0]}; });
+    sc.custom.forEach(function(c){ if(c.kind===kind) def.push({id:c.id,name:c.name,date:c.date,custom:1}); });
+    return def.sort(function(a,b){ return dnum(a.date)-dnum(b.date); });
+  }
+  function dnum(s){ var p=String(s).split('-'); return new Date(+p[0],+p[1]-1,+p[2]).getTime(); }
+  function md(s){ var p=String(s).split('-'); return (+p[1])+'/'+(+p[2]); }
+  function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function isoDay(s){ var p=String(s).split('-'); return p[0]+'-'+('0'+p[1]).slice(-2)+'-'+('0'+p[2]).slice(-2); }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function defaultExam(kind){
+    var L=examList(kind), now=Date.now(), pick=L[0];
+    L.forEach(function(e){ if(dnum(e.date)<=now) pick=e; });
+    return pick? pick.id : '';
+  }
+  function termPts(s){ var p=0; TERM_SUB.forEach(function(x){ var v=s&&s[x[0]]; if(typeof v==='number') p+=quizPts('e',v); }); return p; }
+  function mockPts(g){
+    var p=0, all=true;
+    MOCK_SUB.forEach(function(x){ var v=g&&g[x[0]];
+      if(v==='A++') p+=rules.mA2; else if(v==='A+') p+=rules.mA1; else if(v==='A') p+=rules.mA0;
+      if(v!=='A++') all=false; });
+    return p+(all?rules.mAll:0);
+  }
+  function termAvg(s){
+    var v=TERM_SUB.map(function(x){ return s&&s[x[0]]; }).filter(function(x){ return typeof x==='number'; });
     return v.length? Math.round(v.reduce(function(a,b){return a+b;},0)/v.length*10)/10 : null;
   }
-  function drawScores(){
-    if(!tb) return;
-    tb.innerHTML='';
-    EXAMS.forEach(function(e){
-      var id=e[0], r=scores[id]||{};
-      var tr=document.createElement('tr');
-      var td0=document.createElement('td');
-      var p=id.split('-');
-      td0.innerHTML='<span class="t">'+p[1]+'/'+p[2]+'</span><br>'+e[1];
-      tr.appendChild(td0);
-      SUBS.forEach(function(k){
-        var td=document.createElement('td');
-        var inp=document.createElement('input');
-        inp.type='number'; inp.className='mono'; inp.value=(r[k]!==undefined?r[k]:'');
-        inp.min=0; inp.max=(k==='wr'?6:100); inp.step=(k==='wr'?1:0.5);
-        inp.style.cssText='width:56px;font-size:12.5px;padding:5px 6px;border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink)';
-        inp.dataset.id=id; inp.dataset.k=k;
-        td.appendChild(inp); tr.appendChild(td);
+  function gradeSum(g){
+    var c={}; MOCK_SUB.forEach(function(x){ var v=g&&g[x[0]]; if(v) c[v]=(c[v]||0)+1; });
+    return GRADES.filter(function(k){ return c[k]; }).map(function(k){ return c[k]+k; }).join(' ');
+  }
+  function examName(kind,id){ var e=examList(kind).filter(function(x){ return x.id===id; })[0]; return e? e.name : id; }
+
+  var tab=ls(SCT); if(['term','mock','quiz'].indexOf(tab)<0) tab='term';
+  var cur={term:defaultExam('term'), mock:defaultExam('mock')};
+  var draft=null;   // 模考等級選到一半、還沒儲存的狀態
+  var entry=document.getElementById('sc-entry');
+
+  function flash(id,txt,col){
+    var m=document.getElementById(id); if(!m) return;
+    m.textContent=txt; m.style.color=col||'var(--cap)';
+    clearTimeout(m._t); m._t=setTimeout(function(){ m.textContent=''; },3500);
+  }
+  function examPicker(kind){
+    var L=examList(kind);
+    return '<div class="sc-top"><div class="fld"><label for="sc-exam">'+(kind==='term'?'哪一次段考':'哪一次模考')+'</label><select id="sc-exam">'
+      + L.map(function(e){ return '<option value="'+esc(e.id)+'"'+(e.id===cur[kind]?' selected':'')+'>'+esc(e.name)+'（'+md(e.date)+'）'+'</option>'; }).join('')
+      + '<option value="__new">＋ 新增其他'+(kind==='term'?'段考':'模考')+'…</option></select></div>'
+      + '<div class="fld" id="sc-new-n" hidden><label for="sc-nn">名稱</label><input id="sc-nn" type="text" placeholder="'+(kind==='term'?'例：下一段':'例：北模')+'"></div>'
+      + '<div class="fld" id="sc-new-d" hidden><label for="sc-nd">日期</label><input id="sc-nd" type="date"></div>'
+      + '</div>';
+  }
+  function bindPicker(kind){
+    var sel=document.getElementById('sc-exam');
+    sel.addEventListener('change',function(){
+      var nw=sel.value==='__new';
+      document.getElementById('sc-new-n').hidden=!nw; document.getElementById('sc-new-d').hidden=!nw;
+      if(nw){
+        document.getElementById('sc-nd').value=isoDay(todayStr()); document.getElementById('sc-nn').focus();
+        if(kind==='term') entry.querySelectorAll('.sc-nums input').forEach(function(x){ x.value=''; });
+        else { draft={id:'__new',g:{},wr:null};
+          entry.querySelectorAll('.sc-chips button').forEach(function(x){ x.setAttribute('aria-checked','false'); });
+          var ms=document.getElementById('sc-msum'); if(ms) ms.textContent='還沒選等級'; }
+        var lg=entry.querySelector('.sc-legacy'); if(lg) lg.hidden=true;
+        return;
+      }
+      cur[kind]=sel.value; draft=null; renderEntry();
+    });
+  }
+  function resolveExam(kind){
+    var sel=document.getElementById('sc-exam');
+    if(sel.value!=='__new') return sel.value;
+    var n=document.getElementById('sc-nn').value.trim(), d=document.getElementById('sc-nd').value;
+    if(!n||!d){ alert('新增考試要填名稱和日期。'); return null; }
+    var p=d.split('-'), id='c'+Date.now();
+    sc.custom.push({id:id,kind:kind,name:n,date:(+p[0])+'-'+(+p[1])+'-'+(+p[2])});
+    cur[kind]=id; return id;
+  }
+  function legacyNote(rec){
+    if(!rec||!rec.legacy) return '';
+    var t=Object.keys(rec.legacy).map(function(k){ return k+' '+rec.legacy[k]; }).join('、');
+    return '<p class="sc-legacy">舊成績表留下的數字：'+esc(t)+'。舊表沒有分科或不是等級，請照現在的欄位重填，按儲存後這行就會消失。</p>';
+  }
+
+  function renderTerm(){
+    var rec=sc.term[cur.term]||{}, s=rec.s||{};
+    entry.innerHTML=examPicker('term')+legacyNote(rec)
+      + '<div class="sc-nums">'+TERM_SUB.map(function(x){
+          return '<div class="fld"><label for="sc-t-'+x[0]+'">'+x[1]+'</label><input id="sc-t-'+x[0]+'" data-k="'+x[0]+'" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="'+(typeof s[x[0]]==='number'?s[x[0]]:'')+'"></div>';
+        }).join('')+'</div>'
+      + '<div class="bar-btns"><button class="btn solid" id="sc-save" type="button">儲存</button>'
+      + '<button class="btn ghost" id="sc-clear" type="button">清除這次</button><span class="sub" id="sc-msg" style="margin:0"></span></div>'
+      + '<p class="w-note">空白＝沒考或還沒發。點數：每科 ≥90 '+sg(rules.e90)+'、100 '+sg(rules.e100)+'；之後改分數只補差額，不會重複加。</p>';
+    bindPicker('term');
+    document.getElementById('sc-save').addEventListener('click',function(){
+      var id=resolveExam('term'); if(!id) return;
+      var ns={}, bad=false;
+      entry.querySelectorAll('.sc-nums input').forEach(function(inp){
+        var v=inp.value.trim(); if(v==='') return;
+        var n=parseFloat(v); if(isNaN(n)||n<0||n>100){ bad=true; return; } ns[inp.dataset.k]=n;
       });
-      var tda=document.createElement('td'); tda.className='mono';
-      var a=avg(r); tda.textContent=(a===null?'—':a); tda.style.color=(a===null?'var(--ink-faint)':'var(--cap)');
-      tr.appendChild(tda);
-      tb.appendChild(tr);
+      if(bad){ alert('分數要在 0 到 100 之間。'); return; }
+      if(!Object.keys(ns).length){ alert('至少填一科分數；要刪掉這次請按「清除這次」。'); return; }
+      var r=sc.term[id]||{pts:0}, np=termPts(ns), diff=np-(r.pts||0);
+      sc.term[id]={s:ns,pts:np};
+      save(SC2,sc);
+      if(diff) window.__award(diff,'段考成績：'+examName('term',id));
+      renderEntry(); renderTrend();
+      flash('sc-msg','已儲存 ✓'+(diff?'　'+sg(diff):''));
     });
-    drawChart();
+    document.getElementById('sc-clear').addEventListener('click',function(){
+      var r=sc.term[cur.term]; if(!r) return;
+      if(!confirm('清除「'+examName('term',cur.term)+'」的段考成績？')) return;
+      if(r.pts) window.__award(-r.pts,'清除段考成績：'+examName('term',cur.term));
+      delete sc.term[cur.term]; save(SC2,sc); renderEntry(); renderTrend();
+    });
   }
-  function drawChart(){
-    var box=document.getElementById('sc-chart'); if(!box) return;
-    var pts=[];
-    EXAMS.forEach(function(e){ var a=avg(scores[e[0]]); if(a!==null) pts.push({n:e[1],v:a}); });
-    if(pts.length<2){ box.innerHTML='<p class="sub" style="margin:0">填滿兩次以上的成績，這裡就會出現走勢圖。單次分數看不出東西，走勢才看得出來。</p>'; return; }
-    var W=640,H=170,P=32, mn=Math.min.apply(null,pts.map(function(p){return p.v;})), mx=Math.max.apply(null,pts.map(function(p){return p.v;}));
-    mn=Math.max(0,Math.floor((mn-5)/10)*10); mx=Math.min(100,Math.ceil((mx+5)/10)*10);
-    if(mx-mn<10) mx=mn+10;
-    function X(i){ return P+i*((W-P*2)/(pts.length-1)); }
-    function Y(v){ return H-P-((v-mn)/(mx-mn))*(H-P*2); }
-    var d=pts.map(function(p,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1);}).join(' ');
-    var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg">';
-    svg+='<line x1="'+P+'" y1="'+(H-P)+'" x2="'+(W-P)+'" y2="'+(H-P)+'" stroke="#D6DCE1"/>';
-    svg+='<text x="6" y="'+(Y(mx)+4)+'" font-size="10" fill="#7C8894">'+mx+'</text>';
-    svg+='<text x="6" y="'+(Y(mn)+4)+'" font-size="10" fill="#7C8894">'+mn+'</text>';
-    svg+='<path d="'+d+'" fill="none" stroke="#0D7F63" stroke-width="2.5" stroke-linejoin="round"/>';
-    pts.forEach(function(p,i){
-      svg+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(p.v).toFixed(1)+'" r="4" fill="#fff" stroke="#0D7F63" stroke-width="2.5"/>';
-      svg+='<text x="'+X(i).toFixed(1)+'" y="'+(H-P+15)+'" font-size="10" fill="#7C8894" text-anchor="middle">'+p.n+'</text>';
-      svg+='<text x="'+X(i).toFixed(1)+'" y="'+(Y(p.v)-10).toFixed(1)+'" font-size="10.5" fill="#131C26" text-anchor="middle">'+p.v+'</text>';
+
+  function renderMock(){
+    var rec=sc.mock[cur.mock]||{};
+    if(!draft||draft.id!==cur.mock) draft={id:cur.mock,g:Object.assign({},rec.g||{}),wr:(typeof rec.wr==='number'?rec.wr:null)};
+    function chips(k,label,opts){
+      return '<div class="sc-gr-row"><span id="sc-gl-'+k+'">'+label+'</span><div class="sc-chips" role="radiogroup" aria-labelledby="sc-gl-'+k+'" data-k="'+k+'">'
+        + opts.map(function(o){ var on=(k==='wr'? draft.wr===o : draft.g[k]===o);
+            return '<button type="button" role="radio" aria-checked="'+on+'" data-v="'+o+'">'+o+(k==='wr'?' 級':'')+'</button>'; }).join('')
+        + '</div></div>';
+    }
+    entry.innerHTML=examPicker('mock')+legacyNote(rec)
+      + '<div class="sc-gr">'+MOCK_SUB.map(function(x){ return chips(x[0],x[1],GRADES); }).join('')
+      + chips('wr','作文',[0,1,2,3,4,5,6])+'</div>'
+      + '<p class="sc-sum" id="sc-msum"></p>'
+      + '<div class="bar-btns"><button class="btn solid" id="sc-save" type="button">儲存</button>'
+      + '<button class="btn ghost" id="sc-clear" type="button">清除這次</button><span class="sub" id="sc-msg" style="margin:0"></span></div>'
+      + '<p class="w-note">再點一次已選的等級可以取消。點數：每科 A++ '+sg(rules.mA2)+'、A+ '+sg(rules.mA1)+'、A '+sg(rules.mA0)+'，五科全 A++ 再 '+sg(rules.mAll)+'；之後改等級只補差額。</p>';
+    bindPicker('mock');
+    function paintSum(){
+      var t=gradeSum(draft.g);
+      document.getElementById('sc-msum').innerHTML=(t?'<b>'+t+'</b>':'還沒選等級')+(draft.wr!==null?'　作文 <b>'+draft.wr+'</b> 級':'')
+        +'　<span style="font-size:12.5px">這次可得 '+mockPts(draft.g)+' 點</span>';
+    }
+    paintSum();
+    entry.querySelectorAll('.sc-chips').forEach(function(box){
+      box.addEventListener('click',function(ev){
+        var b=ev.target.closest('button'); if(!b) return;
+        var k=box.dataset.k, v=b.dataset.v;
+        if(k==='wr'){ v=+v; draft.wr=(draft.wr===v?null:v); }
+        else { if(draft.g[k]===v) delete draft.g[k]; else draft.g[k]=v; }
+        box.querySelectorAll('button').forEach(function(x){
+          var on=(k==='wr'? draft.wr===+x.dataset.v : draft.g[k]===x.dataset.v);
+          x.setAttribute('aria-checked',on);
+        });
+        paintSum();
+      });
     });
-    svg+='</svg>';
-    box.innerHTML=svg;
-    var first=pts[0].v, last=pts[pts.length-1].v, dv=Math.round((last-first)*10)/10;
-    var s=document.getElementById('sc-summary');
-    if(s) s.innerHTML='<b>已記錄 '+pts.length+' 次</b>　最近一次平均 <b>'+last+'</b>　'
-      + (dv>0? '<span style="color:var(--cap)">比第一次高 '+dv+' 分</span>'
-             : (dv<0? '<span style="color:var(--warn)">比第一次低 '+Math.abs(dv)+' 分</span>' : '跟第一次持平'))
-      + '<br><span style="font-size:12.5px;color:var(--ink-faint)">起伏 3–5 分是正常波動，連續三次同方向才算趨勢。</span>';
+    document.getElementById('sc-save').addEventListener('click',function(){
+      if(!Object.keys(draft.g).length && draft.wr===null){ alert('先點選至少一科的等級；要刪掉這次請按「清除這次」。'); return; }
+      var id=resolveExam('mock'); if(!id) return;
+      var r=sc.mock[id]||{pts:0}, np=mockPts(draft.g), diff=np-(r.pts||0);
+      var rec2={g:Object.assign({},draft.g),pts:np}; if(draft.wr!==null) rec2.wr=draft.wr;
+      sc.mock[id]=rec2; draft=null;
+      save(SC2,sc);
+      if(diff) window.__award(diff,'模考成績：'+examName('mock',id));
+      renderEntry(); renderTrend();
+      flash('sc-msg','已儲存 ✓'+(diff?'　'+sg(diff):''));
+    });
+    document.getElementById('sc-clear').addEventListener('click',function(){
+      var r=sc.mock[cur.mock]; if(!r){ draft=null; renderEntry(); return; }
+      if(!confirm('清除「'+examName('mock',cur.mock)+'」的模考成績？')) return;
+      if(r.pts) window.__award(-r.pts,'清除模考成績：'+examName('mock',cur.mock));
+      delete sc.mock[cur.mock]; draft=null; save(SC2,sc); renderEntry(); renderTrend();
+    });
   }
-  var sv=document.getElementById('sc-save');
-  if(sv) sv.addEventListener('click',function(){
-    document.querySelectorAll('#sc-table input').forEach(function(inp){
-      var id=inp.dataset.id, k=inp.dataset.k, v=inp.value.trim();
-      scores[id]=scores[id]||{};
-      if(v==='') delete scores[id][k]; else scores[id][k]=parseFloat(v);
+
+  function quizSubjects(){
+    var c={}; quiz.forEach(function(q){ c[q.sub]=(c[q.sub]||0)+1; });
+    return Object.keys(c).sort(function(a,b){ return c[b]-c[a]; });
+  }
+  function renderQuiz(){
+    var subs=quizSubjects(), hint=subs.concat(SUBHINT.filter(function(s){ return subs.indexOf(s)<0; }));
+    var last=quiz.length? quiz[quiz.length-1] : null;
+    entry.innerHTML='<div class="set-grid">'
+      + '<div class="fld"><label for="qz-sub">科目</label><input id="qz-sub" type="text" list="qz-sublist" autocomplete="off" placeholder="例：理化" value="'+esc(last?last.sub:'')+'"></div>'
+      + '<div class="fld"><label for="qz-score">分數</label><input id="qz-score" type="number" inputmode="decimal" min="0" step="0.5"></div>'
+      + '<div class="fld"><label for="qz-full">滿分</label><input id="qz-full" type="number" inputmode="decimal" min="1" value="100"></div>'
+      + '<div class="fld"><label for="qz-kind">類型</label><select id="qz-kind"><option value="q">一般小考</option><option value="gq"'+(last&&last.k==='gq'?' selected':'')+'>資優小考</option></select></div>'
+      + '<div class="fld"><label for="qz-date">日期</label><input id="qz-date" type="date" value="'+isoDay(todayStr())+'"></div>'
+      + '<div class="fld"><label for="qz-note">備註（選填）</label><input id="qz-note" type="text" placeholder="例：3-2 功與功率"></div>'
+      + '</div><datalist id="qz-sublist">'+hint.map(function(s){ return '<option value="'+esc(s)+'">'; }).join('')+'</datalist>'
+      + '<div class="bar-btns"><button class="btn solid" id="qz-go" type="button">登記</button><span class="sub" id="qz-msg" style="margin:0"></span></div>'
+      + '<p class="w-note">滿分不是 100 的會換算成百分比再畫圖、算點數。資優小考：≥50 '+sg(rules.gq50)+'、≥90 '+sg(rules.gq90)+'、100 '+sg(rules.gq100)
+      + '；一般小考：≥90 '+sg(rules.q90)+'、<70 '+sg(rules.qU70)+'、<60 '+sg(rules.qU60)+'。</p>'
+      + '<div class="sc-recent" id="qz-recent"></div>';
+    paintRecent();
+    document.getElementById('qz-go').addEventListener('click',function(){
+      var sub=document.getElementById('qz-sub').value.trim();
+      var s=parseFloat(document.getElementById('qz-score').value), f=parseFloat(document.getElementById('qz-full').value);
+      var d=document.getElementById('qz-date').value, note=document.getElementById('qz-note').value.trim();
+      var kind=document.getElementById('qz-kind').value;
+      if(!sub){ alert('先填科目。'); return; }
+      if(isNaN(f)||f<=0) f=100;
+      if(isNaN(s)||s<0||s>f){ alert('分數要在 0 到滿分之間。'); return; }
+      var pct=Math.round(s/f*1000)/10, p=quizPts(kind,pct), dp=(d||isoDay(todayStr())).split('-');
+      quiz.push({id:Date.now(), d:(+dp[0])+'-'+(+dp[1])+'-'+(+dp[2]), sub:sub, s:s, f:f, k:kind, note:note, pts:p});
+      quiz.sort(function(a,b){ return dnum(a.d)-dnum(b.d) || a.id-b.id; });
+      save(QZK,quiz);
+      window.__award(p,(kind==='gq'?'資優小考':'一般小考')+'：'+sub+' '+s+(f!==100?'/'+f:' 分')+(note?'（'+note+'）':''));
+      document.getElementById('qz-score').value=''; document.getElementById('qz-note').value='';
+      paintRecent(); renderTrend();
+      flash('qz-msg','已登記 ✓　'+(p?sg(p):'不加不扣'),(p<0?'var(--warn)':'var(--cap)'));
     });
-    save(SCK,scores); drawScores();
-    var m=document.getElementById('sc-msg'); if(m){ m.textContent='已儲存 ✓'; setTimeout(function(){m.textContent='';},2500); }
+  }
+  function paintRecent(){
+    var box=document.getElementById('qz-recent'); if(!box) return;
+    if(!quiz.length){ box.innerHTML='<h4>最近登記</h4><p class="sub" style="margin:0">還沒有小考紀錄。</p>'; return; }
+    box.innerHTML='<h4>最近登記</h4>'+quiz.slice(-8).reverse().map(function(q){
+      return '<div class="sc-q"><span class="d">'+md(q.d)+'</span><span>'+esc(q.sub)+(q.note?'<small>'+esc(q.note)+'</small>':'')+(q.k==='gq'?'<small>資優</small>':'')+'</span>'
+        + '<span class="v">'+q.s+(q.f!==100?'/'+q.f:'')+'</span>'
+        + '<button type="button" class="tk-del" data-id="'+q.id+'" aria-label="刪除這筆">×</button></div>';
+    }).join('');
+    box.querySelectorAll('.tk-del').forEach(function(b){
+      b.addEventListener('click',function(){
+        var id=+b.dataset.id, q=quiz.filter(function(x){ return x.id===id; })[0]; if(!q) return;
+        if(!confirm('刪除 '+md(q.d)+' '+q.sub+' '+q.s+' 分？'+(q.pts?'\n這筆的 '+sg(q.pts)+'會一起收回。':''))) return;
+        quiz=quiz.filter(function(x){ return x.id!==id; }); save(QZK,quiz);
+        if(q.pts) window.__award(-q.pts,'刪除小考：'+q.sub+' '+q.s);
+        paintRecent(); renderTrend();
+      });
+    });
+  }
+
+  /* 小型走勢圖：一科一張，同一種考試共用 y 軸 */
+  function mini(o){
+    var P=o.pts, W=miniW, H=o.h||124, L=34, R=14, T=18, B=22;
+    var head='<div class="sc-mini-h"><b>'+esc(o.title)+'</b>';
+    if(P.length){
+      var lv=P[P.length-1];
+      head+='<span class="last">'+esc(lv.lab)+'</span>';
+      if(P.length>1){
+        var dv=Math.round((lv.v-P[P.length-2].v)*10)/10, up=dv>0, dn=dv<0;
+        head+='<span class="dl'+(up?' up':(dn?' dn':''))+'"><i>'+(up?'▲':(dn?'▼':'＝'))+'</i>'+(dv?(o.dfmt?o.dfmt(Math.abs(dv)):Math.abs(dv)):'')+'</span>';
+      }
+    }
+    head+='</div>';
+    var meta=o.meta?'<p class="sc-mini-m">'+o.meta+'</p>':'';
+    if(!P.length) return '<div class="sc-mini">'+head+meta+'<p class="sc-mini-e">還沒有資料</p></div>';
+    var mn=o.min, mx=o.max, n=P.length;
+    function X(i){ return n===1? (L+W-R)/2 : L+i*((W-L-R)/(n-1)); }
+    function Y(v){ return T+(1-(v-mn)/(mx-mn))*(H-T-B); }
+    var s='<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.title)+'走勢">';
+    o.ticks.forEach(function(t){
+      s+='<line class="gl" x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(t.v).toFixed(1)+'" y2="'+Y(t.v).toFixed(1)+'"/>'
+        +'<text class="ax" x="'+(L-6)+'" y="'+(Y(t.v)+3.5).toFixed(1)+'" text-anchor="end">'+t.l+'</text>';
+    });
+    var every=n<=7?1:Math.ceil(n/6);
+    P.forEach(function(p,i){
+      if(i%every===0||i===n-1){
+        if(i!==n-1 && n-1-i<every) return;
+        s+='<text class="xl" x="'+X(i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(p.x)+'</text>';
+      }
+    });
+    if(n>1) s+='<path class="ln" d="'+P.map(function(p,i){ return (i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1); }).join(' ')+'"/>';
+    P.forEach(function(p,i){ s+='<circle class="pt" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.v).toFixed(1)+'" r="4.5"/>'; });
+    var li=n-1, lx=X(li), ly=Y(P[li].v);
+    s+='<text class="vl" x="'+lx.toFixed(1)+'" y="'+(ly-9).toFixed(1)+'" text-anchor="'+(n>1?'end':'middle')+'">'+esc(P[li].lab)+'</text>';
+    P.forEach(function(p,i){
+      s+='<circle class="hit" tabindex="0" cx="'+X(i).toFixed(1)+'" cy="'+Y(p.v).toFixed(1)+'" r="13" data-tip="'+esc(p.tip)+'"><title>'+esc(p.tip)+'</title></circle>';
+    });
+    s+='</svg>';
+    return '<div class="sc-mini">'+head+meta+s+'</div>';
+  }
+  function scaleFor(vals){
+    if(!vals.length) return {min:0,max:100,ticks:[{v:0,l:'0'},{v:50,l:'50'},{v:100,l:'100'}]};
+    var lo=Math.min.apply(null,vals), mn=Math.max(0,Math.floor((lo-5)/10)*10);
+    if(100-mn<30) mn=70;
+    var step=(100-mn)<=40?10:20, t=[];
+    for(var v=100; v>=mn; v-=step) t.push({v:v,l:String(v)});
+    return {min:mn,max:100,ticks:t};
+  }
+
+  var grid=document.getElementById('sc-grid'), tbl=document.getElementById('sc-table'), miniW=240;
+  // 依實際欄寬畫圖，字和點才不會被縮小
+  function measure(){
+    var gw=grid?grid.clientWidth:0; if(!gw) return miniW;
+    var cols=Math.max(1,Math.floor((gw+12)/(232+12)));
+    return Math.max(200,Math.round((gw-12*(cols-1))/cols-26));
+  }
+  function renderTrend(){
+    miniW=measure();
+    var title=document.getElementById('sc-trend-t'), sum=document.getElementById('sc-trend-s'), html='', th='', tb='';
+    if(tab==='term'){
+      title.textContent='段考走勢';
+      var ex=examList('term').filter(function(e){ var r=sc.term[e.id]; return r&&r.s&&Object.keys(r.s).length; });
+      var all=[]; ex.forEach(function(e){ TERM_SUB.forEach(function(x){ var v=sc.term[e.id].s[x[0]]; if(typeof v==='number') all.push(v); }); });
+      var sk=scaleFor(all);
+      var avgP=ex.map(function(e){ var a=termAvg(sc.term[e.id].s); return {x:e.name,v:a,lab:String(a),tip:e.name+' 平均 '+a}; });
+      html+=mini(Object.assign({title:'七科平均',pts:avgP},sk));
+      TERM_SUB.forEach(function(x){
+        var p=[]; ex.forEach(function(e){ var v=sc.term[e.id].s[x[0]]; if(typeof v==='number') p.push({x:e.name,v:v,lab:String(v),tip:e.name+' '+x[1]+' '+v}); });
+        html+=mini(Object.assign({title:x[1],pts:p},sk));
+      });
+      if(ex.length){
+        var la=termAvg(sc.term[ex[ex.length-1].id].s);
+        sum.textContent='記了 '+ex.length+' 次段考　最近一次（'+ex[ex.length-1].name+'）平均 '+la+(ex.length>1?'，上一次 '+termAvg(sc.term[ex[ex.length-2].id].s):'');
+      } else sum.textContent='還沒有段考成績。在上面選考試、填分數按儲存，這裡就會出現每一科的走勢。';
+      th='<tr><th>考試</th>'+TERM_SUB.map(function(x){ return '<th>'+x[1]+'</th>'; }).join('')+'<th>平均</th></tr>';
+      tb=ex.map(function(e){ var s=sc.term[e.id].s;
+        return '<tr><td>'+esc(e.name)+' <span class="mono" style="color:var(--ink-faint);font-size:11.5px">'+md(e.date)+'</span></td>'
+          + TERM_SUB.map(function(x){ return '<td class="n">'+(typeof s[x[0]]==='number'?s[x[0]]:'—')+'</td>'; }).join('')
+          + '<td class="n"><b>'+termAvg(s)+'</b></td></tr>'; }).join('');
+    } else if(tab==='mock'){
+      title.textContent='模考走勢';
+      var exm=examList('mock').filter(function(e){ var r=sc.mock[e.id]; return r&&((r.g&&Object.keys(r.g).length)||typeof r.wr==='number'); });
+      var gt=GRADES.map(function(g){ return {v:GV[g],l:g}; });
+      MOCK_SUB.forEach(function(x){
+        var p=[]; exm.forEach(function(e){ var g=sc.mock[e.id].g&&sc.mock[e.id].g[x[0]]; if(g) p.push({x:e.name,v:GV[g],lab:g,tip:e.name+' '+x[1]+' '+g}); });
+        html+=mini({title:x[1],pts:p,min:1,max:7,ticks:gt,h:158,dfmt:function(d){ return d+' 級'; }});
+      });
+      var wp=[]; exm.forEach(function(e){ var w=sc.mock[e.id].wr; if(typeof w==='number') wp.push({x:e.name,v:w,lab:w+' 級',tip:e.name+' 作文 '+w+' 級'}); });
+      html+=mini({title:'作文',pts:wp,min:0,max:6,h:158,ticks:[{v:6,l:'6'},{v:4,l:'4'},{v:2,l:'2'},{v:0,l:'0'}],dfmt:function(d){ return d+' 級'; }});
+      if(exm.length){
+        var lr=sc.mock[exm[exm.length-1].id];
+        sum.textContent='記了 '+exm.length+' 次模考　最近一次（'+exm[exm.length-1].name+'）'+(gradeSum(lr.g)||'')+(typeof lr.wr==='number'?'，作文 '+lr.wr+' 級':'');
+      } else sum.textContent='還沒有模考成績。在上面點選每科等級、按儲存，這裡就會出現每一科的走勢。';
+      th='<tr><th>考試</th>'+MOCK_SUB.map(function(x){ return '<th>'+x[1]+'</th>'; }).join('')+'<th>作文</th><th>合計</th></tr>';
+      tb=exm.map(function(e){ var r=sc.mock[e.id], g=r.g||{};
+        return '<tr><td>'+esc(e.name)+' <span class="mono" style="color:var(--ink-faint);font-size:11.5px">'+md(e.date)+'</span></td>'
+          + MOCK_SUB.map(function(x){ return '<td class="n">'+(g[x[0]]||'—')+'</td>'; }).join('')
+          + '<td class="n">'+(typeof r.wr==='number'?r.wr+' 級':'—')+'</td><td class="n"><b>'+(gradeSum(g)||'—')+'</b></td></tr>'; }).join('');
+    } else {
+      title.textContent='小考走勢';
+      var subs=quizSubjects(), allq=quiz.map(function(q){ return q.s/q.f*100; }), sq=scaleFor(allq);
+      subs.forEach(function(sub){
+        var qs=quiz.filter(function(q){ return q.sub===sub; }).slice(-12);
+        var cnt=quiz.filter(function(q){ return q.sub===sub; }).length;
+        var p=qs.map(function(q){ var pct=Math.round(q.s/q.f*1000)/10;
+          return {x:md(q.d),v:pct,lab:(q.f===100?String(q.s):String(pct)),tip:md(q.d)+' '+sub+' '+q.s+(q.f!==100?'/'+q.f+'（'+pct+'%）':' 分')+(q.note?'　'+q.note:'')}; });
+        var av=Math.round(p.reduce(function(a,b){ return a+b.v; },0)/p.length*10)/10;
+        html+=mini(Object.assign({title:sub,pts:p,meta:cnt+' 次'+(cnt>12?'（圖上是最近 12 次）':'')+'　平均 '+av+'%'},sq));
+      });
+      if(!subs.length) html='<p class="sc-empty">還沒有小考紀錄。在上面填科目和分數按登記，每個科目會各畫一張走勢圖。</p>';
+      var rec30=quiz.filter(function(q){ return Date.now()-dnum(q.d)<=30*864e5; });
+      sum.textContent=subs.length? ('共 '+quiz.length+' 次、'+subs.length+' 個科目'+(rec30.length?'　最近 30 天平均 '+Math.round(rec30.reduce(function(a,q){ return a+q.s/q.f*100; },0)/rec30.length*10)/10+'%':'')) : '';
+      th='<tr><th>日期</th><th>科目</th><th>分數</th><th>百分比</th><th>類型</th><th>備註</th></tr>';
+      tb=quiz.slice().reverse().map(function(q){
+        return '<tr><td class="mono">'+md(q.d)+'</td><td>'+esc(q.sub)+'</td><td class="n">'+q.s+(q.f!==100?'/'+q.f:'')+'</td><td class="n">'+Math.round(q.s/q.f*1000)/10+'%</td><td>'+(q.k==='gq'?'資優':'一般')+'</td><td>'+esc(q.note||'')+'</td></tr>'; }).join('');
+    }
+    grid.innerHTML=html+'<div class="sc-tip" id="sc-tip" hidden></div>';
+    tbl.innerHTML='<thead>'+th+'</thead><tbody>'+(tb||'<tr><td colspan="9" style="color:var(--ink-faint)">還沒有資料</td></tr>')+'</tbody>';
+  }
+
+  // 圖上的點：滑過、點一下或用 Tab 鍵移過去都會顯示數字
+  var tipT=null;
+  function showTip(el){
+    var tip=document.getElementById('sc-tip'); if(!tip) return;
+    var g=grid.getBoundingClientRect(), r=el.getBoundingClientRect();
+    tip.textContent=el.getAttribute('data-tip'); tip.hidden=false;
+    var x=r.left+r.width/2-g.left, w=tip.offsetWidth;
+    x=Math.max(w/2+2,Math.min(g.width-w/2-2,x));
+    tip.style.left=x+'px'; tip.style.top=(r.top+r.height/2-g.top-6)+'px';
+  }
+  function hideTip(){ var tip=document.getElementById('sc-tip'); if(tip) tip.hidden=true; }
+  if(grid){
+    grid.addEventListener('pointerover',function(e){ var h=e.target.closest&&e.target.closest('.hit'); if(h){ clearTimeout(tipT); showTip(h); } });
+    grid.addEventListener('pointerout',function(e){ if(e.target.closest&&e.target.closest('.hit')) hideTip(); });
+    grid.addEventListener('click',function(e){ var h=e.target.closest&&e.target.closest('.hit'); if(h){ showTip(h); clearTimeout(tipT); tipT=setTimeout(hideTip,2500); } });
+    grid.addEventListener('focusin',function(e){ if(e.target.classList&&e.target.classList.contains('hit')) showTip(e.target); });
+    grid.addEventListener('focusout',hideTip);
+  }
+
+  function renderEntry(){
+    if(!entry) return;
+    if(tab==='term') renderTerm(); else if(tab==='mock') renderMock(); else renderQuiz();
+  }
+  var seg=document.getElementById('sc-seg');
+  function paintSeg(){ if(seg) seg.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-selected',b.dataset.k===tab); }); }
+  if(seg) seg.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b||b.dataset.k===tab) return;
+    tab=b.dataset.k; save(SCT,tab); draft=null; paintSeg(); renderEntry(); renderTrend();
   });
-  drawScores();
+  paintSeg(); renderEntry(); renderTrend();
+  var lastW=0, rT=null;
+  function refit(){ var w=measure(); if(w!==lastW){ lastW=w; renderTrend(); } }
+  window.addEventListener('resize',function(){ clearTimeout(rT); rT=setTimeout(refit,150); });
+  document.addEventListener('plan:tab',function(){ setTimeout(refit,30); });
 
   /* ---------- 備份 ---------- */
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan-tab'];
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan-tab'];
   function dump(){
     var o={_v:1,_at:new Date().toISOString()};
     KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} });
@@ -3754,7 +4147,7 @@ section{padding-top:40px}
 
   /* ---------- 本機快照 ---------- */
   var SNK='plan.snap.v1';
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1',
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1',
     'plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1',
     'plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1'];
   function dumpAll(){ var o={_at:new Date().toISOString()}; KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }); return o; }
