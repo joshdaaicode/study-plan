@@ -764,6 +764,84 @@ section{padding-top:40px}
 .sc-tbl .tbl-scroll{margin-top:8px}
 #sc-table td,#sc-table th{white-space:nowrap}
 #sc-table td.n{font-family:'IBM Plex Mono',monospace;text-align:right}
+
+/* ---------- 頁內目錄 ---------- */
+.page-toc{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+.page-toc::-webkit-scrollbar{display:none}
+.page-toc button{flex:0 0 auto;font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r-btn);
+  background:var(--card);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.page-toc button:hover{color:var(--ink)}
+.page-toc button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+
+/* ---------- 日程搜尋 ---------- */
+.dv-q{flex:1 1 220px;min-width:0;font:inherit;font-size:13.5px;padding:8px 12px;border:1px solid var(--rule);background:var(--card);color:var(--ink)}
+.dv-sres{border:1px solid var(--rule);border-radius:var(--r-card);background:var(--card);padding:6px 4px;margin:0 0 14px;max-height:360px;overflow:auto}
+.dv-sres p{margin:6px 10px;font-size:12.5px;color:var(--ink-faint)}
+.dv-sres button{display:grid;grid-template-columns:74px 46px minmax(0,1fr);gap:8px;width:100%;text-align:left;font:inherit;font-size:13px;
+  padding:7px 10px;border:0;border-radius:8px;background:transparent;color:var(--ink);cursor:pointer}
+.dv-sres button:hover,.dv-sres button:focus-visible{background:var(--card2);outline:none}
+.dv-sres .d{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint)}
+.dv-sres mark{background:var(--warn-tint);color:inherit;border-radius:3px;padding:0 1px}
+
+/* ---------- 分科進度、教材進度 ---------- */
+.sp-sum{font-size:13.5px;margin:0 0 10px;color:var(--ink-soft)}
+.sp-tbl td,.sp-tbl th{white-space:nowrap}
+.sp-tbl td.n{font-family:'IBM Plex Mono',monospace;text-align:right}
+.sp-tbl .behind{color:var(--warn);font-weight:700}
+.sp-tbl .ok{color:var(--cap)}
+.sp-bar{display:inline-block;width:60px;height:6px;border-radius:999px;background:var(--rule2);vertical-align:middle;margin-right:6px;overflow:hidden}
+.sp-bar i{display:block;height:100%;background:var(--cap)}
+
+/* ---------- 森林與寵物 ---------- */
+.fp-card{padding:0;overflow:hidden}
+.fp-scene{position:relative;line-height:0;background:#cfe8f7}
+.fp-scene svg{display:block;width:100%;height:auto}
+.fp-pet{transform-box:fill-box;transform-origin:50% 100%;animation:fpIdle 3.2s ease-in-out infinite}
+.fp-pet.hop{animation:fpHop .6s ease-out 1}
+.fp-pet.sick{animation:none;opacity:.85}
+@keyframes fpIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes fpHop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-16px) scale(1.06)}70%{transform:translateY(0) scale(.97)}100%{transform:none}}
+.fp-new{animation:fpGrow .9s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes fpGrow{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.fp-pet,.fp-pet.hop,.fp-new{animation:none}}
+.fp-body{padding:14px 18px 16px}
+.fp-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin-bottom:8px}
+.fp-head b{font-size:17px}
+.fp-head .lv{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--ink-soft)}
+.fp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px 16px;margin:6px 0 10px}
+.fp-stat{font-size:12.5px;color:var(--ink-soft)}
+.fp-stat .bar{margin:4px 0 0;max-width:none;height:7px}
+.fp-stat.low .bar i{background:var(--warn)}
+.fp-care{font-size:13.5px;margin:0 0 12px;padding:8px 12px;border-radius:var(--r-pill);background:var(--card2);border:1px solid var(--rule2)}
+.fp-care.warn{background:var(--warn-tint);border-color:transparent;color:var(--ink)}
+.fp-care.bad{background:var(--rest-tint);border-color:transparent;color:var(--ink)}
+.fp-row{margin:10px 0 0}
+.fp-row h4{margin:0 0 6px;font-size:12.5px;font-weight:700;color:var(--ink-soft)}
+.fp-row h4 span{font-weight:400;color:var(--ink-faint);margin-left:6px}
+.fp-items{display:flex;flex-wrap:wrap;gap:6px}
+.fp-items button{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:13px;padding:6px 11px;border:1px solid var(--rule);
+  border-radius:var(--r-btn);background:var(--card);color:var(--ink);cursor:pointer}
+.fp-items button .e{font-size:16px;line-height:1}
+.fp-items button small{color:var(--ink-faint);font-size:11px}
+.fp-items button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.fp-items button:disabled{cursor:not-allowed;opacity:.5}
+.fp-items button.lock{opacity:.55}
+.fp-items button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.fp-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--ink-soft);margin-top:12px}
+.fp-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:0}
+.fp-adopt{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px;margin:8px 0 10px}
+.fp-adopt button{font:inherit;font-size:13px;padding:8px 4px;border:1px solid var(--rule);border-radius:12px;background:var(--card);color:var(--ink);cursor:pointer}
+.fp-adopt button .e{display:block;font-size:30px;line-height:1.2}
+.fp-adopt button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.fp-msg{font-size:12.5px;color:var(--ink-faint);min-height:1.2em;margin:8px 0 0}
+.fp-gone{font-size:12.5px;color:var(--ink-faint);margin-top:12px}
+.fp-mini{display:flex;gap:12px;align-items:center;padding:12px 14px;cursor:pointer}
+.fp-mini .e{font-size:38px;line-height:1}
+.fp-mini b{font-size:14px}
+.fp-mini p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.fp-mini:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.td-side .fp-mini{order:3}
+
 @media (max-width:560px){
   .sc-seg{display:flex}
   .sc-seg button{flex:1;padding:7px 0}
@@ -811,6 +889,7 @@ section{padding-top:40px}
 </header>
 
 <div class="tabs-wrap"><nav class="tabs" id="main-tabs" role="tablist" aria-label="區塊切換"></nav></div>
+<nav class="page-toc" id="page-toc" aria-label="本頁目錄" hidden></nav>
 
 <section>
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
@@ -843,6 +922,7 @@ section{padding-top:40px}
   </div>
     </div>
     <aside class="td-side">
+  <div class="card fp-mini" id="fp-mini" hidden></div>
   <div class="nowcard">
     <div>
       <span class="eyebrow">現在</span>
@@ -872,7 +952,7 @@ section{padding-top:40px}
     <p class="sub">卡住的當下記一行，隔天到學校問。問完打勾，把答案補上去。</p>
     <div class="set-grid" style="margin-bottom:9px">
       <div class="fld"><label>科目</label>
-        <select id="ask-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
+        <select id="ask-sub"><option>國文</option><option>英文</option><option>數學</option><option>理化</option><option>生物</option><option>地科</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
       </div>
       <div class="fld" style="grid-column:span 2"><label>卡在哪</label><input type="text" id="ask-q" placeholder="第 3 章例 5 為什麼要先平方？"></div>
     </div>
@@ -899,7 +979,9 @@ section{padding-top:40px}
     <button class="btn solid" id="dv-today" type="button">回到今天</button>
     <input type="date" id="dv-pick" min="2026-10-26" max="2027-05-16" aria-label="跳到某一天">
     <label class="dv-toggle"><input type="checkbox" id="dv-life"> 顯示吃飯、通勤、洗澡</label>
+    <input type="search" id="dv-q" class="dv-q" placeholder="搜尋日程：勝經 單元 7、武陵 113…" aria-label="搜尋日程">
   </div>
+  <div class="dv-sres" id="dv-sres" hidden></div>
   <article class="dv-card" id="dv-card">
     <div class="dv-head" id="dv-head"></div>
     <div class="dv-sum" id="dv-sum"></div>
@@ -1333,7 +1415,7 @@ section{padding-top:40px}
       </div>
       <div class="fld" style="grid-column:span 2"><label>快速標記：這題我不會</label>
         <div style="display:flex;gap:7px">
-          <select id="qk-sub" style="flex:0 0 96px"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
+          <select id="qk-sub" style="flex:0 0 96px"><option>國文</option><option>英文</option><option>數學</option><option>理化</option><option>生物</option><option>地科</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
           <input type="text" id="qk-t" placeholder="題號或一句話，之後再補細節">
           <button class="btn solid" id="qk-go" type="button" style="flex:0 0 auto">標記</button>
         </div>
@@ -1351,7 +1433,7 @@ section{padding-top:40px}
     <h3 style="margin-bottom:8px">新增一題</h3>
     <div class="set-grid" style="margin-bottom:9px">
       <div class="fld"><label>科目</label>
-        <select id="wr-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
+        <select id="wr-sub"><option>國文</option><option>英文</option><option>數學</option><option>理化</option><option>生物</option><option>地科</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
       </div>
       <div class="fld"><label>錯因</label>
         <select id="wr-why"><option>觀念不熟</option><option>會但想不到</option><option>讀題錯誤</option><option>計算失誤</option><option>時間不夠</option></select>
@@ -1365,7 +1447,7 @@ section{padding-top:40px}
   <div class="card">
     <div class="sec-head" style="margin-bottom:10px"><h3>全部錯題</h3>
       <select id="wr-filter" style="font-size:12.5px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)">
-        <option value="">全部科目</option><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option><option value="科學班">科班全部</option>
+        <option value="">全部科目</option><option>國文</option><option>英文</option><option>數學</option><option>理化</option><option>生物</option><option>地科</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option><option value="科學班">科班全部</option>
       </select>
     </div>
     <div id="wr-all"></div>
@@ -1406,9 +1488,17 @@ section{padding-top:40px}
     <div class="sec-head" style="margin-bottom:6px"><h3>科班考古題進度</h3><span class="eyebrow">A 本 35 份＋B 本 36 份</span></div>
     <p class="sub">寫完打勾、填分數（換算成百分比）。在「今天」勾掉某份考古題的「限時作答」時，這裡會自動打勾。</p>
     <div class="kp-top" id="kp-top"></div>
+    <p class="sub" id="kp-pace" style="margin:-4px 0 10px"></p>
     <div class="kp-subj" id="kp-subj"></div>
     <div id="kp-list"></div>
   </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>我的森林</h2><span class="eyebrow">讀書種樹，寵物住在你的森林裡</span></div>
+  <p class="sec-note">每完成一項讀書任務就種一棵樹，樹種看科目。讀書時數累積會解鎖新的飼料、玩具和地點；寵物靠完成任務和番茄鐘長大。
+    <b>一天沒照顧會餓、心情變差；連續 3 天會生病；連續 7 天會離家出走。</b>一天完成一半任務或讀滿 60 分鐘就算有照顧；降級模式和休息日不算沒照顧，但沒打開網站的日子算沒照顧。</p>
+  <div class="card fp-card" id="fp-app"></div>
 </section>
 
 <section>
@@ -1531,10 +1621,9 @@ section{padding-top:40px}
     </div>
   </div>
   <div class="card" style="margin-top:14px">
-    <h3 style="margin-bottom:6px">教材對照</h3>
-    <p class="sub">每本講義填目前讀到第幾頁。「今天」裡用到這本書的任務會顯示「目前到 p.120」，打開就知道從哪繼續。</p>
-    <div id="bk-rows"></div>
-    <div class="bar-btns"><button class="btn solid" id="bk-save" type="button">儲存教材</button><span class="sub" id="bk-msg" style="align-self:center;margin:0"></span></div>
+    <h3 style="margin-bottom:6px">教材進度</h3>
+    <p class="sub">不用自己填：照「今天」勾掉的任務自動算出每本書做到第幾頁，和計畫排到哪裡比。</p>
+    <div id="bk-auto"></div>
   </div>
 
   <div class="card" style="margin-top:14px">
@@ -1613,6 +1702,11 @@ section{padding-top:40px}
   <div class="tbl-scroll"><table id="bt-table">
     <thead><tr><th>日期</th><th>完成</th><th>比例</th><th>心情</th><th>體力</th></tr></thead><tbody></tbody>
   </table></div>
+  <div class="card" id="sp-card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">分科進度</h3>
+    <p class="sub">照計畫到昨天每一科應該完成幾段，和你實際勾掉的比；欠帳補完也算。最右邊是近 14 天的完成率，看哪一科最常被跳過。</p>
+    <div id="sp-out"></div>
+  </div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">每週回顧</h3>
     <p class="sub">週日晚上十五分鐘，照著走完就好。靠自覺的回顧通常撐不過三週，有流程才撐得久。</p>
@@ -1770,10 +1864,10 @@ section{padding-top:40px}
     ['日程',  [1]],
     ['月曆',  [4]],
     ['錯題',  [13]],
-    ['紀錄',  [14,17,18]],
-    ['獎勵',  [15,19]],
+    ['紀錄',  [14,18,19]],
+    ['獎勵',  [15,16,20]],
     ['計畫',  [2,3,5,6,7,8,9,10,11,12]],
-    ['設定',  [16]]
+    ['設定',  [17]]
   ];
   var secs = document.querySelectorAll('body > .wrap > section');
   var nav = document.getElementById('main-tabs');
@@ -2279,7 +2373,7 @@ section{padding-top:40px}
       if (x.e || x.l) return;
       out.push({id:'t'+(i++), n:x.n, t:x.t, m:x.m, f:x.f?1:0, c:x.c||'', d:x.d||''});
     });
-    (backlog||[]).forEach(function(b){ out.push({id:'b'+(i++), n:b.n, t:'欠帳', m:b.m, bk:1}); });
+    (backlog||[]).forEach(function(b){ out.push({id:'b'+(i++), n:b.n, t:'欠帳', m:b.m, bk:1, c:b.c||''}); });
     try{
       var due=(window.__wrongDue?window.__wrongDue():[]).length;
       if(due) out.push({id:'w'+(i++), n:'錯題複習 '+due+' 題（闔上答案重做）', t:'錯題本', m:Math.min(60,due*6)});
@@ -2290,12 +2384,17 @@ section{padding-top:40px}
     if (!(st.day && st.list && st.list.length)) return;
     try{
       var hist=JSON.parse(localStorage.getItem('plan.hist.v1')||'{}');
-      var real=st.list.filter(function(x){return !x.f;});
-      var dn=real.filter(function(x){return st.done[x.id];});
-      hist[st.day]=Object.assign(hist[st.day]||{}, {a:real.length, d:dn.length,
-        m:dn.reduce(function(s,x){return s+x.m;},0)});
+      hist[st.day]=Object.assign(hist[st.day]||{}, dayStat());
       localStorage.setItem('plan.hist.v1', JSON.stringify(hist));
     }catch(e){}
+  }
+  // 一天的完成情況：總數、完成數、完成分鐘，另外分科目統計、記下完成的任務名稱（分科進度、教材進度、森林用）
+  function dayStat(){
+    var real=(st.list||[]).filter(function(x){return !x.f;});
+    var dn=real.filter(function(x){return st.done[x.id];});
+    var cat={};
+    real.forEach(function(x){ var c=x.c||'other', o=cat[c]=cat[c]||{a:0,d:0,m:0}; o.a++; if(st.done[x.id]){ o.d++; o.m+=x.m||0; } });
+    return {a:real.length, d:dn.length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;})};
   }
   // 重新產生今天的任務，但保留已勾的（照任務名稱對）和自己加的任務
   function rebuildKeep(d){
@@ -2324,7 +2423,7 @@ section{padding-top:40px}
       recordHist();
       // 錯題複習（w 開頭）每天會依到期題數重新產生，沒做完不另外算欠帳
       st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !st.done[x.id] && !/^w/.test(x.id); })
-        .map(function(x){ return {n:x.n, m:x.m}; });
+        .map(function(x){ return {n:x.n, m:x.m, c:x.c||''}; });
       st.done={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
     } else if (!st.list || !st.list.length){
       st.list=buildList(d, st.backlog||[]); save(SK,st);
@@ -2372,11 +2471,7 @@ section{padding-top:40px}
         save(SK,st); paintBudget();
       });
       var sp=document.createElement('span');
-      var bk=''; try{
-        var B=JSON.parse(localStorage.getItem('plan.books.v1')||'{}');
-        var hit=Object.keys(B).filter(function(s){ return B[s]&&B[s].p&&x.n.indexOf(s)!==-1; })[0];
-        if(hit) bk='　目前到 p.'+B[hit].p;
-      }catch(e){}
+      var bk='';
       sp.innerHTML=esc(x.n)+'<span class="tk-m">'+x.t+(x.m?'　'+x.m+' 分':'')+bk+(x.f?'　固定行程':'')+(x.bk?'　昨日未完成':'')+'</span>'
         +(x.d&&!x.f?'<span class="tk-how">'+esc(x.d)+'</span>':'');
       lab.appendChild(cb); lab.appendChild(sp);
@@ -2564,11 +2659,7 @@ section{padding-top:40px}
     out.sort(function(p,q){return p.a-q.a;});
     return out;
   };
-  window.__todayStat=function(){
-    var real=st.list.filter(function(x){return !x.f;});
-    var dn=real.filter(function(x){return st.done[x.id];});
-    return {day:st.day, a:real.length, d:dn.length, m:dn.reduce(function(s,x){return s+x.m;},0)};
-  };
+  window.__todayStat=function(){ return Object.assign({day:st.day}, dayStat()); };
   window.__doneToday=function(){
     var o={}; (st.list||[]).forEach(function(x){ if(st.done[x.id]) o[x.n]=1; }); return {day:st.day, done:o};
   };
@@ -2959,6 +3050,11 @@ section{padding-top:40px}
       if(v!=='A++') all=false; });
     return p+(all?rules.mAll:0);
   }
+  var TERM_W={ch:5,en:3,ma:4,ph:2,so:3,ea:1};   // 正課節數；生物不算進加權（使用者 10-13 定的算法）
+  function termW(s){
+    var a=0,w=0; Object.keys(TERM_W).forEach(function(k){ if(s&&typeof s[k]==='number'){ a+=s[k]*TERM_W[k]; w+=TERM_W[k]; } });
+    return w? Math.round(a/w*100)/100 : null;
+  }
   function termAvg(s){
     var v=TERM_SUB.map(function(x){ return s&&s[x[0]]; }).filter(function(x){ return typeof x==='number'; });
     return v.length? Math.round(v.reduce(function(a,b){return a+b;},0)/v.length*10)/10 : null;
@@ -3230,21 +3326,23 @@ section{padding-top:40px}
       var ex=examList('term').filter(function(e){ var r=sc.term[e.id]; return r&&r.s&&Object.keys(r.s).length; });
       var all=[]; ex.forEach(function(e){ TERM_SUB.forEach(function(x){ var v=sc.term[e.id].s[x[0]]; if(typeof v==='number') all.push(v); }); });
       var sk=scaleFor(all);
-      var avgP=ex.map(function(e){ var a=termAvg(sc.term[e.id].s); return {x:e.name,v:a,lab:String(a),tip:e.name+' 平均 '+a}; });
-      html+=mini(Object.assign({title:'七科平均',pts:avgP},sk));
+      var avgP=ex.map(function(e){ var a=termW(sc.term[e.id].s); return a===null?null:{x:e.name,v:a,lab:String(a),tip:e.name+' 加權平均 '+a}; }).filter(Boolean);
+      html+=mini(Object.assign({title:'加權平均',meta:'國5 英3 數4 理化2 社3 地科1，生物不算',pts:avgP},sk));
       TERM_SUB.forEach(function(x){
         var p=[]; ex.forEach(function(e){ var v=sc.term[e.id].s[x[0]]; if(typeof v==='number') p.push({x:e.name,v:v,lab:String(v),tip:e.name+' '+x[1]+' '+v}); });
         html+=mini(Object.assign({title:x[1],pts:p},sk));
       });
       if(ex.length){
         var la=termAvg(sc.term[ex[ex.length-1].id].s);
-        sum.textContent='記了 '+ex.length+' 次段考　最近一次（'+ex[ex.length-1].name+'）平均 '+la+(ex.length>1?'，上一次 '+termAvg(sc.term[ex[ex.length-2].id].s):'');
+        var lw=termW(sc.term[ex[ex.length-1].id].s);
+        sum.textContent='記了 '+ex.length+' 次段考　最近一次（'+ex[ex.length-1].name+'）加權平均 '+(lw===null?'—':lw)+'、七科平均 '+la
+          +(ex.length>1?'；上一次加權 '+(termW(sc.term[ex[ex.length-2].id].s)||'—'):'');
       } else sum.textContent='還沒有段考成績。在上面選考試、填分數按儲存，這裡就會出現每一科的走勢。';
-      th='<tr><th>考試</th>'+TERM_SUB.map(function(x){ return '<th>'+x[1]+'</th>'; }).join('')+'<th>平均</th></tr>';
+      th='<tr><th>考試</th>'+TERM_SUB.map(function(x){ return '<th>'+x[1]+'</th>'; }).join('')+'<th>平均</th><th>加權</th></tr>';
       tb=ex.map(function(e){ var s=sc.term[e.id].s;
         return '<tr><td>'+esc(e.name)+' <span class="mono" style="color:var(--ink-faint);font-size:11.5px">'+md(e.date)+'</span></td>'
           + TERM_SUB.map(function(x){ return '<td class="n">'+(typeof s[x[0]]==='number'?s[x[0]]:'—')+'</td>'; }).join('')
-          + '<td class="n"><b>'+termAvg(s)+'</b></td></tr>'; }).join('');
+          + '<td class="n">'+termAvg(s)+'</td><td class="n"><b>'+(termW(s)===null?'—':termW(s))+'</b></td></tr>'; }).join('');
     } else if(tab==='mock'){
       title.textContent='模考走勢';
       var exm=examList('mock').filter(function(e){ var r=sc.mock[e.id]; return r&&((r.g&&Object.keys(r.g).length)||typeof r.wr==='number'); });
@@ -3323,7 +3421,7 @@ section{padding-top:40px}
 
   /* ---------- 備份 ---------- */
   // 要備份、同步的資料（介面狀態像目前在哪個分頁不算，切分頁不該觸發上傳）
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1'];
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1'];
   window.__DATA_KEYS=KEYS;
   function pick(){ var o={}; KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
   function sig(){ return JSON.stringify(pick()); }
@@ -4321,6 +4419,446 @@ section{padding-top:40px}
   })();
 })();
 </script>
+<script>
+/* ===== 分科進度 · 教材進度 · 科班配速 · 日程搜尋 · 頁內目錄 · 森林與寵物 ===== */
+(function(){
+  var PL=window.PLAN; if(!PL) return;
+  function ls(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return v===null||v===undefined?d:v; }catch(e){ return d; } }
+  function sv(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+  function esc(s){ return String(s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+  function kk(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function pk(k){ var p=String(k).split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+  function md(k){ var p=String(k).split('-'); return (+p[1])+'/'+(+p[2]); }
+  var WD='日一二三四五六';
+  var DAYS=Object.keys(PL.days).sort(function(a,b){ return pk(a)-pk(b); });
+
+  // 每天的完成紀錄（歷史＋今天還在進行的）
+  function allHist(){
+    var h=ls('plan.hist.v1',{})||{};
+    var t=window.__todayStat?window.__todayStat():null;
+    if(t&&t.day) h[t.day]=Object.assign({},h[t.day]||{},t);
+    return h;
+  }
+  // 某一天要讀的段落：手動改過的那天用改過的，其餘用 plan.js
+  function studyBlocks(k){
+    var de=ls('plan.dayedit.v1',{})||{};
+    if(de[k]) return de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n}; });
+    var day=PL.days[k]; if(!day) return [];
+    return day.b.filter(function(b){ return b[5]===0; }).map(function(b){ return {c:b[2], n:b[3], t:b[0], d:b[4]}; });
+  }
+  var CATN={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kb:'科班考古題',kbfix:'科班訂正',kbr:'科班複習',
+    hw:'補習作業',mock:'模考／訂正',term:'段考',fu:'複試',other:'其他'};
+
+  /* ---------- 分科進度 ---------- */
+  function paintSubjects(){
+    var box=document.getElementById('sp-out'); if(!box) return;
+    var h=allHist(), today=d0(), tk=kk(today);
+    var tracked=Object.keys(h).filter(function(k){ return h[k].cat; }).sort(function(a,b){ return pk(a)-pk(b); });
+    var from=tracked.length? pk(tracked[0]) : today;
+    var plan={}, done={}, a14={}, d14={};
+    DAYS.forEach(function(k){
+      var d=pk(k); if(d<from||d>=today) return;
+      studyBlocks(k).forEach(function(x){ plan[x.c]=(plan[x.c]||0)+1; });
+    });
+    var lim=new Date(today); lim.setDate(lim.getDate()-13);
+    Object.keys(h).forEach(function(k){
+      var c=h[k].cat; if(!c) return; var d=pk(k);
+      Object.keys(c).forEach(function(cat){
+        done[cat]=(done[cat]||0)+c[cat].d;
+        if(d>=lim && d<today){ a14[cat]=(a14[cat]||0)+c[cat].a; d14[cat]=(d14[cat]||0)+c[cat].d; }   // 今天還沒結束，不算進完成率
+      });
+    });
+    var cats=Object.keys(CATN).filter(function(c){ return plan[c]||done[c]||a14[c]; });
+    if(!cats.length){ box.innerHTML='<p class="sub" style="margin:0">還沒有資料。在「今天」勾任務，這裡就會開始累積。</p>'; return; }
+    var rows=cats.map(function(c){
+      var p=plan[c]||0, dn=done[c]||0, beh=Math.max(0,p-dn), r=a14[c]?Math.round((d14[c]||0)/a14[c]*100):null;
+      return {c:c,p:p,dn:dn,beh:beh,r:r};
+    }).sort(function(x,y){ return y.beh-x.beh || (x.r===null?101:x.r)-(y.r===null?101:y.r); });
+    var worst=rows.filter(function(r){ return r.beh>0; })[0];
+    var low=rows.filter(function(r){ return r.r!==null && r.r<70; }).sort(function(x,y){ return x.r-y.r; })[0];
+    var sum=(from>=today)
+      ? '從今天開始記錄，明天起就看得出哪一科落後。'
+      : (worst? '落後最多：<b>'+CATN[worst.c]+' '+worst.beh+' 段</b>（照計畫到昨天應完成 '+worst.p+' 段）。' : '每一科都跟上計畫了 ✓')
+        +(low? '　近 14 天最常沒做完：<b>'+CATN[low.c]+'</b>（'+low.r+'%）。' : '');
+    box.innerHTML='<p class="sp-sum">'+sum+'</p><div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>科目</th><th>應完成（到昨天）</th><th>已完成</th><th>落後</th><th>近 14 天完成率</th></tr></thead><tbody>'
+      +rows.map(function(r){
+        return '<tr><td>'+CATN[r.c]+'</td><td class="n">'+r.p+'</td><td class="n">'+r.dn+'</td>'
+          +'<td class="n '+(r.beh?'behind':'ok')+'">'+(r.beh?r.beh+' 段':'—')+'</td>'
+          +'<td>'+(r.r===null?'<span style="color:var(--ink-faint)">—</span>':'<span class="sp-bar"><i style="width:'+r.r+'%"></i></span><span class="mono">'+r.r+'%</span>')+'</td></tr>';
+      }).join('')+'</tbody></table></div>'
+      +'<p class="w-note">記錄從 '+md(kk(from))+' 開始；在那之前的日子不算。</p>';
+  }
+
+  /* ---------- 科班考古題：照計畫應寫幾份 ---------- */
+  function paintKbPace(){
+    var el=document.getElementById('kp-pace'); if(!el) return;
+    var today=d0(), exp={}, data=ls('plan.kbscore.v1',{})||{};
+    DAYS.forEach(function(k){
+      if(pk(k)>=today) return;
+      studyBlocks(k).forEach(function(x){
+        var m=String(x.n).match(/^科班考古｜(\S+) (\d{3}) (\S+) 限時作答/);
+        if(m && !/前半/.test(x.n)) exp[m[1]+' '+m[2]+' '+m[3]]=1;
+      });
+    });
+    var n=Object.keys(exp).length, got=Object.keys(data).filter(function(k){ return data[k]&&data[k].d; }).length;
+    var miss=Object.keys(exp).filter(function(k){ return !(data[k]&&data[k].d); });
+    if(!n){ el.textContent='照計畫，第一份考古題排在 '+firstPaperDay()+'。'; return; }
+    el.innerHTML='照計畫到昨天應寫完 <b>'+n+'</b> 份，你已寫 <b>'+got+'</b> 份。'
+      +(miss.length? '<span style="color:var(--warn)">還沒寫：'+miss.slice(0,4).map(esc).join('、')+(miss.length>4?' 等 '+miss.length+' 份':'')+'。</span>' : '<span style="color:var(--cap)">進度正常 ✓</span>');
+  }
+  function firstPaperDay(){
+    for(var i=0;i<DAYS.length;i++){ if(studyBlocks(DAYS[i]).some(function(x){ return /^科班考古｜/.test(x.n); })) return md(DAYS[i]); }
+    return '—';
+  }
+
+  /* ---------- 教材進度（自動） ---------- */
+  function maxPage(s){
+    var m, best=0, re=/p\.(\d+)(?:[–-](\d+))?/g;
+    while((m=re.exec(s))){ best=Math.max(best,+(m[2]||m[1])); }
+    return best;
+  }
+  function paintBooks(){
+    var box=document.getElementById('bk-auto'); if(!box) return;
+    var today=d0(), h=allHist();
+    var names=['chi','m1','m2','e1','e2','phy','bio','ear','his','geo','civ','A','B'].map(function(k){ return PL.books[k]; }).filter(Boolean);
+    var doneNames=[]; Object.keys(h).forEach(function(k){ (h[k].dn||[]).forEach(function(n){ doneNames.push(n); }); });
+    var rows=names.map(function(b){
+      var planTo=0, next=null;
+      DAYS.forEach(function(k){
+        var d=pk(k);
+        studyBlocks(k).forEach(function(x){
+          if(String(x.n).indexOf(b)<0) return;
+          var p=maxPage(x.n);
+          if(d<today) planTo=Math.max(planTo,p);
+          else if(!next) next={k:k, n:x.n};
+        });
+      });
+      var doneTo=0; doneNames.forEach(function(n){ if(n.indexOf(b)>=0) doneTo=Math.max(doneTo,maxPage(n)); });
+      return {b:b, planTo:planTo, doneTo:doneTo, next:next};
+    });
+    box.innerHTML='<div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>講義</th><th>照計畫到昨天</th><th>你做到</th><th>下一次排在</th></tr></thead><tbody>'
+      +rows.map(function(r){
+        var beh=r.planTo && r.doneTo<r.planTo;
+        // 一段任務可能寫了兩本書，頁碼取這本書名後面的第一個範圍
+        var nx=r.next? md(r.next.k)+'（'+WD[pk(r.next.k).getDay()]+'） '+esc((String(r.next.n).slice(String(r.next.n).indexOf(r.b)).match(/p\.\d+(?:[–-]\d+)?/)||[''])[0]) : '—';
+        return '<tr><td>'+esc(r.b)+'</td><td class="n">'+(r.planTo?'p.'+r.planTo:'—')+'</td>'
+          +'<td class="n '+(beh?'behind':(r.doneTo?'ok':''))+'">'+(r.doneTo?'p.'+r.doneTo:'—')+'</td><td>'+nx+'</td></tr>';
+      }).join('')+'</tbody></table></div>'
+      +'<p class="w-note">頁碼取任務名稱裡最後面的頁數；同一本書排了第二輪的，會以排過最遠的那一頁為準。</p>';
+  }
+
+  /* ---------- 日程搜尋 ---------- */
+  var q=document.getElementById('dv-q'), sres=document.getElementById('dv-sres'), qT=null;
+  function search(){
+    var s=q.value.trim().toLowerCase();
+    if(!s){ sres.hidden=true; sres.innerHTML=''; return; }
+    var toks=s.split(/\s+/), out=[];
+    DAYS.forEach(function(k){
+      studyBlocks(k).forEach(function(x){
+        var hay=(x.n+' '+(x.d||'')).toLowerCase();
+        if(toks.every(function(w){ return hay.indexOf(w)>=0; })) out.push({k:k,x:x});
+      });
+    });
+    var hl=function(str){ var r=esc(str); toks.forEach(function(w){ if(!w) return; var i=r.toLowerCase().indexOf(esc(w)); if(i>=0) r=r.slice(0,i)+'<mark>'+r.slice(i,i+esc(w).length)+'</mark>'+r.slice(i+esc(w).length); }); return r; };
+    sres.hidden=false;
+    sres.innerHTML='<p>找到 '+out.length+' 段'+(out.length>60?'，先列前 60 段':'')+'。點一下跳到那天。</p>'
+      +out.slice(0,60).map(function(o){
+        var d=pk(o.k);
+        return '<button type="button" data-k="'+o.k+'"><span class="d">'+md(o.k)+'（'+WD[d.getDay()]+'）</span><span class="d">'+(o.x.t||'')+'</span><span>'+hl(o.x.n)+'</span></button>';
+      }).join('');
+  }
+  if(q&&sres){
+    q.addEventListener('input',function(){ clearTimeout(qT); qT=setTimeout(search,180); });
+    sres.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b&&window.__gotoDay){ window.__gotoDay(b.dataset.k); window.scrollTo(0,0); } });
+  }
+
+  /* ---------- 頁內目錄（一頁有三個區塊以上才出現） ---------- */
+  var toc=document.getElementById('page-toc');
+  function paintToc(){
+    if(!toc) return;
+    var secs=Array.prototype.filter.call(document.querySelectorAll('body > .wrap > section'),function(s){ return !s.hidden && s.querySelector('h2'); });
+    if(secs.length<3){ toc.hidden=true; toc.innerHTML=''; return; }
+    toc.hidden=false; toc.innerHTML='';
+    secs.forEach(function(s){
+      var b=document.createElement('button'); b.type='button'; b.textContent=s.querySelector('h2').textContent;
+      b.addEventListener('click',function(){
+        var tabs=document.querySelector('.tabs-wrap'), off=(tabs?tabs.getBoundingClientRect().height:0)+12;
+        window.scrollTo({top:s.getBoundingClientRect().top+window.pageYOffset-off, behavior:'smooth'});
+      });
+      toc.appendChild(b);
+    });
+  }
+
+  /* ================= 森林與寵物 ================= */
+  var PK='plan.pet.v1';
+  var SPECIES=[['cat','貓','🐱'],['dog','狗','🐶'],['hamster','倉鼠','🐹'],['rabbit','兔子','🐰'],
+               ['fox','狐狸','🦊'],['panda','熊貓','🐼'],['penguin','企鵝','🐧'],['chick','小雞','🐥']];
+  // h＝累積讀書時數（完成任務的分鐘數）達到幾小時解鎖
+  var FOODS=[{n:'乾飼料',h:0,v:20,e:'🥣'},{n:'罐頭',h:8,v:30,e:'🥫'},{n:'小魚乾',h:25,v:40,e:'🐟'},{n:'營養大餐',h:60,v:60,e:'🍱'},{n:'生日蛋糕',h:150,v:80,e:'🎂'}];
+  var TOYS=[{n:'小球',h:0,v:15,e:'⚾'},{n:'逗貓棒',h:5,v:20,e:'🎣'},{n:'毛線球',h:15,v:25,e:'🧶'},{n:'飛盤',h:40,v:30,e:'🥏'},{n:'玩具屋',h:90,v:40,e:'🏠'},{n:'遊戲城堡',h:200,v:50,e:'🏰'}];
+  var PLACES=[
+    {n:'書房',h:0,e:'📚',sky:['#FDF3E1','#F8E2BE'],ground:['#E7CFA6','#D9BC8C']},
+    {n:'公園',h:10,e:'⛲',sky:['#CFE8F7','#E8F5FC'],ground:['#A9D88F','#8CC774']},
+    {n:'湖邊',h:30,e:'🦆',sky:['#BFE0F5','#E3F2FB'],ground:['#9BD08A','#76B86A']},
+    {n:'森林深處',h:60,e:'🍄',sky:['#BFD9C6','#DCEBDD'],ground:['#7FB27A','#5F9A5E']},
+    {n:'海邊',h:100,e:'🏖️',sky:['#9FD3F2','#D8EFFB'],ground:['#F1DFAE','#E6CD8F']},
+    {n:'山頂',h:150,e:'⛰️',sky:['#A9C9EE','#E1ECF8'],ground:['#9DBA8A','#7E9E72']},
+    {n:'星空露營',h:220,e:'⛺',sky:['#1B2350','#3B4A8A'],ground:['#3E5B45','#2F4636'],night:1},
+    {n:'遊樂園',h:300,e:'🎡',sky:['#FBD3E0','#FDEBD9'],ground:['#B9DE9C','#9ACB80']}
+  ];
+  var TREE={chi:'bamboo',math:'pine',eng:'maple',sci:'ginkgo',soc:'oak',kb:'sakura',kbfix:'sakura',kbr:'sakura',fu:'sakura',
+    hw:'cypress',mock:'apple',term:'apple',other:'bush'};
+  var TREEN={sakura:['櫻花','科班','#F4A7C0'],pine:['松樹','數學','#2F7D4F'],bamboo:['竹子','國文','#7DBF5A'],maple:['楓樹','英文','#D9583B'],
+    ginkgo:['銀杏','自然','#E8B931'],oak:['橡樹','社會','#4E9A45'],cypress:['柏樹','補習作業','#2B5E45'],apple:['蘋果樹','模考／段考','#5DA548'],bush:['灌木','其他','#6FAF5B']};
+
+  function petState(){ return ls(PK,{pet:null,gone:[]})||{pet:null,gone:[]}; }
+  function savePet(s){ sv(PK,s); }
+  function easyMap(){ return ls('plan.easy.v1',{})||{}; }
+  function pomoTotal(){ var p=ls('plan.pomo.v1',{})||{}; return p.total||0; }
+
+  // 有沒有照顧：完成一半任務或讀滿 60 分；降級模式、沒有讀書時段的休息日也算
+  function cared(k,h,easy){
+    if(easy[k]) return true;
+    var day=PL.days[k];
+    if(day && !day.b.some(function(b){ return b[5]===0; })) return true;
+    var e=h[k]; if(!e) return false;
+    return (e.a>0 && e.d/e.a>=0.5) || (e.m||0)>=60;
+  }
+  function totals(h, since){
+    var mins=0, tasks=0, clear=0, trees=[];
+    Object.keys(h).sort(function(a,b){ return pk(a)-pk(b); }).forEach(function(k){
+      var e=h[k]; mins+=e.m||0;
+      if(e.cat) Object.keys(e.cat).forEach(function(c){ for(var i=0;i<e.cat[c].d;i++) trees.push({sp:TREE[c]||'bush', k:k}); });
+      else for(var j=0;j<(e.d||0);j++) trees.push({sp:'bush', k:k});
+      if(since && pk(k)>=since){ tasks+=e.d||0; if(e.a>0 && e.d===e.a) clear++; }
+    });
+    return {hours:mins/60, tasks:tasks, clear:clear, trees:trees};
+  }
+  function xpSince(h, since, pomo0){
+    var x=0;
+    Object.keys(h).forEach(function(k){ if(pk(k)>=since){ var e=h[k]; x+=Math.round((e.m||0)/6); if(e.a>0&&e.d===e.a) x+=20; } });
+    return x+Math.max(0,pomoTotal()-pomo0)*5;
+  }
+  function levelOf(xp){ var lv=1, need=100, rest=xp; while(rest>=need){ rest-=need; lv++; need=100+50*(lv-1); } return {lv:lv, cur:rest, need:need}; }
+  function stage(lv){ return lv>=12?['成年',74]:(lv>=5?['少年',60]:['幼年',46]); }
+
+  // 把寵物的狀態推進到昨天：每天會餓、心情下降；沒照顧的日子連續算
+  function advance(s,h){
+    var p=s.pet; if(!p) return null;
+    var y=d0(); y.setDate(y.getDate()-1);
+    var d=pk(p.last||p.born), easy=easyMap(), event=null;
+    d.setDate(d.getDate()+1);
+    while(d<=y){
+      var k=kk(d);
+      p.hunger=Math.max(0,p.hunger-30); p.mood=Math.max(0,p.mood-25);
+      if(cared(k,h,easy)){ p.neglect=0; p.okRun=(p.okRun||0)+1; if(p.sick && p.okRun>=2){ p.sick=false; event='heal'; } }
+      else {
+        p.neglect=(p.neglect||0)+1; p.okRun=0; p.mood=Math.max(0,p.mood-15);
+        if(p.neglect>=3 && !p.sick){ p.sick=true; event='sick'; }
+        if(p.neglect>=7){
+          s.gone=s.gone||[];
+          s.gone.unshift({name:p.name, sp:p.sp, born:p.born, left:k, lv:p.lvSeen||1});
+          s.pet=null; s.justLeft=p.name; savePet(s); return 'gone';
+        }
+      }
+      p.last=k; d.setDate(d.getDate()+1);
+    }
+    if(p.sick) p.mood=Math.min(p.mood,40);
+    savePet(s);
+    return event;
+  }
+
+  // ---- 畫森林（SVG） ----
+  function treeSVG(sp,x,y,s,isNew){
+    // 外層定位置和大小；今天新種的樹在內層做長出來的動畫（CSS 的 transform 會蓋掉同一層的 transform 屬性）
+    var g='<g transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+s.toFixed(2)+')"><g'+(isNew?' class="fp-new" style="transform-box:fill-box;transform-origin:50% 100%"':'')+'>';
+    var trunk='<rect x="-2.2" y="-11" width="4.4" height="11" rx="1.5" fill="#8A5A3B"/>';
+    switch(sp){
+      case 'pine': g+=trunk+'<path d="M0 -40 L-11 -20 L11 -20 Z M0 -32 L-14 -11 L14 -11 Z" fill="#2F7D4F"/>'; break;
+      case 'bamboo': g+='<rect x="-5" y="-38" width="3" height="38" rx="1.4" fill="#7DBF5A"/><rect x="1" y="-30" width="3" height="30" rx="1.4" fill="#93CD6C"/>'
+        +'<path d="M-3.5 -26 l-7 -4 M2.5 -20 l7 -4 M-3.5 -14 l-6 -3" stroke="#5FA544" stroke-width="2" stroke-linecap="round"/>'; break;
+      case 'maple': g+=trunk+'<circle cx="0" cy="-22" r="12" fill="#D9583B"/><circle cx="-7" cy="-17" r="7" fill="#E9774C"/><circle cx="7" cy="-18" r="7" fill="#C94A30"/>'; break;
+      case 'ginkgo': g+=trunk+'<path d="M0 -36 C14 -30 14 -14 0 -12 C-14 -14 -14 -30 0 -36 Z" fill="#E8B931"/>'; break;
+      case 'oak': g+=trunk+'<circle cx="-6" cy="-19" r="9" fill="#4E9A45"/><circle cx="6" cy="-20" r="10" fill="#5DAE52"/><circle cx="0" cy="-28" r="9" fill="#58A64C"/>'; break;
+      case 'sakura': g+=trunk+'<circle cx="-7" cy="-19" r="8" fill="#F4A7C0"/><circle cx="7" cy="-19" r="8" fill="#F7B9CD"/><circle cx="0" cy="-27" r="9" fill="#F28FB0"/>'
+        +'<circle cx="-2" cy="-22" r="1.6" fill="#fff"/><circle cx="5" cy="-25" r="1.4" fill="#fff"/>'; break;
+      case 'cypress': g+='<rect x="-1.8" y="-6" width="3.6" height="6" fill="#8A5A3B"/><ellipse cx="0" cy="-22" rx="6.5" ry="17" fill="#2B5E45"/>'; break;
+      case 'apple': g+=trunk+'<circle cx="0" cy="-22" r="12" fill="#5DA548"/><circle cx="-5" cy="-20" r="2" fill="#E04A3A"/><circle cx="5" cy="-25" r="2" fill="#E04A3A"/><circle cx="3" cy="-16" r="2" fill="#E04A3A"/>'; break;
+      default: g+='<ellipse cx="0" cy="-6" rx="11" ry="7" fill="#6FAF5B"/><ellipse cx="-5" cy="-9" rx="6" ry="5" fill="#82BF6C"/>';
+    }
+    return g+'</g></g>';
+  }
+  function sceneSVG(tr, place, pet, petInfo, today){
+    var W=640, H=300, HZ=150, sky=place.sky, gr=place.ground;
+    var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="我的森林：'+tr.length+' 棵樹'+(pet?'，'+esc(pet.name)+'在'+place.n:'')+'">'
+      +'<defs><linearGradient id="fpSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+sky[0]+'"/><stop offset="1" stop-color="'+sky[1]+'"/></linearGradient>'
+      +'<linearGradient id="fpGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+gr[0]+'"/><stop offset="1" stop-color="'+gr[1]+'"/></linearGradient></defs>'
+      +'<rect width="'+W+'" height="'+H+'" fill="url(#fpSky)"/>';
+    if(place.night){ for(var i=0;i<26;i++){ s+='<circle cx="'+((i*97)%W)+'" cy="'+(10+(i*53)%120)+'" r="'+(i%3?1:1.6)+'" fill="#fff" opacity=".8"/>'; } }
+    else s+='<circle cx="'+(W-80)+'" cy="52" r="22" fill="#FFE08A" opacity=".9"/>';
+    s+='<path d="M0 '+(HZ+10)+' C 120 '+(HZ-12)+', 260 '+(HZ+18)+', 380 '+(HZ-4)+' S 560 '+(HZ+14)+', 640 '+(HZ-2)+' L640 300 L0 300 Z" fill="url(#fpGr)"/>';
+    s+='<text x="'+(W-46)+'" y="'+(HZ+8)+'" font-size="34" text-anchor="middle">'+place.e+'</text>';
+    // 草叢、小花：固定位置的裝飾，樹還少的時候畫面才不會空
+    for(var gi=0;gi<18;gi++){
+      var gx=24+((gi*0.381966)%1)*(W-48), gy=HZ+22+((gi*0.618034)%1)*(H-HZ-40);
+      s+= gi%4===0
+        ? '<g transform="translate('+gx.toFixed(0)+' '+gy.toFixed(0)+')"><path d="M0 0 v-7" stroke="#5E9A4E" stroke-width="1.4"/><circle cx="0" cy="-8" r="2.4" fill="'+(gi%8===0?'#F6D55C':'#F7A8C4')+'"/></g>'
+        : '<path d="M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l-3 -7 M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l0 -9 M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l3 -7" stroke="'+(place.night?'#5f8f62':'#6FA85C')+'" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>';
+    }
+    // 樹：最多畫 260 棵（最新的），位置用固定的亂數序列，越後面（越遠）越小
+    var show=tr.slice(-260), pos=[];
+    show.forEach(function(t,i){
+      var n=tr.length-show.length+i;
+      var fx=(n*0.6180339887)%1, fy=(n*0.7548776662)%1;
+      var y=HZ+14+fy*(H-HZ-30), x=18+fx*(W-36);
+      if(Math.abs(x-W/2)<52 && y>H-78) x+= (x<W/2?-58:58);   // 寵物前面留空位
+      pos.push({t:t,x:x,y:y,s:0.55+0.75*((y-HZ)/(H-HZ))});
+    });
+    pos.sort(function(a,b){ return a.y-b.y; });
+    pos.forEach(function(p){ s+=treeSVG(p.t.sp,p.x,p.y,p.s,p.t.k===today); });
+    if(pet){
+      var st=stage(petInfo.lv.lv), fs=st[1];
+      s+='<ellipse cx="'+(W/2)+'" cy="'+(H-16)+'" rx="'+(fs*0.42)+'" ry="5" fill="#000" opacity=".12"/>';
+      s+='<text class="fp-pet'+(pet.sick?' sick':'')+'" id="fp-pet" x="'+(W/2)+'" y="'+(H-14)+'" font-size="'+fs+'" text-anchor="middle">'+petEmoji(pet)+'</text>';
+      var badge=pet.sick?'🤒':(pet.hunger<30?'🍽️':(pet.mood<30?'💧':(pet.hunger>=70&&pet.mood>=70?'💕':'')));
+      if(badge) s+='<text x="'+(W/2+fs*0.48)+'" y="'+(H-14-fs*0.78)+'" font-size="'+Math.round(fs*0.42)+'" text-anchor="middle">'+badge+'</text>';
+    } else if(!tr.length){
+      s+='<text x="'+(W/2)+'" y="'+(H-60)+'" font-size="15" text-anchor="middle" fill="#3d5a3d">完成第一項讀書任務，這裡就會長出第一棵樹</text>';
+    }
+    return s+'</svg>';
+  }
+  function petEmoji(p){ var x=SPECIES.filter(function(s){ return s[0]===p.sp; })[0]; return x?x[2]:'🐾'; }
+  function spName(sp){ var x=SPECIES.filter(function(s){ return s[0]===sp; })[0]; return x?x[1]:''; }
+
+  var app=document.getElementById('fp-app'), mini=document.getElementById('fp-mini'), pick=null, flash='';
+  function paintPet(){
+    if(!app&&!mini) return;
+    var s=petState(), h=allHist(), today=d0(), tk=kk(today);
+    var ev=advance(s,h); s=petState();
+    var p=s.pet, T=totals(h, p?pk(p.born):null);
+    var place=PLACES[0];
+    if(p){ place=PLACES.filter(function(x){ return x.n===p.loc && T.hours>=x.h; })[0]||PLACES[0]; }
+    var info=null;
+    if(p){
+      var xp=xpSince(h,pk(p.born),p.pomo0||0); info={xp:xp, lv:levelOf(xp)};
+      if(info.lv.lv!==p.lvSeen){ p.lvSeen=info.lv.lv; savePet(s); }
+    }
+    var te=h[tk]||{}, careToday=cared(tk,h,easyMap());
+    // ---- 今天分頁的小卡 ----
+    if(mini){
+      mini.hidden=false;
+      if(p){
+        var warn=p.sick?'生病了：要連續 2 天好好讀書才會好':(p.neglect>=1?'已經 '+p.neglect+' 天沒被照顧了':'');
+        mini.innerHTML='<span class="e" aria-hidden="true">'+petEmoji(p)+'</span><div><b>'+esc(p.name)+'</b>　<span class="mono" style="font-size:12px;color:var(--ink-faint)">Lv '+info.lv.lv+'</span>'
+          +'<p>飽足 '+p.hunger+'　心情 '+p.mood+'　'+(careToday?'今天已照顧 ✓':'今天還沒照顧：讀滿 60 分或完成一半任務')+'</p>'
+          +(warn?'<p style="color:var(--warn)">'+warn+'</p>':'')+'</div>';
+      } else {
+        mini.innerHTML='<span class="e" aria-hidden="true">🌱</span><div><b>森林 '+T.trees.length+' 棵樹</b><p>'+(s.justLeft?esc(s.justLeft)+' 離家出走了，到「獎勵」重新領養':'到「獎勵 → 我的森林」領養一隻寵物')+'</p></div>';
+      }
+    }
+    if(!app) return;
+    // ---- 主畫面 ----
+    var html='<div class="fp-scene">'+sceneSVG(T.trees,place,p,info,tk)+'</div><div class="fp-body">';
+    var nextUnlock=FOODS.concat(TOYS).concat(PLACES).filter(function(x){ return x.h>T.hours; }).sort(function(a,b){ return a.h-b.h; })[0];
+    if(p){
+      var st=stage(info.lv.lv), foodN=Math.max(0,T.tasks-(p.fed||0)), playN=Math.max(0,(pomoTotal()-(p.pomo0||0))+T.clear-(p.played||0));
+      html+='<div class="fp-head"><b>'+esc(p.name)+'</b><span class="sub" style="margin:0">'+spName(p.sp)+'・'+st[0]+'</span><span class="lv">Lv '+info.lv.lv+'</span>'
+        +'<span class="sub" style="margin:0;color:'+(p.sick?'var(--rest)':'var(--cap)')+'">'+(p.sick?'● 生病中':'● 健康')+'</span></div>'
+        +'<div class="fp-stats">'
+        +stat('飽足',p.hunger)+stat('心情',p.mood)
+        +'<div class="fp-stat">升級　<b class="mono">'+info.lv.cur+' / '+info.lv.need+'</b><div class="bar"><i style="width:'+Math.round(info.lv.cur/info.lv.need*100)+'%"></i></div></div>'
+        +'</div>';
+      var cls='fp-care', msg;
+      if(p.sick){ cls+=' bad'; msg='生病了。要<b>連續 2 天</b>有照顧（讀滿 60 分或完成一半任務）才會好；再連續沒照顧到第 7 天會離家出走。'; }
+      else if(p.neglect>=1){ cls+=' warn'; msg='已經連續 <b>'+p.neglect+' 天</b>沒被照顧。'+(p.neglect>=2?'明天再沒照顧就會生病。':'再 '+(3-p.neglect)+' 天沒照顧會生病。'); }
+      else msg='狀態很好。';
+      msg+='　今天：完成 '+(te.d||0)+' / '+(te.a||0)+' 項、讀了 '+(te.m||0)+' 分 → '+(careToday?'<b>已照顧 ✓</b>':'還沒照顧');
+      html+='<p class="'+cls+'">'+msg+'</p>';
+      html+=row('餵食','飼料 '+foodN+' 份（每完成一項任務得 1 份）',FOODS.map(function(f){
+          var lock=T.hours<f.h;
+          return '<button type="button" data-act="feed" data-v="'+f.n+'"'+(lock||!foodN?' disabled':'')+(lock?' class="lock"':'')+'><span class="e">'+f.e+'</span>'+f.n
+            +'<small>'+(lock?'讀書 '+f.h+' 小時解鎖':'+'+f.v)+'</small></button>'; }).join(''));
+      html+=row('玩耍','可以玩 '+playN+' 次（每顆番茄鐘、每個全清日各 1 次）'+(p.sick?'；生病時不能玩':''),TOYS.map(function(t){
+          var lock=T.hours<t.h;
+          return '<button type="button" data-act="play" data-v="'+t.n+'"'+(lock||!playN||p.sick?' disabled':'')+(lock?' class="lock"':'')+'><span class="e">'+t.e+'</span>'+t.n
+            +'<small>'+(lock?'讀書 '+t.h+' 小時解鎖':'+'+t.v)+'</small></button>'; }).join(''));
+      html+=row('帶去哪裡','每天第一次換地點心情 +10',PLACES.map(function(x){
+          var lock=T.hours<x.h;
+          return '<button type="button" data-act="go" data-v="'+x.n+'" aria-pressed="'+(place.n===x.n)+'"'+(lock?' disabled class="lock"':'')+'><span class="e">'+x.e+'</span>'+x.n
+            +(lock?'<small>讀書 '+x.h+' 小時</small>':'')+'</button>'; }).join(''));
+      html+='<p class="fp-msg" id="fp-msg">'+flash+'</p>';
+    } else {
+      html+=(s.justLeft?'<p class="fp-care bad">'+esc(s.justLeft)+' 連續 7 天沒被照顧，離家出走了。森林還在，可以重新領養一隻。</p>':'')
+        +'<div class="fp-head"><b>領養一隻寵物</b><span class="sub" style="margin:0">選一種、取個名字</span></div>'
+        +'<div class="fp-adopt" role="radiogroup" aria-label="寵物種類">'+SPECIES.map(function(x){
+          return '<button type="button" role="radio" data-sp="'+x[0]+'" aria-pressed="'+(pick===x[0])+'"><span class="e">'+x[2]+'</span>'+x[1]+'</button>'; }).join('')+'</div>'
+        +'<div class="set-grid" style="grid-template-columns:minmax(0,240px) auto;align-items:end"><div class="fld"><label for="fp-name">名字</label><input id="fp-name" type="text" maxlength="12" placeholder="例：小橘"></div>'
+        +'<button class="btn solid" id="fp-adopt" type="button" style="justify-self:start">領養</button></div>'
+        +'<p class="fp-msg" id="fp-msg">'+flash+'</p>';
+    }
+    // 森林統計與解鎖
+    var cnt={}; T.trees.forEach(function(t){ cnt[t.sp]=(cnt[t.sp]||0)+1; });
+    html+='<div class="fp-legend"><span><b>'+T.trees.length+'</b> 棵樹　讀書 <b>'+T.hours.toFixed(1)+'</b> 小時</span>'
+      +Object.keys(TREEN).filter(function(k){ return cnt[k]; }).map(function(k){ return '<span><i style="background:'+TREEN[k][2]+'"></i>'+TREEN[k][0]+'（'+TREEN[k][1]+'）'+cnt[k]+'</span>'; }).join('')+'</div>';
+    if(nextUnlock) html+='<p class="fp-gone">下一個解鎖：'+nextUnlock.e+' '+nextUnlock.n+'（讀書 '+nextUnlock.h+' 小時，還差 '+(nextUnlock.h-T.hours).toFixed(1)+' 小時）</p>';
+    if(s.gone&&s.gone.length) html+='<p class="fp-gone">以前養過：'+s.gone.map(function(g){ return esc(g.name)+'（'+spName(g.sp)+'，'+md(g.born)+'–'+md(g.left)+'）'; }).join('、')+'</p>';
+    html+='</div>';
+    app.innerHTML=html;
+    flash='';
+    if(ev==='sick') say('🤒 '+esc(p.name)+' 生病了。接下來要連續 2 天有照顧才會好。');
+    if(ev==='heal') say('🎉 '+esc(p.name)+' 病好了！');
+  }
+  function stat(lab,v){ return '<div class="fp-stat'+(v<30?' low':'')+'">'+lab+'　<b class="mono">'+v+'</b><div class="bar"><i style="width:'+v+'%"></i></div></div>'; }
+  function row(t,sub,items){ return '<div class="fp-row"><h4>'+t+'<span>'+sub+'</span></h4><div class="fp-items">'+items+'</div></div>'; }
+  function say(m){ var el=document.getElementById('fp-msg'); if(el) el.innerHTML=m; }
+  function hop(){ var el=document.getElementById('fp-pet'); if(!el) return; el.classList.remove('hop'); void el.getBBox(); el.classList.add('hop'); }
+
+  if(app) app.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b||b.disabled) return;
+    var s=petState(), p=s.pet;
+    if(b.dataset.sp){ pick=b.dataset.sp; app.querySelectorAll('.fp-adopt button').forEach(function(x){ x.setAttribute('aria-pressed',x.dataset.sp===pick); }); return; }
+    if(b.id==='fp-adopt'){
+      var nm=(document.getElementById('fp-name').value||'').trim();
+      if(!pick){ say('先選一種寵物。'); return; }
+      if(!nm){ say('幫牠取個名字。'); return; }
+      s.pet={name:nm, sp:pick, born:kk(d0()), last:kk(d0()), hunger:80, mood:80, sick:false, neglect:0, okRun:0, fed:0, played:0, pomo0:pomoTotal(), loc:'書房', locDay:''};
+      s.justLeft=''; savePet(s); flash='🎉 歡迎 '+esc(nm)+'！完成任務會得到飼料，番茄鐘可以陪牠玩。'; paintPet(); hop(); return;
+    }
+    if(!p) return;
+    var h=allHist(), T=totals(h,pk(p.born));
+    if(b.dataset.act==='feed'){
+      var f=FOODS.filter(function(x){ return x.n===b.dataset.v; })[0]; if(!f||T.tasks-(p.fed||0)<=0) return;
+      p.fed=(p.fed||0)+1; p.hunger=Math.min(100,p.hunger+f.v); savePet(s); flash=f.e+' '+esc(p.name)+' 吃了'+f.n+'，飽足 +'+f.v+'。'; paintPet(); hop();
+    } else if(b.dataset.act==='play'){
+      var t=TOYS.filter(function(x){ return x.n===b.dataset.v; })[0]; if(!t||p.sick) return;
+      p.played=(p.played||0)+1; p.mood=Math.min(100,p.mood+t.v); savePet(s); flash=t.e+' 和 '+esc(p.name)+' 玩'+t.n+'，心情 +'+t.v+'。'; paintPet(); hop();
+    } else if(b.dataset.act==='go'){
+      var tk=kk(d0()), first=p.locDay!==tk && p.loc!==b.dataset.v;
+      p.loc=b.dataset.v; if(first){ p.locDay=tk; p.mood=Math.min(p.sick?40:100,p.mood+10); }
+      savePet(s); flash='帶 '+esc(p.name)+' 到'+p.loc+(first?'，心情 +10。':'。'); paintPet(); hop();
+    }
+  });
+  if(mini){
+    mini.tabIndex=0; mini.setAttribute('role','button'); mini.setAttribute('aria-label','到我的森林');
+    var goF=function(){ if(window.__showTab) window.__showTab(5); var a=document.getElementById('fp-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start'}); },30); };
+    mini.addEventListener('click',goF);
+    mini.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goF(); } });
+  }
+
+  /* ---------- 什麼時候重畫 ---------- */
+  function paintAll(){ paintSubjects(); paintKbPace(); paintBooks(); paintPet(); }
+  paintAll(); paintToc();
+  document.addEventListener('plan:tab',function(){ paintToc(); paintAll(); });
+  document.addEventListener('change',function(e){
+    if(e.target.closest && (e.target.closest('#td-list')||e.target.closest('#kp-list'))) setTimeout(paintAll,60);
+  });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) paintAll(); });
+  setInterval(function(){ if(!document.hidden) paintPet(); },60000);
+  window.__petRefresh=paintAll;
+})();
+</script>
+
 <script>
 /* ===== 動效 ===== */
 (function(){
