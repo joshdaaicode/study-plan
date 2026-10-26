@@ -1,5 +1,5 @@
-const CACHE='study-plan-v1';
-const ASSETS=['./','./index.html','./manifest.json'];
+const CACHE='study-plan-v2';
+const ASSETS=['./','./index.html','./plan.js','./manifest.json'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS).catch(()=>{})));
