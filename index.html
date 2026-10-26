@@ -842,6 +842,53 @@ section{padding-top:40px}
 .fp-mini:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 .td-side .fp-mini{order:3}
 
+
+/* ---------- 森林與寵物 v3：分頁、地塊、任務、檢查、收藏 ---------- */
+.fp-tabs{display:flex;flex-wrap:wrap;gap:5px;padding:10px 12px;border-bottom:1px solid var(--rule2);background:var(--card)}
+.fp-tabs button{font:inherit;font-size:12.5px;padding:5px 11px;border:1px solid var(--rule);border-radius:var(--r-btn);background:var(--card);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.fp-tabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:700}
+.fp-tabs button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.fp-sep{width:1px;background:var(--rule);margin:2px 4px}
+.fp-dot{display:inline-block;min-width:16px;padding:0 4px;border-radius:999px;background:var(--warn);color:#fff;font-size:10.5px;line-height:16px;text-align:center;margin-left:2px}
+.fp-lands{display:flex;flex-wrap:wrap;gap:5px;align-items:center;padding:8px 12px;background:var(--card2);border-bottom:1px solid var(--rule2)}
+.fp-lands button{font:inherit;font-size:12px;padding:4px 10px;border:1px solid var(--rule);border-radius:var(--r-btn);background:var(--card);color:var(--ink);cursor:pointer}
+.fp-lands button small{color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;font-size:10.5px}
+.fp-lands button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.fp-lock{font-size:11.5px;color:var(--ink-faint)}
+.fp-panel{margin:0 0 12px}
+.fp-panel h4{margin:0 0 8px;font-size:13.5px}
+.fp-panel h4 span{font-weight:400;font-size:12px;color:var(--ink-faint);margin-left:6px}
+.fp-q{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--rule2)}
+.fp-q:last-child{border-bottom:0}
+.fp-q b{font-size:13.5px;font-weight:500}
+.fp-q .bar{margin:5px 0 2px;max-width:none;height:6px}
+.fp-q small{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint)}
+.fp-q .btn{padding:6px 14px;font-size:12.5px}
+.fp-q .st{font-size:12.5px;color:var(--cap)}
+.fp-q.done b{color:var(--ink-faint)}
+.fp-chk{display:grid;grid-template-columns:44px minmax(0,1fr);gap:2px 8px;padding:8px 0;border-bottom:1px solid var(--rule2);font-size:13px}
+.fp-chk .d{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-faint);grid-row:span 2}
+.fp-chk .st{font-size:12px;color:var(--warn)}
+.fp-chk.pass .st{color:var(--cap)} .fp-chk.dead .st{color:var(--ink-faint)}
+.fp-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.fp-cards svg{width:100%;height:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.fp-chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r-btn);background:var(--card)}
+.fp-chip .e{font-size:16px}
+.fp-chip small{color:var(--ink-faint);font-size:11px}
+.fp-dex{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.fp-dex div{border:1px solid var(--rule2);border-radius:10px;padding:8px 6px;text-align:center;background:var(--card2);color:var(--ink-faint)}
+.fp-dex div.on{background:var(--card);color:var(--ink)}
+.fp-dex .e{display:block;font-size:26px;line-height:1.2}
+.fp-dex b{display:block;font-size:12.5px;font-weight:500}
+.fp-dex small{display:block;font-size:10.5px;color:var(--ink-faint);line-height:1.35}
+.fp-scene [data-actor]{cursor:pointer}
+.fp-float{animation:fpFloat 1.3s ease-out forwards;pointer-events:none}
+@keyframes fpFloat{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-26px)}}
+.fp-zz{animation:fpIdle 2.4s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.fp-float,.fp-zz{animation:none}}
+.td-chk{display:block;margin-top:3px;font-size:12px;color:var(--ink-faint)}
+.td-chk.wait{color:var(--warn)} .td-chk.ok{color:var(--cap)}
+
 @media (max-width:560px){
   .sc-seg{display:flex}
   .sc-seg button{flex:1;padding:7px 0}
@@ -1496,8 +1543,10 @@ section{padding-top:40px}
 
 <section>
   <div class="sec-head"><h2>我的森林</h2><span class="eyebrow">讀書種樹，寵物住在你的森林裡</span></div>
-  <p class="sec-note">每完成一項讀書任務就種一棵樹，樹種看科目。讀書時數累積會解鎖新的飼料、玩具和地點；寵物靠完成任務和番茄鐘長大。
-    <b>一天沒照顧會餓、心情變差；連續 3 天會生病；連續 7 天會離家出走。</b>一天完成一半任務或讀滿 60 分鐘就算有照顧；降級模式和休息日不算沒照顧，但沒打開網站的日子算沒照顧。</p>
+  <p class="sec-note">每完成一項讀書任務就種一棵樹（樹種看科目），樹只在有照顧的日子長大，30 天變神木；一塊地種滿才開下一塊。
+    訂正、考古題、模考卷、歷屆會考要<b>拍照給 Claude 檢查，過關才算數</b>（只種樹苗、3 天沒交就枯死）。
+    <b>1 天沒照顧牠不理你、2 天生病、5 天離家出走；沒照顧的日子樹會枯，3 天沒救回就死；番茄鐘中途放棄留下枯樹樁；讀書時段跑來看、一天待超過 15 分鐘，牠也不理你。</b>
+    牠越大吃越多：Lv5 起每天要讀 90 分或完成 60%，Lv12 起 120 分或 70%。降級模式和休息日算有照顧，沒打開網站的日子算沒照顧。</p>
   <div class="card fp-card" id="fp-app"></div>
 </section>
 
@@ -2821,6 +2870,8 @@ section{padding-top:40px}
     paintPomo();
   });
   elReset.addEventListener('click',function(){
+    // 專注中途放棄（已經開始超過 1 分鐘）：森林留下一根枯樹樁
+    if(running && mode==='work' && P.w*60-Math.ceil((endAt-Date.now())/1000)>=60 && window.__petEvent) window.__petEvent('abandon');
     running=false; elGo.textContent='開始'; mode='work'; left=P.w*60; paintPomo();
   });
   selW.addEventListener('change',function(){
@@ -3421,7 +3472,7 @@ section{padding-top:40px}
 
   /* ---------- 備份 ---------- */
   // 要備份、同步的資料（介面狀態像目前在哪個分頁不算，切分頁不該觸發上傳）
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1'];
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1','plan.checks.v1'];
   window.__DATA_KEYS=KEYS;
   function pick(){ var o={}; KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
   function sig(){ return JSON.stringify(pick()); }
@@ -4591,252 +4642,776 @@ section{padding-top:40px}
   }
 
   /* ================= 森林與寵物 ================= */
-  var PK='plan.pet.v1';
+  // 使用者 2026-10-26 定的規則：
+  // 懲罰「重」：1 天沒照顧不理你、2 天生病、5 天離家；沒照顧的日子最新 5 棵樹枯萎，3 天內沒救回就死；番茄鐘中途放棄留下枯樹樁；
+  //   讀書時段來看、一天待超過 15 分鐘，牠也不理你。
+  // 訂正、題本要 Claude 檢查才過關（過關連結有簽章）；沒檢查只種樹苗、不給飼料，3 天沒交就枯死。
+  // 無限循環：每日任務＋每週挑戰、樹會長成神木、森林一塊種滿才開下一塊、寵物越大吃越多。旅行照旅蛙。
+  var PK='plan.pet.v1', VK='plan.petview.v1', CK='plan.checks.v1';
+  var SICK_AT=2, LEAVE_AT=5, WILT_N=5, WILT_DIE=3, VIEW_MAX=15*60*1000, CHECK_DAYS=3;
+  var PUBKEY={kty:'EC',crv:'P-256',x:'Ebpis9DgYaUWiZCOn1Mfw9ROGd4fxe53fcajRNcESZo',y:'Rs2KjSBng3Woe_cGXb32MB2nE0pLEux7iifJrmArqP4'};
+  // 要給 Claude 檢查的任務：訂正、考古題限時作答、模考卷、歷屆會考、錯題重做
+  var CHECK_RE=/(訂正|限時作答|模考卷|歷屆會考|限時重做|整份限時|錯題重做|雄中考古題)/;
+  function needsCheck(n){ return CHECK_RE.test(String(n)) && !/補習|錯題本：到期題/.test(String(n)); }
+
   var SPECIES=[['cat','貓','🐱'],['dog','狗','🐶'],['hamster','倉鼠','🐹'],['rabbit','兔子','🐰'],
                ['fox','狐狸','🦊'],['panda','熊貓','🐼'],['penguin','企鵝','🐧'],['chick','小雞','🐥']];
-  // h＝累積讀書時數（完成任務的分鐘數）達到幾小時解鎖
-  var FOODS=[{n:'乾飼料',h:0,v:20,e:'🥣'},{n:'罐頭',h:8,v:30,e:'🥫'},{n:'小魚乾',h:25,v:40,e:'🐟'},{n:'營養大餐',h:60,v:60,e:'🍱'},{n:'生日蛋糕',h:150,v:80,e:'🎂'}];
+  var FOODS=[{n:'乾飼料',h:0,v:20,e:'🥣',trip:[3,8]},{n:'罐頭',h:8,v:30,e:'🥫',trip:[5,12]},{n:'小魚乾',h:25,v:40,e:'🐟',trip:[8,18]},
+             {n:'營養大餐',h:60,v:60,e:'🍱',trip:[12,28]},{n:'生日蛋糕',h:150,v:80,e:'🎂',trip:[18,40]}];
   var TOYS=[{n:'小球',h:0,v:15,e:'⚾'},{n:'逗貓棒',h:5,v:20,e:'🎣'},{n:'毛線球',h:15,v:25,e:'🧶'},{n:'飛盤',h:40,v:30,e:'🥏'},{n:'玩具屋',h:90,v:40,e:'🏠'},{n:'遊戲城堡',h:200,v:50,e:'🏰'}];
-  var PLACES=[
-    {n:'書房',h:0,e:'📚',sky:['#FDF3E1','#F8E2BE'],ground:['#E7CFA6','#D9BC8C']},
-    {n:'公園',h:10,e:'⛲',sky:['#CFE8F7','#E8F5FC'],ground:['#A9D88F','#8CC774']},
-    {n:'湖邊',h:30,e:'🦆',sky:['#BFE0F5','#E3F2FB'],ground:['#9BD08A','#76B86A']},
-    {n:'森林深處',h:60,e:'🍄',sky:['#BFD9C6','#DCEBDD'],ground:['#7FB27A','#5F9A5E']},
-    {n:'海邊',h:100,e:'🏖️',sky:['#9FD3F2','#D8EFFB'],ground:['#F1DFAE','#E6CD8F']},
-    {n:'山頂',h:150,e:'⛰️',sky:['#A9C9EE','#E1ECF8'],ground:['#9DBA8A','#7E9E72']},
-    {n:'星空露營',h:220,e:'⛺',sky:['#1B2350','#3B4A8A'],ground:['#3E5B45','#2F4636'],night:1},
-    {n:'遊樂園',h:300,e:'🎡',sky:['#FBD3E0','#FDEBD9'],ground:['#B9DE9C','#9ACB80']}
+  var TOOLS=[{n:'地圖',h:20,e:'🗺️',say:'能去國外'},{n:'相機',h:40,e:'📷',say:'明信片變多'},{n:'泳圈',h:60,e:'🛟',say:'能去離島'},{n:'帳篷',h:100,e:'⛺',say:'能去高山'}];
+  // 金幸運草商店（金幸運草只有 Claude 檢查過關、全部每日任務、每週挑戰拿得到）
+  var SHOP=[{id:'ribbon',n:'蝴蝶結',e:'🎀',c:2,acc:1},{id:'scarf',n:'圍巾',e:'🧣',c:2,acc:1},{id:'hat',n:'紳士帽',e:'🎩',c:3,acc:1},
+    {id:'shades',n:'墨鏡',e:'🕶️',c:3,acc:1},{id:'grad',n:'學士帽',e:'🎓',c:5,acc:1},{id:'crown',n:'皇冠',e:'👑',c:8,acc:1},
+    {id:'ticket',n:'旅行券',e:'🎟️',c:2,say:'下次旅行一定去遠的地方'},{id:'bento',n:'特製便當',e:'🍙',c:3,say:'打包時用，旅行 24–48 小時、明信片機會加倍'},
+    {id:'seed',n:'神木種子',e:'🌰',c:4,say:'種下去直接是大樹，30 天照顧就成神木'}];
+  // 森林：一塊地種滿才開下一塊；第 7 塊以後一直有新森林
+  var LANDS=[
+    {n:'小山丘',cap:40,sky:['#CFE8F7','#E8F5FC'],ground:['#A9D88F','#8CC774'],deco:'hills',e:'🌳'},
+    {n:'溪谷',cap:70,sky:['#BFE0F5','#E3F2FB'],ground:['#9BD08A','#76B86A'],deco:'stream',e:'🪨'},
+    {n:'竹林',cap:100,sky:['#D6EBD3','#EEF6EA'],ground:['#8FC27A','#6EA85E'],deco:'bamboo',e:'🎋'},
+    {n:'湖畔',cap:140,sky:['#BFE0F5','#E3F2FB'],ground:['#9BD08A','#76B86A'],deco:'lake',e:'⛵'},
+    {n:'高山',cap:180,sky:['#A9C9EE','#E1ECF8'],ground:['#9DBA8A','#7E9E72'],deco:'mountain',e:'🏔️'},
+    {n:'雲海神木林',cap:240,sky:['#F7D9C4','#FBEBDD'],ground:['#7FB27A','#5F9A5E'],deco:'clouds',e:'🌄'}
+  ];
+  function land(i){ if(i<LANDS.length) return LANDS[i]; var b=LANDS[(i-LANDS.length)%LANDS.length]; return {n:'新森林 '+(i-LANDS.length+1),cap:240,sky:b.sky,ground:b.ground,deco:b.deco,e:'🌲'}; }
+  function landStart(i){ var s=0; for(var j=0;j<i;j++) s+=land(j).cap; return s; }
+  function landOfIndex(n){ var i=0, s=0; while(n>=s+land(i).cap){ s+=land(i).cap; i++; } return {i:i, pos:n-s}; }
+  var DESTS=[
+    {n:'旗津',e:'⛴️',s:'旗魚黑輪',se:'🍢',tier:1,bg:['#9FD3F2','#F1DFAE']},{n:'台南',e:'🏯',s:'擔仔麵',se:'🍜',tier:1,bg:['#FCE3C4','#F4C98F']},
+    {n:'嘉義',e:'🚂',s:'雞肉飯',se:'🍗',tier:1,bg:['#D7EBC8','#B9D99F']},{n:'台中',e:'🎨',s:'太陽餅',se:'🥮',tier:1,bg:['#FFE7A8','#F9C97B']},
+    {n:'鹿港',e:'🏮',s:'牛舌餅',se:'🥠',tier:1,bg:['#F6D2C2','#E9A88F']},{n:'日月潭',e:'⛵',s:'紅茶',se:'🍵',tier:2,bg:['#BFE0F5','#8CC7A6']},
+    {n:'九份',e:'🏮',s:'芋圓',se:'🍡',tier:2,bg:['#3B4A8A','#C77D5A']},{n:'花蓮',e:'🌊',s:'麻糬',se:'🍡',tier:2,bg:['#A8DBF5','#7FC2C9']},
+    {n:'宜蘭',e:'♨️',s:'蔥油餅',se:'🥞',tier:2,bg:['#CFE8D9','#9CCDAE']},{n:'台北',e:'🏙️',s:'珍珠奶茶',se:'🧋',tier:2,bg:['#C9D6EC','#9DB0D6']},
+    {n:'阿里山',e:'🌄',s:'高山茶',se:'🍵',tier:2,need:'帳篷',bg:['#F7C9A0','#9DBA8A']},{n:'合歡山',e:'❄️',s:'高麗菜',se:'🥬',tier:2,need:'帳篷',bg:['#E1ECF8','#B8C9D9']},
+    {n:'太魯閣',e:'🏞️',s:'小米麻糬',se:'🍡',tier:2,need:'帳篷',bg:['#BFD9C6','#8FA89A']},{n:'墾丁',e:'🏖️',s:'綠豆蒜',se:'🥣',tier:2,need:'泳圈',bg:['#9FD3F2','#F1DFAE']},
+    {n:'澎湖',e:'🌉',s:'黑糖糕',se:'🍰',tier:2,need:'泳圈',bg:['#8FD0EE','#5BA9D6']},{n:'綠島',e:'🐢',s:'海草冰',se:'🍧',tier:2,need:'泳圈',bg:['#7FD1D6','#4FA9C0']},
+    {n:'蘭嶼',e:'🛶',s:'飛魚乾',se:'🐟',tier:2,need:'泳圈',bg:['#9FD3F2','#6FB0D8']},{n:'京都',e:'⛩️',s:'抹茶',se:'🍵',tier:3,need:'地圖',bg:['#F7D2D9','#E7A2B2']},
+    {n:'東京',e:'🗼',s:'人形燒',se:'🍘',tier:3,need:'地圖',bg:['#D2DDF2','#A7B8E0']},{n:'北海道',e:'⛄',s:'白色戀人',se:'🍪',tier:3,need:'地圖',bg:['#EAF2FB','#C5D8EE']},
+    {n:'首爾',e:'🏯',s:'年糕',se:'🍢',tier:3,need:'地圖',bg:['#F2E2CF','#D8B996']}
+  ];
+  // 野生動物：在哪塊地出現、要連續照顧幾天；第一次出現記進圖鑑
+  var ANIMALS=[
+    {id:'butterfly',n:'蝴蝶',e:'🦋',land:0,fly:1,streak:0,p:.85},{id:'sparrow',n:'麻雀',e:'🐦',land:0,fly:1,streak:0,p:.7},
+    {id:'snail',n:'蝸牛',e:'🐌',land:0,streak:0,p:.5},{id:'squirrel',n:'松鼠',e:'🐿️',land:0,streak:1,p:.5},
+    {id:'frog',n:'青蛙',e:'🐸',land:1,streak:0,p:.7},{id:'duck',n:'鴨子',e:'🦆',land:1,streak:1,p:.6},{id:'crab',n:'螃蟹',e:'🦀',land:1,streak:2,p:.45},
+    {id:'hedgehog',n:'刺蝟',e:'🦔',land:2,streak:1,p:.55},{id:'rooster',n:'竹雞',e:'🐓',land:2,streak:2,p:.5},{id:'panda',n:'熊貓',e:'🐼',land:2,streak:3,p:.35},
+    {id:'swan',n:'天鵝',e:'🦢',land:3,streak:2,p:.5},{id:'deer',n:'梅花鹿',e:'🦌',land:3,streak:3,p:.4},{id:'raccoon',n:'浣熊',e:'🦝',land:3,streak:3,p:.4},
+    {id:'goat',n:'山羊',e:'🐐',land:4,streak:3,p:.5},{id:'eagle',n:'老鷹',e:'🦅',land:4,fly:1,streak:4,p:.45},{id:'owl',n:'貓頭鷹',e:'🦉',land:4,fly:1,streak:3,p:.5,night:1},
+    {id:'bear',n:'台灣黑熊',e:'🐻',land:4,streak:6,p:.3},
+    {id:'peacock',n:'孔雀',e:'🦚',land:5,streak:5,p:.35},{id:'unicorn',n:'獨角獸',e:'🦄',land:5,streak:10,p:.2},{id:'dragon',n:'龍',e:'🐉',land:5,fly:1,streak:14,p:.12}
   ];
   var TREE={chi:'bamboo',math:'pine',eng:'maple',sci:'ginkgo',soc:'oak',kb:'sakura',kbfix:'sakura',kbr:'sakura',fu:'sakura',
     hw:'cypress',mock:'apple',term:'apple',other:'bush'};
   var TREEN={sakura:['櫻花','科班','#F4A7C0'],pine:['松樹','數學','#2F7D4F'],bamboo:['竹子','國文','#7DBF5A'],maple:['楓樹','英文','#D9583B'],
-    ginkgo:['銀杏','自然','#E8B931'],oak:['橡樹','社會','#4E9A45'],cypress:['柏樹','補習作業','#2B5E45'],apple:['蘋果樹','模考／段考','#5DA548'],bush:['灌木','其他','#6FAF5B']};
+    ginkgo:['銀杏','自然','#E8B931'],oak:['橡樹','社會','#4E9A45'],cypress:['柏樹','補習作業','#2B5E45'],apple:['蘋果樹','模考／段考','#5DA548'],
+    bush:['灌木','其他','#6FAF5B'],holy:['神木種子','金幸運草','#3E7D3A']};
+  // 寵物越大吃越多：照顧門檻和每天餓的速度
+  function careNeed(lv){ return lv>=12?{m:120,r:.7,h:40}:(lv>=5?{m:90,r:.6,h:35}:{m:60,r:.5,h:30}); }
 
-  function petState(){ return ls(PK,{pet:null,gone:[]})||{pet:null,gone:[]}; }
+  /* ---- 存取 ---- */
+  function petState(){ var s=ls(PK,null)||{}; ['gone','album','dead','wilt','stumps','seeds'].forEach(function(k){ s[k]=s[k]||[]; });
+    ['souv','dex','quests','weekly','pomoLog','acc'].forEach(function(k){ s[k]=s[k]||{}; }); s.gold=s.gold||0; s.clover=s.clover||0; s.bonusFood=s.bonusFood||0; s.tickets=s.tickets||0; s.bentos=s.bentos||0; return s; }
   function savePet(s){ sv(PK,s); }
+  function checks(){ var c=ls(CK,null)||{}; c.items=c.items||{}; c.used=c.used||{}; return c; }
+  function saveChecks(c){ sv(CK,c); }
+  function viewState(){ var v=ls(VK,null)||{}; if(v.day!==kk(d0())) v={day:kk(d0()),ms:0,peek:{},warned:0,pets:0,scene:v.scene||'forest',tab:v.tab||'main',land:v.land}; return v; }   // 只存在這台，不同步
+  function saveView(v){ sv(VK,v); }
   function easyMap(){ return ls('plan.easy.v1',{})||{}; }
-  function pomoTotal(){ var p=ls('plan.pomo.v1',{})||{}; return p.total||0; }
+  function pomoState(){ return ls('plan.pomo.v1',{})||{}; }
+  function pomoTotal(){ return pomoState().total||0; }
+  function rnd(str){ var h=2166136261; for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return ((h>>>0)%100000)/100000; }
+  function pickR(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function nowMin(){ var n=new Date(); return n.getHours()*60+n.getMinutes(); }
+  function hm(m){ return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+(m%60)).slice(-2); }
+  function fmtT(ms){ var d=new Date(ms); return (d.getMonth()+1)+'/'+d.getDate()+' '+hm(d.getHours()*60+d.getMinutes()); }
+  function weekKey(d){ var x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-((x.getDay()+6)%7)); return kk(x); }   // 週一
+  function petEmoji(p){ var x=SPECIES.filter(function(s){ return s[0]===p.sp; })[0]; return x?x[2]:'🐾'; }
+  function spName(sp){ var x=SPECIES.filter(function(s){ return s[0]===sp; })[0]; return x?x[1]:''; }
+  function destOf(n){ return DESTS.filter(function(d){ return d.n===n; })[0]||DESTS[0]; }
+  var TITLE_CAT=null;
+  function titleCat(n){
+    if(!TITLE_CAT){ TITLE_CAT={}; DAYS.forEach(function(k){ PL.days[k].b.forEach(function(b){ if(b[5]===0 && !TITLE_CAT[b[3]]) TITLE_CAT[b[3]]=b[2]; }); }); }
+    var de=ls('plan.dayedit.v1',{})||{}, c=TITLE_CAT[n];
+    if(!c) Object.keys(de).some(function(k){ return de[k].some(function(x){ if(x.n===n&&x.c){ c=x.c; return true; } }); });
+    return c||'other';
+  }
 
-  // 有沒有照顧：完成一半任務或讀滿 60 分；降級模式、沒有讀書時段的休息日也算
-  function cared(k,h,easy){
+  /* ---- 照顧、樹、經驗 ---- */
+  function cared(k,h,easy,lv){
     if(easy[k]) return true;
     var day=PL.days[k];
     if(day && !day.b.some(function(b){ return b[5]===0; })) return true;
-    var e=h[k]; if(!e) return false;
-    return (e.a>0 && e.d/e.a>=0.5) || (e.m||0)>=60;
+    var e=h[k]; if(!e) return false; var need=careNeed(lv||1);
+    return (e.a>0 && e.d/e.a>=need.r) || (e.m||0)>=need.m;
   }
-  function totals(h, since){
-    var mins=0, tasks=0, clear=0, trees=[];
-    Object.keys(h).sort(function(a,b){ return pk(a)-pk(b); }).forEach(function(k){
+  // 完成的任務名稱（舊紀錄沒有名稱的，用各科數量補）
+  function doneList(e){
+    if(e.dn) return e.dn.map(function(n){ return {n:n, c:titleCat(n)}; });
+    var out=[]; if(e.cat) Object.keys(e.cat).sort().forEach(function(c){ for(var i=0;i<e.cat[c].d;i++) out.push({n:'', c:c}); });
+    else for(var j=0;j<(e.d||0);j++) out.push({n:'', c:'other'});
+    return out;
+  }
+  function collect(h, C, s, since){
+    var mins=0, tasks=0, clear=0, allClear=0, trees=[], keys=Object.keys(h).sort(function(a,b){ return pk(a)-pk(b); });
+    keys.forEach(function(k){
       var e=h[k]; mins+=e.m||0;
-      if(e.cat) Object.keys(e.cat).forEach(function(c){ for(var i=0;i<e.cat[c].d;i++) trees.push({sp:TREE[c]||'bush', k:k}); });
-      else for(var j=0;j<(e.d||0);j++) trees.push({sp:'bush', k:k});
-      if(since && pk(k)>=since){ tasks+=e.d||0; if(e.a>0 && e.d===e.a) clear++; }
+      var full=e.a>0 && e.d===e.a; if(full) allClear++;
+      doneList(e).forEach(function(t){
+        var chk=t.n && needsCheck(t.n), it=chk? C.items[k+'|'+t.n] : null;
+        trees.push({sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?it.st:'pending'):'ok', n:t.n});
+        if(since && pk(k)>=since && (!chk || (it&&it.st==='pass'))) tasks++;
+      });
+      if(since && pk(k)>=since && full) clear++;
     });
-    return {hours:mins/60, tasks:tasks, clear:clear, trees:trees};
+    s.seeds.forEach(function(sd){ trees.push({sp:'holy', k:sd.k, st:'ok', seed:1}); });
+    return {hours:mins/60, tasks:tasks, clear:clear, allClear:allClear, trees:trees};
   }
-  function xpSince(h, since, pomo0){
+  // 每天有沒有照顧的累計，用來算樹長了幾天（只算有照顧的日子）
+  function caredCum(h,lv){
+    var easy=easyMap(), keys=DAYS.filter(function(k){ return pk(k)<d0(); }), cum={}, n=0;
+    keys.forEach(function(k){ if(cared(k,h,easy,lv)) n++; cum[k]=n; });
+    return {cum:cum, total:n};
+  }
+  function treeStage(t,cc){
+    if(t.st==='pending') return 0;
+    var base=t.seed?7:0, grown=cc.total-(cc.cum[t.k]||0);
+    var g=base+Math.max(0,grown);
+    return g>=30?3:(g>=7?2:(g>=2?1:0));
+  }
+  function streakDays(h,lv){ var easy=easyMap(), d=d0(), n=0; d.setDate(d.getDate()-1); for(var i=0;i<200;i++){ if(!cared(kk(d),h,easy,lv)) break; n++; d.setDate(d.getDate()-1); } return n; }
+  function xpSince(h, since, pomo0, C){
     var x=0;
     Object.keys(h).forEach(function(k){ if(pk(k)>=since){ var e=h[k]; x+=Math.round((e.m||0)/6); if(e.a>0&&e.d===e.a) x+=20; } });
+    Object.keys(C.items).forEach(function(key){ var it=C.items[key]; if(it.st==='pass' && pk(it.k)>=since) x+=it.g==='A'?40:25; });
     return x+Math.max(0,pomoTotal()-pomo0)*5;
   }
   function levelOf(xp){ var lv=1, need=100, rest=xp; while(rest>=need){ rest-=need; lv++; need=100+50*(lv-1); } return {lv:lv, cur:rest, need:need}; }
-  function stage(lv){ return lv>=12?['成年',74]:(lv>=5?['少年',60]:['幼年',46]); }
+  function stage(lv){ return lv>=12?['成年',60]:(lv>=5?['少年',50]:['幼年',40]); }
 
-  // 把寵物的狀態推進到昨天：每天會餓、心情下降；沒照顧的日子連續算
-  function advance(s,h){
-    var p=s.pet; if(!p) return null;
+  /* ---- 每天的結算：檢查到期、森林枯萎、寵物飢餓與生病 ---- */
+  function checksAdvance(C,h){
+    var today=d0(), tk=kk(today), changed=false;
+    Object.keys(h).forEach(function(k){ (h[k].dn||[]).forEach(function(n){ if(needsCheck(n) && !C.items[k+'|'+n]){ C.items[k+'|'+n]={k:k,n:n,st:'pending'}; changed=true; } }); });
+    Object.keys(C.items).forEach(function(key){
+      var it=C.items[key];
+      if(it.st==='pending' && it.k===tk && !((h[tk]||{}).dn||[]).some(function(n){ return n===it.n; })){ delete C.items[key]; changed=true; return; }   // 今天取消勾選
+      if(it.st==='pending' && Math.round((today-pk(it.k))/864e5)>CHECK_DAYS){ it.st='dead'; changed=true; }
+    });
+    if(changed) saveChecks(C);
+  }
+  function forestAdvance(s,h,trees,lv){
     var y=d0(); y.setDate(y.getDate()-1);
-    var d=pk(p.last||p.born), easy=easyMap(), event=null;
+    if(!s.fLast){ s.fLast=kk(y); return; }   // 第一次：不追溯以前
+    var d=pk(s.fLast); d.setDate(d.getDate()+1);
+    var easy=easyMap(), dead=s.dead.slice(), wilt=s.wilt.slice(), changed=false;
+    while(d<=y){
+      var k=kk(d); changed=true;
+      if(cared(k,h,easy,lv)) wilt=[];
+      else {
+        var taken={}; dead.forEach(function(i){ taken[i]=1; }); wilt.forEach(function(w){ w.idx.forEach(function(i){ taken[i]=1; }); });
+        var idx=[];
+        for(var i=trees.length-1;i>=0 && idx.length<WILT_N;i--){ if(pk(trees[i].k)<=d && !taken[i] && trees[i].st==='ok') idx.push(i); }
+        if(idx.length) wilt.push({d:k, idx:idx});
+        wilt=wilt.filter(function(w){ if(Math.round((d-pk(w.d))/864e5)>=WILT_DIE){ dead=dead.concat(w.idx); return false; } return true; });
+      }
+      s.fLast=k; d.setDate(d.getDate()+1);
+    }
+    if(changed){ s.dead=dead; s.wilt=wilt; }
+  }
+  function petAdvance(s,h,lv){
+    var p=s.pet, ev=[]; if(!p) return ev;
+    var y=d0(); y.setDate(y.getDate()-1);
+    var d=pk(p.last||p.born), easy=easyMap(), need=careNeed(lv);
     d.setDate(d.getDate()+1);
     while(d<=y){
       var k=kk(d);
-      p.hunger=Math.max(0,p.hunger-30); p.mood=Math.max(0,p.mood-25);
-      if(cared(k,h,easy)){ p.neglect=0; p.okRun=(p.okRun||0)+1; if(p.sick && p.okRun>=2){ p.sick=false; event='heal'; } }
+      if(!p.trip){ p.hunger=Math.max(0,p.hunger-need.h); p.mood=Math.max(0,p.mood-25); }
+      if(cared(k,h,easy,lv)){ p.neglect=0; p.okRun=(p.okRun||0)+1; if(p.sick && p.okRun>=2){ p.sick=false; ev.push('heal'); } }
       else {
-        p.neglect=(p.neglect||0)+1; p.okRun=0; p.mood=Math.max(0,p.mood-15);
-        if(p.neglect>=3 && !p.sick){ p.sick=true; event='sick'; }
-        if(p.neglect>=7){
-          s.gone=s.gone||[];
-          s.gone.unshift({name:p.name, sp:p.sp, born:p.born, left:k, lv:p.lvSeen||1});
-          s.pet=null; s.justLeft=p.name; savePet(s); return 'gone';
+        p.neglect=(p.neglect||0)+1; p.okRun=0; if(!p.trip) p.mood=Math.max(0,p.mood-15);
+        if(p.neglect>=SICK_AT && !p.sick){ p.sick=true; ev.push('sick'); }
+        if(p.neglect>=LEAVE_AT){
+          s.gone.unshift({name:p.name, sp:p.sp, born:p.born, left:k, lv:p.lvSeen||1, where:p.trip?p.trip.dest:''});
+          s.justLeft=p.name+(p.trip?'在'+p.trip.dest+'住下來，不回來了':'離家出走了');
+          s.pet=null; ev.push('gone'); return ev;
         }
       }
       p.last=k; d.setDate(d.getDate()+1);
     }
     if(p.sick) p.mood=Math.min(p.mood,40);
-    savePet(s);
-    return event;
+    return ev;
+  }
+  /* ---- 現在牠理不理你 ---- */
+  function studyBlockNow(){
+    var tk=kk(d0()), m=nowMin(), de=ls('plan.dayedit.v1',{})||{}, list=[];
+    if(de[tk]) de[tk].forEach(function(x){ if(x.f||x.e||x.l) return; var mm=String(x.t||'').match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/); if(mm) list.push([(+mm[1])*60+(+mm[2]),(+mm[3])*60+(+mm[4]),x.n]); });
+    else if(PL.days[tk]) PL.days[tk].b.forEach(function(b){ if(b[5]!==0) return; var a=b[0].split(':'), z=b[1].split(':'); list.push([(+a[0])*60+(+a[1]),(+z[0])*60+(+z[1]),b[3]]); });
+    for(var i=0;i<list.length;i++){ if(m>=list[i][0] && m<list[i][1]) return {a:list[i][0], b:list[i][1], n:list[i][2]}; }
+    return null;
+  }
+  function attitude(s,h,v,lv){
+    var p=s.pet; if(!p) return {};
+    if(p.trip) return {away:1};
+    var m=nowMin();
+    if(p.neglect>=1 && !cared(kk(d0()),h,easyMap(),lv)) return {sulk:'neglect'};
+    if(v.ms>VIEW_MAX) return {sulk:'toolong'};
+    var blk=studyBlockNow(); if(blk) return {sulk:'study', blk:blk};
+    if(m>=22*60+45 || m<6*60+30) return {sleep:1};
+    return {ok:1};
+  }
+  var SULK={neglect:'牠在生氣：你昨天沒讀書。今天達到照顧標準，牠才會理你。',
+    toolong:'你今天在這裡待超過 15 分鐘了，牠覺得你在逃避讀書，今天不理你了。',
+    study:'現在是讀書時段，牠轉過身去不理你。'};
+
+  /* ---- 旅行（旅蛙制度） ---- */
+  function cardChance(t){ return Math.min(.95,(.45+(t.tool==='相機'?.25:0)+(t.charm?.15:0))*(t.bento?2:1)); }
+  function addCard(s,dest,p){ s.album.unshift({d:dest, at:Date.now(), name:p.name, sp:p.sp, v:Math.floor(Math.random()*3)}); s.album=s.album.slice(0,300); }
+  function tripTick(s,att){
+    var p=s.pet, ev=[]; if(!p) return ev;
+    var now=Date.now();
+    if(p.trip){
+      var pt=pomoTotal();
+      if(pt>p.trip.pomoSeen){
+        for(var i=p.trip.pomoSeen;i<pt;i++){ if(Math.random()<cardChance(p.trip)){ addCard(s,p.trip.dest,p); p.trip.cards=(p.trip.cards||0)+1; ev.push('card'); } }
+        p.trip.pomoSeen=pt;
+      }
+      if(now>=p.trip.backAt){
+        var D=destOf(p.trip.dest), n=1+(p.trip.charm?1:0)+(p.trip.bento?1:0);
+        s.souv[D.s]=(s.souv[D.s]||0)+n;
+        if(!p.trip.cards && Math.random()<.3) addCard(s,D.n,p);
+        p.mood=Math.min(100,p.mood+15); p.hunger=Math.max(p.hunger,50);
+        ev.push('back|'+D.n+'|'+D.se+' '+D.s+(n>1?' ×'+n:''));
+        p.trip=null; p.departAt=0;
+      }
+    } else if(p.bag && p.bag.food){
+      var h0=new Date().getHours(), night=h0>=23||h0<6;
+      if(!p.departAt) p.departAt=now+(30+Math.floor(Math.random()*210))*60000;
+      else if(now>=p.departAt){
+        if(!night && !p.sick && !att.sulk && p.mood>=40 && p.hunger>=30){
+          var bento=p.bag.food==='特製便當', F=bento?{n:'特製便當',trip:[24,48]}:(FOODS.filter(function(f){ return f.n===p.bag.food; })[0]||FOODS[0]);
+          var fi=bento?4:FOODS.indexOf(F);
+          var pool=DESTS.filter(function(d){ if(d.need) return (d.need===p.bag.tool||p.bag.ticket) && (d.tier<3 || fi>=3 || p.bag.ticket); return d.tier===1 || fi>=1; });
+          if(p.bag.charm||p.bag.ticket){ var rare=pool.filter(function(d){ return d.tier>1; }); if(rare.length) pool=rare; }
+          if(p.bag.tool){ var withTool=pool.filter(function(d){ return d.need===p.bag.tool; }); if(withTool.length && Math.random()<.7) pool=withTool; }
+          var D2=pickR(pool), hrs=F.trip[0]+Math.random()*(F.trip[1]-F.trip[0]);
+          p.trip={dest:D2.n, leaveAt:now, backAt:now+hrs*3600000, food:F.n, charm:!!p.bag.charm, tool:p.bag.tool||'', bento:bento, pomoSeen:pomoTotal(), cards:0};
+          p.bag=null; p.departAt=0; ev.push('left');
+        } else p.departAt=now+60*60000;
+      }
+    }
+    return ev;
   }
 
-  // ---- 畫森林（SVG） ----
-  function treeSVG(sp,x,y,s,isNew){
-    // 外層定位置和大小；今天新種的樹在內層做長出來的動畫（CSS 的 transform 會蓋掉同一層的 transform 屬性）
-    var g='<g transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+s.toFixed(2)+')"><g'+(isNew?' class="fp-new" style="transform-box:fill-box;transform-origin:50% 100%"':'')+'>';
-    var trunk='<rect x="-2.2" y="-11" width="4.4" height="11" rx="1.5" fill="#8A5A3B"/>';
-    switch(sp){
-      case 'pine': g+=trunk+'<path d="M0 -40 L-11 -20 L11 -20 Z M0 -32 L-14 -11 L14 -11 Z" fill="#2F7D4F"/>'; break;
-      case 'bamboo': g+='<rect x="-5" y="-38" width="3" height="38" rx="1.4" fill="#7DBF5A"/><rect x="1" y="-30" width="3" height="30" rx="1.4" fill="#93CD6C"/>'
-        +'<path d="M-3.5 -26 l-7 -4 M2.5 -20 l7 -4 M-3.5 -14 l-6 -3" stroke="#5FA544" stroke-width="2" stroke-linecap="round"/>'; break;
-      case 'maple': g+=trunk+'<circle cx="0" cy="-22" r="12" fill="#D9583B"/><circle cx="-7" cy="-17" r="7" fill="#E9774C"/><circle cx="7" cy="-18" r="7" fill="#C94A30"/>'; break;
-      case 'ginkgo': g+=trunk+'<path d="M0 -36 C14 -30 14 -14 0 -12 C-14 -14 -14 -30 0 -36 Z" fill="#E8B931"/>'; break;
-      case 'oak': g+=trunk+'<circle cx="-6" cy="-19" r="9" fill="#4E9A45"/><circle cx="6" cy="-20" r="10" fill="#5DAE52"/><circle cx="0" cy="-28" r="9" fill="#58A64C"/>'; break;
-      case 'sakura': g+=trunk+'<circle cx="-7" cy="-19" r="8" fill="#F4A7C0"/><circle cx="7" cy="-19" r="8" fill="#F7B9CD"/><circle cx="0" cy="-27" r="9" fill="#F28FB0"/>'
-        +'<circle cx="-2" cy="-22" r="1.6" fill="#fff"/><circle cx="5" cy="-25" r="1.4" fill="#fff"/>'; break;
-      case 'cypress': g+='<rect x="-1.8" y="-6" width="3.6" height="6" fill="#8A5A3B"/><ellipse cx="0" cy="-22" rx="6.5" ry="17" fill="#2B5E45"/>'; break;
-      case 'apple': g+=trunk+'<circle cx="0" cy="-22" r="12" fill="#5DA548"/><circle cx="-5" cy="-20" r="2" fill="#E04A3A"/><circle cx="5" cy="-25" r="2" fill="#E04A3A"/><circle cx="3" cy="-16" r="2" fill="#E04A3A"/>'; break;
-      default: g+='<ellipse cx="0" cy="-6" rx="11" ry="7" fill="#6FAF5B"/><ellipse cx="-5" cy="-9" rx="6" ry="5" fill="#82BF6C"/>';
+  /* ---- 每日任務、每週挑戰（跟讀書掛勾） ---- */
+  function todayData(h){
+    var tk=kk(d0()), te=h[tk]||{}, P=pomoState(), W=ls('plan.wrong.v1',[])||[], jr=ls('plan.journal.v1',{})||{}, C=checks();
+    var rev=0; W.forEach(function(x){ (x.hist||[]).forEach(function(r){ if(r.d===tk) rev++; }); });
+    var passToday=Object.keys(C.items).filter(function(key){ var it=C.items[key]; return it.st==='pass' && it.passAt && kk(new Date(it.passAt))===tk; }).length;
+    var chkToday=studyBlocks(tk).some(function(z){ return needsCheck(z.n); });   // 手動改過的日程也算
+    return {pomo:P.day===tk?(P.done||0):0, min:te.m||0, pct:te.a?Math.round(te.d/te.a*100):0, a:te.a||0, rev:rev, jr:!!(jr[tk]&&(jr[tk].w||jr[tk].s||jr[tk].n)), pass:passToday, chkToday:chkToday};
+  }
+  var QPOOL=[
+    {id:'pomo3',t:'完成 3 顆番茄鐘',f:function(x){ return [x.pomo,3]; }},
+    {id:'pomo5',t:'完成 5 顆番茄鐘',f:function(x){ return [x.pomo,5]; }},
+    {id:'min150',t:'讀滿 150 分鐘',f:function(x){ return [x.min,150]; }},
+    {id:'min240',t:'讀滿 240 分鐘',f:function(x){ return [x.min,240]; }},
+    {id:'pct80',t:'今天任務完成 80%',f:function(x){ return [x.pct,80]; }},
+    {id:'pct100',t:'今天任務全部清完',f:function(x){ return [x.pct,100]; }},
+    {id:'rev3',t:'錯題本重做 3 題',f:function(x){ return [x.rev,3]; }},
+    {id:'jr',t:'寫今天的日誌',f:function(x){ return [x.jr?1:0,1]; }},
+    {id:'pass1',t:'交一份訂正或題本給 Claude 檢查並過關',f:function(x){ return [x.pass,1]; },need:'chk'}
+  ];
+  function dailyQuests(x){
+    var tk=kk(d0()), pool=QPOOL.filter(function(q){ return !q.need || x.chkToday; });
+    pool=pool.slice().sort(function(a,b){ return rnd(tk+a.id)-rnd(tk+b.id); });
+    var pick=[], used={};
+    pool.forEach(function(q){ var fam=q.id.replace(/\d+$/,''); if(pick.length<3 && !used[fam]){ pick.push(q); used[fam]=1; } });
+    if(x.chkToday && !pick.some(function(q){ return q.id==='pass1'; })) pick[2]=QPOOL[QPOOL.length-1];   // 有題本的日子一定要交檢查
+    return pick;
+  }
+  function weekData(s,h){
+    var wk=weekKey(d0()), start=pk(wk), C=checks(), lv=s.pet?(s.pet.lvSeen||1):1, easy=easyMap(), care=0, mins=0, clear=0, pomo=0, pass=0;
+    for(var i=0;i<7;i++){ var d=new Date(start); d.setDate(d.getDate()+i); if(d>d0()) break; var k=kk(d), e=h[k];
+      if(d<d0() && cared(k,h,easy,lv)) care++; if(e){ mins+=e.m||0; if(e.a>0&&e.d===e.a) clear++; } pomo+=s.pomoLog[k]||0; }
+    Object.keys(C.items).forEach(function(key){ var it=C.items[key]; if(it.st==='pass' && it.passAt && new Date(it.passAt)>=start) pass++; });
+    return {care:care, hours:mins/60, clear:clear, pomo:pomo, pass:pass};
+  }
+  var WPOOL=[
+    {id:'care6',t:'本週照顧 6 天（週日晚上前）',f:function(w){ return [w.care,6]; }},
+    {id:'pomo20',t:'本週 20 顆番茄鐘',f:function(w){ return [w.pomo,20]; }},
+    {id:'pass3',t:'本週 3 份訂正／題本過關',f:function(w){ return [w.pass,3]; }},
+    {id:'hour18',t:'本週讀滿 18 小時',f:function(w){ return [Math.floor(w.hours),18]; }},
+    {id:'clear3',t:'本週全清 3 天',f:function(w){ return [w.clear,3]; }}
+  ];
+  function weeklyChallenges(){ var wk=weekKey(d0()); return WPOOL.slice().sort(function(a,b){ return rnd(wk+a.id)-rnd(wk+b.id); }).slice(0,2); }
+
+  /* ---- 野生動物 ---- */
+  function visitorsToday(li,streak){
+    var tk=kk(d0()), hr=new Date().getHours();
+    return ANIMALS.filter(function(a){
+      if(a.land!==Math.min(li,LANDS.length-1) && !(li>=LANDS.length && a.land===li%LANDS.length)) return false;
+      if(streak<a.streak) return false;
+      if(a.night && hr<18) return false;
+      return rnd(tk+li+a.id) < Math.min(.95, a.p+streak*.03);
+    });
+  }
+
+  /* ---- 畫：樹 ---- */
+  var WILTC='#B9965A';
+  function treeSVG(sp,x,y,s,state,stg,isNew){
+    var k=[.42,.72,1,1.45][stg]||1, g='<g transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+(s*k).toFixed(2)+')"><g'+(isNew?' class="fp-new" style="transform-box:fill-box;transform-origin:50% 100%"':'')+'>';
+    if(state==='dead') return g+'<rect x="-3" y="-7" width="6" height="7" rx="1" fill="#7A5236"/><ellipse cx="0" cy="-7" rx="3" ry="1.3" fill="#B98A5E"/><path d="M-6 0 h12" stroke="#6b4a32" stroke-width="1.4" stroke-linecap="round"/></g></g>';
+    if(state==='pending'||stg===0){
+      g+='<path d="M0 0 V-12" stroke="#6F9E4F" stroke-width="2.4" stroke-linecap="round"/><path d="M0 -10 C-10 -16 -12 -6 0 -8 Z M0 -12 C10 -20 13 -9 0 -10 Z" fill="'+(state==='wilt'?WILTC:'#7CC25B')+'"/>';
+      if(state==='pending') g+='<circle cx="9" cy="-20" r="7" fill="#fff" stroke="#E0A030" stroke-width="1.2"/><text x="9" y="-16.5" font-size="9" text-anchor="middle">⏳</text>';
+      return g+'</g></g>';
     }
+    var w=state==='wilt', C=function(c){ return w?WILTC:c; };
+    var trunk=stg===3?'<path d="M-5 0 L-3 -14 L3 -14 L5 0 Z" fill="#7A4E30"/>':'<rect x="-2.2" y="-11" width="4.4" height="11" rx="1.5" fill="#8A5A3B"/>';
+    if(stg===3 && !w) g+='<circle cx="0" cy="-26" r="22" fill="#FFF4B0" opacity=".35"/>';
+    switch(sp){
+      case 'pine': g+=trunk+'<path d="M0 -40 L-11 -20 L11 -20 Z M0 -32 L-14 -11 L14 -11 Z" fill="'+C('#2F7D4F')+'"/>'; break;
+      case 'bamboo': g+='<rect x="-5" y="-38" width="3" height="38" rx="1.4" fill="'+C('#7DBF5A')+'"/><rect x="1" y="-30" width="3" height="30" rx="1.4" fill="'+C('#93CD6C')+'"/>'
+        +'<path d="M-3.5 -26 l-7 -4 M2.5 -20 l7 -4 M-3.5 -14 l-6 -3" stroke="'+C('#5FA544')+'" stroke-width="2" stroke-linecap="round"/>'; break;
+      case 'maple': g+=trunk+'<circle cx="0" cy="-22" r="12" fill="'+C('#D9583B')+'"/><circle cx="-7" cy="-17" r="7" fill="'+C('#E9774C')+'"/><circle cx="7" cy="-18" r="7" fill="'+C('#C94A30')+'"/>'; break;
+      case 'ginkgo': g+=trunk+'<path d="M0 -36 C14 -30 14 -14 0 -12 C-14 -14 -14 -30 0 -36 Z" fill="'+C('#E8B931')+'"/>'; break;
+      case 'oak': g+=trunk+'<circle cx="-6" cy="-19" r="9" fill="'+C('#4E9A45')+'"/><circle cx="6" cy="-20" r="10" fill="'+C('#5DAE52')+'"/><circle cx="0" cy="-28" r="9" fill="'+C('#58A64C')+'"/>'; break;
+      case 'sakura': g+=trunk+'<circle cx="-7" cy="-19" r="8" fill="'+C('#F4A7C0')+'"/><circle cx="7" cy="-19" r="8" fill="'+C('#F7B9CD')+'"/><circle cx="0" cy="-27" r="9" fill="'+C('#F28FB0')+'"/>'
+        +(w?'':'<circle cx="-2" cy="-22" r="1.6" fill="#fff"/><circle cx="5" cy="-25" r="1.4" fill="#fff"/>'); break;
+      case 'cypress': g+='<rect x="-1.8" y="-6" width="3.6" height="6" fill="#8A5A3B"/><ellipse cx="0" cy="-22" rx="6.5" ry="17" fill="'+C('#2B5E45')+'"/>'; break;
+      case 'apple': g+=trunk+'<circle cx="0" cy="-22" r="12" fill="'+C('#5DA548')+'"/>'+(w?'':'<circle cx="-5" cy="-20" r="2" fill="#E04A3A"/><circle cx="5" cy="-25" r="2" fill="#E04A3A"/><circle cx="3" cy="-16" r="2" fill="#E04A3A"/>'); break;
+      case 'holy': g+='<path d="M-5 0 L-3 -16 L3 -16 L5 0 Z" fill="#6B4428"/><circle cx="0" cy="-30" r="15" fill="'+C('#3E7D3A')+'"/><circle cx="-10" cy="-22" r="9" fill="'+C('#4A8F44')+'"/><circle cx="10" cy="-22" r="9" fill="'+C('#46883F')+'"/>'; break;
+      default: g+='<ellipse cx="0" cy="-6" rx="11" ry="7" fill="'+C('#6FAF5B')+'"/><ellipse cx="-5" cy="-9" rx="6" ry="5" fill="'+C('#82BF6C')+'"/>';
+    }
+    if(w) g+='<path d="M-6 -2 l-3 2 M5 -3 l3 2" stroke="'+WILTC+'" stroke-width="1.6" stroke-linecap="round"/>';
     return g+'</g></g>';
   }
-  function sceneSVG(tr, place, pet, petInfo, today){
-    var W=640, H=300, HZ=150, sky=place.sky, gr=place.ground;
-    var s='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="我的森林：'+tr.length+' 棵樹'+(pet?'，'+esc(pet.name)+'在'+place.n:'')+'">'
-      +'<defs><linearGradient id="fpSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+sky[0]+'"/><stop offset="1" stop-color="'+sky[1]+'"/></linearGradient>'
-      +'<linearGradient id="fpGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+gr[0]+'"/><stop offset="1" stop-color="'+gr[1]+'"/></linearGradient></defs>'
-      +'<rect width="'+W+'" height="'+H+'" fill="url(#fpSky)"/>';
-    if(place.night){ for(var i=0;i<26;i++){ s+='<circle cx="'+((i*97)%W)+'" cy="'+(10+(i*53)%120)+'" r="'+(i%3?1:1.6)+'" fill="#fff" opacity=".8"/>'; } }
-    else s+='<circle cx="'+(W-80)+'" cy="52" r="22" fill="#FFE08A" opacity=".9"/>';
-    s+='<path d="M0 '+(HZ+10)+' C 120 '+(HZ-12)+', 260 '+(HZ+18)+', 380 '+(HZ-4)+' S 560 '+(HZ+14)+', 640 '+(HZ-2)+' L640 300 L0 300 Z" fill="url(#fpGr)"/>';
-    s+='<text x="'+(W-46)+'" y="'+(HZ+8)+'" font-size="34" text-anchor="middle">'+place.e+'</text>';
-    // 草叢、小花：固定位置的裝飾，樹還少的時候畫面才不會空
-    for(var gi=0;gi<18;gi++){
-      var gx=24+((gi*0.381966)%1)*(W-48), gy=HZ+22+((gi*0.618034)%1)*(H-HZ-40);
-      s+= gi%4===0
-        ? '<g transform="translate('+gx.toFixed(0)+' '+gy.toFixed(0)+')"><path d="M0 0 v-7" stroke="#5E9A4E" stroke-width="1.4"/><circle cx="0" cy="-8" r="2.4" fill="'+(gi%8===0?'#F6D55C':'#F7A8C4')+'"/></g>'
-        : '<path d="M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l-3 -7 M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l0 -9 M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l3 -7" stroke="'+(place.night?'#5f8f62':'#6FA85C')+'" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>';
-    }
-    // 樹：最多畫 260 棵（最新的），位置用固定的亂數序列，越後面（越遠）越小
-    var show=tr.slice(-260), pos=[];
-    show.forEach(function(t,i){
-      var n=tr.length-show.length+i;
-      var fx=(n*0.6180339887)%1, fy=(n*0.7548776662)%1;
-      var y=HZ+14+fy*(H-HZ-30), x=18+fx*(W-36);
-      if(Math.abs(x-W/2)<52 && y>H-78) x+= (x<W/2?-58:58);   // 寵物前面留空位
-      pos.push({t:t,x:x,y:y,s:0.55+0.75*((y-HZ)/(H-HZ))});
-    });
-    pos.sort(function(a,b){ return a.y-b.y; });
-    pos.forEach(function(p){ s+=treeSVG(p.t.sp,p.x,p.y,p.s,p.t.k===today); });
-    if(pet){
-      var st=stage(petInfo.lv.lv), fs=st[1];
-      s+='<ellipse cx="'+(W/2)+'" cy="'+(H-16)+'" rx="'+(fs*0.42)+'" ry="5" fill="#000" opacity=".12"/>';
-      s+='<text class="fp-pet'+(pet.sick?' sick':'')+'" id="fp-pet" x="'+(W/2)+'" y="'+(H-14)+'" font-size="'+fs+'" text-anchor="middle">'+petEmoji(pet)+'</text>';
-      var badge=pet.sick?'🤒':(pet.hunger<30?'🍽️':(pet.mood<30?'💧':(pet.hunger>=70&&pet.mood>=70?'💕':'')));
-      if(badge) s+='<text x="'+(W/2+fs*0.48)+'" y="'+(H-14-fs*0.78)+'" font-size="'+Math.round(fs*0.42)+'" text-anchor="middle">'+badge+'</text>';
-    } else if(!tr.length){
-      s+='<text x="'+(W/2)+'" y="'+(H-60)+'" font-size="15" text-anchor="middle" fill="#3d5a3d">完成第一項讀書任務，這裡就會長出第一棵樹</text>';
-    }
-    return s+'</svg>';
+  var W=640, H=300, HZ=150;
+  function actorSVG(id,emo,x,y,fs,kind,spd,area,extra){
+    return '<g data-actor="'+kind+'" data-spd="'+spd+'" data-area="'+area.join(',')+'" data-x="'+x.toFixed(1)+'" data-y="'+y.toFixed(1)+'"'+(id?' id="'+id+'"':'')
+      +' transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+')"><g class="f"><text font-size="'+fs+'" text-anchor="middle">'+emo+'</text></g>'+(extra||'')+'</g>';
   }
-  function petEmoji(p){ var x=SPECIES.filter(function(s){ return s[0]===p.sp; })[0]; return x?x[2]:'🐾'; }
-  function spName(sp){ var x=SPECIES.filter(function(s){ return s[0]===sp; })[0]; return x?x[1]:''; }
+  function decoSVG(L){
+    var o='';
+    if(L.deco==='stream') o+='<path d="M0 230 C 120 200, 220 260, 340 225 S 540 190, 640 215" stroke="#7FC6E8" stroke-width="16" fill="none" opacity=".85"/><path d="M0 230 C 120 200, 220 260, 340 225 S 540 190, 640 215" stroke="#BFE6F7" stroke-width="5" fill="none"/>';
+    if(L.deco==='lake') o+='<ellipse cx="420" cy="205" rx="150" ry="34" fill="#8CCBEA"/><ellipse cx="420" cy="200" rx="120" ry="20" fill="#B5E0F4" opacity=".7"/>';
+    if(L.deco==='mountain') o+='<path d="M60 '+HZ+' L170 60 L280 '+HZ+' Z" fill="#8FA3B8"/><path d="M150 76 L170 60 L190 76 Z" fill="#fff"/><path d="M300 '+HZ+' L430 40 L560 '+HZ+' Z" fill="#7F93AA"/><path d="M405 62 L430 40 L455 62 Z" fill="#fff"/>';
+    if(L.deco==='bamboo') for(var i=0;i<14;i++){ var bx=20+i*46; o+='<rect x="'+bx+'" y="'+(40+(i%3)*10)+'" width="5" height="'+(HZ-30)+'" fill="#9CCB86" opacity=".55"/>'; }
+    if(L.deco==='clouds') for(var c=0;c<5;c++){ o+='<ellipse cx="'+(70+c*130)+'" cy="'+(70+(c%2)*30)+'" rx="60" ry="16" fill="#fff" opacity=".75"/>'; }
+    if(L.deco==='hills') o+='<path d="M0 '+(HZ-6)+' C 100 '+(HZ-50)+', 200 '+(HZ-50)+', 300 '+(HZ-6)+' Z" fill="#B8DDA5" opacity=".8"/>';
+    return o;
+  }
+  function forestSVG(s,T,trees,cc,li,p,info,att,vis){
+    var L=land(li), tk=kk(d0());
+    var o='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+L.n+'：'+trees.inLand+' 棵樹'+(p?'，'+esc(p.name)+'在這裡':'')+'">'
+      +'<defs><linearGradient id="fpSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+L.sky[0]+'"/><stop offset="1" stop-color="'+L.sky[1]+'"/></linearGradient>'
+      +'<linearGradient id="fpGr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+L.ground[0]+'"/><stop offset="1" stop-color="'+L.ground[1]+'"/></linearGradient></defs>'
+      +'<rect width="'+W+'" height="'+H+'" fill="url(#fpSky)"/><circle cx="'+(W-80)+'" cy="52" r="22" fill="#FFE08A" opacity=".9"/>';
+    if(L.deco==='mountain'||L.deco==='clouds'||L.deco==='bamboo'||L.deco==='hills') o+=decoSVG(L);
+    o+='<path d="M0 '+(HZ+10)+' C 120 '+(HZ-12)+', 260 '+(HZ+18)+', 380 '+(HZ-4)+' S 560 '+(HZ+14)+', 640 '+(HZ-2)+' L640 300 L0 300 Z" fill="url(#fpGr)"/>';
+    if(L.deco==='stream'||L.deco==='lake') o+=decoSVG(L);
+    o+='<text x="'+(W-46)+'" y="'+(HZ+8)+'" font-size="30" text-anchor="middle">'+L.e+'</text>';
+    for(var gi=0;gi<16;gi++){
+      var gx=24+((gi*0.381966)%1)*(W-48), gy=HZ+22+((gi*0.618034)%1)*(H-HZ-40);
+      o+= gi%4===0 ? '<g transform="translate('+gx.toFixed(0)+' '+gy.toFixed(0)+')"><path d="M0 0 v-7" stroke="#5E9A4E" stroke-width="1.4"/><circle cx="0" cy="-8" r="2.4" fill="'+(gi%8===0?'#F6D55C':'#F7A8C4')+'"/></g>'
+        : '<path d="M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l-3 -7 M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l0 -9 M'+gx.toFixed(0)+' '+gy.toFixed(0)+' l3 -7" stroke="#6FA85C" stroke-width="1.6" stroke-linecap="round" opacity=".75"/>';
+    }
+    // 這塊地上的樹（含枯樹樁）
+    var a0=landStart(li), a1=a0+L.cap, items=[];
+    for(var n=a0;n<Math.min(a1,T.trees.length);n++){ var t=T.trees[n]; items.push({t:t, n:n-a0, st:trees.state[n]||(t.st==='dead'?'dead':(t.st==='pending'?'pending':'')), stg:treeStage(t,cc)}); }
+    if(li===trees.curLand) s.stumps.slice(-30).forEach(function(st,j){ items.push({t:{sp:'',k:st.k}, n:1000+j, st:'dead', stg:1}); });
+    items.map(function(q){
+      var fx=(q.n*0.6180339887)%1, fy=(q.n*0.7548776662)%1, y=HZ+14+fy*(H-HZ-30), x=18+fx*(W-36);
+      if(Math.abs(x-W/2)<46 && y>H-70) x+=(x<W/2?-52:52);
+      return {q:q,x:x,y:y,s:0.6+0.7*((y-HZ)/(H-HZ))};
+    }).sort(function(a,b){ return a.y-b.y; }).forEach(function(z){ o+=treeSVG(z.q.t.sp,z.x,z.y,z.s,z.q.st,z.q.stg,z.q.t.k===tk && !z.q.st); });
+    vis.forEach(function(a){
+      var fly=!!a.fly, x=40+rnd(tk+a.id+'x')*(W-80), y=fly? 40+rnd(tk+a.id+'y')*90 : HZ+30+rnd(tk+a.id+'y')*(H-HZ-50);
+      o+=actorSVG('',a.e,x,y,fly?20:24,fly?'fly':'walk',fly?70:26,fly?[20,20,W-20,HZ-10]:[30,HZ+28,W-30,H-12]);
+    });
+    if(p && !att.away && (p.land||0)===li) o+=petActor(p,info,att,att.sulk?W-110:W/2,H-16,[40,HZ+40,W-90,H-10]);
+    return o+'</svg>';
+  }
+  function accOf(p){ var a=SHOP.filter(function(x){ return x.id===p.wear; })[0]; return a?a.e:''; }
+  function petActor(p,info,att,x,y,area){
+    var fs=stage(info.lv.lv)[1], badge=p.sick?'🤒':(att.sulk?'💢':(att.sleep?'💤':(p.hunger<30?'🍽️':(p.mood<30?'💧':(p.hunger>=70&&p.mood>=70?'💕':'')))));
+    var extra='<ellipse cx="0" cy="2" rx="'+(fs*0.42)+'" ry="4" fill="#000" opacity=".1"/>';   // 影子跟著寵物走
+    var acc=accOf(p); if(acc) extra+='<text x="0" y="'+(-fs*0.78)+'" font-size="'+Math.round(fs*0.5)+'" text-anchor="middle">'+acc+'</text>';
+    if(badge) extra+='<text x="'+(fs*0.5)+'" y="'+(-fs*0.72)+'" font-size="'+Math.round(fs*0.4)+'" text-anchor="middle">'+badge+'</text>';
+    if(att.sulk) extra+='<g transform="translate('+(-fs*0.25)+' '+(-fs*1.3)+')"><rect x="-16" y="-15" width="32" height="20" rx="9" fill="#fff" stroke="#999" stroke-width=".8"/><text x="0" y="0" font-size="12" text-anchor="middle" fill="#333">哼</text></g>';
+    var kind=(att.sulk||att.sleep)?'still':'pet', sp=p.sick?14:(p.mood>=70?62:42);
+    return actorSVG('fp-pet-g',petEmoji(p),x,y,fs,kind,sp,area,extra);
+  }
+  function homeSVG(s,p,info,att,fedToday){
+    var night=(function(){ var m=nowMin(); return m>=18*60+30||m<6*60; })();
+    var o='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+(p?esc(p.name)+'的家':'家')+'">'
+      +'<defs><linearGradient id="fpWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F8EBD8"/><stop offset="1" stop-color="#F1DDC2"/></linearGradient></defs>'
+      +'<rect width="'+W+'" height="205" fill="url(#fpWall)"/><rect y="205" width="'+W+'" height="95" fill="#D9B98F"/>';
+    for(var i=0;i<8;i++) o+='<path d="M'+(i*80)+' 205 v95" stroke="#C9A77C" stroke-width="1"/>';
+    o+='<path d="M0 205 h'+W+'" stroke="#B88F63" stroke-width="3"/>';
+    o+='<rect x="40" y="38" width="128" height="96" rx="6" fill="'+(night?'#1F2A55':'#BFE3F7')+'" stroke="#9B7652" stroke-width="5"/><path d="M104 38 v96 M40 86 h128" stroke="#9B7652" stroke-width="4"/>'
+      +(night?'<circle cx="140" cy="60" r="9" fill="#FFF3B0"/><circle cx="70" cy="110" r="1.5" fill="#fff"/><circle cx="88" cy="56" r="1.2" fill="#fff"/>':'<circle cx="146" cy="58" r="10" fill="#FFE08A"/>');
+    o+='<rect x="200" y="96" width="170" height="6" rx="2" fill="#9B7652"/>';
+    var sv2=Object.keys(s.souv).slice(-7);
+    sv2.forEach(function(nm,j){ var D=DESTS.filter(function(d){ return d.s===nm; })[0]; o+='<text x="'+(214+j*23)+'" y="92" font-size="18" text-anchor="middle">'+(D?D.se:'🎁')+'</text>'; });
+    if(!sv2.length) o+='<text x="285" y="88" font-size="11" text-anchor="middle" fill="#9B7652">（紀念品架）</text>';
+    var cards=s.album.slice(0,6);
+    for(var c=0;c<6;c++){
+      var cx=398+(c%3)*62, cy=34+Math.floor(c/3)*56, cd=cards[c];
+      o+='<rect x="'+cx+'" y="'+cy+'" width="52" height="40" rx="3" fill="'+(cd?'#fff':'#EBD8BE')+'" stroke="#C9A77C" stroke-width="1.5"'+(cd?' transform="rotate('+((c%2?3:-3))+' '+(cx+26)+' '+(cy+20)+')"':'')+'/>';
+      if(cd) o+='<text x="'+(cx+26)+'" y="'+(cy+28)+'" font-size="20" text-anchor="middle">'+destOf(cd.d).e+'</text>';
+    }
+    o+='<rect x="430" y="168" width="170" height="52" rx="10" fill="#8C6A4A"/><rect x="436" y="158" width="158" height="40" rx="12" fill="#F3F0EA"/>'
+      +'<rect x="500" y="160" width="94" height="38" rx="10" fill="#9CC3E6"/><ellipse cx="462" cy="170" rx="20" ry="10" fill="#fff"/>';
+    o+='<ellipse cx="250" cy="262" rx="30" ry="9" fill="#C0504D"/><ellipse cx="250" cy="258" rx="24" ry="6" fill="#8E3B39"/>'+(fedToday?'<text x="250" y="262" font-size="16" text-anchor="middle">'+fedToday+'</text>':'');
+    o+='<rect x="330" y="236" width="56" height="34" rx="4" fill="#E9A23B"/><text x="358" y="246" font-size="18" text-anchor="middle">🧸</text>';
+    o+='<rect x="'+(W-48)+'" y="110" width="40" height="95" rx="3" fill="#A97D52"/><circle cx="'+(W-16)+'" cy="160" r="2.5" fill="#E9C46A"/>';
+    if(p && (p.bag||p.trip)) o+='<text x="'+(W-70)+'" y="200" font-size="26" text-anchor="middle" opacity="'+(p.trip?.35:1)+'">🎒</text>';
+    if(p && p.trip) o+='<g transform="translate(515 140)"><rect x="-70" y="-22" width="140" height="28" rx="6" fill="#fff" stroke="#C9A77C"/><text y="-3" font-size="12" text-anchor="middle" fill="#6b4a32">去旅行了，家裡空空的</text></g>';
+    if(p && !att.away){
+      if(att.sleep){ var fs=stage(info.lv.lv)[1]; o+='<text x="520" y="190" font-size="'+fs+'" text-anchor="middle">'+petEmoji(p)+'</text><text class="fp-zz" x="550" y="150" font-size="20">💤</text>'; }
+      else o+=petActor(p,info,att,att.sulk?120:300,282,[110,250,420,290]);
+    }
+    return o+'</svg>';
+  }
+  function cardSVG(c){
+    var D=destOf(c.d), d=new Date(c.at), sp=SPECIES.filter(function(x){ return x[0]===c.sp; })[0];
+    var px=[52,70,40][c.v||0], ps=[34,30,38][c.v||0];
+    return '<svg viewBox="0 0 240 160" role="img" aria-label="'+esc(c.name)+'在'+D.n+'的明信片"><defs><linearGradient id="cg'+c.at+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+D.bg[0]+'"/><stop offset="1" stop-color="'+D.bg[1]+'"/></linearGradient></defs>'
+      +'<rect width="240" height="160" rx="8" fill="url(#cg'+c.at+')"/><text x="170" y="92" font-size="64" text-anchor="middle">'+D.e+'</text>'
+      +'<text x="'+px+'" y="118" font-size="'+ps+'" text-anchor="middle">'+(sp?sp[2]:'🐾')+'</text>'
+      +'<rect y="126" width="240" height="34" fill="#fff" opacity=".9"/><text x="10" y="148" font-size="13" fill="#333">'+esc(c.name)+' 在 '+D.n+'</text>'
+      +'<text x="230" y="148" font-size="11" text-anchor="end" fill="#777">'+(d.getMonth()+1)+'/'+d.getDate()+'</text></svg>';
+  }
 
-  var app=document.getElementById('fp-app'), mini=document.getElementById('fp-mini'), pick=null, flash='';
+  /* ---- 動起來 ---- */
+  var raf=0, actors=[], lastT=0, RM=window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function pickTarget(a){ var ar=a.area; a.tx=ar[0]+Math.random()*(ar[2]-ar[0]); a.ty=ar[1]+Math.random()*(ar[3]-ar[1]); if(a.kind==='pet' && Math.random()<.25) a.hop=0.45; }
+  function startMotion(){
+    cancelAnimationFrame(raf); actors=[];
+    if(RM||!app) return;
+    Array.prototype.forEach.call(app.querySelectorAll('[data-actor]'),function(g){
+      var a={g:g, f:g.querySelector('.f'), kind:g.dataset.actor, x:+g.dataset.x, y:+g.dataset.y, spd:+g.dataset.spd,
+        area:g.dataset.area.split(',').map(Number), wait:Math.random()*1.2, dir:-1, t0:Math.random()*10, hop:0};
+      pickTarget(a); actors.push(a);
+    });
+    if(!actors.length) return;
+    lastT=performance.now(); raf=requestAnimationFrame(step);
+  }
+  function step(t){
+    var dt=Math.min(.05,(t-lastT)/1000); lastT=t;
+    if(document.hidden || !actors.length || !actors[0].g.isConnected){ raf=0; return; }
+    actors.forEach(function(a){
+      if(a.kind!=='still'){
+        if(a.wait>0) a.wait-=dt;
+        else {
+          var dx=a.tx-a.x, dy=a.ty-a.y, dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist<2){ a.wait=a.kind==='fly'?Math.random()*.6:.7+Math.random()*2.6; pickTarget(a); }
+          else { var st=Math.min(dist,a.spd*dt); a.x+=dx/dist*st; a.y+=dy/dist*st;
+            var nd=dx<0?-1:1; if(Math.abs(dx)>1 && nd!==a.dir){ a.dir=nd; a.f.setAttribute('transform','scale('+(-nd)+',1)'); } }
+        }
+      }
+      var bob=0;
+      if(a.kind==='fly') bob=Math.sin((t/1000+a.t0)*6)*4;
+      else if(a.hop>0){ a.hop-=dt; bob=-Math.sin((0.45-a.hop)/0.45*Math.PI)*14; }
+      else if(a.wait<=0 && a.kind!=='still') bob=-Math.abs(Math.sin((t/1000+a.t0)*9))*2.5;
+      a.g.setAttribute('transform','translate('+a.x.toFixed(1)+' '+(a.y+bob).toFixed(1)+')');
+    });
+    raf=requestAnimationFrame(step);
+  }
+  function floatAt(txt){
+    var g=app&&app.querySelector('#fp-pet-g'), svg=app&&app.querySelector('.fp-scene svg'); if(!g||!svg) return;
+    var a=actors.filter(function(x){ return x.g===g; })[0], x=a?a.x:+g.dataset.x, y=a?a.y:+g.dataset.y;
+    var el=document.createElementNS('http://www.w3.org/2000/svg','text');
+    el.setAttribute('x',x); el.setAttribute('y',y-46); el.setAttribute('text-anchor','middle'); el.setAttribute('font-size','20'); el.setAttribute('class','fp-float');
+    el.textContent=txt; svg.appendChild(el); setTimeout(function(){ el.remove(); },1300);
+    if(a && a.kind==='pet') a.hop=0.45;
+  }
+
+  /* ---- 主畫面 ---- */
+  var app=document.getElementById('fp-app'), mini=document.getElementById('fp-mini'), pick=null, flash=[], bagPick={food:'',charm:false,tool:'',ticket:false};
   function paintPet(){
     if(!app&&!mini) return;
-    var s=petState(), h=allHist(), today=d0(), tk=kk(today);
-    var ev=advance(s,h); s=petState();
-    var p=s.pet, T=totals(h, p?pk(p.born):null);
-    var place=PLACES[0];
-    if(p){ place=PLACES.filter(function(x){ return x.n===p.loc && T.hours>=x.h; })[0]||PLACES[0]; }
+    var s=petState(), C=checks(), h=allHist(), v=viewState(), tk=kk(d0());
+    var lv=s.pet?(s.pet.lvSeen||1):1;
+    checksAdvance(C,h);
+    var P=pomoState(); if(P.day) s.pomoLog[P.day]=Math.max(s.pomoLog[P.day]||0,P.done||0);
+    var T=collect(h,C,s,s.pet?pk(s.pet.born):null);
+    forestAdvance(s,h,T.trees,lv);
+    var ev=petAdvance(s,h,lv);
+    var p=s.pet, att=attitude(s,h,v,lv);
+    ev=ev.concat(tripTick(s,att)); p=s.pet; att=attitude(s,h,v,lv);
+    var onTab=window.__tab===5 && !document.hidden;
+    if(p && onTab && att.sulk==='study'){ var bk=tk+'@'+att.blk.a; if(!v.peek[bk]){ v.peek[bk]=1; p.mood=Math.max(0,p.mood-5); saveView(v); ev.push('peek'); } }
+    if(p && onTab && att.sulk==='toolong' && !v.warned){ v.warned=1; p.mood=Math.max(0,p.mood-10); saveView(v); ev.push('toolong'); }
+    // 樹的狀態
+    var state={}, deadSet={};
+    s.dead.forEach(function(i){ state[i]='dead'; deadSet[i]=1; });
+    s.wilt.forEach(function(w){ w.idx.forEach(function(i){ if(!deadSet[i]) state[i]='wilt'; }); });
+    T.trees.forEach(function(t,i){ if(t.st==='dead'){ state[i]='dead'; deadSet[i]=1; } });
+    var nDead=Object.keys(deadSet).length, nWilt=s.wilt.reduce(function(a,w){ return a+w.idx.length; },0), nPend=T.trees.filter(function(t){ return t.st==='pending'; }).length;
+    var curLand=T.trees.length? landOfIndex(T.trees.length-1).i : 0;
+    var li=Math.max(0,Math.min(v.land===undefined?curLand:v.land, curLand));
+    var cc=caredCum(h,lv), nHoly=0, stageCnt=[0,0,0,0];
+    T.trees.forEach(function(t,i){ if(deadSet[i]) return; var g=treeStage(t,cc); stageCnt[g]++; });
+    var trees={state:state, alive:T.trees.length-nDead, curLand:curLand, inLand:Math.max(0,Math.min(land(li).cap,T.trees.length-landStart(li)))};
+    var streak=streakDays(h,lv), vis=visitorsToday(li,streak);
+    vis.forEach(function(a){ if(!s.dex[a.id]){ s.dex[a.id]=tk; ev.push('dex|'+a.e+' '+a.n); } });
     var info=null;
-    if(p){
-      var xp=xpSince(h,pk(p.born),p.pomo0||0); info={xp:xp, lv:levelOf(xp)};
-      if(info.lv.lv!==p.lvSeen){ p.lvSeen=info.lv.lv; savePet(s); }
-    }
-    var te=h[tk]||{}, careToday=cared(tk,h,easyMap());
+    if(p){ var xp=xpSince(h,pk(p.born),p.pomo0||0,C); info={xp:xp, lv:levelOf(xp)}; if(info.lv.lv!==p.lvSeen){ if(p.lvSeen && info.lv.lv>p.lvSeen) ev.push('lv|'+info.lv.lv); p.lvSeen=info.lv.lv; } }
+    savePet(s);
+    ev.forEach(function(e){
+      var q=e.split('|');
+      if(q[0]==='sick') flash.push('🤒 '+esc((p||{}).name||'')+' 生病了：連續 2 天有照顧才會好。');
+      else if(q[0]==='heal') flash.push('🎉 病好了！');
+      else if(q[0]==='gone') flash.push('💔 '+esc(s.justLeft||''));
+      else if(q[0]==='card') flash.push('📮 收到一張明信片！');
+      else if(q[0]==='back') flash.push('🏠 '+esc(p.name)+' 從'+q[1]+'回來了，帶了 '+q[2]+'。');
+      else if(q[0]==='left') flash.push('🎒 '+esc(p.name)+' 揹著行李出門旅行了。多做番茄鐘，牠會多寄明信片。');
+      else if(q[0]==='dex') flash.push('📖 新訪客：'+q[1]+'（記進圖鑑了）');
+      else if(q[0]==='lv') flash.push('⬆ 升到 Lv '+q[1]+'！'+(q[1]==5||q[1]==12?'長大了，每天要讀更多才算照顧。':''));
+      else if(q[0]==='peek') flash.push('🙈 讀書時段跑來看牠，心情 −5。');
+      else if(q[0]==='toolong') flash.push('😤 待太久了，牠今天不理你，心情 −10。');
+    });
+    var x=todayData(h), quests=dailyQuests(x), wk=weekKey(d0()), wdat=weekData(s,h), weekly=weeklyChallenges();
+    var careToday=cared(tk,h,easyMap(),lv), te=h[tk]||{}, need=careNeed(lv);
+    var charms=Math.max(0,T.allClear+s.clover-(s.charmsUsed||0));
+    var questReady=quests.filter(function(q){ var r=q.f(x); return r[0]>=r[1] && !(s.quests[tk]||{})[q.id]; }).length
+      + weekly.filter(function(c){ var r=c.f(wdat); return r[0]>=r[1] && !(s.weekly[wk]||{})[c.id]; }).length;
+    var pendList=Object.keys(C.items).map(function(key){ return C.items[key]; }).filter(function(it){ return it.st==='pending'; });
     // ---- 今天分頁的小卡 ----
     if(mini){
       mini.hidden=false;
+      var extraLines=(pendList.length?'<p style="color:var(--warn)">⏳ '+pendList.length+' 份等 Claude 檢查（'+CHECK_DAYS+' 天沒交樹苗會枯）</p>':'')+(questReady?'<p style="color:var(--cap)">🎁 有 '+questReady+' 個任務可以領獎</p>':'');
       if(p){
-        var warn=p.sick?'生病了：要連續 2 天好好讀書才會好':(p.neglect>=1?'已經 '+p.neglect+' 天沒被照顧了':'');
-        mini.innerHTML='<span class="e" aria-hidden="true">'+petEmoji(p)+'</span><div><b>'+esc(p.name)+'</b>　<span class="mono" style="font-size:12px;color:var(--ink-faint)">Lv '+info.lv.lv+'</span>'
-          +'<p>飽足 '+p.hunger+'　心情 '+p.mood+'　'+(careToday?'今天已照顧 ✓':'今天還沒照顧：讀滿 60 分或完成一半任務')+'</p>'
-          +(warn?'<p style="color:var(--warn)">'+warn+'</p>':'')+'</div>';
+        var line=att.away?'去'+p.trip.dest+'旅行了（'+fmtT(p.trip.leaveAt)+' 出發）':(att.sulk?'不理你：'+(att.sulk==='study'?'現在是讀書時段':(att.sulk==='toolong'?'今天待太久了':'昨天沒讀書')):(att.sleep?'睡覺中 💤':'飽足 '+p.hunger+'　心情 '+p.mood));
+        mini.innerHTML='<span class="e" aria-hidden="true">'+(att.away?'🎒':petEmoji(p))+'</span><div><b>'+esc(p.name)+'</b>　<span class="mono" style="font-size:12px;color:var(--ink-faint)">Lv '+info.lv.lv+'</span>'
+          +'<p>'+line+'</p><p style="color:'+(careToday?'var(--cap)':'var(--warn)')+'">'+(careToday?'今天已照顧 ✓':'今天還沒照顧：讀滿 '+need.m+' 分或完成 '+Math.round(need.r*100)+'% 任務')+'</p>'
+          +(p.sick?'<p style="color:var(--rest)">生病中：連續 2 天照顧才會好</p>':(p.neglect>=1?'<p style="color:var(--warn)">已經 '+p.neglect+' 天沒照顧，第 '+SICK_AT+' 天生病、第 '+LEAVE_AT+' 天離家</p>':''))
+          +extraLines+(flash.length?'<p>'+flash[flash.length-1]+'</p>':'')+'</div>';
       } else {
-        mini.innerHTML='<span class="e" aria-hidden="true">🌱</span><div><b>森林 '+T.trees.length+' 棵樹</b><p>'+(s.justLeft?esc(s.justLeft)+' 離家出走了，到「獎勵」重新領養':'到「獎勵 → 我的森林」領養一隻寵物')+'</p></div>';
+        mini.innerHTML='<span class="e" aria-hidden="true">🌱</span><div><b>森林 '+trees.alive+' 棵樹</b><p>'+(s.justLeft?esc(s.justLeft)+'，到「獎勵」重新領養':'到「獎勵 → 我的森林」領養一隻寵物')+'</p>'+extraLines+'</div>';
       }
     }
     if(!app) return;
-    // ---- 主畫面 ----
-    var html='<div class="fp-scene">'+sceneSVG(T.trees,place,p,info,tk)+'</div><div class="fp-body">';
-    var nextUnlock=FOODS.concat(TOYS).concat(PLACES).filter(function(x){ return x.h>T.hours; }).sort(function(a,b){ return a.h-b.h; })[0];
-    if(p){
-      var st=stage(info.lv.lv), foodN=Math.max(0,T.tasks-(p.fed||0)), playN=Math.max(0,(pomoTotal()-(p.pomo0||0))+T.clear-(p.played||0));
-      html+='<div class="fp-head"><b>'+esc(p.name)+'</b><span class="sub" style="margin:0">'+spName(p.sp)+'・'+st[0]+'</span><span class="lv">Lv '+info.lv.lv+'</span>'
-        +'<span class="sub" style="margin:0;color:'+(p.sick?'var(--rest)':'var(--cap)')+'">'+(p.sick?'● 生病中':'● 健康')+'</span></div>'
-        +'<div class="fp-stats">'
-        +stat('飽足',p.hunger)+stat('心情',p.mood)
-        +'<div class="fp-stat">升級　<b class="mono">'+info.lv.cur+' / '+info.lv.need+'</b><div class="bar"><i style="width:'+Math.round(info.lv.cur/info.lv.need*100)+'%"></i></div></div>'
-        +'</div>';
-      var cls='fp-care', msg;
-      if(p.sick){ cls+=' bad'; msg='生病了。要<b>連續 2 天</b>有照顧（讀滿 60 分或完成一半任務）才會好；再連續沒照顧到第 7 天會離家出走。'; }
-      else if(p.neglect>=1){ cls+=' warn'; msg='已經連續 <b>'+p.neglect+' 天</b>沒被照顧。'+(p.neglect>=2?'明天再沒照顧就會生病。':'再 '+(3-p.neglect)+' 天沒照顧會生病。'); }
-      else msg='狀態很好。';
-      msg+='　今天：完成 '+(te.d||0)+' / '+(te.a||0)+' 項、讀了 '+(te.m||0)+' 分 → '+(careToday?'<b>已照顧 ✓</b>':'還沒照顧');
-      html+='<p class="'+cls+'">'+msg+'</p>';
-      html+=row('餵食','飼料 '+foodN+' 份（每完成一項任務得 1 份）',FOODS.map(function(f){
-          var lock=T.hours<f.h;
-          return '<button type="button" data-act="feed" data-v="'+f.n+'"'+(lock||!foodN?' disabled':'')+(lock?' class="lock"':'')+'><span class="e">'+f.e+'</span>'+f.n
-            +'<small>'+(lock?'讀書 '+f.h+' 小時解鎖':'+'+f.v)+'</small></button>'; }).join(''));
-      html+=row('玩耍','可以玩 '+playN+' 次（每顆番茄鐘、每個全清日各 1 次）'+(p.sick?'；生病時不能玩':''),TOYS.map(function(t){
-          var lock=T.hours<t.h;
-          return '<button type="button" data-act="play" data-v="'+t.n+'"'+(lock||!playN||p.sick?' disabled':'')+(lock?' class="lock"':'')+'><span class="e">'+t.e+'</span>'+t.n
-            +'<small>'+(lock?'讀書 '+t.h+' 小時解鎖':'+'+t.v)+'</small></button>'; }).join(''));
-      html+=row('帶去哪裡','每天第一次換地點心情 +10',PLACES.map(function(x){
-          var lock=T.hours<x.h;
-          return '<button type="button" data-act="go" data-v="'+x.n+'" aria-pressed="'+(place.n===x.n)+'"'+(lock?' disabled class="lock"':'')+'><span class="e">'+x.e+'</span>'+x.n
-            +(lock?'<small>讀書 '+x.h+' 小時</small>':'')+'</button>'; }).join(''));
-      html+='<p class="fp-msg" id="fp-msg">'+flash+'</p>';
-    } else {
-      html+=(s.justLeft?'<p class="fp-care bad">'+esc(s.justLeft)+' 連續 7 天沒被照顧，離家出走了。森林還在，可以重新領養一隻。</p>':'')
-        +'<div class="fp-head"><b>領養一隻寵物</b><span class="sub" style="margin:0">選一種、取個名字</span></div>'
-        +'<div class="fp-adopt" role="radiogroup" aria-label="寵物種類">'+SPECIES.map(function(x){
-          return '<button type="button" role="radio" data-sp="'+x[0]+'" aria-pressed="'+(pick===x[0])+'"><span class="e">'+x[2]+'</span>'+x[1]+'</button>'; }).join('')+'</div>'
-        +'<div class="set-grid" style="grid-template-columns:minmax(0,240px) auto;align-items:end"><div class="fld"><label for="fp-name">名字</label><input id="fp-name" type="text" maxlength="12" placeholder="例：小橘"></div>'
-        +'<button class="btn solid" id="fp-adopt" type="button" style="justify-self:start">領養</button></div>'
-        +'<p class="fp-msg" id="fp-msg">'+flash+'</p>';
+    var scene=v.scene||'forest', tabk=v.tab||'main';
+    var fedToday=p&&p.fedDay===tk?(FOODS.filter(function(f){ return f.n===p.fedWhat; })[0]||{}).e:'';
+    var html='<div class="fp-tabs" role="tablist">'
+      +tbtn('scene','forest','🌲 森林',scene==='forest')+tbtn('scene','home','🏠 家',scene==='home')+'<span class="fp-sep"></span>'
+      +tbtn('tab','main','狀態',tabk==='main')+tbtn('tab','quest','📋 任務'+(questReady?' <b class="fp-dot">'+questReady+'</b>':''),tabk==='quest')
+      +tbtn('tab','check','🔍 檢查'+(pendList.length?' <b class="fp-dot">'+pendList.length+'</b>':''),tabk==='check')
+      +tbtn('tab','shop','🌟 '+s.gold,tabk==='shop')+tbtn('tab','album','📮 '+s.album.length,tabk==='album')
+      +tbtn('tab','souv','🎁 '+Object.keys(s.souv).length,tabk==='souv')+tbtn('tab','dex','📖 '+Object.keys(s.dex).length+'/'+ANIMALS.length,tabk==='dex')+'</div>';
+    if(scene==='forest'){
+      html+='<div class="fp-lands">'; for(var L2=0;L2<=curLand;L2++){ var LL=land(L2), cnt2=Math.max(0,Math.min(LL.cap,T.trees.length-landStart(L2)));
+        html+='<button type="button" data-land="'+L2+'" aria-pressed="'+(L2===li)+'">'+LL.e+' '+LL.n+' <small>'+cnt2+'/'+LL.cap+'</small></button>'; }
+      var nxL=land(curLand+1); html+='<span class="fp-lock">🔒 '+nxL.n+'（'+land(curLand).n+'種滿 '+land(curLand).cap+' 棵開放）</span></div>';
     }
-    // 森林統計與解鎖
-    var cnt={}; T.trees.forEach(function(t){ cnt[t.sp]=(cnt[t.sp]||0)+1; });
-    html+='<div class="fp-legend"><span><b>'+T.trees.length+'</b> 棵樹　讀書 <b>'+T.hours.toFixed(1)+'</b> 小時</span>'
-      +Object.keys(TREEN).filter(function(k){ return cnt[k]; }).map(function(k){ return '<span><i style="background:'+TREEN[k][2]+'"></i>'+TREEN[k][0]+'（'+TREEN[k][1]+'）'+cnt[k]+'</span>'; }).join('')+'</div>';
-    if(nextUnlock) html+='<p class="fp-gone">下一個解鎖：'+nextUnlock.e+' '+nextUnlock.n+'（讀書 '+nextUnlock.h+' 小時，還差 '+(nextUnlock.h-T.hours).toFixed(1)+' 小時）</p>';
-    if(s.gone&&s.gone.length) html+='<p class="fp-gone">以前養過：'+s.gone.map(function(g){ return esc(g.name)+'（'+spName(g.sp)+'，'+md(g.born)+'–'+md(g.left)+'）'; }).join('、')+'</p>';
+    html+='<div class="fp-scene">'+(scene==='home'?homeSVG(s,p,info||{lv:{lv:1}},att,fedToday):forestSVG(s,T,trees,cc,li,p,info||{lv:{lv:1}},att,vis))+'</div><div class="fp-body">';
+    var block=!!(att.sulk||att.sleep||att.away);
+    if(tabk==='main'){
+      if(p){
+        var st=stage(info.lv.lv), foodN=Math.max(0,T.tasks+s.bonusFood-(p.fed||0)), playN=Math.max(0,(pomoTotal()-(p.pomo0||0))+T.clear-(p.played||0)), petsLeft=Math.max(0,3-(v.pets||0));
+        html+='<div class="fp-head"><b>'+esc(p.name)+'</b><span class="sub" style="margin:0">'+spName(p.sp)+'・'+st[0]+'</span><span class="lv">Lv '+info.lv.lv+'</span>'
+          +'<span class="sub" style="margin:0;color:'+(p.sick?'var(--rest)':'var(--cap)')+'">'+(p.sick?'● 生病中':'● 健康')+'</span>'
+          +'<span class="sub" style="margin:0">每天要讀 '+need.m+' 分或完成 '+Math.round(need.r*100)+'%・每天餓 '+need.h+'</span></div>'
+          +'<div class="fp-stats">'+stat('飽足',p.hunger)+stat('心情',p.mood)
+          +'<div class="fp-stat">升級　<b class="mono">'+info.lv.cur+' / '+info.lv.need+'</b><div class="bar"><i style="width:'+Math.round(info.lv.cur/info.lv.need*100)+'%"></i></div></div></div>';
+        var cls='fp-care', msg='';
+        if(att.away) msg='🎒 '+esc(p.name)+' 去'+esc(p.trip.dest)+'旅行了（'+fmtT(p.trip.leaveAt)+' 出發），什麼時候回來由牠決定。這趟已寄 '+(p.trip.cards||0)+' 張明信片；每做完一顆番茄鐘，牠就有機會再寄一張。';
+        else if(att.sulk){ cls+=' bad'; msg=SULK[att.sulk]+(att.sulk==='study'?'（'+hm(att.blk.a)+'–'+hm(att.blk.b)+' '+esc(att.blk.n)+'）讀完這段再來。':''); }
+        else if(att.sleep) msg='💤 '+esc(p.name)+' 睡了（22:45–06:30）。你也該睡了。';
+        else if(p.sick){ cls+=' bad'; msg='生病了：要連續 2 天有照顧才會好，生病時不能玩、不會出門旅行。'; }
+        else if(p.neglect>=1){ cls+=' warn'; msg='已經連續 '+p.neglect+' 天沒被照顧。'; }
+        else msg='狀態很好。';
+        if(!att.away){
+          msg+='<br>今天：完成 '+(te.d||0)+' / '+(te.a||0)+' 項、讀了 '+(te.m||0)+' 分 → '+(careToday?'<b>已照顧 ✓</b>':'還沒照顧');
+          if(p.neglect>=1) msg+='　<b>第 '+SICK_AT+' 天生病、第 '+LEAVE_AT+' 天離家。</b>';
+        }
+        if(p.bag && !p.trip) msg+='<br>🎒 行李打包好了（'+esc(p.bag.food)+(p.bag.charm?'、護身符':'')+(p.bag.tool?'、'+esc(p.bag.tool):'')+(p.bag.ticket?'、旅行券':'')+'），牠會自己挑時間出發。';
+        html+='<p class="'+cls+'">'+msg+'</p>';
+        if(!att.away && scene==='home'){
+          html+=row('餵食','飼料 '+foodN+' 份（一般任務 1 份；要檢查的任務過關後才給，加碼 2–3 份）',FOODS.map(function(f){
+              var lock=T.hours<f.h;
+              return '<button type="button" data-act="feed" data-v="'+f.n+'"'+(lock||!foodN||block?' disabled':'')+(lock?' class="lock"':'')+'><span class="e">'+f.e+'</span>'+f.n+'<small>'+(lock?'讀書 '+f.h+' 小時解鎖':'+'+f.v)+'</small></button>'; }).join(''));
+          html+=row('玩耍','可以玩 '+playN+' 次（每顆番茄鐘、每個全清日各 1 次）'+(p.sick?'；生病不能玩':''),TOYS.map(function(t){
+              var lock=T.hours<t.h;
+              return '<button type="button" data-act="play" data-v="'+t.n+'"'+(lock||!playN||p.sick||block?' disabled':'')+(lock?' class="lock"':'')+'><span class="e">'+t.e+'</span>'+t.n+'<small>'+(lock?'讀書 '+t.h+' 小時解鎖':'+'+t.v)+'</small></button>'; }).join('')
+              +'<button type="button" data-act="pet"'+(block||!petsLeft?' disabled':'')+'><span class="e">🤚</span>摸摸頭<small>心情 +5，今天剩 '+petsLeft+' 次</small></button>');
+          var owned=SHOP.filter(function(a){ return a.acc && s.acc[a.id]; });
+          if(owned.length) html+=row('穿戴','點一下換上，再點一次脫下',owned.map(function(a){ return '<button type="button" data-act="wear" data-v="'+a.id+'" aria-pressed="'+(p.wear===a.id)+'"'+(block?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n+'</button>'; }).join(''));
+          if(!p.bag){
+            html+='<div class="fp-row"><h4>打包行李<span>便當用 1 份飼料；牠吃飽、心情 40 以上、沒生病、沒在生氣才會出門</span></h4>'
+              +'<div class="fp-items">'+FOODS.map(function(f){ var lock=T.hours<f.h;
+                  return '<button type="button" data-bag="food" data-v="'+f.n+'" aria-pressed="'+(bagPick.food===f.n)+'"'+(lock?' disabled class="lock"':'')+'><span class="e">'+f.e+'</span>'+f.n+'便當<small>'+(lock?'讀書 '+f.h+' 小時':f.trip[0]+'–'+f.trip[1]+' 小時')+'</small></button>'; }).join('')
+              +(s.bentos?'<button type="button" data-bag="food" data-v="特製便當" aria-pressed="'+(bagPick.food==='特製便當')+'"><span class="e">🍙</span>特製便當<small>有 '+s.bentos+' 個；24–48 小時、明信片加倍</small></button>':'')+'</div>'
+              +'<div class="fp-items" style="margin-top:6px">'
+              +'<button type="button" data-bag="charm" aria-pressed="'+bagPick.charm+'"'+(charms?'':' disabled')+'><span class="e">🍀</span>護身符<small>有 '+charms+' 個；去更遠、多帶紀念品</small></button>'
+              +(s.tickets?'<button type="button" data-bag="ticket" aria-pressed="'+bagPick.ticket+'"><span class="e">🎟️</span>旅行券<small>有 '+s.tickets+' 張；一定去遠的地方</small></button>':'')
+              +TOOLS.map(function(t){ var lock=T.hours<t.h;
+                  return '<button type="button" data-bag="tool" data-v="'+t.n+'" aria-pressed="'+(bagPick.tool===t.n)+'"'+(lock?' disabled class="lock"':'')+'><span class="e">'+t.e+'</span>'+t.n+'<small>'+(lock?'讀書 '+t.h+' 小時':t.say)+'</small></button>'; }).join('')
+              +'</div><div class="bar-btns" style="margin-top:8px"><button class="btn solid" type="button" data-act="pack"'+(block||!bagPick.food||(bagPick.food!=='特製便當'&&!foodN)?' disabled':'')+'>打包好了</button><span class="sub" style="margin:0">打包後不能拿回來；道具不會用掉，護身符、旅行券、特製便當會。</span></div></div>';
+          }
+        }
+        if(!att.away && scene==='forest'){
+          html+='<p class="fp-gone">'+(vis.length?'今天在'+land(li).n+'的訪客：'+vis.map(function(a){ return a.e+a.n; }).join('、'):'今天'+land(li).n+'沒有訪客。連續讀書越多天，越多動物會來。')+'　點寵物可以跟牠打招呼。</p>';
+          if((p.land||0)!==li) html+='<div class="bar-btns" style="margin-top:4px"><button class="btn" type="button" data-act="move" data-v="'+li+'"'+(block?' disabled':'')+'>帶 '+esc(p.name)+' 到'+land(li).n+'</button><span class="sub" style="margin:0">每天第一次換地方心情 +10</span></div>';
+        }
+      } else {
+        html+=(s.justLeft?'<p class="fp-care bad">'+esc(s.justLeft)+'。森林、明信片、紀念品、圖鑑都還在，可以重新領養一隻。</p>':'')
+          +'<div class="fp-head"><b>領養一隻寵物</b><span class="sub" style="margin:0">選一種、取個名字</span></div>'
+          +'<div class="fp-adopt" role="radiogroup" aria-label="寵物種類">'+SPECIES.map(function(sx){
+            return '<button type="button" role="radio" data-sp="'+sx[0]+'" aria-pressed="'+(pick===sx[0])+'"><span class="e">'+sx[2]+'</span>'+sx[1]+'</button>'; }).join('')+'</div>'
+          +'<div class="set-grid" style="grid-template-columns:minmax(0,240px) auto;align-items:end"><div class="fld"><label for="fp-name">名字</label><input id="fp-name" type="text" maxlength="12" placeholder="例：小橘"></div>'
+          +'<button class="btn solid" id="fp-adopt" type="button" style="justify-self:start">領養</button></div>';
+      }
+      html+='<p class="fp-msg" id="fp-msg">'+flash.join('<br>')+'</p>';
+      // 森林統計
+      var cnt={}; T.trees.forEach(function(t,i){ if(!deadSet[i]) cnt[t.sp]=(cnt[t.sp]||0)+1; });
+      html+='<div class="fp-legend"><span><b>'+trees.alive+'</b> 棵（樹苗 '+stageCnt[0]+'・小樹 '+stageCnt[1]+'・大樹 '+stageCnt[2]+'・<b>神木 '+stageCnt[3]+'</b>）'
+        +(nPend?'　<span style="color:var(--warn)">⏳ '+nPend+' 棵等 Claude 檢查</span>':'')+(nWilt?'　<span style="color:var(--warn)">'+nWilt+' 棵枯萎中</span>':'')+(nDead+s.stumps.length?'　枯死 '+(nDead+s.stumps.length):'')
+        +'　讀書 <b>'+T.hours.toFixed(1)+'</b> 小時　連續照顧 '+streak+' 天</span>'
+        +Object.keys(TREEN).filter(function(k){ return cnt[k]; }).map(function(k){ return '<span><i style="background:'+TREEN[k][2]+'"></i>'+TREEN[k][0]+'（'+TREEN[k][1]+'）'+cnt[k]+'</span>'; }).join('')+'</div>';
+      html+='<p class="fp-gone">樹只在有照顧的日子長大：2 天小樹、7 天大樹、30 天神木。'+(nWilt?'<span style="color:var(--warn)">枯萎的樹 3 天內沒讀書救回就會死。</span>':'')+'</p>';
+      var nextUnlock=FOODS.concat(TOYS).concat(TOOLS).filter(function(o){ return o.h>T.hours; }).sort(function(a,b){ return a.h-b.h; })[0];
+      if(nextUnlock) html+='<p class="fp-gone">下一個解鎖：'+nextUnlock.e+' '+nextUnlock.n+'（讀書 '+nextUnlock.h+' 小時，還差 '+(nextUnlock.h-T.hours).toFixed(1)+' 小時）</p>';
+      if(s.gone.length) html+='<p class="fp-gone">以前養過：'+s.gone.map(function(g){ return esc(g.name)+'（'+spName(g.sp)+'，'+md(g.born)+'–'+md(g.left)+(g.where?'，留在'+g.where:'')+'）'; }).join('、')+'</p>';
+    }
+    if(tabk==='quest'){
+      var claimed=s.quests[tk]||{}, allDone=quests.every(function(q){ return claimed[q.id]; });
+      html+='<div class="fp-panel"><h4>今天的任務 <span>每完成一個 🍀 護身符 ×1；三個都領完再加 🌟 ×1</span></h4>'+quests.map(function(q){ var r=q.f(x); return qrow('q',q.id,q.t,r[0],r[1],claimed[q.id]); }).join('')
+        +(allDone?'<p class="fp-gone" style="color:var(--cap)">今天的任務全部完成 ✓</p>':'')+'</div>';
+      var wcl=s.weekly[wk]||{};
+      html+='<div class="fp-panel"><h4>本週挑戰 <span>每個 🌟 ×2，再抽一個飾品或道具；週一換新</span></h4>'+weekly.map(function(c){ var r=c.f(wdat); return qrow('w',c.id,c.t,r[0],r[1],wcl[c.id]); }).join('')+'</div>';
+      html+='<p class="fp-msg" id="fp-msg">'+flash.join('<br>')+'</p>';
+    }
+    if(tabk==='check'){
+      var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
+      html+='<div class="fp-panel"><h4>給 Claude 檢查 <span>訂正、考古題限時作答、模考卷、歷屆會考、錯題重做</span></h4>'
+        +'<p class="fp-gone">做法：在「今天」勾掉這類任務 → 把寫好的題本、訂正拍照傳給 Claude，說「檢查：任務名稱」→ Claude 檢查過關會給你一個連結，點開就過關。'
+        +'沒過關的話 Claude 會告訴你哪裡要重做。'+CHECK_DAYS+' 天內沒交，樹苗會枯死、也拿不到獎勵。過關：A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。</p>'
+        +(items.length?items.slice(0,30).map(function(it){
+          var left=CHECK_DAYS-Math.round((d0()-pk(it.k))/864e5);
+          return '<div class="fp-chk '+it.st+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'
+            +(it.st==='pass'?'✅ 過關（'+it.g+'）':(it.st==='dead'?'🪦 沒交檢查，樹苗枯了':'⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')))+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有要檢查的任務。</p>')
+        +'</div>';
+    }
+    if(tabk==='shop'){
+      html+='<div class="fp-panel"><h4>🌟 金幸運草商店 <span>你有 🌟 '+s.gold+'。金幸運草只有 Claude 檢查過關、每日任務全清、每週挑戰拿得到</span></h4><div class="fp-items">'
+        +SHOP.map(function(a){ var own=a.acc&&s.acc[a.id];
+          return '<button type="button" data-buy="'+a.id+'"'+(own||s.gold<a.c?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n+'<small>'+(own?'已擁有':('🌟 '+a.c+(a.say?'・'+a.say:'')))+'</small></button>'; }).join('')+'</div>'
+        +'<p class="fp-gone">持有：🍀 護身符 '+charms+'・🎟️ 旅行券 '+s.tickets+'・🍙 特製便當 '+s.bentos+'・🌰 已種神木種子 '+s.seeds.length+'</p></div>'
+        +'<p class="fp-msg" id="fp-msg">'+flash.join('<br>')+'</p>';
+    }
+    if(tabk==='album') html+='<div class="fp-panel"><h4>明信片 '+s.album.length+' 張</h4>'+(s.album.length?'<div class="fp-cards">'+s.album.slice(0,24).map(cardSVG).join('')+'</div>'+(s.album.length>24?'<p class="fp-gone">只列最新 24 張。</p>':''):'<p class="fp-gone">還沒有明信片。到「家」幫牠打包便當，牠出門旅行時你做番茄鐘，牠就會寄回來。</p>')+'</div>';
+    if(tabk==='souv'){ var ks=Object.keys(s.souv); html+='<div class="fp-panel"><h4>紀念品 '+ks.length+' / '+DESTS.length+'</h4>'+(ks.length?'<div class="fp-items">'+ks.map(function(nm){ var D=DESTS.filter(function(d){ return d.s===nm; })[0]; return '<span class="fp-chip"><span class="e">'+(D?D.se:'🎁')+'</span>'+esc(nm)+(D?'<small>'+D.n+'</small>':'')+' ×'+s.souv[nm]+'</span>'; }).join('')+'</div>':'<p class="fp-gone">還沒有紀念品。旅行回來會帶當地特產。</p>')
+      +'<p class="fp-gone">還沒去過：'+DESTS.filter(function(d){ return !s.souv[d.s]; }).map(function(d){ return d.n+(d.need?'（要'+d.need+'）':''); }).join('、')+'</p></div>'; }
+    if(tabk==='dex'){
+      html+='<div class="fp-panel"><h4>森林圖鑑 '+Object.keys(s.dex).length+' / '+ANIMALS.length+'</h4>';
+      for(var LD=0;LD<LANDS.length;LD++){
+        html+='<p class="fp-gone" style="margin:8px 0 4px"><b>'+LANDS[LD].e+' '+LANDS[LD].n+'</b>'+(LD>curLand?'（還沒開放）':'')+'</p><div class="fp-dex">'+ANIMALS.filter(function(a){ return a.land===LD; }).map(function(a){
+          var seen=s.dex[a.id];
+          return '<div class="'+(seen?'on':'')+'"><span class="e">'+(seen?a.e:'❔')+'</span><b>'+(seen?a.n:'？？？')+'</b><small>'+(seen?md(seen)+' 第一次來':'連續讀書 '+a.streak+' 天'+(a.night?'、晚上':''))+'</small></div>'; }).join('')+'</div>';
+      }
+      html+='</div>';
+    }
     html+='</div>';
     app.innerHTML=html;
-    flash='';
-    if(ev==='sick') say('🤒 '+esc(p.name)+' 生病了。接下來要連續 2 天有照顧才會好。');
-    if(ev==='heal') say('🎉 '+esc(p.name)+' 病好了！');
+    flash=[];
+    startMotion();
+    tagToday();
   }
+  function tbtn(kind,k,t,on){ return '<button type="button" data-'+kind+'="'+k+'" aria-pressed="'+on+'">'+t+'</button>'; }
   function stat(lab,v){ return '<div class="fp-stat'+(v<30?' low':'')+'">'+lab+'　<b class="mono">'+v+'</b><div class="bar"><i style="width:'+v+'%"></i></div></div>'; }
   function row(t,sub,items){ return '<div class="fp-row"><h4>'+t+'<span>'+sub+'</span></h4><div class="fp-items">'+items+'</div></div>'; }
+  function qrow(kind,id,t,cur,goal,claimed){
+    var ok=cur>=goal, pct=Math.min(100,Math.round(cur/goal*100));
+    return '<div class="fp-q'+(claimed?' done':'')+'"><div><b>'+t+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><small>'+Math.min(cur,goal)+' / '+goal+'</small></div>'
+      +(claimed?'<span class="st">已領 ✓</span>':'<button type="button" class="btn'+(ok?' solid':'')+'" data-claim="'+kind+':'+id+'"'+(ok?'':' disabled')+'>'+(ok?'領取':'還沒完成')+'</button>')+'</div>';
+  }
   function say(m){ var el=document.getElementById('fp-msg'); if(el) el.innerHTML=m; }
-  function hop(){ var el=document.getElementById('fp-pet'); if(!el) return; el.classList.remove('hop'); void el.getBBox(); el.classList.add('hop'); }
 
   if(app) app.addEventListener('click',function(e){
-    var b=e.target.closest('button'); if(!b||b.disabled) return;
-    var s=petState(), p=s.pet;
-    if(b.dataset.sp){ pick=b.dataset.sp; app.querySelectorAll('.fp-adopt button').forEach(function(x){ x.setAttribute('aria-pressed',x.dataset.sp===pick); }); return; }
+    var b=e.target.closest('button');
+    if(!b && e.target.closest('#fp-pet-g')){
+      var s0=petState(), h0=allHist(), att0=attitude(s0,h0,viewState(),s0.pet?(s0.pet.lvSeen||1):1);
+      if(att0.sulk){ floatAt('💢'); say(SULK[att0.sulk]); } else if(att0.sleep){ floatAt('💤'); } else floatAt(pickR(['💕','✨','🎵','😊']));
+      return;
+    }
+    if(!b||b.disabled) return;
+    var v=viewState();
+    if(b.dataset.scene){ v.scene=b.dataset.scene; if(v.tab!=='main') v.tab='main'; saveView(v); paintPet(); return; }
+    if(b.dataset.tab){ v.tab=b.dataset.tab; saveView(v); paintPet(); return; }
+    if(b.dataset.land){ v.land=+b.dataset.land; saveView(v); paintPet(); return; }
+    var s=petState(), p=s.pet, h=allHist(), tk=kk(d0());
+    if(b.dataset.claim){
+      var parts=b.dataset.claim.split(':'), x=todayData(h);
+      if(parts[0]==='q'){
+        var q=dailyQuests(x).filter(function(z){ return z.id===parts[1]; })[0]; if(!q) return; var r=q.f(x); if(r[0]<r[1]) return;
+        s.quests[tk]=s.quests[tk]||{}; if(s.quests[tk][q.id]) return; s.quests[tk][q.id]=1; s.clover++;
+        var all=dailyQuests(x).every(function(z){ return s.quests[tk][z.id]; });
+        if(all){ s.gold++; flash.push('🍀 護身符 +1，今天的任務全清，🌟 金幸運草 +1！'); } else flash.push('🍀 護身符 +1');
+      } else {
+        var wk=weekKey(d0()), c=weeklyChallenges().filter(function(z){ return z.id===parts[1]; })[0]; if(!c) return; var r2=c.f(weekData(s,h)); if(r2[0]<r2[1]) return;
+        s.weekly[wk]=s.weekly[wk]||{}; if(s.weekly[wk][c.id]) return; s.weekly[wk][c.id]=1; s.gold+=2;
+        var prizes=SHOP.filter(function(a){ return a.acc && !s.acc[a.id]; }), prize;
+        if(prizes.length && Math.random()<.5){ prize=pickR(prizes); s.acc[prize.id]=1; flash.push('🌟 ×2，抽到飾品 '+prize.e+' '+prize.n+'！'); }
+        else { var g=pickR(['ticket','bento']); if(g==='ticket'){ s.tickets++; flash.push('🌟 ×2，抽到 🎟️ 旅行券！'); } else { s.bentos++; flash.push('🌟 ×2，抽到 🍙 特製便當！'); } }
+      }
+      savePet(s); paintPet(); return;
+    }
+    if(b.dataset.buy){
+      var it=SHOP.filter(function(a){ return a.id===b.dataset.buy; })[0]; if(!it||s.gold<it.c) return;
+      if(it.acc){ if(s.acc[it.id]) return; s.acc[it.id]=1; }
+      else if(it.id==='ticket') s.tickets++;
+      else if(it.id==='bento') s.bentos++;
+      else if(it.id==='seed') s.seeds.push({k:tk});
+      s.gold-=it.c; savePet(s); flash.push('買了 '+it.e+' '+it.n+(it.id==='seed'?'，已經種在森林裡了':'')+'。'); paintPet(); return;
+    }
+    if(b.dataset.sp){ pick=b.dataset.sp; app.querySelectorAll('.fp-adopt button').forEach(function(z){ z.setAttribute('aria-pressed',z.dataset.sp===pick); }); return; }
     if(b.id==='fp-adopt'){
       var nm=(document.getElementById('fp-name').value||'').trim();
       if(!pick){ say('先選一種寵物。'); return; }
       if(!nm){ say('幫牠取個名字。'); return; }
-      s.pet={name:nm, sp:pick, born:kk(d0()), last:kk(d0()), hunger:80, mood:80, sick:false, neglect:0, okRun:0, fed:0, played:0, pomo0:pomoTotal(), loc:'書房', locDay:''};
-      s.justLeft=''; savePet(s); flash='🎉 歡迎 '+esc(nm)+'！完成任務會得到飼料，番茄鐘可以陪牠玩。'; paintPet(); hop(); return;
+      s.pet={name:nm, sp:pick, born:tk, last:tk, hunger:80, mood:80, sick:false, neglect:0, okRun:0, fed:0, played:0, pomo0:pomoTotal(), land:0, locDay:'', bag:null, trip:null, departAt:0, wear:''};
+      s.justLeft=''; s.bonusFood=0; savePet(s); flash.push('🎉 歡迎 '+esc(nm)+'！完成任務會得到飼料，番茄鐘可以陪牠玩，到「家」打包便當牠就會去旅行。'); paintPet(); return;
     }
     if(!p) return;
-    var h=allHist(), T=totals(h,pk(p.born));
-    if(b.dataset.act==='feed'){
-      var f=FOODS.filter(function(x){ return x.n===b.dataset.v; })[0]; if(!f||T.tasks-(p.fed||0)<=0) return;
-      p.fed=(p.fed||0)+1; p.hunger=Math.min(100,p.hunger+f.v); savePet(s); flash=f.e+' '+esc(p.name)+' 吃了'+f.n+'，飽足 +'+f.v+'。'; paintPet(); hop();
-    } else if(b.dataset.act==='play'){
-      var t=TOYS.filter(function(x){ return x.n===b.dataset.v; })[0]; if(!t||p.sick) return;
-      p.played=(p.played||0)+1; p.mood=Math.min(100,p.mood+t.v); savePet(s); flash=t.e+' 和 '+esc(p.name)+' 玩'+t.n+'，心情 +'+t.v+'。'; paintPet(); hop();
-    } else if(b.dataset.act==='go'){
-      var tk=kk(d0()), first=p.locDay!==tk && p.loc!==b.dataset.v;
-      p.loc=b.dataset.v; if(first){ p.locDay=tk; p.mood=Math.min(p.sick?40:100,p.mood+10); }
-      savePet(s); flash='帶 '+esc(p.name)+' 到'+p.loc+(first?'，心情 +10。':'。'); paintPet(); hop();
+    var lv=p.lvSeen||1, C=checks(), T=collect(h,C,s,pk(p.born)), att=attitude(s,h,v,lv);
+    if(att.sulk||att.sleep||att.away){ paintPet(); return; }
+    var foodN=T.tasks+s.bonusFood-(p.fed||0);
+    if(b.dataset.bag){
+      if(b.dataset.bag==='food') bagPick.food=(bagPick.food===b.dataset.v?'':b.dataset.v);
+      else if(b.dataset.bag==='tool') bagPick.tool=(bagPick.tool===b.dataset.v?'':b.dataset.v);
+      else if(b.dataset.bag==='ticket') bagPick.ticket=!bagPick.ticket;
+      else bagPick.charm=!bagPick.charm;
+      paintPet(); return;
+    }
+    var act=b.dataset.act;
+    if(act==='feed'){
+      var f=FOODS.filter(function(z){ return z.n===b.dataset.v; })[0]; if(!f||foodN<=0) return;
+      p.fed=(p.fed||0)+1; p.hunger=Math.min(100,p.hunger+f.v); p.fedDay=tk; p.fedWhat=f.n; savePet(s); flash.push(f.e+' '+esc(p.name)+' 吃了'+f.n+'，飽足 +'+f.v+'。'); paintPet(); floatAt('😋');
+    } else if(act==='play'){
+      var t=TOYS.filter(function(z){ return z.n===b.dataset.v; })[0]; if(!t||p.sick) return;
+      p.played=(p.played||0)+1; p.mood=Math.min(100,p.mood+t.v); savePet(s); flash.push(t.e+' 和 '+esc(p.name)+' 玩'+t.n+'，心情 +'+t.v+'。'); paintPet(); floatAt(t.e);
+    } else if(act==='pet'){
+      if((v.pets||0)>=3) return;
+      v.pets=(v.pets||0)+1; saveView(v); p.mood=Math.min(p.sick?40:100,p.mood+5); savePet(s); flash.push('🤚 摸摸頭，心情 +5。'); paintPet(); floatAt('💕');
+    } else if(act==='wear'){
+      p.wear=(p.wear===b.dataset.v?'':b.dataset.v); savePet(s); paintPet(); floatAt('✨');
+    } else if(act==='pack'){
+      if(!bagPick.food) return;
+      var charms=Math.max(0,T.allClear+s.clover-(s.charmsUsed||0));
+      if(bagPick.food==='特製便當'){ if(!s.bentos) return; s.bentos--; } else { if(foodN<=0) return; p.fed=(p.fed||0)+1; }
+      var useCharm=!!(bagPick.charm&&charms), useTicket=!!(bagPick.ticket&&s.tickets);
+      if(useCharm) s.charmsUsed=(s.charmsUsed||0)+1; if(useTicket) s.tickets--;
+      p.bag={food:bagPick.food, charm:useCharm, tool:bagPick.tool||'', ticket:useTicket}; p.departAt=0;
+      bagPick={food:'',charm:false,tool:'',ticket:false}; savePet(s); flash.push('🎒 行李打包好了。牠會挑一個時間自己出發，去哪裡、去多久都是牠決定。'); paintPet();
+    } else if(act==='move'){
+      var to=+b.dataset.v, first=p.locDay!==tk && (p.land||0)!==to;
+      p.land=to; if(first){ p.locDay=tk; p.mood=Math.min(p.sick?40:100,p.mood+10); }
+      savePet(s); flash.push('帶 '+esc(p.name)+' 到'+land(to).n+(first?'，心情 +10。':'。')); paintPet();
     }
   });
   if(mini){
@@ -4845,6 +5420,73 @@ section{padding-top:40px}
     mini.addEventListener('click',goF);
     mini.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goF(); } });
   }
+  // 番茄鐘中途放棄：留下一根枯樹樁
+  window.__petEvent=function(type){
+    if(type!=='abandon') return;
+    var s=petState(); s.stumps.push({k:kk(d0()), why:'番茄鐘中途放棄'});
+    if(s.pet && !s.pet.trip) s.pet.mood=Math.max(0,s.pet.mood-10);
+    savePet(s); flash.push('🪵 番茄鐘中途放棄，森林多了一根枯樹樁'+(s.pet?'，'+esc(s.pet.name)+' 心情 −10':'')+'。');
+    paintPet();
+  };
+  // 在森林頁面待多久（只算這台）
+  setInterval(function(){
+    if(document.hidden || window.__tab!==5) return;
+    var v=viewState(), before=v.ms; v.ms+=5000; saveView(v);
+    if(before<=VIEW_MAX && v.ms>VIEW_MAX) paintPet();
+  },5000);
+
+  /* ---- 今天的任務清單：標出要給 Claude 檢查的 ---- */
+  function tagToday(){
+    var list=document.getElementById('td-list'); if(!list) return;
+    var C=checks(), tk=kk(d0()), st=ls('plan.state.v3',{})||{};
+    Array.prototype.forEach.call(list.querySelectorAll('label'),function(lab){
+      var sp=lab.querySelector('span'), cb=lab.querySelector('input'); if(!sp||!cb) return;
+      var name=(sp.firstChild&&sp.firstChild.nodeType===3)?sp.firstChild.textContent:'';
+      var old=lab.querySelector('.td-chk'); if(old) old.remove();
+      if(!name || !needsCheck(name)) return;
+      var it=C.items[tk+'|'+name], tag=document.createElement('span'); tag.className='td-chk';
+      if(it&&it.st==='pass'){ tag.className+=' ok'; tag.textContent='✅ Claude 檢查過關（'+it.g+'）'; }
+      else if(cb.checked){ tag.className+=' wait'; tag.textContent='⏳ 拍照傳給 Claude 檢查，過關才算數（'+CHECK_DAYS+' 天內）'; }
+      else tag.textContent='🔍 寫完要給 Claude 檢查才算過關';
+      sp.appendChild(tag);
+    });
+  }
+  var tdl=document.getElementById('td-list');
+  if(tdl && window.MutationObserver){ var mo=new MutationObserver(function(){ mo.disconnect(); tagToday(); mo.observe(tdl,{childList:true}); }); mo.observe(tdl,{childList:true}); }
+  tagToday();
+
+  /* ---- 過關連結：#pass=內容.簽章 ---- */
+  function b64uBytes(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; var bin=atob(s), u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; }
+  function passBanner(msg,ok){
+    var b=document.createElement('div'); b.className='rem-banner'; b.style.display='flex'; if(ok) b.style.background='var(--cap)';
+    b.innerHTML='<span>'+msg+'</span>';
+    var go=document.createElement('button'); go.type='button'; go.textContent='去看森林';
+    go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(5); var v=viewState(); v.tab='check'; saveView(v); paintPet(); });
+    var x=document.createElement('button'); x.type='button'; x.textContent='知道了'; x.addEventListener('click',function(){ b.remove(); });
+    b.appendChild(go); b.appendChild(x); document.body.appendChild(b);
+  }
+  function handlePass(){
+    var m=location.hash.match(/^#pass=([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/); if(!m) return;
+    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    if(!(window.crypto&&crypto.subtle)){ passBanner('這個瀏覽器沒辦法驗證過關連結，換 Chrome 或 Safari 再點一次。'); return; }
+    crypto.subtle.importKey('jwk',PUBKEY,{name:'ECDSA',namedCurve:'P-256'},false,['verify']).then(function(key){
+      return crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,b64uBytes(m[2]),new TextEncoder().encode(m[1]));
+    }).then(function(ok){
+      if(!ok){ passBanner('❌ 這個過關連結無效（內容被改過，或不是 Claude 發的）。'); return; }
+      var pl=JSON.parse(new TextDecoder().decode(b64uBytes(m[1])));
+      var C=checks(); if(C.used[pl.i]){ passBanner('這個過關連結已經用過了。'); return; }
+      C.used[pl.i]=Date.now();
+      var key=pl.k+'|'+pl.n, prev=C.items[key];
+      if(prev && prev.st==='pass'){ saveChecks(C); passBanner('這份已經過關了。'); return; }
+      C.items[key]={k:pl.k, n:pl.n, st:'pass', g:pl.g, m:pl.m||'', passAt:Date.now()};
+      saveChecks(C);
+      var s=petState(); s.gold+=(pl.g==='A'?2:1); s.bonusFood+=(pl.g==='A'?3:2); savePet(s);
+      passBanner('✅ Claude 檢查過關（'+esc(pl.g)+'）：'+esc(pl.n)+(pl.m?'——'+esc(pl.m):'')+'。🌟 +'+(pl.g==='A'?2:1)+'、飼料 +'+(pl.g==='A'?3:2)+'。', true);
+      tagToday(); paintPet();
+    }).catch(function(){ passBanner('❌ 過關連結讀不出來，請把整串連結重新點一次。'); });
+  }
+  handlePass();
+  window.addEventListener('hashchange',handlePass);
 
   /* ---------- 什麼時候重畫 ---------- */
   function paintAll(){ paintSubjects(); paintKbPace(); paintBooks(); paintPet(); }

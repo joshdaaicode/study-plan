@@ -1,4 +1,4 @@
-const CACHE='study-plan-v5';
+const CACHE='study-plan-v6';
 const ASSETS=['./','./index.html','./plan.js','./manifest.json'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
