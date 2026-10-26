@@ -933,6 +933,7 @@ def main():
     out = {'v': VERSION, 'from': '2026-10-26', 'to': '2027-5-16', 'books': BK,
            'sci': [2027, 3, 6], 'cap': [2027, 5, 15], 'exams': exams, 'hol': hol,
            'hanfu': [key(x) for x in sorted(HANFU)], 'notes': OrderedDict((key(x), n) for x, n in DAY_NOTES.items()),
+           'papers': [[bk, sc, sb, yr, a, b] for bk, lst in (('A', PAPERS_A), ('B', PAPERS_B)) for sc, sb, yr, a, b in lst],
            'days': plan}
     here = os.path.dirname(os.path.abspath(__file__))
     path = os.path.join(here, '..', 'plan.js')

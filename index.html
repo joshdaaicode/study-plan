@@ -496,7 +496,7 @@ section:not([hidden]){animation:fxRise .3s ease both}
 html,body{overflow-x:hidden}
 @supports (overflow:clip){html,body{overflow-x:clip}}
 .hero{position:relative;isolation:isolate;padding:46px 0 30px;border-bottom:0}
-.hero::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:-40px;right:-40px;
+.hero::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);
   background:
     radial-gradient(60% 70% at 8% 0%, color-mix(in srgb,var(--sci) 22%,transparent), transparent 70%),
     radial-gradient(55% 60% at 100% 18%, color-mix(in srgb,var(--cap) 16%,transparent), transparent 70%);
@@ -537,6 +537,17 @@ section{padding-top:40px}
 .c-kbfix,.cat-kbfix{--c:#4C6EF5} .c-kbr,.cat-kbr{--c:#1098AD} .c-hw,.cat-hw{--c:#7950F2} .c-fu,.cat-fu{--c:#AE3EC9}
 .c-fixed,.cat-fixed{--c:#868E96} .c-life,.cat-life{--c:#ADB5BD} .c-rest,.cat-rest{--c:#20C997} .c-free,.cat-free{--c:#12B886}
 .todo label[class*="cat-"]{box-shadow:inset 4px 0 0 var(--c)}
+[data-dark] .c-math,[data-dark] .cat-math{--c:#74C0FC} [data-dark] .c-chi,[data-dark] .cat-chi{--c:#FFA94D}
+[data-dark] .c-eng,[data-dark] .cat-eng{--c:#F783AC} [data-dark] .c-sci,[data-dark] .cat-sci{--c:#69DB7C}
+[data-dark] .c-soc,[data-dark] .cat-soc{--c:#E0A86B} [data-dark] .c-mock,[data-dark] .cat-mock{--c:#FFC078}
+[data-dark] .c-term,[data-dark] .cat-term{--c:#FF8787} [data-dark] .c-kb,[data-dark] .cat-kb{--c:#91A7FF}
+[data-dark] .c-kbfix,[data-dark] .cat-kbfix{--c:#A5B4FC} [data-dark] .c-kbr,[data-dark] .cat-kbr{--c:#66D9E8}
+[data-dark] .c-hw,[data-dark] .cat-hw{--c:#B197FC} [data-dark] .c-fu,[data-dark] .cat-fu{--c:#E599F7}
+[data-dark] .c-fixed,[data-dark] .cat-fixed{--c:#ADB5BD} [data-dark] .c-life,[data-dark] .cat-life{--c:#868E96}
+[data-dark] .c-rest,[data-dark] .cat-rest{--c:#63E6BE} [data-dark] .c-free,[data-dark] .cat-free{--c:#38D9A9}
+[data-dark] .count,[data-dark] .card,[data-dark] .tl,[data-dark] .cal,[data-dark] .tbl-scroll,[data-dark] .todo,[data-dark] .now,[data-dark] .td-budget,
+[data-dark] .nowcard,[data-dark] .floor,[data-dark] .method,[data-dark] .phases,[data-dark] .cal-focus,[data-dark] .dv-card,[data-dark] .td-editor{box-shadow:0 1px 2px rgba(0,0,0,.3)}
+
 .todo .tk-how{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px;line-height:1.55}
 
 /* ---------- 每日日程 ---------- */
@@ -612,12 +623,67 @@ section{padding-top:40px}
   .dv-time b{font-size:13.5px}
   .dv-head{padding:16px 15px 12px} .dv-sum{padding:10px 15px} .dv-date{font-size:21px}
   .dv-toggle{margin-left:0}
-  .hero::before{left:-14px;right:-14px}
 }
 @media print{
   .dv-nav,.dv-tools,.tabs-wrap{display:none}
   .dv-item.past{opacity:1}
 }
+/* ---------- 電腦版：加寬與兩欄 ---------- */
+@media (min-width:1180px){ .wrap{max-width:1120px} }
+.td-grid{display:flex;flex-direction:column}
+.td-main,.td-side{display:contents}
+.td-side .nowcard{order:1} .td-side .bar-btns{order:2} #td-note2{order:3} #td-budget{order:4} #td-list{order:5}
+.td-main .td-bar{order:6} #td-editor{order:7} .td-ask{order:8;margin-top:16px}
+@media (min-width:1100px){
+  .td-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+  .td-main,.td-side{display:block}
+  .td-side{position:sticky;top:70px}
+  .td-side .nowcard{grid-template-columns:1fr;gap:12px}
+  .td-side .nc-right{border-left:0;border-top:1px solid var(--rule);padding-left:0;padding-top:13px}
+  .td-ask{margin-top:0}
+}
+.dv-layout{display:block}
+.dv-side{margin-top:18px;display:grid;gap:14px}
+@media (min-width:1100px){
+  .dv-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+  .dv-side{margin-top:0;position:sticky;top:70px}
+}
+.dv-box{padding:14px 16px}
+.dv-box-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px}
+.dv-box h3{font-size:15px}
+.wk-row{display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;padding:7px 8px;border-radius:12px;cursor:pointer;
+  border:1px solid transparent;transition:background .15s ease}
+.wk-row:hover{background:var(--card2)}
+.wk-row.sel{background:color-mix(in srgb,var(--sci) 10%,transparent);border-color:color-mix(in srgb,var(--sci) 30%,transparent)}
+.wk-row.today .wk-d b{color:var(--sci)}
+.wk-d{font-size:11.5px;color:var(--ink-faint);line-height:1.3}
+.wk-d b{display:block;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink)}
+.wk-mid{min-width:0}
+.wk-lab{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wk-bar{display:flex;gap:2px;height:6px;border-radius:999px;overflow:hidden;margin-top:4px;background:var(--slate-tint)}
+.wk-bar i{display:block;height:100%;background:var(--c)}
+.wk-h{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft);white-space:nowrap}
+.up-row{display:grid;grid-template-columns:1fr auto;gap:8px;padding:8px 2px;border-bottom:1px dashed var(--rule2);font-size:13px;align-items:baseline}
+.up-row:last-child{border-bottom:0}
+.up-row b{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--warn)}
+.up-row small{display:block;font-size:11.5px;color:var(--ink-faint)}
+.up-row.kbx b{color:var(--sci)} .up-row.capx b{color:var(--cap)}
+/* ---------- 科班考古題進度 ---------- */
+.kp-top{display:flex;gap:18px;flex-wrap:wrap;align-items:baseline;margin-bottom:10px}
+.kp-top b{font-family:'IBM Plex Mono',monospace;font-size:22px;color:var(--sci)}
+.kp-subj{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.kp-subj span{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--slate-tint);color:var(--ink-soft)}
+.kp-year{margin-top:12px}
+.kp-year h4{margin:0 0 6px;font-size:13px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;letter-spacing:.06em}
+.kp-row{display:grid;grid-template-columns:22px minmax(0,1fr) 74px;gap:10px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--rule2);font-size:13.5px}
+.kp-row:last-child{border-bottom:0}
+.kp-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--sci)}
+.kp-row input[type=number]{width:100%;font-family:'IBM Plex Mono',monospace;font-size:12.5px;padding:5px 8px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.kp-row small{color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;font-size:11px;margin-left:6px}
+.kp-row.on .kp-name{color:var(--ink-faint)}
+.kp-tag{display:inline-block;font-size:11px;padding:0 7px;border-radius:999px;margin-right:6px;font-weight:700;
+  background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)}
+.kp-row .kp-name{min-width:0}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -663,6 +729,33 @@ section{padding-top:40px}
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
   <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來，並從當天的娛樂時間扣掉。</p>
 
+  <div class="td-grid">
+    <div class="td-main">
+  <div class="td-budget" id="td-note2" hidden style="border-left:3px solid var(--warn)"></div>
+  <div class="td-budget" id="td-budget"></div>
+  <div class="todo" id="td-list"></div>
+
+  <div class="td-bar">
+    <button class="td-btn" id="td-add" type="button">＋ 新增任務</button>
+    <button class="td-btn" id="td-edit" type="button">編輯今天的日程</button>
+    <button class="td-btn ghost" id="td-clear" type="button">清掉欠帳</button>
+    <button class="td-btn ghost" id="td-easy" type="button">今天狀況不好</button>
+  </div>
+
+  <div class="td-editor" id="td-editor" hidden>
+    <p class="ed-head"><b id="ed-title">編輯範本</b><span>改動會套用到所有同類型的日子（例如所有暑假平日）。</span></p>
+    <div id="ed-rows"></div>
+    <p class="sub" style="margin:14px 0 4px"><b>套用到哪幾天</b>　勾起來的日子會一起套用這份範本（只影響同一個時期：暑假／學期／寒假）。</p>
+    <div class="dowbox" id="ed-dow"></div>
+    <div class="td-bar">
+      <button class="td-btn" id="ed-addrow" type="button">＋ 加一列</button>
+      <button class="td-btn solid" id="ed-save" type="button">儲存</button>
+      <button class="td-btn ghost" id="ed-cancel" type="button">取消</button>
+      <button class="td-btn ghost" id="ed-reset" type="button">恢復預設</button>
+    </div>
+  </div>
+    </div>
+    <aside class="td-side">
   <div class="nowcard">
     <div>
       <span class="eyebrow">現在</span>
@@ -687,47 +780,27 @@ section{padding-top:40px}
   <div class="bar-btns" style="margin:0 0 14px">
     <button class="btn" id="nt-on" type="button">開啟時段提醒</button>
   </div>
-  <div class="td-budget" id="td-note2" hidden style="border-left:3px solid var(--warn)"></div>
-  <div class="td-budget" id="td-budget"></div>
-  <div class="todo" id="td-list"></div>
-
-  <div class="td-bar">
-    <button class="td-btn" id="td-add" type="button">＋ 新增任務</button>
-    <button class="td-btn" id="td-edit" type="button">編輯今天的日程</button>
-    <button class="td-btn ghost" id="td-clear" type="button">清掉欠帳</button>
-    <button class="td-btn ghost" id="td-easy" type="button">今天狀況不好</button>
-  </div>
-
-  <div class="card" style="margin-top:16px">
+  <div class="card td-ask">
     <div class="sec-head" style="margin-bottom:6px"><h3>要問老師</h3><span class="eyebrow" id="ask-count">—</span></div>
     <p class="sub">卡住的當下記一行，隔天到學校問。問完打勾，把答案補上去。</p>
     <div class="set-grid" style="margin-bottom:9px">
       <div class="fld"><label>科目</label>
-        <select id="ask-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option></select>
+        <select id="ask-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
       </div>
       <div class="fld" style="grid-column:span 2"><label>卡在哪</label><input type="text" id="ask-q" placeholder="第 3 章例 5 為什麼要先平方？"></div>
     </div>
     <div class="bar-btns" style="margin-top:0"><button class="btn" id="ask-add" type="button">記下來</button></div>
     <div id="ask-list" style="margin-top:12px"></div>
   </div>
-
-  <div class="td-editor" id="td-editor" hidden>
-    <p class="ed-head"><b id="ed-title">編輯範本</b><span>改動會套用到所有同類型的日子（例如所有暑假平日）。</span></p>
-    <div id="ed-rows"></div>
-    <p class="sub" style="margin:14px 0 4px"><b>套用到哪幾天</b>　勾起來的日子會一起套用這份範本（只影響同一個時期：暑假／學期／寒假）。</p>
-    <div class="dowbox" id="ed-dow"></div>
-    <div class="td-bar">
-      <button class="td-btn" id="ed-addrow" type="button">＋ 加一列</button>
-      <button class="td-btn solid" id="ed-save" type="button">儲存</button>
-      <button class="td-btn ghost" id="ed-cancel" type="button">取消</button>
-      <button class="td-btn ghost" id="ed-reset" type="button">恢復預設</button>
-    </div>
+    </aside>
   </div>
 </section>
 
 <section id="daily">
   <div class="sec-head"><h2>每日日程</h2><span class="eyebrow" id="dv-range">2026/10/26 → 2027/5/16</span></div>
   <p class="sec-note">從今天到會考，每一天的每個時段都排好了。左右切換日期，或點日期條、用日曆跳到任何一天。今天的讀書時段會同步到「今天」分頁讓你打勾。</p>
+  <div class="dv-layout">
+  <div class="dv-main">
   <div class="dv-nav">
     <button class="dv-arrow" id="dv-prevw" type="button" aria-label="上一週">«</button>
     <button class="dv-arrow" id="dv-prev" type="button" aria-label="前一天">‹</button>
@@ -746,6 +819,18 @@ section{padding-top:40px}
     <ol class="dv-list" id="dv-list"></ol>
   </article>
   <div class="dv-legend" id="dv-legend"></div>
+  </div>
+  <aside class="dv-side">
+    <div class="card dv-box">
+      <div class="dv-box-head"><h3>這一週</h3><span class="eyebrow" id="dv-wk-range">—</span></div>
+      <div id="dv-weeksum"></div>
+    </div>
+    <div class="card dv-box">
+      <div class="dv-box-head"><h3>接下來的關卡</h3></div>
+      <div id="dv-upcoming"></div>
+    </div>
+  </aside>
+  </div>
 </section>
 
 <section>
@@ -1159,7 +1244,7 @@ section{padding-top:40px}
       </div>
       <div class="fld" style="grid-column:span 2"><label>快速標記：這題我不會</label>
         <div style="display:flex;gap:7px">
-          <select id="qk-sub" style="flex:0 0 96px"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option></select>
+          <select id="qk-sub" style="flex:0 0 96px"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
           <input type="text" id="qk-t" placeholder="題號或一句話，之後再補細節">
           <button class="btn solid" id="qk-go" type="button" style="flex:0 0 auto">標記</button>
         </div>
@@ -1177,7 +1262,7 @@ section{padding-top:40px}
     <h3 style="margin-bottom:8px">新增一題</h3>
     <div class="set-grid" style="margin-bottom:9px">
       <div class="fld"><label>科目</label>
-        <select id="wr-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option></select>
+        <select id="wr-sub"><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option></select>
       </div>
       <div class="fld"><label>錯因</label>
         <select id="wr-why"><option>觀念不熟</option><option>會但想不到</option><option>讀題錯誤</option><option>計算失誤</option><option>時間不夠</option></select>
@@ -1191,7 +1276,7 @@ section{padding-top:40px}
   <div class="card">
     <div class="sec-head" style="margin-bottom:10px"><h3>全部錯題</h3>
       <select id="wr-filter" style="font-size:12.5px;padding:5px 9px;border:1px solid var(--rule);background:var(--paper);color:var(--ink)">
-        <option value="">全部科目</option><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科學班</option>
+        <option value="">全部科目</option><option>國文</option><option>數學</option><option>英文</option><option>自然</option><option>社會</option><option>科班數學</option><option>科班物理</option><option>科班化學</option><option>科班生物</option><option>科班地科</option><option>科學班</option>
       </select>
     </div>
     <div id="wr-all"></div>
@@ -1245,6 +1330,13 @@ section{padding-top:40px}
   </table></div>
   <div class="bar-btns"><button class="btn solid" id="sc-save" type="button">儲存成績</button><span class="sub" id="sc-msg" style="align-self:center"></span></div>
   <p class="w-note">作文是級分（0–6），不計入平均。空白代表沒考或還沒填。</p>
+  <div class="card" id="kp-card" style="margin-top:18px">
+    <div class="sec-head" style="margin-bottom:6px"><h3>科班考古題進度</h3><span class="eyebrow">A 本 35 份＋B 本 36 份</span></div>
+    <p class="sub">寫完打勾、填分數（換算成百分比）。在「今天」勾掉某份考古題的「限時作答」時，這裡會自動打勾。</p>
+    <div class="kp-top" id="kp-top"></div>
+    <div class="kp-subj" id="kp-subj"></div>
+    <div id="kp-list"></div>
+  </div>
 </section>
 
 <section>
@@ -1364,7 +1456,7 @@ section{padding-top:40px}
   </div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">教材對照</h3>
-    <p class="sub">每科綁一本主要教材和目前推到的頁數。「今天」的任務會直接顯示「《翰林》p.120」，打開就知道從哪繼續，不用每天花三分鐘決定。</p>
+    <p class="sub">每本講義填目前讀到第幾頁。「今天」裡用到這本書的任務會顯示「目前到 p.120」，打開就知道從哪繼續。</p>
     <div id="bk-rows"></div>
     <div class="bar-btns"><button class="btn solid" id="bk-save" type="button">儲存教材</button><span class="sub" id="bk-msg" style="align-self:center;margin:0"></span></div>
   </div>
@@ -2110,7 +2202,13 @@ section{padding-top:40px}
     // 換了新版日程：今天重新產生，舊計畫留下的欠帳一筆勾銷
     if (PL && st.pv !== PL.v){
       st.pv=PL.v;
-      if (st.day === k){ st.backlog=[]; st.done={}; st.bonus=0; st.list=buildList(d, []); save(SK,st); return d; }
+      if (st.day === k){
+        // 同一天換版：名稱相同的任務保留勾選
+        var was={}; (st.list||[]).forEach(function(x){ if(st.done[x.id]) was[x.n]=1; });
+        st.backlog=[]; st.done={}; st.list=buildList(d, []);
+        st.list.forEach(function(x){ if(was[x.n]) st.done[x.id]=1; });
+        save(SK,st); return d;
+      }
       st.day=null; st.list=[];
     }
     if (st.day !== k){
@@ -2167,6 +2265,7 @@ section{padding-top:40px}
       cb.addEventListener('change',function(){
         var pv=(window.__rules?window.__rules().task:5);
         if(cb.checked){ st.done[x.id]=1; if(window.__award) window.__award(pv,'完成：'+x.n);
+          if(window.__kbMark) window.__kbMark(x.n);
           if(window.__fx) window.__fx.task(lab,pv); }
         else { delete st.done[x.id]; if(window.__award) window.__award(-pv,'取消勾選');
           if(window.__fx) window.__fx.undo(lab,pv); }
@@ -2175,8 +2274,8 @@ section{padding-top:40px}
       var sp=document.createElement('span');
       var bk=''; try{
         var B=JSON.parse(localStorage.getItem('plan.books.v1')||'{}');
-        var hit=Object.keys(B).filter(function(s){ return x.n.indexOf(s)!==-1; })[0];
-        if(hit&&B[hit].b) bk='　《'+B[hit].b+'》'+(B[hit].p?' p.'+B[hit].p:'');
+        var hit=Object.keys(B).filter(function(s){ return B[s]&&B[s].p&&x.n.indexOf(s)!==-1; })[0];
+        if(hit) bk='　目前到 p.'+B[hit].p;
       }catch(e){}
       sp.innerHTML=esc(x.n)+'<span class="tk-m">'+x.t+(x.m?'　'+x.m+' 分':'')+bk+(x.f?'　固定行程':'')+(x.bk?'　昨日未完成':'')+'</span>'
         +(x.d&&!x.f?'<span class="tk-how">'+esc(x.d)+'</span>':'');
@@ -2340,7 +2439,8 @@ section{padding-top:40px}
     var out=[];
     dayTpl(today0()).forEach(function(x){
       var m=(x.t||'').match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/);
-      if(m) out.push({a:(+m[1])*60+(+m[2]), b:(+m[3])*60+(+m[4]), n:x.n});
+      if(m) out.push({a:(+m[1])*60+(+m[2]), b:(+m[3])*60+(+m[4]), n:x.n,
+        quiet:(x.l && !/出門/.test(x.n)) || /^學校/.test(x.n)});
     });
     out.sort(function(p,q){return p.a-q.a;});
     return out;
@@ -2460,9 +2560,9 @@ section{padding-top:40px}
 
     if(P.notify){
       var id=cur?(cur.a+'|'+cur.n):null;
-      if(id && id!==lastBlock && mins-cur.a<=2){ notify('該開始了：'+cur.n, hhmm(cur.a)+'–'+hhmm(cur.b)+'，共 '+(cur.b-cur.a)+' 分'); }
+      if(id && id!==lastBlock && mins-cur.a<=2 && !cur.quiet){ notify('該開始了：'+cur.n, hhmm(cur.a)+'–'+hhmm(cur.b)+'，共 '+(cur.b-cur.a)+' 分'); }
       lastBlock=id;
-      if(nxt && nxt.a-mins===5 && warned!==nxt.a){ warned=nxt.a; notify('5 分鐘後：'+nxt.n, '先把手邊的收個尾'); }
+      if(nxt && nxt.a-mins===5 && warned!==nxt.a && !nxt.quiet){ warned=nxt.a; notify('5 分鐘後：'+nxt.n, '先把手邊的收個尾'); }
     }
   }
 
@@ -2677,8 +2777,8 @@ section{padding-top:40px}
   var SCK='plan.scores.v1';
   var EXAMS=[
     ['2026-9-8','一模'],['2026-10-12','上一段'],['2026-10-28','二模'],['2026-11-23','上二段'],
-    ['2026-12-23','三模'],['2027-1-14','上三段'],['2027-2-18','四模'],['2027-3-22','下一段'],
-    ['2027-4-15','五模'],['2027-5-3','下二段'],['2027-5-15','會考']
+    ['2026-12-23','三模'],['2027-1-18','上三段'],['2027-3-3','四模'],['2027-4-7','五模'],
+    ['2027-4-28','六模'],['2027-5-15','會考']
   ];
   var SUBS=['ch','ma','en','sc','so','wr'];
   var scores = ls(SCK) || {};
@@ -2756,7 +2856,7 @@ section{padding-top:40px}
   drawScores();
 
   /* ---------- 備份 ---------- */
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan-tab'];
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1','plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan-tab'];
   function dump(){
     var o={_v:1,_at:new Date().toISOString()};
     KEYS.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} });
@@ -2974,6 +3074,7 @@ section{padding-top:40px}
     var t=THEMES[cfg.key]||THEMES.sky;
     var base = (cfg.night && isNight()) ? THEMES.dusk.light : t.light;
     var p=Object.assign({},base);
+    if(base===THEMES.dusk.light) document.documentElement.setAttribute('data-dark','1'); else document.documentElement.removeAttribute('data-dark');
     var note='';
     if(cfg.mode==='auto'){
       var u=urgency();
@@ -3530,7 +3631,7 @@ section{padding-top:40px}
 
   /* ---------- 配速紀錄 ---------- */
   var PK='plan.pace.v1', pace=ls(PK,[]);
-  var EXAMS=['一模','上一段','二模','上二段','三模','上三段','四模','下一段','五模','下二段','會考'];
+  var EXAMS=['二模','上二段','三模','四模','五模','六模','會考','一模','上一段','上三段'];
   var pe=document.getElementById('pc-exam');
   if(pe){
     EXAMS.forEach(function(e){ var o=document.createElement('option'); o.textContent=e; pe.appendChild(o); });
@@ -3561,15 +3662,16 @@ section{padding-top:40px}
 
   /* ---------- 教材對照 ---------- */
   var BK='plan.books.v1', books=ls(BK,{});
-  var SUBS=['國文','數學','英文','自然','社會','科學班','補習作業'];
+  // 依 plan.js 的講義名稱：任務名稱裡出現這本書，就顯示「目前到第幾頁」
+  var PB=(window.PLAN&&window.PLAN.books)||{};
+  var SUBS=['chi','m1','m2','e1','e2','phy','bio','ear','his','geo','civ','A','B'].map(function(k){ return PB[k]; }).filter(Boolean);
   var br=document.getElementById('bk-rows');
   if(br){
     SUBS.forEach(function(s){
-      var row=document.createElement('div'); row.className='row'; row.style.gridTemplateColumns='72px 1fr 92px';
-      var lab=document.createElement('span'); lab.style.cssText='font-size:13.5px;color:var(--ink-soft)'; lab.textContent=s;
-      var b=document.createElement('input'); b.placeholder='教材名稱'; b.value=(books[s]||{}).b||''; b.dataset.s=s; b.dataset.f='b';
-      var pg=document.createElement('input'); pg.type='number'; pg.placeholder='頁'; pg.value=(books[s]||{}).p||''; pg.dataset.s=s; pg.dataset.f='p';
-      row.appendChild(lab); row.appendChild(b); row.appendChild(pg);
+      var row=document.createElement('div'); row.className='row'; row.style.gridTemplateColumns='1fr 92px';
+      var lab=document.createElement('span'); lab.style.cssText='font-size:13.5px;color:var(--ink-soft);align-self:center'; lab.textContent=s;
+      var pg=document.createElement('input'); pg.type='number'; pg.placeholder='目前頁'; pg.value=(books[s]||{}).p||''; pg.dataset.s=s; pg.dataset.f='p';
+      row.appendChild(lab); row.appendChild(pg);
       br.appendChild(row);
     });
     document.getElementById('bk-save').addEventListener('click',function(){
@@ -3651,7 +3753,7 @@ section{padding-top:40px}
 
   /* ---------- 本機快照 ---------- */
   var SNK='plan.snap.v1';
-  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1',
+  var KEYS=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.rules.v1',
     'plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1',
     'plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1','plan.books.v1','plan.review.v1'];
   function dumpAll(){ var o={_at:new Date().toISOString()}; KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }); return o; }
@@ -3744,6 +3846,57 @@ section{padding-top:40px}
     cheer:function(){ return CHEER[(Math.random()*CHEER.length)|0]; },
     banner:banner
   };
+})();
+</script>
+<script>
+/* ===== 科班考古題進度 ===== */
+(function(){
+  var PL=window.PLAN, box=document.getElementById('kp-list');
+  if(!PL||!PL.papers||!box) return;
+  var K='plan.kbscore.v1';
+  function ls(){ try{ return JSON.parse(localStorage.getItem(K))||{}; }catch(e){ return {}; } }
+  function sv(v){ try{ localStorage.setItem(K, JSON.stringify(v)); }catch(e){} }
+  var data=ls();
+  var CAT={'數學':'math','物理':'kb','化學':'kbfix','生物':'sci','地科':'kbr','自然綜合':'fu'};
+  function id(p){ return p[1]+' '+p[3]+' '+p[2]; }
+  function paint(){
+    var done=0, by={}, sum={}, cnt={};
+    PL.papers.forEach(function(p){
+      var r=data[id(p)]||{};
+      if(r.d) done++;
+      by[p[2]]=by[p[2]]||[0,0]; by[p[2]][1]++; if(r.d) by[p[2]][0]++;
+      if(r.s!==undefined && r.s!==''){ sum[p[2]]=(sum[p[2]]||0)+(+r.s); cnt[p[2]]=(cnt[p[2]]||0)+1; }
+    });
+    document.getElementById('kp-top').innerHTML='<span>已寫 <b>'+done+'</b> / '+PL.papers.length+' 份</span>'
+      +'<span class="sub" style="margin:0">目標：2/13 全部寫完並訂正</span>';
+    document.getElementById('kp-subj').innerHTML=Object.keys(by).map(function(s){
+      return '<span>'+s+' '+by[s][0]+'/'+by[s][1]+(cnt[s]?'　平均 '+Math.round(sum[s]/cnt[s])+'%':'')+'</span>'; }).join('');
+    var html='';
+    [112,113,114].forEach(function(y){
+      html+='<div class="kp-year"><h4>'+y+' 年</h4>';
+      PL.papers.filter(function(p){ return p[3]===y; }).forEach(function(p){
+        var k=id(p), r=data[k]||{};
+        html+='<div class="kp-row'+(r.d?' on':'')+'"><input type="checkbox" data-k="'+k+'"'+(r.d?' checked':'')+' aria-label="'+k+' 已寫">'
+          +'<span class="kp-name"><span class="kp-tag c-'+(CAT[p[2]]||'kb')+'">'+p[2]+'</span>'+p[1]+'<small>'+p[0]+' 本 p.'+p[4]+'–'+p[5]+'</small></span>'
+          +'<input type="number" min="0" max="100" placeholder="%" data-s="'+k+'" value="'+(r.s!==undefined?r.s:'')+'" aria-label="'+k+' 分數"></div>';
+      });
+      html+='</div>';
+    });
+    box.innerHTML=html;
+    Array.prototype.forEach.call(box.querySelectorAll('input[type=checkbox]'),function(c){
+      c.addEventListener('change',function(){ var r=data[c.dataset.k]||{}; r.d=c.checked?1:0; data[c.dataset.k]=r; sv(data); paint(); });
+    });
+    Array.prototype.forEach.call(box.querySelectorAll('input[type=number]'),function(c){
+      c.addEventListener('change',function(){ var r=data[c.dataset.s]||{}; r.s=c.value===''?'':Math.max(0,Math.min(100,+c.value)); if(c.value!=='') r.d=1; data[c.dataset.s]=r; sv(data); paint(); });
+    });
+  }
+  // 「今天」勾掉「科班考古｜台南一中 112 數學 限時作答…」就自動打勾（分前後半的，後半勾掉才算）
+  window.__kbMark=function(name){
+    var m=String(name).match(/^科班考古｜(\S+) (\d{3}) (\S+) 限時作答/);
+    if(!m || /前半/.test(name)) return;
+    var k=m[1]+' '+m[2]+' '+m[3]; data=ls(); var r=data[k]||{}; r.d=1; data[k]=r; sv(data); paint();
+  };
+  paint();
 })();
 </script>
 <script>
@@ -3863,8 +4016,50 @@ section{padding-top:40px}
       elLeg.innerHTML=Object.keys(CAT).filter(function(c){ return used[c]; }).map(function(c){
         return '<span class="c-'+c+'"><i></i>'+CAT[c]+'</span>'; }).join('');
     }
+    drawSide();
     if(dir&&elCard){ elCard.classList.remove('swipe-l','swipe-r'); void elCard.offsetWidth; elCard.classList.add(dir>0?'swipe-l':'swipe-r'); }
     if(isToday){ var n=elList.querySelector('.now'); if(n && window.__tab===1){ try{ n.scrollIntoView({block:'nearest'}); }catch(e){} } }
+  }
+  function studyOf(k){
+    var by={}, tot=0;
+    blocksOf(k).b.forEach(function(b){
+      if(b[5]!==0) return; var m=mm(b[1])-mm(b[0]); if(!(m>0)) return;
+      by[b[2]]=(by[b[2]]||0)+m; tot+=m;
+    });
+    return {by:by, tot:tot};
+  }
+  function drawSide(){
+    var ws=document.getElementById('dv-weeksum'), up=document.getElementById('dv-upcoming'), wr=document.getElementById('dv-wk-range');
+    if(ws){
+      var mon=addD(cur, -((cur.getDay()+6)%7)), t=today0(), html='', wt=0;
+      for(var i=0;i<7;i++){
+        var d=addD(mon,i), k=key(d), pd=PL.days[k];
+        if(!pd){ continue; }
+        var st=studyOf(k); wt+=st.tot;
+        var bar=Object.keys(st.by).sort(function(a,b){ return st.by[b]-st.by[a]; }).map(function(c){
+          return '<i class="c-'+c+'" style="flex:'+st.by[c]+'"></i>'; }).join('');
+        var lab=pd.note?pd.note.split('・')[0]:pd.lab;
+        html+='<div class="wk-row'+(d.getTime()===cur.getTime()?' sel':'')+(d.getTime()===t.getTime()?' today':'')+'" data-k="'+k+'">'
+          +'<div class="wk-d">週'+WD[d.getDay()]+'<b>'+(d.getMonth()+1)+'/'+d.getDate()+'</b></div>'
+          +'<div class="wk-mid"><div class="wk-lab">'+esc(lab)+'</div><div class="wk-bar">'+bar+'</div></div>'
+          +'<div class="wk-h">'+(st.tot?(Math.round(st.tot/6)/10)+'h':'休')+'</div></div>';
+      }
+      ws.innerHTML=html+'<p class="sub" style="margin:8px 4px 0;font-size:12px">本週讀書合計約 '+(Math.round(wt/6)/10)+' 小時</p>';
+      if(wr) wr.textContent=(mon.getMonth()+1)+'/'+mon.getDate()+' – '+(addD(mon,6).getMonth()+1)+'/'+addD(mon,6).getDate();
+      Array.prototype.forEach.call(ws.querySelectorAll('.wk-row'),function(r){ r.addEventListener('click',function(){ go(parse(r.dataset.k)); }); });
+    }
+    if(up){
+      var t0=today0(), list=[];
+      PL.exams.forEach(function(e){
+        if(/第二天/.test(e[3])) return;
+        var ed=new Date(e[0],e[1]-1,e[2]); if(ed<t0) return;
+        list.push({n:e[3].replace(/ 第一天$/,''), d:ed, est:e[4]});
+      });
+      up.innerHTML=list.slice(0,6).map(function(x){
+        var g=Math.round((x.d-t0)/86400000), cls=/科學班/.test(x.n)?' kbx':(/會考/.test(x.n)?' capx':'');
+        return '<div class="up-row'+cls+'"><span>'+esc(x.n)+(x.est?'（推估）':'')+'<small>'+(x.d.getMonth()+1)+'/'+x.d.getDate()+' 週'+WD[x.d.getDay()]+'</small></span><b>'+(g===0?'今天':g+' 天')+'</b></div>';
+      }).join('');
+    }
   }
   function go(d, dir){
     d=clamp(d);
