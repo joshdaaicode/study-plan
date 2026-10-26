@@ -11,6 +11,9 @@ import re
 import sys
 from collections import OrderedDict, defaultdict
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import books as TOC  # noqa: E402
+
 D = dt.date
 
 
@@ -95,48 +98,110 @@ def T(cat, title, how='', **kw):
     return t
 
 
-def pass1(vols, fine=False):
-    """各科第一輪講義（依冊）。回傳 {科目: [任務…]}。fine=True 切得更細（4–6 冊用）。"""
+# 國文（橘子）依主題編，不分冊：記憶型的先做（三模前），閱讀素養區留到三月後接近會考再做
+CHI_EARLY = [10, 11, 12, 13, 9, 6]
+CHI_LATE = [8, 7, 1, (2, 3), 4, 5, 14, 15, 16, 17, 18, 19, 20]
+
+
+def unit_task(cat, sub, book, u, how=PASS_HOW, extra=''):
+    vol, no, name, a, b = u
+    rng = (' p.%d–%d' % (a, b)) if a and b else ''
+    return T(cat, '%s｜%s 單元 %d %s%s%s' % (sub, book, no, name, rng, extra), how, vol=vol)
+
+
+def chi_tasks(units):
+    by = {u[1]: u for u in TOC.CHI}
+    out = []
+    for key in units:
+        if isinstance(key, tuple):
+            us = [by[k] for k in key]
+            out.append(T('chi', '國文｜%s 單元 %d–%d %s／%s p.%d–%d' % (
+                BK['chi'], us[0][1], us[-1][1], us[0][2], us[-1][2], us[0][3], us[-1][4]), PASS_HOW))
+            continue
+        u = by[key]
+        pages = u[4] - u[3] + 1
+        if pages > 20:                         # 太長的單元切兩段
+            mid = u[3] + pages // 2 - 1
+            out.append(T('chi', '國文｜%s 單元 %d %s（上）p.%d–%d' % (BK['chi'], u[1], u[2], u[3], mid), PASS_HOW))
+            out.append(T('chi', '國文｜%s 單元 %d %s（下）p.%d–%d' % (BK['chi'], u[1], u[2], mid + 1, u[4]), PASS_HOW))
+        else:
+            out.append(unit_task('chi', '國文', BK['chi'], u))
+    if units is CHI_LATE:
+        x = TOC.CHI_EXTRA[0]
+        out.append(T('chi', '國文｜%s %s p.%d–%d（限時 70 分）' % (BK['chi'], x[0], x[1], x[2]), '照會考時間計時，寫完立刻對答案'))
+    return out
+
+
+def blocks_of(units, cat, sub, book, split_at=None, pair_upto=None, extras=(), how=PASS_HOW):
+    """把單元變成讀書段：超過 split_at 頁切成上下兩段；相鄰兩單元合計不超過 pair_upto 頁就併成一段。"""
+    out, i = [], 0
+    units = list(units)
+    while i < len(units):
+        u = units[i]
+        pages = u[4] - u[3] + 1
+        last_of_vol = (i == len(units) - 1) or units[i + 1][0] != u[0]
+        if pair_upto and not last_of_vol and (units[i + 1][4] - u[3] + 1) <= pair_upto:
+            v = units[i + 1]
+            last2 = (i + 1 == len(units) - 1) or units[i + 2][0] != v[0]
+            ex = extra_note(extras, v[0]) if last2 else ''
+            out.append(T(cat, '%s｜%s 單元 %d–%d %s／%s p.%d–%d%s' % (sub, book, u[1], v[1], u[2], v[2], u[3], v[4], ex), how, vol=u[0]))
+            i += 2
+            continue
+        ex = extra_note(extras, u[0]) if last_of_vol else ''
+        if split_at and pages >= split_at:
+            mid = u[3] + pages // 2 - 1
+            out.append(T(cat, '%s｜%s 單元 %d %s（上）p.%d–%d' % (sub, book, u[1], u[2], u[3], mid), how, vol=u[0]))
+            out.append(T(cat, '%s｜%s 單元 %d %s（下）p.%d–%d%s' % (sub, book, u[1], u[2], mid + 1, u[4], ex), how, vol=u[0]))
+        else:
+            out.append(unit_task(cat, sub, book, u, how=how, extra=ex))
+        i += 1
+    return out
+
+
+def extra_note(extras, vol):
+    for e in extras:
+        if e[0] == vol:
+            return '＋%s p.%d–%d' % (e[1], e[2], e[3])
+    return ''
+
+
+def pass1(vols):
+    """各科第一輪講義。社會、生物、英文依講義目錄的真實單元與頁碼；數學、理化、地科暫照課綱章節。"""
     out = OrderedDict()
     for key in ['math', 'chi', 'eng', 'sci', 'soc']:
         out[key] = []
     for v in vols:
-        for c in range(len(MATH_CH[v])):
-            names = MATH_CH[v][c]
-            if (v, c + 1) in DOUBLE_CH:
-                out['math'].append(T('math', '數學｜%s 第 %d 冊 第 %d 章 %s（上）' % (BK['m1'], v, c + 1, names), PASS_HOW))
-                out['math'].append(T('math', '數學｜%s 第 %d 冊 第 %d 章 %s（下）' % (BK['m1'], v, c + 1, names), PASS_HOW))
-            else:
-                out['math'].append(T('math', '數學｜%s 第 %d 冊 第 %d 章 %s' % (BK['m1'], v, c + 1, names), PASS_HOW))
-        chi_parts = ['L1–L4（課文、注釋、形音義）', 'L5–L8', 'L9 之後＋自學課＋國學常識']
-        for part in chi_parts:
-            out['chi'].append(T('chi', '國文｜%s 第 %d 冊 %s' % (BK['chi'], v, part), PASS_HOW))
-        eng_parts = (['前段單元：單字、片語、文法', '中段單元：單字、片語、文法', '後段單元＋文法總整理'] if fine else
-                     ['前半單元：單字、片語、文法', '後半單元：單字、片語、文法'])
-        for part in eng_parts:
-            out['eng'].append(T('eng', '英文｜%s 第 %d 冊 %s' % (BK['e1'], v, part), PASS_HOW))
-        if v in BIO_CH:
-            for part in BIO_CH[v]:
-                out['sci'].append(T('sci', '生物｜%s 第 %d 冊 %s' % (BK['bio'], v, part), PASS_HOW))
-        if v in (3, 4):
-            for part in ['第 1–3 章', '第 4–6 章']:
-                out['sci'].append(T('sci', '理化｜%s 第 %d 冊 %s' % (BK['phy'], v, part), PASS_HOW))
-        if v == 5:
-            out['sci'].append(T('sci', '理化｜%s 第 5 冊 第 1 章' % BK['phy'], PASS_HOW))
-            out['sci'].append(T('sci', '理化｜%s 第 5 冊 第 2 章' % BK['phy'], PASS_HOW))
-            out['sci'].append(T('sci', '理化｜%s 第 5 冊 第 3 章之後' % BK['phy'], PASS_HOW))
-            out['sci'].append(T('sci', '地科｜%s 第 5 冊 地科全部' % BK['ear'], PASS_HOW))
-        if v == 6:
-            out['sci'].append(T('sci', '理化｜%s 第 6 冊 理化 前半' % BK['phy'], PASS_HOW))
-            out['sci'].append(T('sci', '理化｜%s 第 6 冊 理化 後半' % BK['phy'], PASS_HOW))
-            out['sci'].append(T('sci', '地科｜%s 第 6 冊 地科 前半' % BK['ear'], PASS_HOW))
-            out['sci'].append(T('sci', '地科｜%s 第 6 冊 地科 後半' % BK['ear'], PASS_HOW))
-        for k, sub in (('his', '歷史'), ('geo', '地理'), ('civ', '公民')):
-            if fine and k != 'civ':
-                out['soc'].append(T('soc', '%s｜%s 第 %d 冊 前半課次' % (sub, BK[k], v), PASS_HOW))
-                out['soc'].append(T('soc', '%s｜%s 第 %d 冊 後半課次' % (sub, BK[k], v), PASS_HOW))
-            else:
-                out['soc'].append(T('soc', '%s｜%s 第 %d 冊 全部課次' % (sub, BK[k], v), PASS_HOW))
+        if v <= 4:
+            out['math'] += blocks_of([x for x in TOC.MATH_SJ if x[0] == v], 'math', '數學', BK['m1'],
+                                     split_at=16, extras=TOC.MATH_SJ_EXTRA)
+        else:
+            out['math'] += blocks_of([x for x in TOC.MATH_SX if x[0] == v], 'math', '數學', BK['m2'],
+                                     split_at=16, extras=TOC.MATH_SX_EXTRA)
+        for u in [x for x in TOC.ENG_SX if x[0] == v]:
+            out['eng'].append(unit_task('eng', '英文', BK['e1'], u))
+        for e in TOC.ENG_SX_EXTRA:
+            if e[0] == v:
+                out['eng'].append(T('eng', '英文｜%s %s p.%d–%d' % (BK['e1'], e[1], e[2], e[3]), '閱讀測驗限時寫，對完答案再看文法整理'))
+        bio = [x for x in TOC.BIO if x[0] == v]
+        for i, u in enumerate(bio):
+            out['sci'].append(unit_task('sci', '生物', BK['bio'], u,
+                                        extra=extra_note(TOC.BIO_EXTRA, v) if i == len(bio) - 1 else ''))
+        out['sci'] += blocks_of([x for x in TOC.PHY if x[0] == v], 'sci', '理化', BK['phy'],
+                                pair_upto=28, extras=TOC.PHY_EXTRA)
+        out['sci'] += blocks_of([x for x in TOC.EAR if x[0] == v], 'sci', '地科', BK['ear'],
+                                extras=TOC.EAR_EXTRA, how='重點整理先看一遍 → 只寫精選題；科班讀過的地科這裡會快很多')
+        # 社會：同一冊內歷史、地理、公民輪流，任何時候三科都差不多走到同一冊
+        lists = []
+        for data, extras, sub, key in ((TOC.HIS, TOC.HIS_EXTRA, '歷史', 'his'), (TOC.GEO, TOC.GEO_EXTRA, '地理', 'geo'),
+                                       (TOC.CIV, TOC.CIV_EXTRA, '公民', 'civ')):
+            us = [x for x in data if x[0] == v]
+            lists.append([unit_task('soc', sub, BK[key], u, extra=extra_note(extras, v) if i == len(us) - 1 else '')
+                          for i, u in enumerate(us)])
+        while any(lists):
+            for l in lists:
+                if l:
+                    out['soc'].append(l.pop(0))
+    out['chi'] = chi_tasks(CHI_EARLY if 1 in vols else CHI_LATE)
     return out
 
 
@@ -333,34 +398,32 @@ def fu_queue():
 def cap_round2():
     """四月起：單本科目第二輪（只看重點整理＋自己的錯題）。"""
     g = OrderedDict()
-    g['chi'] = [T('chi', '國文第二輪｜%s 第 %s 冊：只看重點整理＋自己標記的錯題' % (BK['chi'], v), '') for v in ('1–2', '3–4', '5–6')]
-    g['sci'] = [T('sci', '理化第二輪｜%s 第 3–4 冊：重點＋錯題' % BK['phy'], ''),
-                T('sci', '理化第二輪｜%s 第 5–6 冊：重點＋錯題' % BK['phy'], ''),
-                T('sci', '生物第二輪｜%s 第 1–2 冊：重點＋錯題' % BK['bio'], ''),
-                T('sci', '地科第二輪｜%s 第 5–6 冊：重點＋錯題' % BK['ear'], '')]
-    g['soc'] = [T('soc', '%s第二輪｜%s 第 %s 冊：重點＋錯題' % (n, BK[k], v), '')
-                for v in ('1–3', '4–6') for k, n in (('his', '歷史'), ('geo', '地理'), ('civ', '公民'))]
+    g['chi'] = [T('chi', '國文第二輪｜%s 單元 %s：只看重點整理＋自己標記的錯題' % (BK['chi'], v), '') for v in ('6–9', '10–13')]
+    g['sci'] = [T('sci', '理化第二輪｜%s 單元 1–11：重點＋錯題' % BK['phy'], ''),
+                T('sci', '理化第二輪｜%s 單元 12–17：重點＋錯題' % BK['phy'], ''),
+                T('sci', '生物第二輪｜%s 單元 1–9：重點＋錯題' % BK['bio'], ''),
+                T('sci', '地科第二輪｜%s 單元 1–5：重點＋錯題' % BK['ear'], '')]
+    g['soc'] = [T('soc', '%s第二輪｜%s 單元 %s：重點＋錯題' % (n, BK[k], v), '')
+                for k, n, v in (('his', '歷史', '1–8'), ('geo', '地理', '1–9'), ('civ', '公民', '1–7'),
+                                ('his', '歷史', '9–15'), ('geo', '地理', '10–16'), ('civ', '公民', '8–14'))]
     return interleave(g)
 
 
 def math2_queue():
-    out = []
-    for v in range(1, 7):
-        ch = MATH_CH[v]
-        half = (len(ch) + 1) // 2
-        out.append(T('math', '數學第二本｜%s 第 %d 冊 第 1–%d 章' % (BK['m2'], v, half), '只寫中等以上的題目，簡單題跳過'))
-        out.append(T('math', '數學第二本｜%s 第 %d 冊 第 %d–%d 章' % (BK['m2'], v, half + 1, len(ch)), '只寫中等以上的題目，簡單題跳過'))
-    return out
+    us = [x for x in TOC.MATH_SX if x[0] <= 4]
+    return blocks_of(us, 'math', '數學第二本', BK['m2'], pair_upto=40, extras=TOC.MATH_SX_EXTRA,
+                     how='只寫中等以上的題目，簡單題跳過；錯的登記錯題本')
 
 
 def eng2_queue():
-    out = [T('eng', '英文第二本｜%s 第 %d 章（聽力部分跳過）' % (BK['e2'], i), '主題單字先默寫，再寫閱讀題') for i in range(1, 16)]
-    out.append(T('eng', '英文第二本｜%s 書末會考模擬測驗（只寫閱讀）' % BK['e2'], '限時 60 分'))
+    out = [unit_task('eng', '英文第二本', BK['e2'], u, how='主題單字先默寫，再寫文法與閱讀題；聽力部分跳過') for u in TOC.ENG_DMG]
+    x = TOC.ENG_DMG_EXTRA[0]
+    out.append(T('eng', '英文第二本｜%s %s p.%d–%d' % (BK['e2'], x[0], x[1], x[2]), '限時 60 分'))
     return out
 
 
 LIGHT_CYCLE = [
-    lambda n: T('chi', '國文｜形音義＋成語（%s 第 %d 冊 形音義區）' % (BK['chi'], n), '同音、形近字寫三遍'),
+    lambda n: T('chi', '國文｜%s 單元 %d 快速複習（只看重點與錯題）' % (BK['chi'], [10, 11, 12, 13, 9, 6][(n - 1) % 6]), '同音、形近字寫三遍'),
     lambda n: T('eng', '英文｜單字片語默寫（%s 第 %d 冊 單字表）' % (BK['e1'], n), '只看中文默寫英文'),
     lambda n: T('mock', '錯題本：今天到期的題目（闔上答案重做）', ''),
     lambda n: T('soc', '社會｜名詞、年代、地圖快速卡（第 %d 冊）' % n, ''),
@@ -458,16 +521,16 @@ PH_NAME = {
 }
 PH_NOTE = {
     'P0': '先讀第一天考科（社會、數學、國文），晚上自然、英文；只求翻過一遍。週四考完當晚把五科錯題登記進錯題本。',
-    'P1': '三模前把 1–3 冊走完一輪；考古題從 112 年開始寫，作答隔一段再訂正。',
+    'P1': '科班優先（會考 4：科班 6）。考古題從 112 年開始寫，作答隔一段再訂正；會考講義各科交錯推進。',
     'P2': '二段（11/23–24）倒數兩週：會考講義暫停，考古題減半，補習作業照寫。',
-    'P3': '三模前把 1–3 冊走完一輪；每週日晚上補習前的「空檔」先補欠帳。',
-    'P3b': '三模（12/23–24）週：模考卷第 2 回限時＋訂正，1–3 冊收尾。',
+    'P3': '科班優先：三模前會考大約走到第 2 冊＋第 3 冊開頭，剩下的三月接著做。每週日下午的「空檔」先補欠帳。',
+    'P3b': '三模（12/23–24）週：模考卷第 2 回限時＋訂正，其餘時間繼續推 1–3 冊。',
     'P4': '二月中前寫完兩本考古題＋訂正、補習講義複習一輪；會考暫停，三段不準備。',
     'P5': '最後兩週半：第二輪錯題重做、限時模擬、觀念總整理。四模不另外準備。',
     'P6': '一半時間準備複試、一半回會考；沒進複試就把複試格子全部改成會考。',
-    'P7a': '4–6 冊第一輪＋模考卷第 3、4 回；4/3–4/6 連假寫模考卷第 5 回。',
-    'P7c': '數學、英文第二本講義＋歷屆會考 111、112 年＋單本科目第二輪。',
-    'P7d': '歷屆會考 113–115 年＋錯題本總複習；考前一週不讀新東西。',
+    'P7a': '先補完 1–3 冊，再走 4–6 冊第一輪；4 冊走完寫模考卷第 3 回，4/3–4/6 連假寫第 4 回。',
+    'P7c': '4–6 冊第一輪走完後寫模考卷第 5 回（全範圍），接著數學、英文第二本講義＋歷屆會考 112 年；平日 50 分鐘那段做第二輪（只看重點＋錯題）。',
+    'P7d': '歷屆會考 113–115 年＋錯題本總複習；考前一週只看錯題紙。',
 }
 
 
@@ -570,7 +633,10 @@ def build():
     rot = {'kbr': 0, 'hw_mon': 0, 'weak': 0}
     KBR_SUBJ = ['資優數學', '物理', '化學', '生物', '地科']
 
-    def light():
+    def light(day=None):
+        if day is not None and day >= d(4, 9) and r2q.items and light_i[0] % 2 == 0:
+            light_i[0] += 1
+            return r2q.pop()
         i = light_i[0]
         light_i[0] += 1
         f = LIGHT_CYCLE[i % len(LIGHT_CYCLE)]
@@ -593,31 +659,32 @@ def build():
     # 7 月以後的會考隊列在進入 P6 時建立（要接上 P3 沒做完的 1–3 冊）
     p7_built = [False]
     q7a, q7c, q7d = Q([], 'q7a'), Q([], 'q7c'), Q([], 'q7d')
+    r2q = Q([], 'r2q')
 
     def build_p7():
         p7_built[0] = True
         rest13 = list(cap13.items)
         cap13.items = []
-        g = pass1([4, 5, 6], fine=True)
+        g = pass1([4, 5, 6])
         # 剩下的 1–3 冊排在最前面
         seq = [T('mock', '四模訂正：初試前沒時間訂正的五科錯題，現在補登記錯題本', '每題一行「為什麼錯」')] + rest13 + interleave(g)
         # 4 冊結束後插入模考卷第 3 回、5 冊結束後插入第 4 回
         def last_idx(vol):
             idx = -1
             for i, t in enumerate(seq):
-                if ('第 %d 冊' % vol) in t['n']:
+                if t.get('vol') == vol:
                     idx = i
             return idx
-        i5 = last_idx(5)
-        seq = seq[:i5 + 1] + mock_round(4) + seq[i5 + 1:]
+        i6 = last_idx(6)
+        seq = seq[:i6 + 1] + mock_round(5) + seq[i6 + 1:]
         i4 = last_idx(4)
         seq = seq[:i4 + 1] + mock_round(3) + seq[i4 + 1:]
         q7a.items = seq
         g2 = OrderedDict()
         g2['math'] = math2_queue()
         g2['eng'] = eng2_queue()
-        g2['past'] = past_round(111) + past_round(112)
-        g2['r2'] = cap_round2()
+        g2['past'] = past_round(112)
+        r2q.items = cap_round2()            # 第二輪改放三月後的 50 分鐘輕量時段
         q7c.items = interleave(g2)
         g3 = OrderedDict()
         g3['past'] = past_round(113) + past_round(114) + past_round(115)
@@ -625,7 +692,7 @@ def build():
                        for s in ['數學', '自然', '社會', '國文', '英文', '數學', '自然', '社會']]
         g3['last'] = [T(c, '最後一輪｜%s' % w, '只看自己整理過的東西') for c, w in [
             ('math', '數學：自己的公式紙＋錯題紙，不看解答重做'),
-            ('chi', '國文：形音義、成語、國學常識總整理（%s 各冊整理頁）' % BK['chi']),
+            ('chi', '國文：形音義、成語、國學常識總整理（%s 單元 9–13）' % BK['chi']),
             ('eng', '英文：%s 1–6 冊單字表快速默寫＋文法總整理' % BK['e1']),
             ('sci', '自然：理化公式＋生物、地科關鍵名詞，自己畫一張總圖'),
             ('soc', '社會：歷史年代表、地理圖表、公民名詞總整理')]]
@@ -637,7 +704,7 @@ def build():
             return t or T('mock', '會考｜1–3 冊錯題本＋講義打★的題目重做', '')
         if not p7_built[0]:
             build_p7()
-        for q in ((q7a,) if ph in ('P6', 'P7a') else (q7c, q7a) if ph == 'P7c' else (q7d, q7c, q7a)):
+        for q in ((q7a,) if ph in ('P6', 'P7a') else (q7a, q7c) if ph == 'P7c' else (q7a, q7d, q7c)):
             t = q.pop()
             if t:
                 return t
@@ -724,7 +791,7 @@ def build():
                 elif tr == 'recall':
                     t = T('hw', '今天補習重點回想：不看筆記，寫下 3 個重點', '寫不出來的就是下週要問的')
                 elif tr == 'light':
-                    t = light()
+                    t = light(day)
                 else:
                     t = light()
                 blocks.append((s, e, t['cat'], t['n'], t.get('d', ''), 0))
@@ -777,14 +844,14 @@ def pinned(day, slot):
         (d(3, 5), 'S2'): T('kbr', '準備准考證、文具、手錶；洗澡，22:00 前上床', ''),
         (d(3, 5), 'S3'): False,
         (d(3, 2), 'S3'): T('hw', '雄科班補習作業（初試週：只寫老師指定要交的）', ''),
-        # 五模前（4/3–4/6 連假寫模考卷第 5 回）
-        (d(4, 3), 'H1'): mock_paper(5, '數學'),
-        (d(4, 3), 'H2'): mock_paper(5, '社會'),
-        (d(4, 3), 'H3'): mock_paper(5, '國文'),
-        (d(4, 3), 'H4'): mock_fix(5, ['數學', '社會', '國文']),
-        (d(4, 4), 'H1'): mock_paper(5, '自然'),
-        (d(4, 4), 'H2'): mock_paper(5, '英文'),
-        (d(4, 4), 'H3'): mock_fix(5, ['自然', '英文']),
+        # 五模前（4/3–4/6 連假寫模考卷第 4 回；第 5 回等 6 冊走完、六模前寫）
+        (d(4, 3), 'H1'): mock_paper(4, '數學'),
+        (d(4, 3), 'H2'): mock_paper(4, '社會'),
+        (d(4, 3), 'H3'): mock_paper(4, '國文'),
+        (d(4, 3), 'H4'): mock_fix(4, ['數學', '社會', '國文']),
+        (d(4, 4), 'H1'): mock_paper(4, '自然'),
+        (d(4, 4), 'H2'): mock_paper(4, '英文'),
+        (d(4, 4), 'H3'): mock_fix(4, ['自然', '英文']),
         (d(4, 6), 'H7'): T('mock', '明天五模第一天：社會、數學、國文 重點快速過', '早點睡'),
         (d(4, 27), 'S2'): T('mock', '明天六模第一天：社會、數學、國文 重點快速過', '只看重點和錯題'),
         (d(4, 27), 'S3'): False,
