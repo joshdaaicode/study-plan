@@ -312,11 +312,11 @@ tr.sumrow.todayrow td{background:var(--hi)}
 .cal-d.holiday{background:var(--hi2)}
 .cal-d.holiday .cal-n{color:var(--rest)}
 /* ---------- 主分頁 ---------- */
-.tabs{position:sticky;top:0;z-index:20;display:flex;gap:2px;overflow-x:auto;
+.tabs{position:relative;display:flex;gap:2px;overflow-x:auto;
   background:var(--paper);padding:10px 0 9px;margin-bottom:2px;
   border-bottom:1px solid var(--rule);-webkit-overflow-scrolling:touch}
 .tabs::-webkit-scrollbar{display:none}
-.tabs-wrap{position:relative}
+.tabs-wrap{position:sticky;top:0;z-index:30;background:var(--paper)}   /* 分頁列和子分頁一起黏在最上面 */
 .tabs-wrap::after{content:"";position:absolute;top:0;right:0;bottom:1px;width:26px;pointer-events:none;
   background:linear-gradient(90deg,transparent,var(--paper))}
 @media (min-width:900px){.tabs-wrap::after{display:none}}
@@ -632,7 +632,7 @@ section{padding-top:40px}
 @media (min-width:1180px){ .wrap{max-width:1120px} }
 .td-grid{display:flex;flex-direction:column}
 .td-main,.td-side{display:contents}
-.td-side .nowcard{order:1} .td-side .bar-btns{order:2} #td-note2{order:3} #td-budget{order:4} #td-list{order:5}
+.td-side .nowcard{order:1} #td-note2{order:2} #td-budget{order:3} #td-list{order:4} .td-bar{order:5} #td-editor{order:6} .td-side .fp-mini{order:7} .td-side .bar-btns{order:8} .td-side .td-ask{order:9}   /* 手機：現在→進度→任務→按鈕→寵物→提醒→問老師 */
 .td-main .td-bar{order:6} #td-editor{order:7} .td-ask{order:8;margin-top:16px}
 @media (min-width:1100px){
   .td-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
@@ -765,12 +765,29 @@ section{padding-top:40px}
 #sc-table td,#sc-table th{white-space:nowrap}
 #sc-table td.n{font-family:'IBM Plex Mono',monospace;text-align:right}
 
-/* ---------- 頁內目錄 ---------- */
-.page-toc{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
+/* ---------- 子分頁（紀錄、獎勵、計畫） ---------- */
+.page-toc{display:flex;gap:6px;overflow-x:auto;padding:7px 0 8px;scrollbar-width:none;border-bottom:1px solid var(--rule)}
 .page-toc::-webkit-scrollbar{display:none}
-.page-toc button{flex:0 0 auto;font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--rule);border-radius:var(--r-btn);
+.page-toc button{flex:0 0 auto;font:inherit;font-size:12.5px;padding:5px 12px;border:1px solid var(--rule);border-radius:999px;
   background:var(--card);color:var(--ink-soft);cursor:pointer;white-space:nowrap}
 .page-toc button:hover{color:var(--ink)}
+.page-toc button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--card);font-weight:700}
+/* 其他分頁不放大標題，只留一條小倒數列 */
+.hero-mini{display:none;align-items:baseline;gap:6px 14px;flex-wrap:wrap;padding:12px 0 4px;font-size:12.5px;color:var(--ink-faint)}
+.hero-mini b{font-family:'Noto Serif TC',serif;font-size:15px;color:var(--ink);margin-right:auto}
+.hero-mini em{font-style:normal;font-family:'IBM Plex Mono',monospace;color:var(--ink)}
+[data-tab]:not([data-tab="0"]) .hero{display:none}
+[data-tab]:not([data-tab="0"]) .hero-mini{display:flex}
+/* 可收合的卡片（設定、考古題清單） */
+.fold > .fold-h{cursor:pointer;user-select:none}
+.fold > .fold-h h3,.fold > h3.fold-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.fold > .fold-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.fold > .fold-h h3{flex:1}
+.fold > .fold-h h3::after,.fold > h3.fold-h::after{content:"▾";font-size:13px;color:var(--ink-faint);transition:transform .15s}
+.fold:not(.open) > .fold-h h3::after,.fold:not(.open) > h3.fold-h::after{transform:rotate(-90deg)}
+.fold:not(.open) > :not(.fold-h):not(.fold-keep){display:none!important}
+.fold:not(.open) > h3.fold-h{margin-bottom:0!important}
+.fold > .fold-h:focus-visible{outline:2px solid var(--warn);outline-offset:3px}
 .page-toc button:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 
 /* ---------- 日程搜尋 ---------- */
@@ -1031,6 +1048,76 @@ section{padding-top:40px}
 }
 @media (prefers-reduced-motion:reduce){.ac-m.ready{animation:none}}
 .no-motion .ac-m.ready{animation:none}
+
+/* ---------- 手機版面：頂端精簡 ---------- */
+@media (max-width:640px){
+  .hero{padding:16px 0 8px}
+  .hero .lede,.hero .tagline{display:none}
+  .hero-eyebrow{font-size:10.5px;padding:3px 10px}
+  .hero .brand{font-size:26px;margin-top:10px}
+  .hero .counts{grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .hero .count{padding:11px 12px 10px}
+  .hero .count .tag{font-size:10px;padding:2px 7px;letter-spacing:.06em}
+  .hero .count .n{font-size:30px;margin-top:4px}
+  .hero .count .n small{font-size:12px;margin-left:3px}
+  .hero .count .d{font-size:11px;margin-top:3px;line-height:1.35}
+  .hero .now{margin-top:10px;padding:11px 13px 11px;gap:8px}
+  .hero .now .next{border-left:0;padding-left:0;border-top:1px solid var(--rule);padding-top:8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .hero .now .next .nx-n{font-size:24px;margin-top:0}
+  .hero .now .next .nx-l{margin:0}
+  .page-toc{padding:6px 0 7px}
+  .page-toc button{font-size:12px;padding:5px 11px}
+  section{padding-top:18px}
+  .sec-note{margin:6px 0 14px;font-size:13.5px}
+}
+
+/* ---------- 手機版面：獎勵區 ---------- */
+.sec-rules{margin:-2px 0 12px}
+.sec-rules > summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-soft);
+  padding:4px 11px;border:1px solid var(--rule);border-radius:999px;background:var(--card)}
+.sec-rules > summary::-webkit-details-marker{display:none}
+.sec-rules > summary::before{content:"ⓘ";color:var(--ink-faint)}
+.sec-rules[open] > summary{margin-bottom:8px}
+.sec-rules > summary:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
+.fp-more{margin-top:12px;border:1px solid var(--rule2);border-radius:12px;background:var(--card2)}
+.fp-more > summary{cursor:pointer;list-style:none;padding:9px 12px;font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fp-more > summary::-webkit-details-marker{display:none}
+.fp-more > summary span{margin-left:auto;color:var(--ink-faint);font-size:11.5px}
+.fp-more > summary::after{content:"▾";color:var(--ink-faint)}
+.fp-more[open] > summary::after{content:"▴"}
+.fp-more > :not(summary){margin-left:12px;margin-right:12px}
+.fp-more > :last-child{margin-bottom:10px}
+.fp-mini-chips{display:flex;flex-wrap:wrap;gap:2px 10px}
+.ac-more{display:block;margin:12px auto 0}
+@media (max-width:560px){
+  .fp-tabs,.fp-lands{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .fp-tabs::-webkit-scrollbar,.fp-lands::-webkit-scrollbar{display:none}
+  .fp-tabs > *,.fp-lands > *{flex:0 0 auto}
+  .fp-items{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+  .fp-items button{flex:0 0 auto}
+  .fp-row h4 span{display:block;margin:2px 0 0}
+  .fp-stats{grid-template-columns:1fr 1fr;gap:6px 12px}
+  .fp-care{font-size:13px;padding:8px 10px}
+  .fp-boost{font-size:12px;padding:6px 9px}
+  .fp-head{gap:2px 8px}
+  .ac-sum{grid-template-columns:minmax(0,1fr) auto;gap:10px 10px;padding:12px;align-items:end}
+  .ac-sum > :first-child{grid-column:1/-1}
+  .ac-sum > .btn{padding:8px 12px;font-size:12.5px}
+  .ac-sum > .sub{font-size:11.5px;text-align:right}
+  .ac-title small{display:none}
+  .ac-title select{padding:6px 8px;font-size:13px}
+  .ac-card{grid-template-columns:36px minmax(0,1fr) auto;gap:8px;padding:9px 10px}
+  .ac-ic{width:36px;height:36px;font-size:17px}
+  .ac-cat{display:none}
+  .ac-ms{margin-top:3px} .ac-m{width:11px;height:11px}
+  .ac-card .btn{padding:6px 9px}
+  .bn-tiles{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .bn-tile{padding:8px 9px;border-radius:10px}
+  .bn-tile b{font-size:18px}
+  .bn-tile small{font-size:10.5px}
+  .bn-tile em{font-size:10px;line-height:1.3}
+  .bn-terms button{min-width:0;padding:7px 10px}
+}
 </style>
 </head>
 <body>
@@ -1069,8 +1156,9 @@ section{padding-top:40px}
   </div>
 </header>
 
-<div class="tabs-wrap"><nav class="tabs" id="main-tabs" role="tablist" aria-label="區塊切換"></nav></div>
-<nav class="page-toc" id="page-toc" aria-label="本頁目錄" hidden></nav>
+<div class="hero-mini" id="hero-mini" aria-live="off"></div>
+<div class="tabs-wrap"><nav class="tabs" id="main-tabs" role="tablist" aria-label="區塊切換"></nav>
+<nav class="page-toc" id="page-toc" aria-label="這一頁的子分頁" hidden></nav></div>
 
 <section>
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
@@ -1677,18 +1765,18 @@ section{padding-top:40px}
 
 <section>
   <div class="sec-head"><h2>我的森林</h2><span class="eyebrow">讀書種樹，寵物住在你的森林裡</span></div>
-  <p class="sec-note">每完成一項讀書任務就種一棵樹（樹種看科目），樹只在有照顧的日子長大，30 天變神木；一塊地種滿才開下一塊。
+  <details class="sec-rules"><summary>森林規則</summary><p class="sec-note">每完成一項讀書任務就種一棵樹（樹種看科目），樹只在有照顧的日子長大，30 天變神木；一塊地種滿才開下一塊。
     訂正、考古題、模考卷、歷屆會考要<b>拍照給 Claude 檢查，過關才算數</b>（只種樹苗、3 天沒交就枯死）。
     <b>1 天沒照顧牠不理你、2 天生病、5 天離家出走；沒照顧的日子樹會枯，3 天沒救回就死；番茄鐘中途放棄留下枯樹樁；讀書時段跑來看、一天待超過 15 分鐘，牠也不理你。</b>
     牠越大吃越多：Lv5 起每天要讀 90 分或完成 60%，Lv12 起 120 分或 70%。降級模式和休息日算有照顧，沒打開網站的日子算沒照顧。
-    <br>點寵物會表演把戲，親密度越高學越多（有照顧的日子 +1、那天有餵或陪玩再 +1、沒照顧 −3）。天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。</p>
+    <br>點寵物會表演把戲，親密度越高學越多（有照顧的日子 +1、那天有餵或陪玩再 +1、沒照顧 −3）。天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。</p></details>
   <div class="card fp-card" id="fp-app"></div>
 </section>
 
 <section>
   <div class="sec-head"><h2>成就</h2><span class="eyebrow">達成就永遠算數，領了有點數、🌟、稱號和家具</span></div>
-  <p class="sec-note">33 個成就各有<b>銅、銀、金、白金、鑽石</b>五階，另外還有 8 個隱藏成就。達成之後按「領」才拿得到：銅 +10、銀 +25、金 +50＋🌟1（解鎖稱號）、白金 +100＋🌟1、鑽石 +200＋🌟2，隱藏成就 +100＋🌟2。
-    領過的階數越多，寵物的家越漂亮（地毯、盆栽、掛畫、沙發、書櫃、落地燈、獎盃、串燈）。成就算的是投入——讀書時數、番茄鐘、訂正過關、錯題精熟——分數只占一小部分。</p>
+  <details class="sec-rules"><summary>成就怎麼算</summary><p class="sec-note">33 個成就各有<b>銅、銀、金、白金、鑽石</b>五階，另外還有 8 個隱藏成就。達成之後按「領」才拿得到：銅 +10、銀 +25、金 +50＋🌟1（解鎖稱號）、白金 +100＋🌟1、鑽石 +200＋🌟2，隱藏成就 +100＋🌟2。
+    領過的階數越多，寵物的家越漂亮（地毯、盆栽、掛畫、沙發、書櫃、落地燈、獎盃、串燈）。成就算的是投入——讀書時數、番茄鐘、訂正過關、錯題精熟——分數只占一小部分。</p></details>
   <div id="ac-app"></div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">自己訂的獎勵</h3>
@@ -1707,17 +1795,17 @@ section{padding-top:40px}
 
 <section>
   <div class="sec-head"><h2>森林銀行</h2><span class="eyebrow">有讀書，存款才會長大</span></div>
-  <p class="sec-note">許願商店的點數可以存進來。<b>只有「有照顧的日子」才有利息，偷懶的日子反而被扣保管費。</b>
+  <details class="sec-rules"><summary>銀行規則摘要</summary><p class="sec-note">許願商店的點數可以存進來。<b>只有「有照顧的日子」才有利息，偷懶的日子反而被扣保管費。</b>
     定存要整段期間都乖乖讀書才拿得到高利息；考試定存是押自己下一次模考、段考的成績，考好最多拿回 3 倍；急著換願望可以預支，但要付利息，之後賺的點數會先拿一半去還。
-    🌟 可以換成點數，點數可以換 🍀 和 🎟️。完整規則在「規則」分頁。</p>
+    🌟 可以換成點數，點數可以換 🍀 和 🎟️。完整規則在「規則」分頁。</p></details>
   <div class="card bn-card" id="bn-app"></div>
 </section>
 
 <section>
   <div class="sec-head"><h2>許願商店</h2><span class="eyebrow">做完事才換得到</span></div>
-  <p class="sec-note">完成一項任務 +5 點，一顆番茄鐘 +5 點，當天全部清完再 +15 點，小考大考另外加減。
+  <details class="sec-rules"><summary>點數怎麼來</summary><p class="sec-note">完成一項任務 +5 點，一顆番茄鐘 +5 點，當天全部清完再 +15 點，小考大考另外加減。
     <b>連續照顧 3／7／14／30 天，讀書點數 ×1.1／1.2／1.3／1.5</b>；每天還有一種「今日加成」（番茄鐘日、數學日、全清日……），每項任務也有機會「幸運 ×2」。
-    點數拿來兌換你自己設定的獎勵，也可以存進上面的森林銀行生利息。品項和價格都可以改——標準訂在「有點難拿到但拿得到」最有用。點數可能被扣成負的，要先補回來才能兌換。</p>
+    點數拿來兌換你自己設定的獎勵，也可以存進上面的森林銀行生利息。品項和價格都可以改——標準訂在「有點難拿到但拿得到」最有用。點數可能被扣成負的，要先補回來才能兌換。</p></details>
   <div class="td-budget" id="sh-pts"></div>
   <div class="todo" id="sh-list"></div>
   <div class="bar-btns">
@@ -2098,18 +2186,48 @@ section{padding-top:40px}
   var nav = document.getElementById('main-tabs');
   if (!nav || !secs.length) return;
 
-  function show(gi){
+  // 一個分頁有好幾個區塊（紀錄、獎勵、計畫）：上面列子分頁，一次只顯示一個區塊，手機上才不會拖很長
+  var toc = document.getElementById('page-toc'), mini = document.getElementById('hero-mini');
+  var SUBK = 'plan-sub', sub = {};
+  try { sub = JSON.parse(localStorage.getItem(SUBK) || '{}') || {}; } catch(e){}
+  function secTitle(s){ var h = s.querySelector('h2'); return h ? h.textContent : ''; }
+  function paintMini(){
+    if (!mini) return;
+    function tx(id){ var el = document.getElementById(id); return el ? el.textContent.replace(/\s+/g,' ').trim() : '—'; }
+    mini.innerHTML = '<b>joshdaai 讀書計畫</b><span>初試 <em>' + tx('c-sci') + '</em></span><span>會考 <em>' + tx('c-cap') + '</em></span>';
+  }
+  window.__paintHeroMini = paintMini;
+  function show(gi, si){
     var set = GROUPS[gi][1];
-    window.__tab = gi;
-    secs.forEach(function(s, i){ s.hidden = set.indexOf(i) === -1; });
+    if (si === undefined) si = sub[gi];
+    if (set.indexOf(si) === -1) si = set[0];
+    sub[gi] = si;
+    try { localStorage.setItem(SUBK, JSON.stringify(sub)); } catch(e){}
+    window.__tab = gi; window.__sub = si;
+    document.documentElement.setAttribute('data-tab', gi);
+    secs.forEach(function(s, i){ s.hidden = set.length > 1 ? i !== si : set.indexOf(i) === -1; });
     Array.prototype.forEach.call(nav.children, function(b, i){
       b.setAttribute('aria-selected', i === gi ? 'true' : 'false');
     });
+    if (toc){
+      toc.innerHTML = '';
+      toc.hidden = set.length < 2;
+      if (set.length > 1) set.forEach(function(i){
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = secTitle(secs[i]);
+        b.setAttribute('aria-pressed', i === si ? 'true' : 'false');
+        b.addEventListener('click', function(){ show(gi, i); });
+        toc.appendChild(b);
+      });
+    }
+    paintMini();
+    var ab = nav.children[gi];
+    if (ab) { try { nav.scrollLeft = Math.max(0, ab.offsetLeft - (nav.clientWidth - ab.offsetWidth) / 2); } catch(e){} }
     try { localStorage.setItem('plan-tab', gi); } catch(e){}
     try{ window.scrollTo(0,0); }catch(e){}
     try{ document.dispatchEvent(new CustomEvent('plan:tab',{detail:gi})); }catch(e){}
   }
-  window.__showTab = show;
+  window.__showTab = show;   // show(分頁, 區塊編號)：區塊編號可省略，省略就回到上次看的那一區
+  window.addEventListener('load', paintMini);
 
   GROUPS.forEach(function(g, i){
     var b = document.createElement('button');
@@ -2911,6 +3029,7 @@ section{padding-top:40px}
   function dayKey(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();}
 
   var P=g(PK)||{w:25,b:5,notify:false,day:null,done:0,seq:0};
+  P.w=+P.w||25; P.b=+P.b||5; P.done=P.done||0; P.seq=P.seq||0;   // 舊資料或還原的資料缺欄位時補預設值
   if(P.day!==dayKey()){P.day=dayKey();P.done=0;P.seq=0;s(PK,P);}
 
   var elClock=document.getElementById('nc-clock'), elDoing=document.getElementById('nc-doing'),
@@ -3883,7 +4002,7 @@ section{padding-top:40px}
     b.innerHTML=fresh?'<span><b>雲端有你在別台裝置的資料（'+at+'）</b>　這台還沒同步過，要把資料拿過來嗎？</span>'
       :'<span><b>雲端有 '+at+' 的新資料</b>　可能是另一台裝置傳的，這台也改過。自動上傳先暫停，到「設定 → 雲端同步」選要用哪一份。</span>';
     var go=document.createElement('button'); go.type='button'; go.textContent=fresh?'下載雲端資料':'去設定';
-    go.addEventListener('click',function(){ b.remove(); if(fresh){ download(true); return; } if(window.__showTab) window.__showTab(7); var c=document.getElementById('cl-status'); if(c) c.scrollIntoView({block:'center'}); });
+    go.addEventListener('click',function(){ b.remove(); if(fresh){ download(true); return; } if(window.__showTab) window.__showTab(7,19); var c=document.getElementById('cl-status'); if(c) c.scrollIntoView({block:'center'}); });
     var ok=document.createElement('button'); ok.type='button'; ok.textContent='等一下';
     ok.addEventListener('click',function(){ b.remove(); });
     b.appendChild(go); b.appendChild(ok); document.body.appendChild(b);
@@ -3934,7 +4053,7 @@ section{padding-top:40px}
       var b=document.createElement('div'); b.className='rem-banner'; b.id='cl-banner'; b.style.display='flex';
       b.innerHTML='<span><b>資料只存在這台裝置</b>　到「設定 → 雲端同步」貼上 token，就會自動備份，換裝置也不會重置。</span>';
       var go=document.createElement('button'); go.type='button'; go.textContent='去設定';
-      go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(7); var c=document.getElementById('cl-token'); if(c){ c.scrollIntoView({block:'center'}); c.focus(); } });
+      go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(7,19); var c=document.getElementById('cl-token'); if(c){ c.scrollIntoView({block:'center'}); c.focus(); } });
       var no=document.createElement('button'); no.type='button'; no.textContent='今天不再提醒';
       no.addEventListener('click',function(){ b.remove(); try{ localStorage.setItem(NK,tk); }catch(e){} });
       b.appendChild(go); b.appendChild(no); document.body.appendChild(b);
@@ -4869,6 +4988,7 @@ section{padding-top:40px}
   /* ---------- 頁內目錄（一頁有三個區塊以上才出現） ---------- */
   var toc=document.getElementById('page-toc');
   function paintToc(){
+    return;   // 頁內目錄改成分頁列下面的子分頁（在主分頁的程式裡）
     if(!toc) return;
     var secs=Array.prototype.filter.call(document.querySelectorAll('body > .wrap > section'),function(s){ return !s.hidden && s.querySelector('h2'); });
     if(secs.length<3){ toc.hidden=true; toc.innerHTML=''; return; }
@@ -6080,11 +6200,13 @@ section{padding-top:40px}
     // ---- 今天分頁的小卡 ----
     if(mini){
       mini.hidden=false;
-      var extra=(pendList.length?'<p style="color:var(--warn)">⏳ '+pendList.length+' 份等 Claude 檢查（'+CHECK_DAYS+' 天沒交樹苗會枯）</p>':'')
-        +(questReady?'<p style="color:var(--cap)">🎁 有 '+questReady+' 個任務可以領獎</p>':'')
-        +(achReady?'<p style="color:var(--cap)">🏆 有 '+achReady+' 個成就可以領</p>':'')
-        +'<p>⚡ 今日加成：'+B.n+'（'+B.say+'）'+(sm>1?'・連續 '+streak+' 天點數 ×'+sm:'')+'</p>'
-        +(bk.loan?'<p style="color:'+(bk.loan.late?'var(--rest)':'var(--warn)')+'">🏦 欠銀行 '+bk.loan.owe+' 點'+(bk.loan.late?'（逾期中）':'')+'</p>':'');
+      var chips=[];   // 手機上小卡不要拉太長：待辦併成一行
+      if(pendList.length) chips.push('<span style="color:var(--warn)">⏳ 檢查 '+pendList.length+'</span>');
+      if(questReady) chips.push('<span style="color:var(--cap)">🎁 任務 '+questReady+'</span>');
+      if(achReady) chips.push('<span style="color:var(--cap)">🏆 成就 '+achReady+'</span>');
+      if(bk.loan) chips.push('<span style="color:'+(bk.loan.late?'var(--rest)':'var(--warn)')+'">🏦 欠 '+bk.loan.owe+(bk.loan.late?' 逾期':'')+'</span>');
+      var extra=(chips.length?'<p class="fp-mini-chips">'+chips.join('')+'</p>':'')
+        +'<p>⚡ '+B.n+'：'+B.say+(sm>1?'・🔥 ×'+sm:'')+'</p>';
       if(p){
         var line=att.away?'去'+esc(p.trip.dest)+'旅行了（'+fmtT(p.trip.leaveAt)+' 出發）':(att.sulk?'不理你：'+(att.sulk==='study'?'現在是讀書時段':(att.sulk==='toolong'?'今天待太久了':'昨天沒讀書')):(att.sleep?'睡覺中 💤':'飽足 '+p.hunger+'　心情 '+p.mood+'　親密度 '+(p.bond||0)));
         mini.innerHTML='<span class="e" aria-hidden="true">'+(att.away?'<span style="font-size:38px">🎒</span>':petMini(p,att.sleep?'sleep':(att.sulk?'sulk':'stand'),58))+'</span><div><b>'+esc(p.name)+'</b>　<span class="mono" style="font-size:12px;color:var(--ink-faint)">Lv '+info.lv.lv+'</span>'+(title?'　<span class="fp-title">'+esc(title)+'</span>':'')
@@ -6181,6 +6303,7 @@ section{padding-top:40px}
           +'<button class="btn solid" id="fp-adopt" type="button" style="justify-self:start">領養</button></div>';
       }
       body+='<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p>';
+      body+='<details class="fp-more" data-more="forest"'+(v.more?' open':'')+'><summary>🌳 '+trees.alive+' 棵・讀書 '+T.hours.toFixed(1)+' 小時・連續照顧 '+streak+' 天<span>森林統計、下一個解鎖</span></summary>';
       var cnt={}; T.trees.forEach(function(t,i){ if(!deadSet[i]) cnt[t.sp]=(cnt[t.sp]||0)+1; });
       body+='<div class="fp-legend"><span><b>'+trees.alive+'</b> 棵（樹苗 '+stageCnt[0]+'・小樹 '+stageCnt[1]+'・大樹 '+stageCnt[2]+'・<b>神木 '+stageCnt[3]+'</b>）'
         +(nPend?'　<span style="color:var(--warn)">⏳ '+nPend+' 棵等 Claude 檢查</span>':'')+(nWilt?'　<span style="color:var(--warn)">'+nWilt+' 棵枯萎中</span>':'')+(nDead+s.stumps.length?'　枯死 '+(nDead+s.stumps.length):'')
@@ -6190,6 +6313,7 @@ section{padding-top:40px}
       var nextUnlock=FOODS.concat(TOYS).concat(TOOLS).filter(function(o){ return o.h>T.hours; }).sort(function(a,b){ return a.h-b.h; })[0];
       if(nextUnlock) body+='<p class="fp-gone">下一個解鎖：'+nextUnlock.e+' '+nextUnlock.n+'（讀書 '+nextUnlock.h+' 小時，還差 '+(nextUnlock.h-T.hours).toFixed(1)+' 小時）</p>';
       if(s.gone.length) body+='<p class="fp-gone">以前養過：'+s.gone.map(function(g){ return esc(g.name)+'（'+spName(g.sp)+'，'+md(g.born)+'–'+md(g.left)+(g.where?'，留在'+esc(g.where):'')+'）'; }).join('、')+'</p>';
+      body+='</details>';
     }
     if(tabk==='quest'){
       var claimed=s.quests[tk]||{}, allDone=quests.every(function(q){ return claimed[q.id]; });
@@ -6369,11 +6493,13 @@ section{padding-top:40px}
   });
   if(mini){
     mini.tabIndex=0; mini.setAttribute('role','button'); mini.setAttribute('aria-label','到我的森林');
-    var goF=function(){ if(window.__showTab) window.__showTab(5); var a=document.getElementById('fp-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start'}); },30); };
+    var goF=function(){ if(window.__showTab) window.__showTab(5,15); var a=document.getElementById('fp-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start'}); },30); };
     mini.addEventListener('click',goF);
     mini.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goF(); } });
   }
-  function goBank(){ if(window.__showTab) window.__showTab(5); var a=document.getElementById('bn-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start',behavior:'smooth'}); },40); }
+  function goBank(){ if(window.__showTab) window.__showTab(5,17); window.scrollTo(0,0); }
+  // 「更多」打開或收起要記住（每分鐘重畫時才不會自己收起來）
+  if(app) app.addEventListener('toggle',function(e){ var d=e.target; if(!d||!d.dataset||!d.dataset.more) return; var v=viewState(); v.more=d.open; saveView(v); },true);
   // 番茄鐘中途放棄：留下一根枯樹樁
   window.__petEvent=function(type){
     if(type!=='abandon') return;
@@ -6497,7 +6623,7 @@ section{padding-top:40px}
     var o='<div class="fp-tabs bn-tabs" role="tablist" aria-label="銀行分頁">'+bnTab('home','總覽',tab==='home')+bnTab('sav','活存',tab==='sav')+bnTab('fix','定存',tab==='fix')
       +bnTab('bond','考試定存',tab==='bond')+bnTab('loan','預支'+(b.loan?' <b class="fp-dot">!</b>':''),tab==='loan')+bnTab('ex','兌換所',tab==='ex')+bnTab('log','帳本',tab==='log')+bnTab('rule','規則',tab==='rule')+'</div><div class="bn-body">';
     o+='<div class="bn-tiles">'
-      +'<div class="bn-tile"><small>錢包（可花的點數）</small><b>'+pts+'</b></div>'
+      +'<div class="bn-tile"><small>錢包</small><b>'+pts+'</b><em>可以花的點數</em></div>'
       +'<div class="bn-tile"><small>活存</small><b>'+b.sav+'</b><em>'+(b.loan?'有借款，暫停計息':'有照顧 +'+(BANK.sav+cr.sav).toFixed(1)+'%／天')+'</em></div>'
       +'<div class="bn-tile"><small>定存中</small><b>'+fixSum+'</b><em>'+fixedOpen.length+' 筆</em></div>'
       +'<div class="bn-tile"><small>考試定存中</small><b>'+bondSum+'</b><em>'+bondsOpen.length+' 筆</em></div>'
@@ -6507,8 +6633,8 @@ section{padding-top:40px}
     if(tab==='home'){
       var recent=b.log.slice(0,5);
       o+='<div class="bn-panel"><h4>最近的帳 <span>完整的在「帳本」</span></h4>'+(recent.length?recent.map(logRow).join(''):'<p class="fp-gone">還沒有交易。先到「活存」存一點點數試試看。</p>')+'</div>'
-        +'<div class="bn-panel"><h4>怎麼用最划算</h4><ul class="bn-ul"><li>天天照顧（讀滿門檻）→ 活存每天自己長大；一天沒讀就倒扣。</li><li>確定這週會乖乖讀書 → 開<b>定存</b>，利息比活存高很多。</li>'
-        +'<li>對下一次模考／段考有把握 → 押<b>考試定存</b>，考好最多拿回 3 倍。</li><li>急著想兌換願望 → <b>預支</b>，但每週 10% 利息，之後賺的點數會先拿一半去還。</li></ul></div>';
+        +'<details class="fp-more"><summary>怎麼用最划算</summary><ul class="bn-ul"><li>天天照顧（讀滿門檻）→ 活存每天自己長大；一天沒讀就倒扣。</li><li>確定這週會乖乖讀書 → 開<b>定存</b>，利息比活存高很多。</li>'
+        +'<li>對下一次模考／段考有把握 → 押<b>考試定存</b>，考好最多拿回 3 倍。</li><li>急著想兌換願望 → <b>預支</b>，但每週 10% 利息，之後賺的點數會先拿一半去還。</li></ul></details>';
     }
     if(tab==='sav'){
       o+='<div class="bn-panel"><h4>活存 <span>隨時存、隨時領</span></h4><p class="fp-gone">有照顧的日子 +'+(BANK.sav+cr.sav).toFixed(1)+'%（信用 '+cr.n+' 加成 '+cr.sav+'%，每天最多 '+BANK.savCap+' 點；存 20 點以上至少 +1）；沒照顧的日子 −'+BANK.fee+'%。'+(b.loan?'<b>有借款時活存不計息。</b>':'')+'</p>'
@@ -6749,15 +6875,21 @@ section{padding-top:40px}
   function paintAch(){
     if(!acApp || window.__tab!==5) return;
     if(!lastStats){ acApp.innerHTML='<p class="fp-gone">計算中…</p>'; return; }
-    var A=achState(), st=lastStats, v=viewState(), fil=v.afil||'all', ready=achClaimable(), score=achScore(), maxScore=ACH.length*5+SECRET.length;
+    var A=achState(), st=lastStats, v=viewState(), fil=v.afil||'near', ready=achClaimable(), score=achScore(), maxScore=ACH.length*5+SECRET.length;
     var owned=titlesOwned(), cur=achTitle(), nf=FURN.filter(function(f){ return score<f.at; })[0];
     var o='<div class="ac-sum"><div><b class="ac-big">'+score+'</b><span> / '+maxScore+' 階</span><div class="bar"><i style="width:'+Math.round(score/maxScore*100)+'%"></i></div>'
       +'<small>'+(nf?'再領 '+(nf.at-score)+' 階，家裡多一個 '+nf.e+' '+nf.n:'家具全部到齊了')+'</small></div>'
       +'<div class="ac-title"><label for="ac-ti">稱號</label><select id="ac-ti"><option value="">（不顯示）</option>'+owned.map(function(t){ return '<option'+(t===cur?' selected':'')+'>'+esc(t)+'</option>'; }).join('')+'</select><small>'+(owned.length?'會顯示在寵物名字旁邊':'金牌成就會解鎖稱號')+'</small></div>'
       +(ready?'<button class="btn solid" type="button" data-acall="1">全部領取（'+ready+'）</button>':'<span class="sub" style="margin:0">目前沒有可以領的</span>')+'</div>';
-    o+='<div class="fp-tabs ac-fil" role="tablist" aria-label="成就分類">'+[['all','全部'],['ready','可領'+(ready?' <b class="fp-dot">'+ready+'</b>':'')]].concat(ACATS.map(function(c){ return [c,c]; })).concat([['secret','隱藏']])
+    o+='<div class="fp-tabs ac-fil" role="tablist" aria-label="成就分類">'+[['near','快達成'],['ready','可領'+(ready?' <b class="fp-dot">'+ready+'</b>':'')],['all','全部']].concat(ACATS.map(function(c){ return [c,c]; })).concat([['secret','隱藏']])
       .map(function(f){ return '<button type="button" data-afil="'+f[0]+'" aria-pressed="'+(fil===f[0])+'">'+f[1]+'</button>'; }).join('')+'</div><div class="ac-grid">';
     var list=ACH.filter(function(a){ return fil==='all'||fil===a.c||(fil==='ready'&&(A.r[a.id]||0)>(A.c[a.id]||0)); });
+    if(fil==='near'){   // 可以領的排最前面，其餘照「離下一階還差多少」挑最接近的 8 個
+      list=ACH.filter(function(a){ return (A.c[a.id]||0)<5; }).map(function(a){
+        var val=st[a.id]||0, have=A.r[a.id]||0, nx=a.t[have], pv=have?a.t[have-1]:0;
+        return {a:a, k:((A.r[a.id]||0)>(A.c[a.id]||0)?2:0)+(nx?Math.max(0,Math.min(1,(val-pv)/(nx-pv))):1)};
+      }).sort(function(x,y){ return y.k-x.k; }).slice(0,8).map(function(x){ return x.a; });
+    }
     list.forEach(function(a){
       var val=st[a.id]||0, have=A.r[a.id]||0, got=A.c[a.id]||0, nx=a.t[have], done=got>=5, can=have>got;
       var prevT=have?a.t[have-1]:0, pct=nx?Math.max(0,Math.min(100,Math.round((val-prevT)/(nx-prevT)*100))):100;
@@ -6768,13 +6900,14 @@ section{padding-top:40px}
         +(nx?'<div class="bar"><i style="width:'+pct+'%"></i></div><small>'+fmtV(val,a.u)+' / '+fmtV(nx,a.u)+'　下一階：'+TIERS[have].n+' +'+TIERS[have].p+(TIERS[have].g?'、🌟'+TIERS[have].g:'')+(have===2?'、稱號「'+a.ti+'」':'')+'</small>':'<small>'+fmtV(val,a.u)+'　五階全部達成 💎</small>')
         +'</div>'+(can?'<button class="btn solid" type="button" data-acclaim="'+a.id+'">領 +'+rp+(rg?' 🌟'+rg:'')+'</button>':'')+'</div>';
     });
-    if(fil==='all'||fil==='secret'||fil==='ready') SECRET.forEach(function(a){
+    if(fil==='all'||fil==='secret'||fil==='ready'||fil==='near') SECRET.forEach(function(a){
       var have=A.r[a.id]||0, got=A.c[a.id]||0, can=have>got;
-      if(fil==='ready' && !can) return;
+      if((fil==='ready'||fil==='near') && !can) return;
       o+='<div class="ac-card secret'+(got?' done':'')+(can?' can':'')+'" data-acid="'+a.id+'"><div class="ac-ic" style="--tc:'+(got?'#8B5CF6':'var(--rule)')+'">'+(have?a.e:'❔')+'</div><div class="ac-main"><b>'+(have?a.n:'隱藏成就')+'</b><span class="ac-cat">隱藏</span>'
         +'<small>'+(have?esc(a.d)+(got?'　稱號「'+a.ti+'」':''):'達成了才會知道是什麼')+'</small></div>'+(can?'<button class="btn solid" type="button" data-acclaim="'+a.id+'">領 +100 🌟2</button>':'')+'</div>';
     });
-    if(!list.length && fil!=='secret' && fil!=='all') o+='<p class="fp-gone">'+(fil==='ready'?'目前沒有可以領的成就。':'這一類還沒有成就。')+'</p>';
+    if(fil==='near') o+='</div><button class="btn ghost ac-more" type="button" data-afil="all">看全部 '+(ACH.length+SECRET.length)+' 個成就</button><div>';
+    if(!list.length && fil!=='secret' && fil!=='all' && fil!=='near') o+='<p class="fp-gone">'+(fil==='ready'?'目前沒有可以領的成就。':'這一類還沒有成就。')+'</p>';
     o+='</div><p class="fp-msg" id="ac-msg" aria-live="polite">'+acMsg+'</p>';
     acApp.innerHTML=o;   // 訊息留到下一次操作才清
   }
@@ -6867,7 +7000,7 @@ section{padding-top:40px}
     var b=document.createElement('div'); b.className='rem-banner'+(ok?' ok':''); b.style.display='flex';
     b.innerHTML='<span>'+m+'</span>';
     var go=document.createElement('button'); go.type='button'; go.textContent='去看森林';
-    go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(5); var v=viewState(); v.tab='check'; saveView(v); paintPet(); });
+    go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(5,15); var v=viewState(); v.tab='check'; saveView(v); paintPet(); });
     var x=document.createElement('button'); x.type='button'; x.textContent='知道了'; x.addEventListener('click',function(){ b.remove(); });
     b.appendChild(go); b.appendChild(x); document.body.appendChild(b);
   }
@@ -7241,6 +7374,32 @@ section{padding-top:40px}
     if(n!==stamp){ stamp=n; cur=clamp(today0()); }
     if(window.__tab===1) draw();
   },60000);
+})();
+</script>
+<script>
+/* ===== 可收合的卡片：設定、科班考古題清單（手機上版面太長） ===== */
+(function(){
+  var FK='plan-fold', st={};
+  try{ st=JSON.parse(localStorage.getItem(FK)||'{}')||{}; }catch(e){}
+  function fold(card,key,def,keep){
+    var head=card.firstElementChild; if(!head) return;
+    card.classList.add('fold'); head.classList.add('fold-h'); head.setAttribute('role','button'); head.tabIndex=0;
+    (keep||[]).forEach(function(id){ var k=document.getElementById(id); if(k) k.classList.add('fold-keep'); });
+    function set(o){ card.classList.toggle('open',o); head.setAttribute('aria-expanded',o?'true':'false'); }
+    set(key in st ? !!st[key] : def);
+    function tog(e){ if(e && e.target.closest && e.target.closest('a,button,input,select,textarea')) return; var o=!card.classList.contains('open'); set(o); st[key]=o; try{ localStorage.setItem(FK,JSON.stringify(st)); }catch(err){} }
+    head.addEventListener('click',tog);
+    head.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(); } });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('body > .wrap > section'),function(s){
+    var h2=s.querySelector('h2'); if(!h2 || h2.textContent!=='設定與備份') return;
+    Array.prototype.forEach.call(s.children,function(c){
+      if(!c.classList.contains('card')) return;
+      var h=c.firstElementChild; if(!h || h.tagName!=='H3') return;
+      fold(c,'set:'+h.textContent.trim(),/雲端同步/.test(h.textContent));
+    });
+  });
+  var kp=document.getElementById('kp-card'); if(kp) fold(kp,'kp',false,['kp-top','kp-pace']);
 })();
 </script>
 </body>
