@@ -347,7 +347,9 @@ section[hidden]{display:none}
 .td-btn:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 .todo .tk-m{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
   display:block;margin-top:3px;letter-spacing:.05em}
-.todo .tk-fix{opacity:.6}
+.todo .tk-fix{opacity:.78}
+.todo .tk-pre{opacity:.55}
+.todo .tk-late .tk-m{color:var(--c)}
 .todo .tk-bk{background:var(--hi)}
 .todo .tk-bk .tk-m{color:var(--warn)}
 .tk-del{border:0;background:none;color:var(--ink-faint);font-size:15px;cursor:pointer;padding:0 4px;line-height:1}
@@ -379,7 +381,8 @@ section[hidden]{display:none}
 .pm-time.brk{color:var(--rest)}
 .pm-btns{display:flex;gap:6px;justify-content:center}
 .pm-btns .btn{padding:6px 12px;font-size:12.5px}
-.pm-sel{display:flex;gap:5px;justify-content:center;margin-top:9px}
+.pm-sel{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-top:9px}
+.pm-sel select.pm-subj{flex-basis:100%;font-family:inherit;font-size:12.5px;padding:5px 6px;color:var(--ink)}
 .pm-sel select{font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 4px;
   border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink-soft)}
 .pm-note{margin:8px 0 0;font-size:11px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace}
@@ -535,6 +538,7 @@ section{padding-top:40px}
 .c-math,.cat-math{--c:#1971C2} .c-chi,.cat-chi{--c:#E8590C} .c-eng,.cat-eng{--c:#D6336C} .c-sci,.cat-sci{--c:#2B8A3E}
 .c-soc,.cat-soc{--c:#B5651D} .c-mock,.cat-mock{--c:#E67700} .c-term,.cat-term{--c:#C92A2A} .c-kb,.cat-kb{--c:#364FC7}
 .c-kbfix,.cat-kbfix{--c:#4C6EF5} .c-kbr,.cat-kbr{--c:#1098AD} .c-hw,.cat-hw{--c:#7950F2} .c-fu,.cat-fu{--c:#AE3EC9}
+.c-late,.cat-late{--c:#4B3F72}
 .c-fixed,.cat-fixed{--c:#868E96} .c-life,.cat-life{--c:#ADB5BD} .c-rest,.cat-rest{--c:#20C997} .c-free,.cat-free{--c:#12B886}
 .todo label[class*="cat-"]{box-shadow:inset 4px 0 0 var(--c)}
 [data-dark] .c-math,[data-dark] .cat-math{--c:#74C0FC} [data-dark] .c-chi,[data-dark] .cat-chi{--c:#FFA94D}
@@ -544,6 +548,7 @@ section{padding-top:40px}
 [data-dark] .c-kbfix,[data-dark] .cat-kbfix{--c:#A5B4FC} [data-dark] .c-kbr,[data-dark] .cat-kbr{--c:#66D9E8}
 [data-dark] .c-hw,[data-dark] .cat-hw{--c:#B197FC} [data-dark] .c-fu,[data-dark] .cat-fu{--c:#E599F7}
 [data-dark] .c-fixed,[data-dark] .cat-fixed{--c:#ADB5BD} [data-dark] .c-life,[data-dark] .cat-life{--c:#868E96}
+[data-dark] .c-late,[data-dark] .cat-late{--c:#B8A9E8}
 [data-dark] .c-rest,[data-dark] .cat-rest{--c:#63E6BE} [data-dark] .c-free,[data-dark] .cat-free{--c:#38D9A9}
 [data-dark] .count,[data-dark] .card,[data-dark] .tl,[data-dark] .cal,[data-dark] .tbl-scroll,[data-dark] .todo,[data-dark] .now,[data-dark] .td-budget,
 [data-dark] .nowcard,[data-dark] .floor,[data-dark] .method,[data-dark] .phases,[data-dark] .cal-focus,[data-dark] .dv-card,[data-dark] .td-editor{box-shadow:0 1px 2px rgba(0,0,0,.3)}
@@ -1207,6 +1212,7 @@ section{padding-top:40px}
         <button class="btn ghost" id="pm-reset" type="button">重設</button>
       </div>
       <div class="pm-sel">
+        <select id="pm-s" class="pm-subj" aria-label="這顆番茄鐘讀的科目"></select>
         <select id="pm-w" aria-label="專注分鐘"></select>
         <select id="pm-b" aria-label="休息分鐘"></select>
       </div>
@@ -1766,7 +1772,8 @@ section{padding-top:40px}
 
 <section>
   <div class="sec-head"><h2>我的森林</h2><span class="eyebrow">讀書種樹，寵物住在你的森林裡</span></div>
-  <details class="sec-rules"><summary>森林規則</summary><p class="sec-note">每完成一項讀書任務就種一棵樹（樹種看科目），樹只在有照顧的日子長大，30 天變神木；一塊地種滿才開下一塊。
+  <details class="sec-rules"><summary>森林規則</summary><p class="sec-note">完成一項任務種一棵樹，<b>每完成一顆番茄鐘也種一棵</b>（樹種看科目，番茄鐘開始前選這顆讀什麼）。
+    <b>樹靠番茄鐘長大</b>：讀哪一科只照顧那一科的樹，免得偏科；讀科班的資優數學、自然學科會照顧全部的樹，但只算一半時間。同一種樹累積 50 分鐘變小樹、175 分鐘變大樹、750 分鐘變神木；一塊地種滿才開下一塊。
     訂正、考古題、模考卷、歷屆會考要<b>拍照給 Claude 檢查，過關才算數</b>（只種樹苗、3 天沒交就枯死）。
     <b>1 天沒照顧牠不理你、2 天生病、5 天離家出走；沒照顧的日子樹會枯，3 天沒救回就死；番茄鐘中途放棄留下枯樹樁；讀書時段跑來看、一天待超過 15 分鐘，牠也不理你。</b>
     牠越大吃越多：Lv5 起每天要讀 90 分或完成 60%，Lv12 起 120 分或 70%。降級模式和休息日算有照顧，沒打開網站的日子算沒照顧。
@@ -2572,7 +2579,7 @@ section{padding-top:40px}
   var PLABEL={summer:'暑假',term:'學期',winter:'寒假'};
   function label(pf){ var p=pf.split('-'); return (PLABEL[p[0]]||p[0])+'週'+WD[+p[1]]; }
 
-  // f=固定行程（不可勾、不欠帳）  e=娛樂／自由（算預算，不算任務）
+  // f=固定行程（可勾、算完成率、不欠帳、不算讀書分鐘）  e=娛樂／自由（算預算，不算任務）
   var S_AM=[{t:'08:40–09:00',n:'昨日回想',m:20},
             {t:'09:00–10:30',n:'科學班｜數學',m:90},
             {t:'10:45–12:15',n:'科學班｜理化',m:90}];
@@ -2713,17 +2720,59 @@ section{padding-top:40px}
 
   var st = ls(SK) || {day:null, list:[], done:{}, backlog:[], bonus:0};
 
+  /* 熬夜補進度（隔週六，2026-10-29 使用者定）：plan.js 只放「熬夜補進度 ①②…」的空槽，這裡才決定寫什麼。
+     先補以前排了、還沒勾掉的複習講義（最早的先補）；都補完就把科班考古題往前寫（照原本的順序）。
+     往前寫掉的考古題，到了原本那天會自動打勾、不重複算。完成與否都看 plan.hist.v1 記下的任務名稱。 */
+  var CAP_RE=/^(國文|數學|英文|理化|生物|地科|歷史|地理|公民)｜/, CAP_C={chi:1,math:1,eng:1,sci:1,soc:1};
+  var KB_RE=/^科班考古｜/, KB_C={kb:1,kbfix:1};
+  function pk(k){ var p=String(k).split('-'); return new Date(+p[0],p[1]-1,+p[2]).getTime(); }
+  function doneNames(){   // 以前做完的任務名稱 → 哪一天做的
+    var o={};
+    try{ var h=JSON.parse(localStorage.getItem('plan.hist.v1')||'{}');
+      Object.keys(h).forEach(function(k){ (h[k].dn||[]).forEach(function(n){ if(!o[n]||pk(k)<pk(o[n])) o[n]=k; }); }); }catch(e){}
+    return o;
+  }
+  function md(k){ var p=String(k).split('-'); return (+p[1])+'/'+(+p[2]); }
+  function lateQueue(d, taken, done){
+    var t0=d.getTime(), cap=[], kb=[];
+    Object.keys(PL.days).sort(function(a,b){ return pk(a)-pk(b); }).forEach(function(k){
+      var past=pk(k)<t0;
+      PL.days[k].b.forEach(function(b){
+        var n=b[3]; if(b[5]!==0 || taken[n] || done[n]) return;
+        if(past && CAP_C[b[2]] && CAP_RE.test(n)) cap.push({n:n, c:b[2], d:b[4], k:k, how:'補'});
+        else if(KB_C[b[2]] && KB_RE.test(n) && pk(k)!==t0) kb.push({n:n, c:b[2], d:b[4], k:k, how:past?'補':'往前寫'});
+      });
+    });
+    return cap.concat(kb);
+  }
+  function lateFill(d, out){
+    var lates=out.filter(function(x){ return x.late; }); if(!lates.length || !PL || !PL.days) return;
+    var taken={}; out.forEach(function(x){ if(!x.late) taken[x.n]=1; });
+    var q=lateQueue(d, taken, doneNames());
+    lates.forEach(function(x){
+      var y=q.shift();
+      if(!y){ x.n='熬夜補進度：講義和考古題都補完了 🎉 科班錯題本挑最常錯的題目重做'; x.c='kb'; x.lt='熬夜'; return; }
+      x.n=y.n; x.c=y.c; x.d=/錯題本|訂正|對答案/.test(y.d||'')?y.d:((y.d?y.d+'；':'')+'寫完對答案，錯的登記錯題本'); x.lt='熬夜'+y.how+'（原本排 '+md(y.k)+'）';
+    });
+  }
   function buildList(d, backlog){
-    var out=[], i=0;
+    var out=[], i=0, done=null;
     dayTpl(d).forEach(function(x){
       if (x.e || x.l) return;
-      out.push({id:'t'+(i++), n:x.n, t:x.t, m:x.m, f:x.f?1:0, c:x.c||'', d:x.d||''});
+      var o={id:'t'+(i++), n:x.n, t:x.t, m:x.m, f:x.f?1:0, c:x.c||'', d:x.d||''};
+      if (x.c==='late') o.late=1;
+      else if (!o.f && KB_RE.test(o.n)){   // 熬夜時已經往前寫掉的考古題：打勾、不再算進今天
+        done=done||doneNames();
+        if(done[o.n] && pk(done[o.n])<d.getTime()){ o.pre=1; o.lt='已在 '+md(done[o.n])+' 熬夜寫完'; }
+      }
+      out.push(o);
     });
     (backlog||[]).forEach(function(b){ out.push({id:'b'+(i++), n:b.n, t:'欠帳', m:b.m, bk:1, c:b.c||''}); });
     try{
       var due=(window.__wrongDue?window.__wrongDue():[]).length;
       if(due) out.push({id:'w'+(i++), n:'錯題複習 '+due+' 題（闔上答案重做）', t:'錯題本', m:Math.min(60,due*6)});
     }catch(e){}
+    lateFill(d, out);
     return out;
   }
   function recordHist(){
@@ -2735,12 +2784,15 @@ section{padding-top:40px}
     }catch(e){}
   }
   // 一天的完成情況：總數、完成數、完成分鐘，另外分科目統計、記下完成的任務名稱（分科進度、教材進度、森林用）
+  // 上學、上課、補習（固定行程）可以勾，算進完成率（a、d），但不算讀書分鐘、分科、任務名稱（2026-10-29 使用者要的）
+  // 熬夜時已經往前寫掉的任務（pre）整個不算
   function dayStat(){
-    var real=(st.list||[]).filter(function(x){return !x.f;});
+    var all=(st.list||[]).filter(function(x){return !x.pre;});
+    var real=all.filter(function(x){return !x.f;});
     var dn=real.filter(function(x){return st.done[x.id];});
     var cat={};
     real.forEach(function(x){ var c=x.c||'other', o=cat[c]=cat[c]||{a:0,d:0,m:0}; o.a++; if(st.done[x.id]){ o.d++; o.m+=x.m||0; } });
-    return {a:real.length, d:dn.length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;})};
+    return {a:all.length, d:all.filter(function(x){return st.done[x.id];}).length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;})};
   }
   // 重新產生今天的任務，但保留已勾的（照任務名稱對）和自己加的任務
   function rebuildKeep(d){
@@ -2768,7 +2820,7 @@ section{padding-top:40px}
       var wasEasy=false; try{ wasEasy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[st.day]); }catch(e){}
       recordHist();
       // 錯題複習（w 開頭）每天會依到期題數重新產生，沒做完不另外算欠帳
-      st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !st.done[x.id] && !/^w/.test(x.id); })
+      st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !x.pre && !st.done[x.id] && !/^w/.test(x.id); })
         .map(function(x){ return {n:x.n, m:x.m, c:x.c||''}; });
       st.done={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
     } else if (!st.list || !st.list.length){
@@ -2804,9 +2856,9 @@ section{padding-top:40px}
     }
     st.list.forEach(function(x){
       var lab=document.createElement('label');
-      lab.className='tk'+(x.f?' tk-fix':'')+(x.bk?' tk-bk':'')+(x.c?' cat-'+x.c:'');
+      lab.className='tk'+(x.f?' tk-fix':'')+(x.bk?' tk-bk':'')+(x.pre?' tk-pre':'')+(x.late?' tk-late':'')+(x.c?' cat-'+x.c:'');
       var cb=document.createElement('input');
-      cb.type='checkbox'; cb.checked=!!st.done[x.id]; cb.disabled=!!x.f;
+      cb.type='checkbox'; cb.checked=!!(st.done[x.id]||x.pre); cb.disabled=!!x.pre;
       cb.addEventListener('change',function(){
         var pv=(window.__rules?window.__rules().task:5);
         if(cb.checked){ st.done[x.id]=1; var got=window.__award?window.__award(pv,'完成：'+x.n):pv;
@@ -2818,10 +2870,10 @@ section{padding-top:40px}
       });
       var sp=document.createElement('span');
       var bk='';
-      sp.innerHTML=esc(x.n)+'<span class="tk-m">'+esc(x.t)+(x.m?'　'+x.m+' 分':'')+bk+(x.f?'　固定行程':'')+(x.bk?'　昨日未完成':'')+'</span>'
-        +(x.d&&!x.f?'<span class="tk-how">'+esc(x.d)+'</span>':'');
+      sp.innerHTML=esc(x.n)+'<span class="tk-m">'+esc(x.t)+(x.m&&!x.f?'　'+x.m+' 分':'')+bk+(x.f?'　固定行程：上完打勾':'')+(x.bk?'　昨日未完成':'')+(x.lt?'　'+esc(x.lt):'')+'</span>'
+        +(x.d&&!x.f&&!x.pre?'<span class="tk-how">'+esc(x.d)+'</span>':'');
       lab.appendChild(cb); lab.appendChild(sp);
-      if(!x.f){
+      if(!x.f && !x.pre){
         var del=document.createElement('button');
         del.type='button'; del.className='tk-del'; del.textContent='×'; del.setAttribute('aria-label','刪除「'+x.n+'」');
         del.addEventListener('click',function(ev){ ev.preventDefault();
@@ -2831,7 +2883,7 @@ section{padding-top:40px}
         lab.appendChild(del);
       }
       elList.appendChild(lab);
-      if(!x.f) elList.appendChild(metaRow(x));
+      if(!x.f && !x.pre) elList.appendChild(metaRow(x));
     });
     paintBudget();
   }
@@ -2884,8 +2936,8 @@ section{padding-top:40px}
     var owed=0; st.list.forEach(function(x){ if(x.bk) owed+=x.m; });
     var easy=false; try{ easy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[key(D)]); }catch(e){}
     var cut=easy?0:Math.min(CAP,owed), left=Math.max(FLOOR,base-cut);
-    var all=st.list.filter(function(x){return !x.f;}).length;
-    var done=st.list.filter(function(x){return !x.f && st.done[x.id];}).length;
+    var all=st.list.filter(function(x){return !x.pre;}).length;
+    var done=st.list.filter(function(x){return !x.pre && st.done[x.id];}).length;
     var pct=all?Math.round(done/all*100):100;
     if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st);
       if(window.__award) window.__award((window.__rules?window.__rules().allclear:15),'今日全清');
@@ -2895,7 +2947,7 @@ section{padding-top:40px}
     var took=Math.max(0,base-left);   // 實際扣掉的分鐘（娛樂本來就是最低 30 分的日子扣不到）
     if(took>0) m+='　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+took+' 分）</span>';
     else if(owed>0 && !easy) m+='　<span class="warn">（欠帳 '+owed+' 分）</span>';
-    if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項，不要靠熬夜追。';
+    if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項。沒寫的複習講義，隔週六的「熬夜補進度」會自動帶回來補。';
     else if(took>0) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">每天最多扣 '+CAP+' 分，娛樂不低於 '+FLOOR+' 分，睡眠一律不動。</span>';
     else if(owed>0 && !easy) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">今天娛樂已經是最低的 '+FLOOR+' 分，不再扣；欠帳用週日 14:40 的空檔補。</span>';
     elBud.innerHTML=m;
@@ -2998,10 +3050,12 @@ section{padding-top:40px}
   });
 
   window.__blocks=function(){
-    var out=[];
+    var out=[], lateN={};
+    (st.list||[]).forEach(function(y){ if(y.late) lateN[y.t]=y; });
     dayTpl(today0()).forEach(function(x){
       var m=(x.t||'').match(/(\d{1,2}):(\d{2})\D+(\d{1,2}):(\d{2})/);
-      if(m) out.push({a:(+m[1])*60+(+m[2]), b:(+m[3])*60+(+m[4]), n:x.n,
+      if(x.c==='late' && lateN[x.t]) x={t:x.t, n:lateN[x.t].n, c:lateN[x.t].c};   // 熬夜槽顯示網站帶入的任務
+      if(m) out.push({a:(+m[1])*60+(+m[2]), b:(+m[3])*60+(+m[4]), n:x.n, c:x.c||'',
         quiet:(x.l && !/出門/.test(x.n)) || /^學校/.test(x.n)});
     });
     out.sort(function(p,q){return p.a-q.a;});
@@ -3037,9 +3091,39 @@ section{padding-top:40px}
       elNext=document.getElementById('nc-next'), elTime=document.getElementById('pm-time'),
       elMode=document.getElementById('pm-mode'), elGo=document.getElementById('pm-go'),
       elReset=document.getElementById('pm-reset'), elNote=document.getElementById('pm-note'),
-      selW=document.getElementById('pm-w'), selB=document.getElementById('pm-b'),
+      selW=document.getElementById('pm-w'), selB=document.getElementById('pm-b'), selS=document.getElementById('pm-s'),
       btnNT=document.getElementById('nt-on');
   if(!elClock) return;
+
+  /* 這顆番茄鐘讀的科目（2026-10-29 使用者定）：每完成一顆就在森林種一棵那科的樹，而且只照顧那科的樹；
+     科班的資優數學、自然學科照顧全部的樹，但只算一半時間。紀錄存在 P.log（森林讀這份） */
+  var SUBJ=[['','這顆讀什麼？（選了才知道種哪種樹）'],['chi','國文'],['math','數學'],['eng','英文'],['sci','自然'],['soc','社會'],
+            ['kbm','科班｜資優數學'],['kbs','科班｜自然學科']];
+  SUBJ.forEach(function(x){ var o=document.createElement('option'); o.value=x[0]; o.textContent=x[1]; selS.appendChild(o); });
+  selS.value=P.subj||'';
+  function curBlock(){
+    var d=new Date(), mins=d.getHours()*60+d.getMinutes(), bl=[];
+    try{ bl=(window.__blocks?window.__blocks():[])||[]; }catch(e){ bl=[]; }
+    for(var i=0;i<bl.length;i++){ if(mins>=bl[i].a && mins<bl[i].b) return bl[i]; }
+    return null;
+  }
+  function guessSubj(b){
+    if(!b) return '';
+    var c=b.c||'', n=b.n||'';
+    if(/^(chi|math|eng|sci|soc)$/.test(c)) return c;
+    if(/^(kb|kbfix|kbr|fu|hw)$/.test(c)){ if(/數學/.test(n)) return 'kbm'; if(/物理|化學|生物|地科|自然/.test(n)) return 'kbs'; }
+    return '';
+  }
+  // 換到新的時段時，照日程猜這顆讀什麼；同一個時段裡自己選過就不再蓋掉
+  function autoSubj(){
+    if(running) return;
+    var b=curBlock(), id=b?(b.a+'|'+b.n):'';
+    if(id===P.subjBlk) return;
+    P.subjBlk=id; var g=guessSubj(b);
+    if(g){ P.subj=g; selS.value=g; }
+    s(PK,P);
+  }
+  selS.addEventListener('change',function(){ var b=curBlock(); P.subj=selS.value; P.subjBlk=b?(b.a+'|'+b.n):''; s(PK,P); });
 
   [15,20,25,30,40,45,50].forEach(function(v){
     var o=document.createElement('option');o.value=v;o.textContent='專注 '+v;
@@ -3152,7 +3236,10 @@ section{padding-top:40px}
   }
   function nextPhase(){
     if(mode==='work'){
-      P.done++; P.seq++; P.total=(P.total||0)+1; s(PK,P); if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘');
+      P.done++; P.seq++; P.total=(P.total||0)+1;
+      P.log=Array.isArray(P.log)?P.log:[]; P.log.push({k:dayKey(), t:Date.now(), s:P.subj||'', m:P.w});
+      if(P.log.length>4000) P.log=P.log.slice(-4000);
+      s(PK,P); if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘');
       var lng = P.seq%4===0;
       mode = lng?'long':'break';
       left = (lng?15:P.b)*60; endAt=Date.now()+left*1000;
@@ -3192,11 +3279,11 @@ section{padding-top:40px}
 
   window.__baseTitle=document.title;
   elGo.textContent=running?'暫停':'開始';
-  paintPomo(); tickNow();
+  paintPomo(); tickNow(); autoSubj();
   setInterval(function(){ tickPomo(); },1000);
   setInterval(function(){
     if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; s(PK,P); }
-    tickNow(); paintPomo();
+    tickNow(); paintPomo(); autoSubj();
   },15000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tickNow(); tickPomo(); } });
 })();
@@ -5143,32 +5230,82 @@ section{padding-top:40px}
     else for(var j=0;j<(e.d||0);j++) out.push({n:'', c:'other'});
     return out;
   }
+  // 番茄鐘種的樹（2026-10-29 使用者定）：一顆一棵，樹種看那顆選的科目；接在同一天任務種的樹後面
+  var POMO_TREE={chi:'bamboo',math:'pine',eng:'maple',sci:'ginkgo',soc:'oak',kbm:'sakura',kbs:'sakura'};
+  var POMO_SUBJ={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kbm:'科班資優數學',kbs:'科班自然學科'};
+  function pomoLog(){ var L=pomoState().log; return Array.isArray(L)?L:[]; }
   function collect(h, C, s, since){
-    var mins=0, tasks=0, clear=0, allClear=0, trees=[], keys=Object.keys(h).sort(function(a,b){ return pk(a)-pk(b); });
+    var mins=0, tasks=0, clear=0, allClear=0, trees=[], byDay={};
+    pomoLog().forEach(function(p){ if(p&&p.k) (byDay[p.k]=byDay[p.k]||[]).push(p); });
+    var keys=Object.keys(h); Object.keys(byDay).forEach(function(k){ if(!h[k]) keys.push(k); });
+    keys.sort(function(a,b){ return pk(a)-pk(b); });
     keys.forEach(function(k){
-      var e=h[k]; mins+=e.m||0;
-      var full=e.a>0 && e.d===e.a; if(full) allClear++;
-      doneList(e).forEach(function(t){
-        var chk=t.n && needsCheck(t.n), it=chk? C.items[k+'|'+t.n] : null;
-        trees.push({sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?it.st:'pending'):'ok', n:t.n});
-        if(since && pk(k)>=since && (!chk || (it&&it.st==='pass'))) tasks++;
-      });
-      if(since && pk(k)>=since && full) clear++;
+      var e=h[k];
+      if(e){
+        mins+=e.m||0;
+        var full=e.a>0 && e.d===e.a; if(full) allClear++;
+        doneList(e).forEach(function(t){
+          var chk=t.n && needsCheck(t.n), it=chk? C.items[k+'|'+t.n] : null;
+          trees.push({sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?it.st:'pending'):'ok', n:t.n});
+          if(since && pk(k)>=since && (!chk || (it&&it.st==='pass'))) tasks++;
+        });
+        if(since && pk(k)>=since && full) clear++;
+      }
+      (byDay[k]||[]).forEach(function(p){ trees.push({sp:POMO_TREE[p.s]||'bush', k:k, st:'ok', pomo:1, n:'番茄鐘：'+(POMO_SUBJ[p.s]||'沒選科目')}); });
     });
     s.seeds.forEach(function(sd){ trees.push({sp:'holy', k:sd.k, st:'ok', seed:1}); });
     return {hours:mins/60, tasks:tasks, clear:clear, allClear:allClear, trees:trees};
   }
-  // 每天有沒有照顧的累計，用來算樹長了幾天（只算有照顧的日子）
+  // 樹怎麼長（2026-10-29 改）：GROW_CUT 以前照「有照顧的日子」長（已經長的不會縮回去），之後只靠番茄鐘。
+  // 25 分鐘＝1 格；2 格小樹、7 格大樹、30 格神木（就是 50／175／750 分鐘）。只算種下那天之後的番茄鐘。
+  var GROW_CUT=new Date(2026,9,30).getTime();
+  function growW(sp, s){   // 一顆番茄鐘對這種樹算幾成
+    var kbS=(s==='kbm'||s==='kbs');
+    if(sp==='holy') return 1;                                  // 神木種子：讀什麼都長
+    if(sp==='sakura'||sp==='cypress') return kbS?1:0;          // 科班、補習作業的樹：只吃科班
+    if(sp==='apple'||sp==='bush') return .5;                   // 模考／段考、其他：每科都算一半
+    var own={bamboo:'chi',pine:'math',maple:'eng',ginkgo:'sci',oak:'soc'}[sp];
+    if(own) return s===own?1:(kbS?.5:0);                       // 會考各科：同科全算，科班算一半，別科不算
+    return 0;
+  }
+  var GI_KEY=null, GI=null;
+  function growIdx(){
+    var L=pomoLog(), key=L.length+'|'+(L.length?L[L.length-1].t:0);
+    if(key===GI_KEY) return GI;
+    var G={};
+    L.forEach(function(e){ if(!e||!e.k) return; var p=+pk(e.k), m=+e.m||25;
+      Object.keys(TREEN).forEach(function(sp){ var w=growW(sp,e.s); if(w) (G[sp]=G[sp]||[]).push([p,m*w]); }); });
+    Object.keys(G).forEach(function(sp){
+      var a=G[sp].sort(function(x,y){ return x[0]-y[0]; }), suf=[]; suf[a.length]=0;
+      for(var i=a.length-1;i>=0;i--) suf[i]=suf[i+1]+a[i][1];
+      G[sp]={a:a, suf:suf};
+    });
+    GI_KEY=key; GI=G; return G;
+  }
+  function minsAfter(sp, p){   // 這種樹在 p 那天之後吃到的番茄鐘分鐘
+    var g=growIdx()[sp]; if(!g) return 0;
+    var a=g.a, lo=0, hi=a.length;
+    while(lo<hi){ var mid=(lo+hi)>>1; if(a[mid][0]>p) hi=mid; else lo=mid+1; }
+    return g.suf[lo];
+  }
+  // 每天有沒有照顧的累計：GROW_CUT 以前的樹用它算已經長了幾天
   function caredCum(h,lv){
-    var easy=easyMap(), keys=DAYS.filter(function(k){ return pk(k)<d0(); }), cum={}, n=0;
-    keys.forEach(function(k){ if(cared(k,h,easy,lv)) n++; cum[k]=n; });
-    return {cum:cum, total:n};
+    var easy=easyMap(), keys=DAYS.filter(function(k){ return pk(k)<d0(); }), cum={}, n=0, cut=0;
+    keys.forEach(function(k){ if(cared(k,h,easy,lv)) n++; cum[k]=n; if(pk(k)<GROW_CUT) cut=n; });
+    return {cum:cum, total:n, cut:cut};
   }
   function treeStage(t,cc){
     if(t.st==='pending') return 0;
-    var base=t.seed?7:0, grown=cc.total-(cc.cum[t.k]||0);
-    var g=base+Math.max(0,grown);
+    var p=+pk(t.k), base=t.seed?7:0;
+    var old=p<GROW_CUT ? Math.max(0,(cc.cut||0)-(cc.cum[t.k]||0)) : 0;
+    var g=base+old+minsAfter(t.sp,p)/25;
     return g>=30?3:(g>=7?2:(g>=2?1:0));
+  }
+  // 這 7 天各科番茄鐘分鐘（看有沒有偏科）
+  function pomoWeek(){
+    var o={}, t0=d0().getTime()-6*864e5;
+    pomoLog().forEach(function(e){ if(e&&e.k&&pk(e.k)>=t0) o[e.s||'']=(o[e.s||'']||0)+(+e.m||25); });
+    return o;
   }
   function streakDays(h,lv){ var easy=easyMap(), d=d0(), n=0; d.setDate(d.getDate()-1); for(var i=0;i<400;i++){ if(!cared(kk(d),h,easy,lv)) break; n++; d.setDate(d.getDate()-1); } return n; }
   function xpSince(h, since, pomo0, C){
@@ -6310,7 +6447,10 @@ section{padding-top:40px}
         +(nPend?'　<span style="color:var(--warn)">⏳ '+nPend+' 棵等 Claude 檢查</span>':'')+(nWilt?'　<span style="color:var(--warn)">'+nWilt+' 棵枯萎中</span>':'')+(nDead+s.stumps.length?'　枯死 '+(nDead+s.stumps.length):'')
         +'　讀書 <b>'+T.hours.toFixed(1)+'</b> 小時　連續照顧 '+streak+' 天</span>'
         +Object.keys(TREEN).filter(function(k){ return cnt[k]; }).map(function(k){ return '<span><i style="background:'+TREEN[k][2]+'"></i>'+TREEN[k][0]+'（'+TREEN[k][1]+'）'+cnt[k]+'</span>'; }).join('')+'</div>';
-      body+='<p class="fp-gone">樹只在有照顧的日子長大：2 天小樹、7 天大樹、30 天神木。'+(nWilt?'<span style="color:var(--warn)">枯萎的樹 3 天內沒讀書救回就會死。</span>':'')+'天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。</p>';
+      var pw=pomoWeek(), pwk=['chi','math','eng','sci','soc','kbm','kbs'].filter(function(k){ return pw[k]; });
+      body+='<p class="fp-gone">這 7 天的番茄鐘：'+(pwk.length?pwk.map(function(k){ return POMO_SUBJ[k]+' '+(pw[k]/60).toFixed(1)+' 時'; }).join('・'):'還沒有')
+        +(pw['']?'・沒選科目 '+(pw['']/60).toFixed(1)+' 時':'')+'。少的那科，樹就長不大。</p>';
+      body+='<p class="fp-gone">完成任務種一棵、每顆番茄鐘再種一棵；樹靠番茄鐘長大：讀哪科只照顧那科的樹，科班資數、自然學科照顧全部但只算一半；同種樹累積 50 分鐘小樹、175 分鐘大樹、750 分鐘神木。'+(nWilt?'<span style="color:var(--warn)">枯萎的樹 3 天內沒讀書救回就會死。</span>':'')+'天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。</p>';
       var nextUnlock=FOODS.concat(TOYS).concat(TOOLS).filter(function(o){ return o.h>T.hours; }).sort(function(a,b){ return a.h-b.h; })[0];
       if(nextUnlock) body+='<p class="fp-gone">下一個解鎖：'+nextUnlock.e+' '+nextUnlock.n+'（讀書 '+nextUnlock.h+' 小時，還差 '+(nextUnlock.h-T.hours).toFixed(1)+' 小時）</p>';
       if(s.gone.length) body+='<p class="fp-gone">以前養過：'+s.gone.map(function(g){ return esc(g.name)+'（'+spName(g.sp)+'，'+md(g.born)+'–'+md(g.left)+(g.where?'，留在'+esc(g.where):'')+'）'; }).join('、')+'</p>';
@@ -6983,7 +7123,7 @@ section{padding-top:40px}
       var sp=lab.querySelector('span'), cb=lab.querySelector('input'); if(!sp||!cb) return;
       var name=(sp.firstChild&&sp.firstChild.nodeType===3)?sp.firstChild.textContent:'';
       var old=lab.querySelector('.td-chk'); if(old) old.remove();
-      if(!name || !needsCheck(name)) return;
+      if(!name || !needsCheck(name) || lab.classList.contains('tk-pre')) return;   // 熬夜時已寫完的，檢查算在寫的那天
       var it=C.items[tk+'|'+name], tag=document.createElement('span'); tag.className='td-chk';
       if(it&&it.st==='pass'){ tag.className+=' ok'; tag.textContent='✅ Claude 檢查過關（'+it.g+'）'; }
       else if(cb.checked){ tag.className+=' wait'; tag.textContent='⏳ 拍照傳給 Claude 檢查，過關才算數（'+CHECK_DAYS+' 天內）'; }
@@ -7174,7 +7314,7 @@ section{padding-top:40px}
   if(!PL||!sec) return;
   var WD=['日','一','二','三','四','五','六'];
   var CAT={math:'數學',chi:'國文',eng:'英文',sci:'自然',soc:'社會',mock:'模考／訂正',term:'段考',kb:'科班考古',
-    kbfix:'考古題訂正',kbr:'科班複習',hw:'補習作業',fu:'複試',fixed:'固定行程',life:'生活',rest:'娛樂',free:'空檔'};
+    kbfix:'考古題訂正',kbr:'科班複習',hw:'補習作業',fu:'複試',late:'熬夜補進度',fixed:'固定行程',life:'生活',rest:'娛樂',free:'空檔'};
   var CAP_CATS={math:1,chi:1,eng:1,sci:1,soc:1,mock:1,term:1}, KB_CATS={kb:1,kbfix:1,kbr:1,hw:1,fu:1};
   function key(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
   function parse(k){ var p=k.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }

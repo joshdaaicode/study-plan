@@ -38,6 +38,11 @@ SPRING = OrderedDict([(d(2, 4), '小年夜'), (d(2, 5), '除夕'), (d(2, 6), '�
 REST_DAYS = {d(2, 5), d(2, 6)}            # 除夕、初一：整天休息
 WINTER = (d(1, 21), d(2, 10))
 HANFU = {d(1, 21), d(1, 22), d(1, 25), d(1, 26), d(1, 27), d(1, 28), d(1, 29)}   # 寒輔（暫定，佔上午）
+# 隔週六熬夜補進度（使用者 2026-10-29 定：補習完熬到週日 05:00，隔天睡到 11:00，週日早上的補習作業挪到半夜先寫）
+# 11/21 在二段（11/23）前兩天，改到 11/28；排到科學班初試前。內容由網站自動帶入（還沒寫的複習講義 → 科班考古題往前寫）
+LATE_NIGHTS = [d(11, 7), d(11, 28), d(12, 5), d(12, 19), d(1, 2), d(1, 16), d(1, 30), d(2, 13), d(2, 27)]
+LATE_HOW = '網站自動帶入：先補以前沒寫的複習講義（最早的先補，寫完對答案、錯的登記錯題本）；都補完就往前寫科班考古題'
+CIRCLED = '①②③④'
 CRAM_LAST = d(3, 7)                       # 雄科班補習上到複試前的最後一個週末
 GIFTED_LAST = d(3, 3)                     # 週三資優數學上到初試前
 
@@ -579,6 +584,35 @@ def tpl_hanfu(day, gifted):
     return t
 
 
+# 熬夜那晚：週六的「就寢」換成熬夜第一段；過了午夜的部分放在週日（網站在午夜換日，週六的任務才不會半夜變成欠帳）
+# N＝熬夜補進度槽（網站自動帶入任務）
+def tpl_late_sat(tpl, kind):
+    if kind == 'weekend':
+        return tpl[:-1] + [('22:35', '23:00', 'L', '洗澡、吃點東西（今晚熬到 05:00）'), ('23:00', '23:55', 'N', 'N1')]
+    t = [x for x in tpl if x[0] < '21:50']   # 放假日（沒補習）
+    return t + [('21:50', '22:20', 'L', '洗澡、吃點東西（今晚熬到 05:00）'), ('22:20', '23:50', 'N', 'N1')]
+
+
+def tpl_late_sun(day, kind):
+    if kind == 'weekend':
+        return [('00:00', '01:30', 'S', 'W1'), ('01:40', '03:10', 'N', 'N2'),
+                ('03:10', '03:30', 'L', '休息 20 分：吃點東西、起來走一走'), ('03:30', '04:50', 'N', 'N3'),
+                ('04:50', '05:00', 'L', '05:00 就寢（睡到 11:00）'),
+                ('11:00', '11:40', 'L', '起床、早午餐'),
+                ('11:40', '13:10', 'S', 'W2'), ('13:20', '14:50', 'S', 'W3'), ('15:00', '16:00', 'S', 'W4'),
+                ('16:00', '16:30', 'R', '娛樂'), ('16:30', '17:00', 'L', '吃點東西、出門'),
+                ('17:00', '22:00', 'F', '雄科班補習（自然學科）'),
+                ('22:15', '22:35', 'S', 'W5'), ('22:35', '23:00', 'L', '洗澡，23:00 就寢（明天 06:30 起床，早點躺）')]
+    return [('00:00', '01:30', 'N', 'N2'), ('01:40', '03:10', 'N', 'N3'),
+            ('03:10', '03:30', 'L', '休息 20 分：吃點東西、起來走一走'), ('03:30', '04:50', 'N', 'N4'),
+            ('04:50', '05:00', 'L', '05:00 就寢（睡到 11:00）'),
+            ('11:00', '11:40', 'L', '起床、早午餐'),
+            ('11:40', '13:10', 'S', 'H1'), ('13:20', '14:50', 'S', 'H2'), ('15:00', '16:00', 'S', 'H4'),
+            ('16:00', '16:30', 'R', '娛樂'), ('16:30', '17:30', 'S', 'H5'), ('17:30', '18:30', 'L', '晚餐＋散步'),
+            ('18:30', '20:00', 'S', 'H6'), ('20:15', '21:45', 'S', 'H7'),
+            ('21:45', '23:00', 'L', '洗澡、放鬆、整理明天，23:00 就寢')]
+
+
 def mins(a, b):
     h1, m1 = map(int, a.split(':'))
     h2, m2 = map(int, b.split(':'))
@@ -845,9 +879,17 @@ def build():
                 tpl = tpl_hanfu(day, gifted)
             else:
                 tpl = tpl_full(day, gifted)
+            if day in LATE_NIGHTS:
+                tpl = tpl_late_sat(tpl, kind)
+            elif day - dt.timedelta(days=1) in LATE_NIGHTS:
+                tpl = tpl_late_sun(day, kind)
             for s, e, ty, name in tpl:
                 if ty == 'L':
                     blocks.append((s, e, 'life', name, '', 2)); continue
+                if ty == 'N':
+                    blocks.append((s, e, 'late', '熬夜補進度 %s' % CIRCLED[int(name[1]) - 1], LATE_HOW, 0))
+                    stats[ph]['late'] += mins(s, e)
+                    continue
                 if ty == 'F':
                     cat = 'fixed'
                     blocks.append((s, e, cat, name, '', 1)); continue
@@ -900,6 +942,10 @@ def build():
         if day in DAY_NOTES: notes.append(DAY_NOTES[day])
         if day.weekday() >= 5 and day <= CRAM_LAST and (day in HOLIDAY or day in SPRING):
             notes.append('連假，補習停課')
+        if day in LATE_NIGHTS:
+            notes.append('今晚熬夜補進度到 05:00')
+        elif day - dt.timedelta(days=1) in LATE_NIGHTS:
+            notes.append('昨晚熬夜：00:00–05:00 補進度，睡到 11:00')
         for bl in blocks:
             assert len(bl) == 6, (k, bl)
         plan[k] = {'k': kind, 'lab': lab, 'ph': PH_NAME[ph], 'tip': PH_NOTE.get(ph, ''),
