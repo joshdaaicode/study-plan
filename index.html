@@ -2755,11 +2755,13 @@ section{padding-top:40px}
       x.n=y.n; x.c=y.c; x.d=/錯題本|訂正|對答案/.test(y.d||'')?y.d:((y.d?y.d+'；':'')+'寫完對答案，錯的登記錯題本'); x.lt='熬夜'+y.how+'（原本排 '+md(y.k)+'）';
     });
   }
+  // 任務編號帶日期（t0@2026-10-30）：勾選是用編號記的，舊的勾選才不可能對到另一天同位置的任務
+  // （2026-10-30 使用者打開網頁發現今天前 4 項都已勾、點數紀錄卻沒有任何「完成」）
   function buildList(d, backlog){
-    var out=[], i=0, done=null;
+    var out=[], i=0, done=null, dk='@'+key(d);
     dayTpl(d).forEach(function(x){
       if (x.e || x.l) return;
-      var o={id:'t'+(i++), n:x.n, t:x.t, m:x.m, f:x.f?1:0, c:x.c||'', d:x.d||''};
+      var o={id:'t'+(i++)+dk, n:x.n, t:x.t, m:x.m, f:x.f?1:0, c:x.c||'', d:x.d||''};
       if (x.c==='late') o.late=1;
       else if (!o.f && KB_RE.test(o.n)){   // 熬夜時已經往前寫掉的考古題：打勾、不再算進今天
         done=done||doneNames();
@@ -2767,10 +2769,10 @@ section{padding-top:40px}
       }
       out.push(o);
     });
-    (backlog||[]).forEach(function(b){ out.push({id:'b'+(i++), n:b.n, t:'欠帳', m:b.m, bk:1, c:b.c||''}); });
+    (backlog||[]).forEach(function(b){ out.push({id:'b'+(i++)+dk, n:b.n, t:'欠帳', m:b.m, bk:1, c:b.c||''}); });
     try{
       var due=(window.__wrongDue?window.__wrongDue():[]).length;
-      if(due) out.push({id:'w'+(i++), n:'錯題複習 '+due+' 題（闔上答案重做）', t:'錯題本', m:Math.min(60,due*6)});
+      if(due) out.push({id:'w'+(i++)+dk, n:'錯題複習 '+due+' 題（闔上答案重做）', t:'錯題本', m:Math.min(60,due*6)});
     }catch(e){}
     lateFill(d, out);
     return out;
@@ -2824,8 +2826,13 @@ section{padding-top:40px}
         .map(function(x){ return {n:x.n, m:x.m, c:x.c||''}; });
       st.done={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
     } else if (!st.list || !st.list.length){
+      st.done={}; st.bonus=0;   // 清單是空的就重建：沒有任務可以對，留下的勾選一律清掉
       st.list=buildList(d, st.backlog||[]); save(SK,st);
     }
+    // 保險：勾選只認今天清單裡的編號，對不到的（舊的、別台同步來的）清掉
+    var ids={}; (st.list||[]).forEach(function(x){ ids[x.id]=1; });
+    var stale=Object.keys(st.done||{}).filter(function(id){ return !ids[id]; });
+    if(stale.length){ stale.forEach(function(id){ delete st.done[id]; }); save(SK,st); }
     return d;
   }
 
