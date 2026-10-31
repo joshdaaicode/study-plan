@@ -2805,18 +2805,17 @@ section{padding-top:40px}
   }
   function rollover(){
     var d=today0(), k=key(d);
-    // 換了新版日程：今天重新產生，舊計畫留下的欠帳一筆勾銷
+    // 換了新版日程：今天重新產生，欠帳照留（10/31 改：之前換版會把欠帳一筆勾銷，使用者說「會拖太多」，欠帳不能消失）
     if (PL && st.pv !== PL.v){
       st.pv=PL.v;
       if (st.day === k){
-        // 同一天換版：名稱相同的任務保留勾選
+        // 同一天換版：名稱相同的任務保留勾選，欠帳也保留
         var was={}, mine=(st.list||[]).filter(function(x){ return /^x/.test(x.id); }); (st.list||[]).forEach(function(x){ if(st.done[x.id]) was[x.n]=1; });
-        st.backlog=[]; st.done={}; st.list=buildList(d, []).concat(mine);   // 自己加的任務留著
+        st.done={}; st.list=buildList(d, st.backlog||[]).concat(mine);   // 自己加的任務留著
         st.list.forEach(function(x){ if(was[x.n]) st.done[x.id]=1; });
         save(SK,st); return d;
       }
-      recordHist();   // 換版前先把昨天的完成率記下來
-      st.day=null; st.list=[];
+      // 換版後隔天才第一次打開：照一般換日處理，昨天沒勾的照樣變欠帳
     }
     if (st.day !== k){
       var wasEasy=false; try{ wasEasy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[st.day]); }catch(e){}
