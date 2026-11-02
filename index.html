@@ -958,6 +958,7 @@ section{padding-top:40px}
 .fp-hint{font-size:12.5px;color:var(--ink-faint);margin:-4px 0 8px}
 .fp-stat small{display:block;margin-top:3px;font-size:11px;color:var(--ink-faint)}
 .tab-dot{display:inline-block;min-width:16px;height:16px;line-height:16px;padding:0 4px;margin-left:4px;border-radius:999px;background:#E5484D;color:#fff;font-size:10.5px;font-weight:700;text-align:center;vertical-align:1px}
+.tab-dot.soft{background:#A65A0C}
 .rem-banner.ok{background:var(--cap)}
 [data-dark] .rem-banner{background:#2A3A48;color:#F2F6F9}
 [data-dark] .rem-banner.ok{background:#1E5A46}
@@ -1019,6 +1020,16 @@ section{padding-top:40px}
 .bn-log .up{color:var(--cap)} .bn-log .dn{color:var(--warn)}
 .bn-ul{margin:0;padding-left:1.2em;font-size:13px;color:var(--ink-soft);line-height:1.7}
 .bn-ul li{margin:2px 0}
+.bn-stks{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.bn-stk{padding:10px 12px;border:1px solid var(--rule2);border-radius:12px;background:var(--card2)}
+.bn-stk-h{display:flex;align-items:baseline;gap:8px}
+.bn-stk-h .mono{font-family:'IBM Plex Mono',monospace;font-size:18px}
+.bn-stk-h small{font-size:12px;color:var(--ink-faint)} .bn-stk-h .up{color:var(--cap)} .bn-stk-h .dn{color:var(--warn)}
+.bn-stk>small{display:block;font-size:11.5px;color:var(--ink-faint)}
+.bn-spark{display:block;margin:4px 0}
+.bn-stk-b{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.bn-stk-b .btn{padding:4px 9px;font-size:12px}
+.fp-diary li{margin:4px 0}
 
 /* ---------- 成就 ---------- */
 .ac-card-wrap{padding:0}
@@ -1777,13 +1788,14 @@ section{padding-top:40px}
     訂正、考古題、模考卷、歷屆會考要<b>拍照給 Claude 檢查，過關才算數</b>（只種樹苗、3 天沒交就枯死）。
     <b>1 天沒照顧牠不理你、2 天生病、5 天離家出走；沒照顧的日子樹會枯，3 天沒救回就死；番茄鐘中途放棄留下枯樹樁；讀書時段跑來看、一天待超過 15 分鐘，牠也不理你。</b>
     牠越大吃越多：Lv5 起每天要讀 90 分或完成 60%，Lv12 起 120 分或 70%。降級模式和休息日算有照顧，沒打開網站的日子算沒照顧。
-    <br>點寵物會表演把戲，親密度越高學越多（有照顧的日子 +1、那天有餵或陪玩再 +1、沒照顧 −3）。天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。</p></details>
+    <br>點寵物會表演把戲，親密度越高學越多（有照顧的日子 +1、那天有餵或陪玩再 +1、沒照顧 −3）。天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。
+    <br><b>番茄鐘掉寶</b>：每完成一顆番茄鐘抽一次，可能掉飼料、小點心、🍀、籌碼，運氣好掉 🌟。<b>天賦</b>：Lv2 起每升一級 1 點，點在理財、旅行、單字三條路線（各 3 階），牠離家天賦就沒了。森林頁下面有<b>牠的日記</b>，記下最近 5 天你讀了什麼。</p></details>
   <div class="card fp-card" id="fp-app"></div>
 </section>
 
 <section>
   <div class="sec-head"><h2>成就</h2><span class="eyebrow">達成就永遠算數，領了有點數、🌟、稱號和家具</span></div>
-  <details class="sec-rules"><summary>成就怎麼算</summary><p class="sec-note">33 個成就各有<b>銅、銀、金、白金、鑽石</b>五階，另外還有 8 個隱藏成就。達成之後按「領」才拿得到：銅 +10、銀 +25、金 +50＋🌟1（解鎖稱號）、白金 +100＋🌟1、鑽石 +200＋🌟2，隱藏成就 +100＋🌟2。
+  <details class="sec-rules"><summary>成就怎麼算</summary><p class="sec-note">39 個成就各有<b>銅、銀、金、白金、鑽石</b>五階（含單字賭場、科目股），另外還有 8 個隱藏成就。達成之後按「領」才拿得到：銅 +10、銀 +25、金 +50＋🌟1（解鎖稱號）、白金 +100＋🌟1、鑽石 +200＋🌟2，隱藏成就 +100＋🌟2。
     領過的階數越多，寵物的家越漂亮（地毯、盆栽、掛畫、沙發、書櫃、落地燈、獎盃、串燈）。成就算的是投入——讀書時數、番茄鐘、訂正過關、錯題精熟——分數只占一小部分。</p></details>
   <div id="ac-app"></div>
   <div class="card" style="margin-top:14px">
@@ -1805,7 +1817,8 @@ section{padding-top:40px}
   <div class="sec-head"><h2>森林銀行</h2><span class="eyebrow">有讀書，存款才會長大</span></div>
   <details class="sec-rules"><summary>銀行規則摘要</summary><p class="sec-note">許願商店的點數可以存進來。<b>只有「有照顧的日子」才有利息，偷懶的日子反而被扣保管費。</b>
     定存要整段期間都乖乖讀書才拿得到高利息；考試定存是押自己下一次模考、段考的成績，考好最多拿回 3 倍；急著換願望可以預支，但要付利息，之後賺的點數會先拿一半去還。
-    🌟 可以換成點數，點數可以換 🍀 和 🎟️。完整規則在「規則」分頁。</p></details>
+    🌟 可以換成點數，點數可以換 🍀 和 🎟️。
+    <b>科目股</b>：每科一支股票，股價跟著那科前 7 天的任務完成率走——買進落後的科目、把它讀完，股價就漲。另外可以設<b>自動存款</b>（讀書賺的點數先存一部分）和<b>存錢目標</b>（挑一個願望，看幾天存得到）。完整規則在「規則」分頁。</p></details>
   <div class="card bn-card" id="bn-app"></div>
 </section>
 
@@ -2035,6 +2048,15 @@ section{padding-top:40px}
   <p class="w-note">連續達標以「當天完成 60% 以上」計算，每 7 天有 1 天寬限——斷掉一天不會歸零。<br>研究也指出，斷掉的連續紀錄反而會降低後續參與度，所以這裡不做「連續中斷」的懲罰。</p>
 </section>
 
+<section>
+  <div class="sec-head"><h2>單字賭場</h2><span class="eyebrow">押點數考單字，答錯的字進錯字本</span></div>
+  <details class="sec-rules"><summary>賭場規則</summary><p class="sec-note">範圍可以選會考 2000 字（基本 1200／進階 800）、片語、錯字本，還能只考某些字母或詞性；康軒課本、多益 5 級之後加入。
+    <b>倍率＝題型 × 單字難度</b>：簡單（看英文選中文）×1.5、普通（看中文選英文）×2、困難（拼字）×3、地獄（聽音拼字、限時 15 秒）×5；會考進階、較難的片語再 ×1.2。同一個字連對 3 次算熟字，倍率只剩 ×1。
+    六種玩法：一局 10 題、一題一注、加倍爬梯、限時衝刺、跟寵物對賭、拉霸轉倍率。可以押點數、籌碼（1 點換 1 籌碼，換回點數打 8 折）或 🌟（一次最多 3 顆）。
+    <b>讀書時段不能下注、今天任務要做完一半、點數是負的或欠銀行錢也不能玩</b>；一次最多押「50＋今天讀書分鐘」點；爬梯最多拿回 10 倍、限時衝刺最多 3 倍。答錯的字收進錯字本，隔 1、3、7 天再考、連對 3 次移出；錯字本複習不用下注、隨時能做，時間算英文讀書分鐘（每題最多 30 秒，按「不會」不算），滿 25 分鐘種一棵英文番茄樹。</p></details>
+  <div class="card vc-card" id="vc-app"><p class="fp-gone">打開這一頁才會載入賭場（約 120 KB）。</p></div>
+</section>
+
 
 <footer>
   <p>本頁的日期、倒數、階段與每日日程，皆依<b>開啟當天</b>自動計算，跨日會自動重算，不需手動修改。<br>會考日期 5/15–5/16 為教育部已公告確定日期。科學班各項日期為依歷屆時程推估，實際以雄中當年度招生簡章為準（簡章通常於 1 月底至 2 月初公告）。段考日期依你提供的預定版本，實際以學校行事曆為準。</p>
@@ -2048,7 +2070,7 @@ section{padding-top:40px}
   // 要備份、同步的資料（介面狀態像目前在哪個分頁不算，切分頁不該觸發上傳）
   var K=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1',
     'plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1',
-    'plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1','plan.checks.v1','plan.bank.v1','plan.ach.v1'];
+    'plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1','plan.checks.v1','plan.bank.v1','plan.ach.v1','plan.vocab.v1','plan.vrev.v1'];
   window.__DATA_KEYS=K;
   function pick(){ var o={}; K.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
   // 雲端同步用：這台「上次同步之後有沒有改過」要拿開頁那一刻比，其他程式開頁時會先補算當天的東西
@@ -2186,7 +2208,7 @@ section{padding-top:40px}
     ['月曆',  [4]],
     ['錯題',  [13]],
     ['紀錄',  [14,20,21]],
-    ['獎勵',  [15,16,17,18]],
+    ['獎勵',  [15,22,16,17,18]],
     ['計畫',  [2,3,5,6,7,8,9,10,11,12]],
     ['設定',  [19]]
   ];
@@ -2221,13 +2243,14 @@ section{padding-top:40px}
       toc.innerHTML = '';
       toc.hidden = set.length < 2;
       if (set.length > 1) set.forEach(function(i){
-        var b = document.createElement('button'); b.type = 'button'; b.textContent = secTitle(secs[i]);
+        var b = document.createElement('button'); b.type = 'button'; b.textContent = secTitle(secs[i]); b.dataset.si = i;
         b.setAttribute('aria-pressed', i === si ? 'true' : 'false');
         b.addEventListener('click', function(){ show(gi, i); });
         toc.appendChild(b);
       });
     }
     paintMini();
+    if (window.__subDots) window.__subDots();   // 子分頁上的小圓點（哪一頁有東西可以領）
     var ab = nav.children[gi];
     if (ab) { try { nav.scrollLeft = Math.max(0, ab.offsetLeft - (nav.clientWidth - ab.offsetWidth) / 2); } catch(e){} }
     try { localStorage.setItem('plan-tab', gi); } catch(e){}
@@ -2241,7 +2264,8 @@ section{padding-top:40px}
     var b = document.createElement('button');
     b.className = 'tab-btn'; b.type = 'button'; b.setAttribute('role','tab');
     b.textContent = g[0];
-    b.addEventListener('click', function(){ show(i); });
+    // 「獎勵」上有紅點時，點下去直接到有東西可以領的那一頁（2026-11-02：使用者看到「獎勵 4」翻遍了還找不到）
+    b.addEventListener('click', function(){ var to = (i === 5 && window.__rewardJump) ? window.__rewardJump() : undefined; show(i, to); });
     nav.appendChild(b);
   });
 
@@ -2765,7 +2789,7 @@ section{padding-top:40px}
       if (x.c==='late') o.late=1;
       else if (!o.f && KB_RE.test(o.n)){   // 熬夜時已經往前寫掉的考古題：打勾、不再算進今天
         done=done||doneNames();
-        if(done[o.n] && pk(done[o.n])<d.getTime()){ o.pre=1; o.lt='已在 '+md(done[o.n])+' 熬夜寫完'; }
+        if(done[o.n] && pk(done[o.n])<d.getTime()){ o.pre=1; o.lt='已在 '+md(done[o.n])+' 寫完（那天勾過，這裡自動打勾）'; }
       }
       out.push(o);
     });
@@ -2797,11 +2821,14 @@ section{padding-top:40px}
     return {a:all.length, d:all.filter(function(x){return st.done[x.id];}).length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;})};
   }
   // 重新產生今天的任務，但保留已勾的（照任務名稱對）和自己加的任務
+  // 勾選照名稱對，但一個勾只還給一項（2026-11-02 修：欠帳和今天同名的「雄科班補習作業」，勾一個、重新產生後會兩個都勾上）
   function rebuildKeep(d){
-    var was={}, mine=(st.list||[]).filter(function(x){ return /^x/.test(x.id); });
-    (st.list||[]).forEach(function(x){ if(st.done[x.id]) was[x.n]=1; });
+    var mine=(st.list||[]).filter(function(x){ return /^x/.test(x.id); }), cnt={};
+    (st.list||[]).forEach(function(x){ if(st.done[x.id] && !/^x/.test(x.id)){ var k=(x.bk?'b|':'t|')+x.n; cnt[k]=(cnt[k]||0)+1; } });
+    var keepMine={}; mine.forEach(function(x){ if(st.done[x.id]) keepMine[x.id]=1; });
     st.list=buildList(d, st.backlog||[]).concat(mine); st.done={};
-    st.list.forEach(function(x){ if(was[x.n]) st.done[x.id]=1; });
+    st.list.forEach(function(x){ if(/^x/.test(x.id)){ if(keepMine[x.id]) st.done[x.id]=1; return; } var k=(x.bk?'b|':'t|')+x.n; if(cnt[k]>0){ cnt[k]--; st.done[x.id]=1; } });
+    st.list.forEach(function(x){ if(st.done[x.id] || /^x/.test(x.id)) return; var o=(x.bk?'t|':'b|')+x.n; if(cnt[o]>0){ cnt[o]--; st.done[x.id]=1; } });   // 欠帳↔今天互換位置的
   }
   function rollover(){
     var d=today0(), k=key(d);
@@ -2809,10 +2836,8 @@ section{padding-top:40px}
     if (PL && st.pv !== PL.v){
       st.pv=PL.v;
       if (st.day === k){
-        // 同一天換版：名稱相同的任務保留勾選，欠帳也保留
-        var was={}, mine=(st.list||[]).filter(function(x){ return /^x/.test(x.id); }); (st.list||[]).forEach(function(x){ if(st.done[x.id]) was[x.n]=1; });
-        st.done={}; st.list=buildList(d, st.backlog||[]).concat(mine);   // 自己加的任務留著
-        st.list.forEach(function(x){ if(was[x.n]) st.done[x.id]=1; });
+        // 同一天換版：名稱相同的任務保留勾選（一個勾只還給一項），欠帳、自己加的任務也保留
+        rebuildKeep(d);
         save(SK,st); return d;
       }
       // 換版後隔天才第一次打開：照一般換日處理，昨天沒勾的照樣變欠帳
@@ -2866,6 +2891,8 @@ section{padding-top:40px}
       var cb=document.createElement('input');
       cb.type='checkbox'; cb.checked=!!(st.done[x.id]||x.pre); cb.disabled=!!x.pre;
       cb.addEventListener('change',function(){
+        // 畫面還是昨天的清單（換日後還沒重畫）：這一下不算，先換成今天的清單
+        if(st.day && st.day!==key(today0())){ cb.checked=!cb.checked; stamp=new Date().toDateString(); render(); return; }
         var pv=(window.__rules?window.__rules().task:5);
         if(cb.checked){ st.done[x.id]=1; var got=window.__award?window.__award(pv,'完成：'+x.n):pv;
           if(window.__kbMark) window.__kbMark(x.n);
@@ -3075,8 +3102,14 @@ section{padding-top:40px}
   window.__regenToday=function(){ rebuildKeep(today0()); save(SK,st); render(); };
 
   render();
+  // 換日（2026-11-02 修）：手機把網頁放背景過夜，回來時計時器要等最多 1 分鐘才跑，畫面一直是昨天的清單和勾選。
+  // 切回來、從背景恢復、拿到焦點都馬上檢查一次
   var stamp=new Date().toDateString();
-  setInterval(function(){ var n=new Date().toDateString(); if(n!==stamp){ stamp=n; render(); } },60000);
+  function dayCheck(){ var n=new Date().toDateString(); if(n!==stamp){ stamp=n; render(); } }
+  setInterval(dayCheck,60000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) dayCheck(); });
+  window.addEventListener('pageshow',dayCheck);
+  window.addEventListener('focus',dayCheck);
 })();
 </script>
 <script>
@@ -3283,6 +3316,16 @@ section{padding-top:40px}
     if(!running && mode!=='work'){ left=P.b*60; } paintPomo();
   });
 
+  // 不是用計時器完成的番茄鐘（單字賭場錯字本複習滿 25 分鐘）：一樣種一棵樹、給番茄鐘點數
+  window.__pomoAdd=function(subj,m,via){
+    if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; }
+    P.done++; P.total=(P.total||0)+1;
+    P.log=Array.isArray(P.log)?P.log:[]; P.log.push({k:dayKey(), t:Date.now(), s:subj||'', m:m||25, via:via||''});
+    if(P.log.length>4000) P.log=P.log.slice(-4000);
+    s(PK,P); paintPomo();
+    if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘'+(via?'（'+via+'）':''));
+  };
+
   window.__baseTitle=document.title;
   elGo.textContent=running?'暫停':'開始';
   paintPomo(); tickNow(); autoSubj();
@@ -3329,12 +3372,15 @@ section{padding-top:40px}
       elLog=document.getElementById('sh-logbox');
 
   // raw：銀行、成就這類直接加減，不算加成、不扣還款
-  window.__award=function(n,why,raw){
+  // opt.quiet：不寫紀錄；opt.logN：紀錄寫這個數字（單字賭場一局只記一筆淨輸贏，紀錄才不會被洗掉）
+  window.__award=function(n,why,raw,opt){
     why=why||''; var note='', bo=null, take=0;
     if(!raw && n && window.__bonusMul){ try{ bo=window.__bonusMul(n,why); }catch(e){} if(bo){ n=bo.n; note=bo.note; } }
-    if(!raw && n>0 && window.__bankTake){ try{ take=window.__bankTake(n)||0; }catch(e){} }
+    if(!raw && n>0 && window.__bankTake){ window.__bankTakeLabel=''; try{ take=window.__bankTake(n)||0; }catch(e){} }
+    if(!raw && n<0 && window.__bankGive){ try{ take=-(window.__bankGive(-n)||0); }catch(e){} if(take) window.__bankTakeLabel='從活存扣回自動存的'; }
     shop.pts=(shop.pts||0)+n-take;   // 可以是負的：扣分扣到底，之後退回才對得上
-    if(n) shop.log.unshift({t:Date.now(), n:(n>0?'＋':'－')+Math.abs(n), w:why+note+(take?'（自動還銀行 '+take+'）':'')});
+    var ln=(opt&&('logN' in opt))?opt.logN:n;
+    if(ln && !(opt&&opt.quiet)) shop.log.unshift({t:Date.now(), n:(ln>0?'＋':'－')+Math.abs(ln), w:why+note+(take?'（'+(window.__bankTakeLabel||'自動還銀行')+' '+Math.abs(take)+'）':'')});
     shop.log=shop.log.slice(0,200);
     save(SHK,shop); paintShop();
     if(bo && bo.lucky && n>0 && window.__fx && window.__fx.banner) window.__fx.banner('🍀 幸運！這項點數 ×2');
@@ -3342,6 +3388,8 @@ section{padding-top:40px}
     return n;
   };
   window.__pts=function(){ return shop.pts||0; };
+  window.__shopItems=function(){ return shop.items.slice(); };   // 銀行的存錢目標用
+  window.__shopLog=function(){ return shop.log.slice(); };
 
   function paintShop(){
     if(!elPts) return;
@@ -4941,6 +4989,11 @@ section{padding-top:40px}
     var h=ls('plan.hist.v1',{})||{};
     var t=window.__todayStat?window.__todayStat():null;
     if(t&&t.day) h[t.day]=Object.assign({},h[t.day]||{},t);
+    // 單字賭場的錯字本複習：算英文讀書分鐘（分科進度、寵物照顧都算；2026-11-01 使用者選）
+    var rv=ls('plan.vrev.v1',null);
+    if(rv) Object.keys(rv).forEach(function(k){ if(k==='pomo') return; var mm=Math.round(rv[k]/60); if(!mm) return;
+      var e=h[k]=Object.assign({a:0,d:0,m:0},h[k]||{}); e.m=(e.m||0)+mm; e.vm=mm;
+      var c=e.cat=Object.assign({},e.cat||{}); c.eng=Object.assign({a:0,d:0,m:0},c.eng||{}); c.eng.m+=mm; });
     return h;
   }
   // 某一天要讀的段落：手動改過的那天用改過的，其餘用 plan.js
@@ -5121,7 +5174,9 @@ section{padding-top:40px}
   var SHOP=[{id:'ribbon',n:'蝴蝶結',e:'🎀',c:2,acc:1},{id:'scarf',n:'圍巾',e:'🧣',c:2,acc:1},{id:'hat',n:'紳士帽',e:'🎩',c:3,acc:1},
     {id:'shades',n:'墨鏡',e:'🕶️',c:3,acc:1},{id:'grad',n:'學士帽',e:'🎓',c:5,acc:1},{id:'crown',n:'皇冠',e:'👑',c:8,acc:1},
     {id:'ticket',n:'旅行券',e:'🎟️',c:2,say:'下次旅行一定去遠的地方'},{id:'bento',n:'特製便當',e:'🍙',c:3,say:'打包時用，旅行 24–48 小時、明信片機會加倍'},
-    {id:'seed',n:'神木種子',e:'🌰',c:4,say:'種下去直接是大樹，30 天照顧就成神木'}];
+    {id:'seed',n:'神木種子',e:'🌰',c:4,say:'種下去直接是大樹，30 天照顧就成神木'},
+    // 單字賭場用籌碼換的飾品（chip：不在金幸運草商店賣，每週挑戰也抽不到）
+    {id:'visor',n:'發牌員遮陽帽',e:'🧢',c:0,acc:1,chip:1},{id:'pokerhat',n:'撲克牌紳士帽',e:'🃏',c:0,acc:1,chip:1}];
   // 森林：一塊地種滿才開下一塊；第 7 塊以後一直有新森林
   var LANDS=[
     {n:'小山丘',cap:40,sky:['#BFE2F6','#EAF6FC'],ground:['#A9D88F','#86C46E'],deco:'hills',e:'🌳'},
@@ -5168,6 +5223,33 @@ section{padding-top:40px}
   // 寵物越大吃越多：照顧門檻和每天餓的速度
   function careNeed(lv){ return lv>=12?{m:120,r:.7,h:40}:(lv>=5?{m:90,r:.6,h:35}:{m:60,r:.5,h:30}); }
   // 親密度：有照顧的日子 +1，那天有餵、玩、摸再 +1；沒照顧 −3。到了就學會新把戲（點寵物會表演）
+  // 寵物天賦（2026-11-02）：Lv2 起每升一級 1 點，點在三條路線上（每條 3 階）。寵物離家，天賦跟著沒了。
+  var TALENTS=[{id:'bank',e:'💰',n:'理財',say:['活存利率 +0.2%、每天利息上限 +5','再 +0.2%、上限再 +5','再 +0.2%、上限再 +5']},
+    {id:'trip',e:'🧳',n:'旅行',say:['明信片機率 +8%','再 +8%','再 +8%，旅行回來多帶 1 個紀念品']},
+    {id:'vocab',e:'🔤',n:'單字',say:['錯字本每答對 1 題 +1 籌碼','改成 +2 籌碼','改成 +3 籌碼，跟牠對賭時牠答對率 −5%']}];
+  function talLv(id){ var p=petState().pet; return p&&p.tal?(p.tal[id]||0):0; }
+  // 單字賭場的資料可能有上百 KB，一次重畫會讀好幾次：字串沒變就用上次解析的結果
+  var VQ_RAW=null, VQ_OBJ={};
+  function vocabQ(){ var raw=null; try{ raw=localStorage.getItem('plan.vocab.v1'); }catch(e){} if(raw!==VQ_RAW){ VQ_RAW=raw; try{ VQ_OBJ=JSON.parse(raw)||{}; }catch(e){ VQ_OBJ={}; } } return VQ_OBJ; }
+  function talFree(p,lv){ var used=0; Object.keys(p.tal||{}).forEach(function(k){ used+=p.tal[k]||0; }); return Math.max(0,(lv-1)-used); }
+  // 番茄鐘掉寶（2026-11-02）：每完成一顆番茄鐘（含錯字本複習滿 25 分）抽一次；用完成時間當種子，不能重抽
+  var LOOT=[[.55,'food','🥣 飼料 +1'],[.75,'snack','🍪 小點心：牠心情 +10'],[.87,'clover','🍀 護身符 +1'],[.95,'chips','🎰 籌碼 +15'],[1,'star','🌟 金幸運草 +1']];
+  function lootTick(s){
+    var L=pomoLog(), last=L.length?L[L.length-1].t:0, out=[];
+    if(s.lootT===undefined){ s.lootT=last||Date.now(); return out; }   // 第一次：不追溯以前的番茄鐘
+    L.forEach(function(e){
+      if(!e || !(e.t>s.lootT)) return;
+      var r=rnd(String(e.t)+'loot'), z=LOOT.filter(function(x){ return r<x[0]; })[0], k=z[1], txt=z[2];
+      if(k==='snack' && !(s.pet && !s.pet.trip)){ k='food'; txt=LOOT[0][2]; }
+      if(k==='food') s.bonusFood++;
+      else if(k==='snack') s.pet.mood=Math.min(s.pet.sick?40:100,s.pet.mood+10);
+      else if(k==='clover') s.clover++;
+      else if(k==='star') s.gold++;
+      out.push({k:k, txt:txt});   // 籌碼在 paintPet 存好寵物資料之後才寫進賭場
+    });
+    if(last) s.lootT=Math.max(s.lootT,last);
+    return out;
+  }
   var TRICKS=[{b:0,id:'jump',n:'跳跳'},{b:3,id:'spin',n:'轉圈圈'},{b:7,id:'dance',n:'跳舞'},{b:14,id:'flip',n:'後空翻'},{b:30,id:'wave',n:'揮手打招呼'},{b:60,id:'star',n:'變出星星'}];
   // 家具：成就領越多階，家裡越漂亮
   var FURN=[{at:5,id:'rug',n:'地毯',e:'🟫'},{at:12,id:'plant',n:'盆栽',e:'🪴'},{at:22,id:'frame',n:'掛畫',e:'🖼️'},{at:35,id:'sofa',n:'沙發',e:'🛋️'},
@@ -5417,7 +5499,7 @@ section{padding-top:40px}
   var WXN={sunny:['☀️','晴天'],cloudy:['⛅','多雲'],rain:['🌧️','下雨'],snow:['🌨️','下雪'],rainbow:['🌈','彩虹（昨天全清）'],gloom:['🌧️','陰雨：牠很難過']};
 
   /* ---- 旅行（旅蛙制度） ---- */
-  function cardChance(t){ return Math.min(.95,(.45+(t.tool==='相機'?.25:0)+(t.charm?.15:0))*(t.bento?2:1)); }
+  function cardChance(t,tr){ return Math.min(.95,(.45+(t.tool==='相機'?.25:0)+(t.charm?.15:0)+.08*(tr||0))*(t.bento?2:1)); }
   function addCard(s,dest,p){ s.album.unshift({d:dest, at:Date.now(), name:p.name, sp:p.sp, wear:p.wear||'', v:Math.floor(Math.random()*3)}); s.album=s.album.slice(0,300); }
   function tripTick(s,att){
     var p=s.pet, ev=[]; if(!p) return ev;
@@ -5425,11 +5507,11 @@ section{padding-top:40px}
     if(p.trip){
       var pt=pomoTotal();
       if(pt>p.trip.pomoSeen){
-        for(var i=p.trip.pomoSeen;i<pt;i++){ if(Math.random()<cardChance(p.trip)){ addCard(s,p.trip.dest,p); p.trip.cards=(p.trip.cards||0)+1; ev.push('card'); } }
+        for(var i=p.trip.pomoSeen;i<pt;i++){ if(Math.random()<cardChance(p.trip,(p.tal||{}).trip)){ addCard(s,p.trip.dest,p); p.trip.cards=(p.trip.cards||0)+1; ev.push('card'); } }
         p.trip.pomoSeen=pt;
       }
       if(now>=p.trip.backAt){
-        var D=destOf(p.trip.dest), n=1+(p.trip.charm?1:0)+(p.trip.bento?1:0);
+        var D=destOf(p.trip.dest), n=1+(p.trip.charm?1:0)+(p.trip.bento?1:0)+(((p.tal||{}).trip||0)>=3?1:0);
         s.souv[D.s]=(s.souv[D.s]||0)+n;
         if(!p.trip.cards && Math.random()<.3) addCard(s,D.n,p);
         p.mood=Math.min(100,p.mood+15); p.hunger=Math.max(p.hunger,50);
@@ -5553,6 +5635,9 @@ section{padding-top:40px}
     if(id==='hat') return '<g transform="translate(1 '+(T+1.5)+') rotate(-6)"><rect x="-8.5" y="-1.6" width="17" height="3.2" rx="1.4" fill="#262626"/><rect x="-5.6" y="-11.5" width="11.2" height="10.4" rx="1.4" fill="#333"/><rect x="-5.6" y="-4.4" width="11.2" height="2.2" fill="#C0504D"/></g>';
     if(id==='grad') return '<g transform="translate(1 '+(T+1.5)+') rotate(-6)"><rect x="-5.4" y="-3.6" width="10.8" height="4.4" rx="1" fill="#2E2E2E"/><path d="M-11 -4 L0 -8.6 L11 -4 L0 .4 Z" fill="#222"/><path d="M0 -4.3 L8.6 -1.6 V4" stroke="#E9C46A" stroke-width="1.1" fill="none"/><circle cx="8.6" cy="4.6" r="1.3" fill="#E9C46A"/></g>';
     if(id==='crown') return '<g transform="translate(1 '+(T+1.2)+')"><path d="M-7.5 0 L-7.5 -7.5 L-3.8 -3.4 L0 -9.6 L3.8 -3.4 L7.5 -7.5 L7.5 0 Z" fill="#F2C230" stroke="#C99A1A" stroke-width=".8" stroke-linejoin="round"/><circle cx="0" cy="-2.6" r="1.4" fill="#E5536B"/><circle cx="-4.6" cy="-2" r=".9" fill="#5AA9E6"/><circle cx="4.6" cy="-2" r=".9" fill="#5AA9E6"/></g>';
+    if(id==='visor') return '<g transform="translate(1 '+(T+3)+') rotate(-6)"><path d="M-8 0 Q0 -3 8 0 L8 1.8 Q0 -1.2 -8 1.8 Z" fill="#1F6E43"/><path d="M-1 .6 Q6 -1 13 3 Q7 4.4 -1 2.8 Z" fill="#35B36E" opacity=".85"/></g>';
+    if(id==='pokerhat') return '<g transform="translate(1 '+(T+1.5)+') rotate(-6)"><rect x="-8.5" y="-1.6" width="17" height="3.2" rx="1.4" fill="#1D1D1D"/><rect x="-5.6" y="-11.5" width="11.2" height="10.4" rx="1.4" fill="#2A2A2A"/><rect x="-5.6" y="-4.4" width="11.2" height="2.2" fill="#C9A227"/>'
+      +'<g transform="translate(3.8 -9.5) rotate(16)"><rect x="-2.3" y="-3.1" width="4.6" height="6.2" rx=".7" fill="#fff" stroke="#9A9A9A" stroke-width=".3"/><path d="M0 1.6 L-1.5 -.2 Q-1.6 -1.6 0 -.8 Q1.6 -1.6 1.5 -.2 Z" fill="#C0392B"/></g></g>';
     if(id==='shades') return '<g><rect x="'+(E[0]-3.2)+'" y="'+(E[2]-2.6)+'" width="6.2" height="4.4" rx="1.8" fill="#1A1A1A"/><rect x="'+(E[1]-3)+'" y="'+(E[2]-2.6)+'" width="6.2" height="4.4" rx="1.8" fill="#1A1A1A"/>'
       +'<path d="M'+(E[0]+3)+' '+(E[2]-1.4)+' H'+(E[1]-3)+'" stroke="#1A1A1A" stroke-width="1.1"/><path d="M'+(E[0]-2.2)+' '+(E[2]-1.5)+' l1.5 -.7" stroke="#fff" stroke-width=".8" opacity=".6"/></g>';
     return '';
@@ -6283,6 +6368,10 @@ section{padding-top:40px}
     var lv=s.pet?(s.pet.lvSeen||1):1;
     checksAdvance(C,h);
     var P=pomoState(); if(P.day) s.pomoLog[P.day]=Math.max(s.pomoLog[P.day]||0,P.done||0);
+    var loot=lootTick(s);
+    loot.forEach(function(L){ flash.push('🍅 番茄鐘掉寶：'+L.txt); });
+    var rare=loot.filter(function(L){ return /clover|chips|star/.test(L.k); });
+    if(rare.length && window.__fx && window.__fx.banner) window.__fx.banner('🍅 番茄鐘掉寶：'+rare.map(function(L){ return L.txt; }).join('、'));
     var T=collect(h,C,s,s.pet?pk(s.pet.born):null);
     forestAdvance(s,h,T.trees,lv);
     var ev=petAdvance(s,h,lv);
@@ -6310,6 +6399,8 @@ section{padding-top:40px}
     var info=null;
     if(p){ var xp=xpSince(h,pk(p.born),p.pomo0||0,C); info={xp:xp, lv:levelOf(xp)}; if(info.lv.lv!==p.lvSeen){ if(p.lvSeen && info.lv.lv>p.lvSeen) ev.push('lv|'+info.lv.lv); p.lvSeen=info.lv.lv; } }
     savePet(s);
+    var lootChips=loot.filter(function(L){ return L.k==='chips'; }).length;
+    if(lootChips){ var vq=ls('plan.vocab.v1',{})||{}; vq.chips=(vq.chips||0)+15*lootChips; sv('plan.vocab.v1',vq); }
     ev.concat(bev).forEach(function(e){
       var q=e.split('|');
       if(q[0]==='sick') flash.push('🤒 '+esc((p||{}).name||'')+' 生病了：連續 2 天有照顧才會好。');
@@ -6339,16 +6430,18 @@ section{padding-top:40px}
     newAch.forEach(function(n){ flash.push('🏆 達成成就：'+n+'（到下面「成就」領獎）'); });
     if(newAch.length && window.__fx && window.__fx.banner) window.__fx.banner('🏆 達成成就：'+newAch[0]+(newAch.length>1?' 等 '+newAch.length+' 個':''));
     var furn=FURN.filter(function(f){ return achScore()>=f.at; }), title=achTitle();
-    tabDot(questReady+achReady);
+    tabDot(questReady,achReady,!!(bk.loan&&bk.loan.late));
     if(p) talkLines=talkFor(p,att,careToday,te,need,pendList.length,questReady,streak,bk,nextTrick(p)); else talkLines=[];
     // ---- 今天分頁的小卡 ----
     if(mini){
       mini.hidden=false;
       var chips=[];   // 手機上小卡不要拉太長：待辦併成一行
-      if(pendList.length) chips.push('<span style="color:var(--warn)">⏳ 檢查 '+pendList.length+'</span>');
-      if(questReady) chips.push('<span style="color:var(--cap)">🎁 任務 '+questReady+'</span>');
-      if(achReady) chips.push('<span style="color:var(--cap)">🏆 成就 '+achReady+'</span>');
-      if(bk.loan) chips.push('<span style="color:'+(bk.loan.late?'var(--rest)':'var(--warn)')+'">🏦 欠 '+bk.loan.owe+(bk.loan.late?' 逾期':'')+'</span>');
+      // 每個小標點了直接到那一頁（以前全部都跳到森林，點「成就 3」卻看不到成就）
+      if(pendList.length) chips.push('<span data-go="check" style="color:var(--warn)">⏳ 檢查 '+pendList.length+'</span>');
+      if(questReady) chips.push('<span data-go="quest" style="color:var(--cap)">🎁 任務 '+questReady+'</span>');
+      if(achReady) chips.push('<span data-go="ach" style="color:var(--cap)">🏆 成就 '+achReady+'</span>');
+      if(bk.loan) chips.push('<span data-go="bank" style="color:'+(bk.loan.late?'var(--rest)':'var(--warn)')+'">🏦 欠 '+bk.loan.owe+(bk.loan.late?' 逾期':'')+'</span>');
+      var vd=vocabDue(); if(vd) chips.push('<span data-go="vocab" style="color:var(--warn)">📕 錯字 '+vd+'</span>');
       var extra=(chips.length?'<p class="fp-mini-chips">'+chips.join('')+'</p>':'')
         +'<p>⚡ '+B.n+'：'+B.say+(sm>1?'・🔥 ×'+sm:'')+'</p>';
       if(p){
@@ -6431,12 +6524,16 @@ section{padding-top:40px}
                   return '<button type="button" data-bag="tool" data-v="'+t.n+'" aria-pressed="'+(bagPick.tool===t.n)+'"'+(lock?' disabled class="lock"':'')+'><span class="e">'+t.e+'</span>'+t.n+'<small>'+(lock?'讀書 '+t.h+' 小時':t.say)+'</small></button>'; }).join('')
               +'</div><div class="bar-btns" style="margin-top:8px"><button class="btn solid" type="button" data-act="pack"'+(block||!bagPick.food||(bagPick.food!=='特製便當'&&!foodN)?' disabled':'')+'>打包好了</button><span class="sub" style="margin:0">打包後不能拿回來；道具不會用掉，護身符、旅行券、特製便當會。</span></div></div>';
           }
+          var tfree=talFree(p,info.lv.lv);
+          body+='<div class="fp-row"><h4>天賦<span>'+(tfree?'還有 <b>'+tfree+'</b> 點可以點':'下一級還差 '+(info.lv.need-info.lv.cur)+' 經驗')+'；Lv2 起每升一級 1 點，牠離家天賦就沒了</span></h4><div class="fp-items">'
+            +TALENTS.map(function(t){ var r=(p.tal||{})[t.id]||0; return '<button type="button" data-tal="'+t.id+'"'+(!tfree||r>=3||block?' disabled':'')+'><span class="e">'+t.e+'</span>'+t.n+' '+'★'.repeat(r)+'☆'.repeat(3-r)+'<small>'+(r>=3?'滿了：'+t.say[2]:'下一階：'+t.say[r])+'</small></button>'; }).join('')+'</div></div>';
           var nf=FURN.filter(function(f){ return achScore()<f.at; })[0];
           body+='<p class="fp-gone">家具：'+(furn.length?furn.map(function(f){ return f.e+f.n; }).join('、'):'還沒有')+(nf?'。成就再領 '+(nf.at-achScore())+' 階就有'+nf.e+nf.n+'。':'。全部家具都有了！')+'　🐷 存錢筒會跟著活存變大，點它可以到銀行。</p>';
         }
         if(!att.away && scene==='forest'){
           body+='<p class="fp-gone">'+(vis.length?'今天在'+land(li).n+'的訪客：'+vis.map(function(a){ return a.e+a.n; }).join('、')+'（點牠們會打招呼）':'今天'+land(li).n+'沒有訪客。連續讀書越多天，越多動物會來。')+'</p>';
           if((p.land||0)!==li) body+='<div class="bar-btns" style="margin-top:4px"><button class="btn" type="button" data-act="move" data-v="'+li+'"'+(block?' disabled':'')+'>帶 '+esc(p.name)+' 到'+land(li).n+'</button><span class="sub" style="margin:0">每天第一次換地方心情 +10</span></div>';
+          body+='<details class="fp-more" data-more="diary"'+(v.diary?' open':'')+'><summary>📔 '+esc(p.name)+'的日記<span>牠記下的最近 5 天</span></summary>'+diaryHtml(h,p,lv)+'</details>';
         }
       } else {
         body+=(s.justLeft?'<p class="fp-care bad">'+esc(s.justLeft)+'。森林、明信片、紀念品、圖鑑都還在，可以重新領養一隻。</p>':'')
@@ -6483,7 +6580,7 @@ section{padding-top:40px}
     }
     if(tabk==='shop'){
       body+='<div class="fp-panel"><h4>🌟 金幸運草商店 <span>你有 🌟 '+s.gold+'。金幸運草只有 Claude 檢查過關、每日任務全清、每週挑戰、成就拿得到</span></h4><div class="fp-items">'
-        +SHOP.map(function(a){ var own=a.acc&&s.acc[a.id];
+        +SHOP.filter(function(a){ return !a.chip; }).map(function(a){ var own=a.acc&&s.acc[a.id];
           return '<button type="button" data-buy="'+a.id+'"'+(own||s.gold<a.c?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n+'<small>'+(own?'已擁有':('🌟 '+a.c+(a.say?'・'+a.say:'')))+'</small></button>'; }).join('')+'</div>'
         +'<p class="fp-gone">持有：🍀 護身符 '+charms+'・🎟️ 旅行券 '+s.tickets+'・🍙 特製便當 '+s.bentos+'・🌰 已種神木種子 '+s.seeds.length+'。🌟 也可以到銀行換成點數。</p></div>'
         +'<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p>';
@@ -6523,11 +6620,33 @@ section{padding-top:40px}
       +(claimed?'<span class="st">已領 ✓</span>':'<button type="button" class="btn'+(ok?' solid':'')+'" data-claim="'+kind+':'+id+'"'+(ok?'':' disabled')+'>'+(ok?'領取':'還沒完成')+'</button>')+'</div>';
   }
   function msg(m){ var el=document.getElementById('fp-msg'); if(el) el.innerHTML=m; }
-  // 「獎勵」分頁按鈕上的小紅點：可以領的任務＋成就
-  function tabDot(n){
+  // 「獎勵」分頁按鈕上的小紅點：可以領的任務＋成就。
+  // 2026-11-02 修：以前只有「獎勵」上有數字，點進去不知道在哪一頁；現在子分頁也有：森林（任務）、成就（可領）、
+  // 單字賭場（錯字本今天到期，橘色、不算進紅點）、銀行（借款逾期「!」）
+  var SUBDOT={};
+  window.__subDots=function(){
+    var toc=document.getElementById('page-toc'); if(!toc || window.__tab!==5) return;
+    Array.prototype.forEach.call(toc.children,function(b){
+      var v=SUBDOT[b.dataset.si], d=b.querySelector('.tab-dot');
+      if(!v){ if(d) d.remove(); return; }
+      if(!d){ d=document.createElement('b'); b.appendChild(d); }
+      d.className='tab-dot'+(v.soft?' soft':''); d.textContent=v.n;
+    });
+  };
+  function vocabDue(){ var q=vocabQ(), t=d0(), n=0; if(q&&q.wb) Object.keys(q.wb).forEach(function(k){ if(pk(q.wb[k].due)<=t) n++; }); return n; }
+  var DOTN={quest:0,ach:0};
+  window.__rewardJump=function(){
+    if(DOTN.ach){ var va=viewState(); va.afil='ready'; saveView(va); return 16; }   // 成就頁直接開「可領」
+    if(DOTN.quest){ var v=viewState(); v.tab='quest'; saveView(v); return 15; }
+    return undefined;
+  };
+  function tabDot(quest,ach,late){
+    var n=quest+ach, due=vocabDue(); DOTN={quest:quest,ach:ach};
+    SUBDOT={15:quest?{n:quest}:null, 16:ach?{n:ach}:null, 17:late?{n:'!'}:null, 22:due?{n:due,soft:1}:null};
+    window.__subDots();
     var nav=document.getElementById('main-tabs'), b=nav&&nav.children[5]; if(!b) return;
     var d=b.querySelector('.tab-dot');
-    if(!n){ if(d) d.remove(); return; }
+    if(!n){ if(d) d.remove(); b.removeAttribute('aria-label'); return; }
     if(!d){ d=document.createElement('b'); d.className='tab-dot'; b.appendChild(d); }
     d.textContent=n; b.setAttribute('aria-label','獎勵，有 '+n+' 個可以領');
   }
@@ -6564,14 +6683,14 @@ section{padding-top:40px}
       } else {
         var wk=weekKey(d0()), c=weeklyChallenges().filter(function(z){ return z.id===parts2[1]; })[0]; if(!c) return; var r2=c.f(weekData(s,h)); if(r2[0]<r2[1]) return;
         s.weekly[wk]=s.weekly[wk]||{}; if(s.weekly[wk][c.id]) return; s.weekly[wk][c.id]=1; s.gold+=2;
-        var prizes=SHOP.filter(function(a){ return a.acc && !s.acc[a.id]; }), prize;
+        var prizes=SHOP.filter(function(a){ return a.acc && !a.chip && !s.acc[a.id]; }), prize;
         if(prizes.length && Math.random()<.5){ prize=pickR(prizes); s.acc[prize.id]=1; flash.push('🌟 ×2，抽到飾品 '+prize.e+' '+prize.n+'！'); }
         else { var g=pickR(['ticket','bento']); if(g==='ticket'){ s.tickets++; flash.push('🌟 ×2，抽到 🎟️ 旅行券！'); } else { s.bentos++; flash.push('🌟 ×2，抽到 🍙 特製便當！'); } }
       }
       savePet(s); if(window.__fx) window.__fx.task(b,0); afterPaint.push(function(){ petDo('jump'); }); paintPet(); return;
     }
     if(b.dataset.buy){
-      var it=SHOP.filter(function(a){ return a.id===b.dataset.buy; })[0]; if(!it||s.gold<it.c) return;
+      var it=SHOP.filter(function(a){ return a.id===b.dataset.buy && !a.chip; })[0]; if(!it||s.gold<it.c) return;
       if(it.acc){ if(s.acc[it.id]) return; s.acc[it.id]=1; }
       else if(it.id==='ticket') s.tickets++;
       else if(it.id==='bento') s.bentos++;
@@ -6597,6 +6716,13 @@ section{padding-top:40px}
       else if(b.dataset.bag==='tool') bagPick.tool=(bagPick.tool===b.dataset.v?'':b.dataset.v);
       else if(b.dataset.bag==='ticket') bagPick.ticket=!bagPick.ticket;
       else bagPick.charm=!bagPick.charm;
+      paintPet(); return;
+    }
+    if(b.dataset.tal){
+      var tid=b.dataset.tal, tt=TALENTS.filter(function(z){ return z.id===tid; })[0]; if(!tt || !talFree(p,lv)) return;
+      p.tal=p.tal||{}; if((p.tal[tid]||0)>=3) return; p.tal[tid]=(p.tal[tid]||0)+1; savePet(s);
+      flash.push(tt.e+' 天賦「'+tt.n+'」升到第 '+p.tal[tid]+' 階：'+tt.say[p.tal[tid]-1]+'。');
+      afterPaint.push(function(){ petDo('star',{dur:1.4}); petDo('say',{txt:'我變強了！'}); });
       paintPet(); return;
     }
     var act=b.dataset.act;
@@ -6640,13 +6766,39 @@ section{padding-top:40px}
   });
   if(mini){
     mini.tabIndex=0; mini.setAttribute('role','button'); mini.setAttribute('aria-label','到我的森林');
-    var goF=function(){ if(window.__showTab) window.__showTab(5,15); var a=document.getElementById('fp-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start'}); },30); };
+    var goF=function(e){
+      var g=e&&e.target&&e.target.closest?e.target.closest('[data-go]'):null, to=g?g.dataset.go:'';
+      if(to==='ach'){ window.__showTab(5,16); return; }
+      if(to==='bank'){ var vb=viewState(); vb.btab='loan'; saveView(vb); window.__showTab(5,17); return; }
+      if(to==='vocab'){ window.__showTab(5,22); return; }
+      if(to==='check'||to==='quest'){ var vv=viewState(); vv.tab=to; saveView(vv); }
+      if(window.__showTab) window.__showTab(5,15); var a=document.getElementById('fp-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start'}); },30); };
     mini.addEventListener('click',goF);
     mini.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goF(); } });
   }
   function goBank(){ if(window.__showTab) window.__showTab(5,17); window.scrollTo(0,0); }
   // 「更多」打開或收起要記住（每分鐘重畫時才不會自己收起來）
-  if(app) app.addEventListener('toggle',function(e){ var d=e.target; if(!d||!d.dataset||!d.dataset.more) return; var v=viewState(); v.more=d.open; saveView(v); },true);
+  if(app) app.addEventListener('toggle',function(e){ var d=e.target; if(!d||!d.dataset||!d.dataset.more) return; var v=viewState(); v[d.dataset.more==='forest'?'more':d.dataset.more]=d.open; saveView(v); },true);
+  // 寵物日記：照每天的讀書紀錄、番茄鐘、錯字本複習，用牠的口氣寫（不另外存，每次照紀錄重寫）
+  function pickBy(r,a){ return a[Math.floor(r*a.length)%a.length]; }
+  function diaryHtml(h,p,lv){
+    var easy=easyMap(), L=pomoLog(), out=[];
+    for(var i=1;i<=5;i++){
+      var d=d0(); d.setDate(d.getDate()-i); if(d<pk(p.born)) break;
+      var k=kk(d), e=h[k]||{}, ok=cared(k,h,easy,lv), pm={}, r=rnd(k+'diary');
+      L.forEach(function(x){ if(x&&x.k===k){ var n=POMO_SUBJ[x.s]||'沒選科目'; pm[n]=(pm[n]||0)+1; } });
+      var pn=Object.keys(pm), line=md(k)+'（'+WD[d.getDay()]+'）';
+      if(!e.a && !e.m && !pn.length) line+=pickBy(r,['主人今天都沒打開網站……我等了一整天。','今天沒看到主人，好寂寞。']);
+      else {
+        line+='主人讀了 '+(e.m||0)+' 分鐘'+(e.a?'，勾掉 '+(e.d||0)+'/'+e.a+' 項':'');
+        if(pn.length) line+='，番茄鐘 '+pn.map(function(n){ return n+' '+pm[n]+' 顆'; }).join('、');
+        if(e.vm) line+='，還複習了 '+e.vm+' 分鐘錯字';
+        line+='。'+(ok?pickBy(r,['有照顧我，好開心 😊','被摸摸頭的感覺真好 ☺️','明天也要一起加油！','主人好認真，我也要快點長大！']):pickBy(r,['今天沒照顧我，好難過 😢','肚子餓餓的……','主人是不是忘記我了？']));
+      }
+      out.push('<li>'+esc(line)+'</li>');
+    }
+    return out.length?'<ul class="bn-ul fp-diary">'+out.join('')+'</ul>':'<p class="fp-gone">牠剛來，日記明天才開始寫。</p>';
+  }
   // 番茄鐘中途放棄：留下一根枯樹樁
   window.__petEvent=function(type){
     if(type!=='abandon') return;
@@ -6676,7 +6828,7 @@ section{padding-top:40px}
   var CREDIT=[{n:'C',min:0,loan:0,sav:0,fix:0},{n:'B',min:30,loan:100,sav:0,fix:0},{n:'A',min:50,loan:200,sav:.2,fix:2},{n:'AA',min:70,loan:400,sav:.4,fix:4},{n:'AAA',min:85,loan:600,sav:.6,fix:6}];
   var EXAMS=[['mock','二模','二模'],['term','上二段','二段'],['mock','三模','三模'],['term','上三段','三段'],['mock','四模','四模'],['mock','五模','五模'],['mock','會考','國中教育會考']];
   function bankState(){
-    var b=ls(BK,null)||{}; b.sav=b.sav||0; b.fixed=b.fixed||[]; b.bonds=b.bonds||[]; b.log=b.log||[]; b.st=b.st||{}; b.ex=b.ex||{};
+    var b=ls(BK,null)||{}; b.sav=b.sav||0; b.fixed=b.fixed||[]; b.bonds=b.bonds||[]; b.log=b.log||[]; b.st=b.st||{}; b.ex=b.ex||{}; b.stk=b.stk||{}; b.auto=b.auto||0;
     ['int','fee','fixOk','fixBad','bondWin','bondLose','repaid','ontime','late','maxSav','borrowed'].forEach(function(k){ b.st[k]=b.st[k]||0; });
     return b;
   }
@@ -6713,12 +6865,12 @@ section{padding-top:40px}
     var b=bankState(), before=JSON.stringify(b), ev=[], y=d0(); y.setDate(y.getDate()-1);
     if(!b.last){ b.last=kk(y); saveBank(b); return ev; }
     var d=pk(b.last); d.setDate(d.getDate()+1);
-    var easy=easyMap(), cr=creditOf(b,h,lv);
+    var easy=easyMap(), cr=creditOf(b,h,lv), tb=talLv('bank');
     while(d<=y){
       var k=kk(d), ok=cared(k,h,easy,lv), B=boostOf(k);
       if(b.sav>0){
         if(ok){
-          if(!b.loan){ var it=Math.floor(b.sav*(BANK.sav+cr.sav)/100); if(b.sav>=20) it=Math.max(1,it); var dbl=B.id==='bank'; it=Math.min(dbl?it*2:it, BANK.savCap*(dbl?2:1));
+          if(!b.loan){ var it=Math.floor(b.sav*(BANK.sav+cr.sav+.2*tb)/100); if(b.sav>=20) it=Math.max(1,it); var dbl=B.id==='bank'; it=Math.min(dbl?it*2:it, (BANK.savCap+5*tb)*(dbl?2:1));
             if(it>0){ b.sav+=it; b.st.int+=it; blog(b,it,md(k)+' 活存利息'+(dbl?'（理財日 ×2）':'')); } }
         } else { var fee=Math.min(b.sav,Math.max(1,Math.round(b.sav*BANK.fee/100))); b.sav-=fee; b.st.fee+=fee; blog(b,-fee,md(k)+' 沒照顧，保管費 '+BANK.fee+'%'); }
       }
@@ -6748,11 +6900,44 @@ section{padding-top:40px}
     return ev;
   }
   // 借款期間：之後賺到的點數自動拿一半還款（由 window.__award 呼叫）
+  // 沒借款時：自動存款（定期定額，2026-11-02 加）——讀書賺到的點數先拿固定比例存進活存
   window.__bankTake=function(n){
-    var b=bankState(); if(!b.loan || n<=0) return 0;
-    var x=Math.min(b.loan.owe,Math.ceil(n*BANK.repay/100)); b.loan.owe-=x; blog(b,x,'自動還款');
-    loanClear(b); saveBank(b); return x;
+    var b=bankState(); if(n<=0) return 0;
+    if(b.loan){
+      var x=Math.min(b.loan.owe,Math.ceil(n*BANK.repay/100)); b.loan.owe-=x; blog(b,x,'自動還款');
+      loanClear(b); saveBank(b); window.__bankTakeLabel='自動還銀行'; return x;
+    }
+    if(b.auto){
+      var y=Math.floor(n*b.auto/100); if(y<=0) return 0;
+      b.sav+=y; b.st.maxSav=Math.max(b.st.maxSav,b.sav); b.st.autoIn=(b.st.autoIn||0)+y; blog(b,y,'自動存款 '+b.auto+'%');
+      saveBank(b); window.__bankTakeLabel='自動存進活存'; return y;
+    }
+    return 0;
   };
+  // 取消勾選（點數是負的、不是銀行或成就那種直接加減）：當初自動存走的比例從活存扣回，不從錢包扣
+  window.__bankGive=function(m){
+    var b=bankState(); if(m<=0 || b.loan || !b.auto) return 0;
+    var x=Math.min(b.sav,Math.floor(m*b.auto/100)); if(x<=0) return 0;
+    b.sav-=x; blog(b,-x,'取消勾選：扣回自動存的 '+x); saveBank(b); return x;
+  };
+  // 科目股（2026-11-02 加）：每科一支股票，股價＝前 7 天（不含今天）這科任務的完成率，40～160 點；7 天都沒有這科任務就是 100。
+  // 押自己會把落後的科目補起來：買進落後的科目、把它讀完，股價就漲。買賣各收 3% 手續費，成本合計最多 500 點。
+  var STOCKS=[['chi','國文','#7DBF5A'],['math','數學','#2F7D4F'],['eng','英文','#D9583B'],['sci','自然','#E8B931'],['soc','社會','#4E9A45'],['kb','科班','#F4A7C0'],['hw','補習作業','#2B5E45']];
+  var STK={fee:3, cap:500, lo:40, span:120};
+  function stkCat(c){ return /^(kb|kbfix|kbr|fu)$/.test(c)?'kb':c; }
+  function stkPrice(h,id,day){
+    var a=0, dn=0;
+    for(var i=1;i<=7;i++){ var x=new Date(day); x.setDate(x.getDate()-i); var e=h[kk(x)]; if(!e||!e.cat) continue;
+      Object.keys(e.cat).forEach(function(c){ if(stkCat(c)===id){ a+=e.cat[c].a||0; dn+=e.cat[c].d||0; } }); }
+    return a?Math.round(STK.lo+STK.span*Math.min(1,dn/a)):100;
+  }
+  function stkHist(h,id){ var out=[]; for(var i=13;i>=0;i--){ var d=d0(); d.setDate(d.getDate()-i); out.push(stkPrice(h,id,d)); } return out; }
+  function spark(a,col){
+    var mn=Math.min.apply(null,a.concat([40])), mx=Math.max.apply(null,a.concat([160])), W2=84, H2=24;
+    var pts=a.map(function(v,i){ return (i*W2/(a.length-1)).toFixed(1)+','+(H2-(v-mn)/(mx-mn||1)*H2).toFixed(1); }).join(' ');
+    return '<svg class="bn-spark" viewBox="0 0 '+W2+' '+H2+'" width="'+W2+'" height="'+H2+'" aria-hidden="true"><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+  }
+  function stkCost(b){ var c=0; Object.keys(b.stk||{}).forEach(function(k){ c+=(b.stk[k].cost||0); }); return c; }
   var bnApp=document.getElementById('bn-app'), bnMsg='';
   function bnTab(k,t,on){ return '<button type="button" data-btab="'+k+'" aria-pressed="'+on+'">'+t+'</button>'; }
   function amtBox(id,ph,quick){
@@ -6768,23 +6953,39 @@ section{padding-top:40px}
     var fixSum=fixedOpen.reduce(function(a,f){ return a+f.amt; },0), bondSum=bondsOpen.reduce(function(a,o){ return a+o.amt; },0);
     var careToday=cared(tk,h,easyMap(),lv);
     var o='<div class="fp-tabs bn-tabs" role="tablist" aria-label="銀行分頁">'+bnTab('home','總覽',tab==='home')+bnTab('sav','活存',tab==='sav')+bnTab('fix','定存',tab==='fix')
-      +bnTab('bond','考試定存',tab==='bond')+bnTab('loan','預支'+(b.loan?' <b class="fp-dot">!</b>':''),tab==='loan')+bnTab('ex','兌換所',tab==='ex')+bnTab('log','帳本',tab==='log')+bnTab('rule','規則',tab==='rule')+'</div><div class="bn-body">';
+      +bnTab('bond','考試定存',tab==='bond')+bnTab('stk','📈 科目股',tab==='stk')+bnTab('loan','預支'+(b.loan?' <b class="fp-dot">!</b>':''),tab==='loan')+bnTab('ex','兌換所',tab==='ex')+bnTab('log','帳本',tab==='log')+bnTab('rule','規則',tab==='rule')+'</div><div class="bn-body">';
+    var tb=talLv('bank'), savRate=BANK.sav+cr.sav+.2*tb, stkVal=0;
+    STOCKS.forEach(function(x){ var hh=b.stk[x[0]]; if(hh&&hh.sh) stkVal+=hh.sh*stkPrice(h,x[0],d0()); });
     o+='<div class="bn-tiles">'
       +'<div class="bn-tile"><small>錢包</small><b>'+pts+'</b><em>可以花的點數</em></div>'
-      +'<div class="bn-tile"><small>活存</small><b>'+b.sav+'</b><em>'+(b.loan?'有借款，暫停計息':'有照顧 +'+(BANK.sav+cr.sav).toFixed(1)+'%／天')+'</em></div>'
+      +'<div class="bn-tile"><small>活存</small><b>'+b.sav+'</b><em>'+(b.loan?'有借款，暫停計息':'有照顧 +'+savRate.toFixed(1)+'%／天'+(b.auto?'・自動存 '+b.auto+'%':''))+'</em></div>'
+      +(stkVal?'<div class="bn-tile"><small>科目股市值</small><b>'+stkVal+'</b><em>成本 '+stkCost(b)+'</em></div>':'')
       +'<div class="bn-tile"><small>定存中</small><b>'+fixSum+'</b><em>'+fixedOpen.length+' 筆</em></div>'
       +'<div class="bn-tile"><small>考試定存中</small><b>'+bondSum+'</b><em>'+bondsOpen.length+' 筆</em></div>'
       +'<div class="bn-tile'+(b.loan?' bad':'')+'"><small>欠款</small><b>'+(b.loan?b.loan.owe:0)+'</b><em>'+(b.loan?(b.loan.late?'逾期中！':'還款期限 '+md(kk(new Date(pk(b.loan.k).getTime()+BANK.loanDays*864e5)))):'沒有欠款')+'</em></div>'
       +'<div class="bn-tile cr cr-'+cr.n+'"><small>信用等級</small><b>'+cr.n+'</b><em>'+cr.score+' 分・額度 '+cr.loan+'</em></div></div>';
     o+='<p class="bn-note">'+(careToday?'✓ 今天已照顧：明天結算時活存會有利息。':'⚠ 今天還沒照顧：如果到睡前都沒讀夠，明天結算會扣 '+BANK.fee+'% 保管費。')+(B.id==='bank'?'　⚡ 今天是理財日：今天的利息 ×2。':'')+'</p>';
     if(tab==='home'){
-      var recent=b.log.slice(0,5);
+      var recent=b.log.slice(0,5), items=window.__shopItems?window.__shopItems():[], goal=b.goal, have=pts+b.sav;
+      o+='<div class="bn-panel"><h4>🎯 存錢目標 <span>挑一個許願商店的願望，看還差多少、照最近 7 天的速度幾天存得到</span></h4>';
+      if(goal){
+        var rate=0; (window.__shopLog?window.__shopLog():[]).forEach(function(l){ if(Date.now()-l.t<7*864e5 && l.n.charAt(0)==='＋' && !/銀行|提領|兌換|籌碼|單字賭場|成就/.test(l.w)) rate+=parseInt(l.n.slice(1),10)||0; });
+        rate=rate/7; var left=Math.max(0,goal.c-have), eta=left?(rate>0?Math.ceil(left/rate):null):0;
+        o+='<div class="bn-item"><div><b>'+esc(goal.n)+'・'+goal.c+' 點</b><div class="bar"><i style="width:'+Math.min(100,Math.round(have/goal.c*100))+'%"></i></div>'
+          +'<small>錢包＋活存 '+have+' 點'+(left?'，還差 '+left+' 點；最近每天約賺 '+Math.round(rate)+' 點'+(eta?'，大約 '+eta+' 天後存到':'（最近沒有收入）'):'，<b>夠了！</b>到許願商店兌換吧')+'</small></div>'
+          +'<button type="button" class="btn ghost" data-bk="goal" data-v="">換一個</button></div>';
+      } else if(items.length){
+        o+='<div class="bn-terms">'+items.map(function(it,i){ return '<button type="button" data-bk="goal" data-v="'+i+'"><b>'+esc(it.n)+'</b><span>'+it.c+' 點</span></button>'; }).join('')+'</div>';
+      } else o+='<p class="fp-gone">許願商店還沒有願望。</p>';
+      o+='</div>';
       o+='<div class="bn-panel"><h4>最近的帳 <span>完整的在「帳本」</span></h4>'+(recent.length?recent.map(logRow).join(''):'<p class="fp-gone">還沒有交易。先到「活存」存一點點數試試看。</p>')+'</div>'
         +'<details class="fp-more"><summary>怎麼用最划算</summary><ul class="bn-ul"><li>天天照顧（讀滿門檻）→ 活存每天自己長大；一天沒讀就倒扣。</li><li>確定這週會乖乖讀書 → 開<b>定存</b>，利息比活存高很多。</li>'
         +'<li>對下一次模考／段考有把握 → 押<b>考試定存</b>，考好最多拿回 3 倍。</li><li>急著想兌換願望 → <b>預支</b>，但每週 10% 利息，之後賺的點數會先拿一半去還。</li></ul></details>';
     }
     if(tab==='sav'){
-      o+='<div class="bn-panel"><h4>活存 <span>隨時存、隨時領</span></h4><p class="fp-gone">有照顧的日子 +'+(BANK.sav+cr.sav).toFixed(1)+'%（信用 '+cr.n+' 加成 '+cr.sav+'%，每天最多 '+BANK.savCap+' 點；存 20 點以上至少 +1）；沒照顧的日子 −'+BANK.fee+'%。'+(b.loan?'<b>有借款時活存不計息。</b>':'')+'</p>'
+      o+='<div class="bn-panel"><h4>活存 <span>隨時存、隨時領</span></h4><p class="fp-gone">有照顧的日子 +'+savRate.toFixed(1)+'%（信用 '+cr.n+' 加成 '+cr.sav+'%'+(tb?'、寵物天賦理財 +'+(.2*tb).toFixed(1)+'%':'')+'，每天最多 '+(BANK.savCap+5*tb)+' 點；存 20 點以上至少 +1）；沒照顧的日子 −'+BANK.fee+'%。'+(b.loan?'<b>有借款時活存不計息。</b>':'')+'</p>'
+        +'<div class="bn-terms" role="radiogroup" aria-label="自動存款">'+[0,10,20,30].map(function(p2){ return '<button type="button" role="radio" data-bk="auto" data-v="'+p2+'" aria-pressed="'+(b.auto===p2)+'" aria-checked="'+(b.auto===p2)+'"><b>'+(p2?'自動存 '+p2+'%':'不自動存')+'</b><small>'+(p2?'讀書賺的點數先存一部分':'全部進錢包')+'</small></button>'; }).join('')+'</div>'
+        +'<p class="fp-gone">自動存款：完成任務、番茄鐘、全清這類讀書賺到的點數，先拿這個比例存進活存（有借款時改成還款）。累積自動存入 '+(b.st.autoIn||0)+' 點。</p>'
         +amtBox('bn-sav-amt','金額',[['50',50],['100',100],['全部',pts]])
         +'<div class="bar-btns"><button class="btn solid" type="button" data-bk="dep">存入</button><button class="btn" type="button" data-bk="wd">提領到錢包</button><button class="btn ghost" type="button" data-bk="wdall">全部提領</button></div>'
         +'<p class="fp-gone">累積利息 '+b.st.int+' 點・被扣保管費 '+b.st.fee+' 點・最高餘額 '+b.st.maxSav+' 點</p></div>';
@@ -6815,6 +7016,19 @@ section{padding-top:40px}
       o+='</div><div class="bn-panel"><h4>我押的</h4>'+(b.bonds.length?b.bonds.slice().reverse().slice(0,12).map(function(x){
           return '<div class="bn-item '+x.st+'"><div><b>'+esc(x.ex)+'・'+x.amt+' 點・'+bondGoalTxt(x.kind,x.goal)+' ×'+x.mul+'</b><small>考試 '+md(x.day)+(x.st==='open'?'・等成績':'・結果：'+(x.res==null?'沒登記':(x.kind==='mock'?'A++ '+x.res+' 科':'平均 '+x.res)))+'</small></div>'
             +'<span class="st">'+(x.st==='open'?'進行中':(x.st==='win'?'🎉 拿回 '+x.pay:'拿回 '+x.pay))+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有押過。</p>')+'</div>';
+    }
+    if(tab==='stk'){
+      var yd=d0(), cost=stkCost(b); yd.setDate(yd.getDate()-1);
+      o+='<div class="bn-panel"><h4>📈 科目股 <span>股價＝前 7 天這科任務的完成率（40～160），每天半夜換價</span></h4>'
+        +'<p class="fp-gone">押自己：買進落後的科目，把它的任務讀完，股價就漲；偷懶那科會跌。買賣各收 '+STK.fee+'% 手續費，持股成本合計最多 '+STK.cap+' 點（現在 '+cost+'）。'+(b.loan?'<b>有借款時不能買。</b>':'')+'已實現損益 '+((b.st.stkWin||0)>0?'+':'')+(b.st.stkWin||0)+' 點。</p>'
+        +'<div class="bn-stks">'+STOCKS.map(function(x){
+          var pr=stkPrice(h,x[0],d0()), py=stkPrice(h,x[0],yd), hh=b.stk[x[0]]||{sh:0,cost:0}, ch=pr-py, val=hh.sh*pr, pl=val-hh.cost;
+          return '<div class="bn-stk"><div class="bn-stk-h"><b>'+x[1]+'</b><span class="mono">'+pr+'</span><small class="'+(ch>0?'up':(ch<0?'dn':''))+'">'+(ch>0?'▲'+ch:(ch<0?'▼'+(-ch):'—'))+'</small></div>'
+            +spark(stkHist(h,x[0]),x[2])
+            +'<small>'+(hh.sh?'持有 '+hh.sh+' 股・市值 '+val+'・'+(pl>=0?'賺 ':'賠 ')+Math.abs(pl):'還沒持有')+'</small>'
+            +'<div class="bn-stk-b"><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="1"'+(b.loan?' disabled':'')+'>買 1</button><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="3"'+(b.loan?' disabled':'')+'>買 3</button>'
+            +'<button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="1"'+(hh.sh?'':' disabled')+'>賣 1</button><button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="all"'+(hh.sh?'':' disabled')+'>全賣</button></div></div>';
+        }).join('')+'</div></div>';
     }
     if(tab==='loan'){
       o+='<div class="bn-panel"><h4>預支點數 <span>信用 '+cr.n+'（'+cr.score+' 分）額度 '+cr.loan+' 點</span></h4>';
@@ -6847,6 +7061,9 @@ section{padding-top:40px}
       +'<li><b>預支</b>：額度看信用（B 100、A 200、AA 400、AAA 600；C 不能借）。每滿 7 天 +'+BANK.loanWeek+'%；之後賺到的點數自動拿 '+BANK.repay+'% 還款；超過 '+BANK.loanDays+' 天沒還清，每天再 +'+BANK.lateDay+'%、信用掉到 C、寵物心情最多 60。有借款時不能開定存或押考試。</li>'
       +'<li><b>信用分數</b>（0–100）：近 14 天照顧天數 ×3、連續照顧天數（最多 14）、準時還清 ×6（最多 18）、定存順利到期 ×4（最多 16）、考試定存達標 ×5（最多 10）；定存違約 −8、逾期中 −40、寵物生病 −10。30 分 B、50 分 A、70 分 AA、85 分 AAA。</li>'
       +'<li><b>兌換</b>：1 🌟 = '+BANK.star2pts+' 點；'+BANK.pts2clover+' 點 = 1 🍀（每天 '+BANK.cloverDay+' 個）；'+BANK.pts2ticket+' 點 = 1 🎟️（每週 1 張）。</li>'
+      +'<li><b>自動存款</b>：可選 10／20／30%，讀書賺到的點數（任務、番茄鐘、全清）先拿這個比例存進活存；有借款時改成自動還款。</li>'
+      +'<li><b>科目股</b>：國文、數學、英文、自然、社會、科班、補習作業各一支。股價＝前 7 天（不含今天）這科任務的完成率換算成 40～160 點，7 天都沒有這科任務就是 100。買賣各收 '+STK.fee+'%，持股成本合計最多 '+STK.cap+' 點；有借款時不能買。</li>'
+      +'<li><b>寵物天賦「理財」</b>：每階活存利率 +0.2%、每天利息上限 +5。</li>'
       +'<li>每天的利息、保管費在<b>隔天第一次打開網站</b>時補算；沒打開網站的日子算沒照顧。</li></ul></div>';
     o+='<p class="fp-msg" id="bn-msg" aria-live="polite">'+bnMsg+'</p></div>';
     bnApp.innerHTML=o;   // 訊息留到下一次操作才清
@@ -6894,6 +7111,25 @@ section{padding-top:40px}
     if(op==='pay'||op==='paysav'){ if(!b.loan) return; n=Math.min(amtOf('bn-pay-amt'),b.loan.owe); if(n<=0) return done('先填金額。');
       if(op==='pay'){ if(n>pts) return done('錢包只有 '+pts+' 點。'); walletAdd(-n,'還銀行借款'); } else { if(n>b.sav) return done('活存只有 '+b.sav+' 點。'); b.sav-=n; }
       b.loan.owe-=n; blog(b,n,'還款'+(op==='paysav'?'（用活存）':'')); out=loanClear(b)?'全部還清了！信用會變好。':'還了 '+n+' 點，還欠 '+b.loan.owe+' 點。'; return done(out); }
+    if(op==='auto'){ b.auto=+b0.dataset.v||0; blog(b,0,b.auto?'自動存款改成 '+b.auto+'%':'關掉自動存款'); return done(b.auto?'之後讀書賺的點數，'+b.auto+'% 會自動存進活存。':'關掉自動存款了。'); }
+    if(op==='goal'){ var its=window.__shopItems?window.__shopItems():[], gi=b0.dataset.v; if(gi===''){ b.goal=null; return done('選一個新的目標。'); } var g0=its[+gi]; if(!g0) return; b.goal={n:g0.n, c:g0.c}; return done('目標：'+g0.n+'（'+g0.c+' 點）。'); }
+    if(op==='sbuy'||op==='ssell'){
+      var sid=b0.dataset.id, sx=STOCKS.filter(function(z){ return z[0]===sid; })[0]; if(!sx) return;
+      var pr=stkPrice(h,sid,d0()), hh=b.stk[sid]||{sh:0,cost:0};
+      if(op==='sbuy'){
+        if(b.loan) return done('有借款時不能買股票。');
+        var nb=+b0.dataset.n||1, c0=nb*pr, fee=Math.ceil(c0*STK.fee/100);
+        if(stkCost(b)+c0>STK.cap) return done('持股成本最多 '+STK.cap+' 點，現在 '+stkCost(b)+'。');
+        if(c0+fee>pts) return done('錢包只有 '+pts+' 點（要 '+(c0+fee)+'）。');
+        walletAdd(-(c0+fee),'買 '+sx[1]+'股 '+nb+' 股'); hh.sh+=nb; hh.cost+=c0; b.stk[sid]=hh; blog(b,0,'買 '+sx[1]+'股 '+nb+' 股 @'+pr+'（手續費 '+fee+'）');
+        return done('買了 '+sx[1]+'股 '+nb+' 股，每股 '+pr+'。把'+sx[1]+'的任務讀完，股價就會漲。');
+      }
+      var ns=b0.dataset.n==='all'?hh.sh:Math.min(hh.sh,+b0.dataset.n||1); if(ns<=0) return;
+      var gross=ns*pr, fee2=Math.ceil(gross*STK.fee/100), avg=hh.sh?hh.cost/hh.sh:0, basis=Math.round(avg*ns), back2=gross-fee2;
+      hh.sh-=ns; hh.cost=hh.sh?Math.max(0,hh.cost-basis):0; b.stk[sid]=hh; b.st.stkWin=(b.st.stkWin||0)+back2-basis;
+      blog(b,0,'賣 '+sx[1]+'股 '+ns+' 股 @'+pr+'（'+(back2-basis>=0?'賺 ':'賠 ')+Math.abs(back2-basis)+'）'); walletAdd(back2,'賣 '+sx[1]+'股 '+ns+' 股');
+      return done('賣了 '+ns+' 股，拿回 '+back2+' 點（'+(back2-basis>=0?'賺 ':'賠 ')+Math.abs(back2-basis)+'）。');
+    }
     if(op==='ex-star'){ if(s.gold<1) return; s.gold--; savePet(s); walletAdd(BANK.star2pts,'兌換：1 🌟 換點數'); blog(b,0,'1 🌟 換 '+BANK.star2pts+' 點'); return done('換了 '+BANK.star2pts+' 點。'); }
     if(op==='ex-clover'){ var ed=b.ex[tk]||{}; if((ed.c||0)>=BANK.cloverDay||pts<BANK.pts2clover) return; Object.keys(b.ex).forEach(function(k){ if(k!=='tkt' && k!==tk) delete b.ex[k]; });
       ed.c=(ed.c||0)+1; b.ex[tk]=ed; s.clover++; savePet(s); walletAdd(-BANK.pts2clover,'兌換：點數換 🍀 護身符'); blog(b,0,BANK.pts2clover+' 點換 1 🍀'); return done('換到 1 個 🍀 護身符。'); }
@@ -6906,7 +7142,7 @@ section{padding-top:40px}
   // 領獎：銅 10、銀 25、金 50＋🌟1、白金 100＋🌟1、鑽石 200＋🌟2 點；金牌解鎖稱號；領越多階，家裡越多家具。
   var AK='plan.ach.v1';
   var TIERS=[{n:'銅',c:'#B87333',p:10,g:0},{n:'銀',c:'#8E9AA6',p:25,g:0},{n:'金',c:'#D9A21B',p:50,g:1},{n:'白金',c:'#3FA79C',p:100,g:1},{n:'鑽石',c:'#4F7FE8',p:200,g:2}];
-  var ACATS=['讀書','毅力','錯題','檢查','成績','森林','寵物','銀行','生活'];
+  var ACATS=['讀書','毅力','錯題','檢查','成績','森林','寵物','銀行','單字','生活'];
   var ACH=[
     {id:'hours',c:'讀書',e:'📚',n:'讀書時數',u:'小時',t:[10,50,150,300,500],ti:'讀書達人'},
     {id:'pomo',c:'讀書',e:'🍅',n:'番茄鐘',u:'顆',t:[20,100,300,600,1000],ti:'番茄大師'},
@@ -6936,6 +7172,12 @@ section{padding-top:40px}
     {id:'fixok',c:'銀行',e:'🔒',n:'定存順利到期',u:'筆',t:[1,3,6,10,15],ti:'耐心投資人'},
     {id:'bondwin',c:'銀行',e:'🎲',n:'考試定存達標',u:'次',t:[1,2,3,4,5],ti:'說到做到'},
     {id:'interest',c:'銀行',e:'📈',n:'累積利息',u:'點',t:[20,100,250,500,1000],ti:'複利信徒'},
+    {id:'stockwin',c:'銀行',e:'📊',n:'科目股賺到',u:'點',t:[20,80,200,400,800],ti:'自己的股神'},
+    {id:'vmaster',c:'單字',e:'🔤',n:'熟字（連對 3 次）',u:'個',t:[50,200,500,1000,2000],ti:'單字通'},
+    {id:'vclear',c:'單字',e:'📕',n:'錯字本移出',u:'個',t:[10,50,150,300,600],ti:'錯字剋星'},
+    {id:'vstreak',c:'單字',e:'🎯',n:'賭場最長連對',u:'題',t:[10,20,30,50,80],ti:'神準'},
+    {id:'vladder',c:'單字',e:'🪜',n:'爬梯爬滿 10 階',u:'次',t:[1,3,10,25,50],ti:'登頂者'},
+    {id:'vpet',c:'單字',e:'🐾',n:'對賭贏過寵物',u:'次',t:[1,10,30,60,100],ti:'寵物剋星'},
     {id:'journal',c:'生活',e:'📔',n:'寫日誌',u:'天',t:[3,10,30,60,120],ti:'日記作家'},
     {id:'review',c:'生活',e:'🪞',n:'每週回顧',u:'週',t:[1,4,8,14,20],ti:'反省大師'},
     {id:'ask',c:'生活',e:'🙋',n:'問到老師答案',u:'題',t:[1,5,15,30,50],ti:'好問寶寶'},
@@ -6983,12 +7225,14 @@ section{padding-top:40px}
     var ask=ls('plan.ask.v1',[])||[], asked=ask.filter(function(x){ return x.pt; }).length;
     var qc=0, wc=0; Object.keys(s.quests).forEach(function(k){ qc+=Object.keys(s.quests[k]).length; }); Object.keys(s.weekly).forEach(function(k){ wc+=Object.keys(s.weekly[k]).length; });
     var b=bankState(), curLv=X.info?X.info.lv.lv:0;
+    var VQ=vocabQ(), vk=VQ.k||{}, vm=0; Object.keys(VQ.ws||{}).forEach(function(k){ if(VQ.ws[k][2]>=3) vm++; });
     return {hours:mins/60, pomo:pomoTotal(), tasks:tasks, bigday:maxDay/60, streak:best, clear:clear, pweek:pw, mastered:mastered, reviews:revs, wrongs:Wl.length,
       pass:pass, passA:passA, q100:q100, q90:q90, app:app, t90:t90, trees:X.alive, holy:X.stageCnt[3], lands:X.curLand+1, dex:Object.keys(s.dex).length,
       petlv:Math.max(curLv, s.gone.reduce(function(m,g){ return Math.max(m,g.lv||1); },0)), bond:Math.max(s.maxBond||0,s.pet?(s.pet.bond||0):0), cards:s.album.length, souv:Object.keys(s.souv).length,
       saver:b.st.maxSav, fixok:b.st.fixOk, bondwin:b.st.bondWin, interest:b.st.int, journal:jd, review:rvn, ask:asked, quests:qc, weekly:wc,
       dragon:s.dex.dragon?1:0, unicorn:s.dex.unicorn?1:0, heal:s.heals?1:0, fullbag:s.flags.fullbag?1:0, phoenix:(s.gone.length&&curLv>=5)?1:0,
-      clean:(X.alive>=100&&X.nDead+s.stumps.length===0)?1:0, debtfree:b.st.repaid?1:0, allapp:allapp};
+      clean:(X.alive>=100&&X.nDead+s.stumps.length===0)?1:0, debtfree:b.st.repaid?1:0, allapp:allapp,
+      stockwin:Math.max(0,b.st.stkWin||0), vmaster:vm, vclear:vk.clr||0, vstreak:vk.best||0, vladder:vk.lad10||0, vpet:vk.petW||0};
   }
   function tierOf(a,v){ var t=0; a.t.forEach(function(x,i){ if(v>=x) t=i+1; }); return t; }
   var lastStats=null;
@@ -7003,7 +7247,9 @@ section{padding-top:40px}
   }
   function achScore(){ var A=achState(), n=0; Object.keys(A.c).forEach(function(k){ n+=A.c[k]||0; }); return n; }
   function achClaimable(){ var A=achState(), n=0; ACH.concat(SECRET).forEach(function(a){ if((A.r[a.id]||0)>(A.c[a.id]||0)) n++; }); return n; }
-  function titlesOwned(){ var A=achState(), L=[]; ACH.forEach(function(a){ if((A.c[a.id]||0)>=3) L.push(a.ti); }); SECRET.forEach(function(a){ if(A.c[a.id]) L.push(a.ti); }); return L; }
+  var CASINO_TI={t_luck:'幸運兒',t_speller:'拼字王',t_god:'單字賭神'};   // 單字賭場用籌碼換的稱號
+  function titlesOwned(){ var A=achState(), L=[]; ACH.forEach(function(a){ if((A.c[a.id]||0)>=3) L.push(a.ti); }); SECRET.forEach(function(a){ if(A.c[a.id]) L.push(a.ti); });
+    var own=vocabQ().own||{}; Object.keys(CASINO_TI).forEach(function(k){ if(own[k]) L.push(CASINO_TI[k]); }); return L; }
   function achTitle(){ var A=achState(); return A.title && titlesOwned().indexOf(A.title)>=0 ? A.title : ''; }
   function claimAch(id){
     var A=achState(), a=ACH.filter(function(x){ return x.id===id; })[0], sec=SECRET.filter(function(x){ return x.id===id; })[0];
@@ -7176,14 +7422,28 @@ section{padding-top:40px}
   handlePass();
   window.addEventListener('hashchange',handlePass);
 
+  /* ---- 給單字賭場（casino.js，打開才載入）用的出入口 ---- */
+  window.__petApi={allHist:allHist, studyBlockNow:studyBlockNow, easyMap:easyMap, petState:petState, savePet:savePet, petMini:petMini, bankState:bankState, talent:talLv,
+    hasAcc:function(id){ return !!petState().acc[id]; },
+    giveAcc:function(id){ var s=petState(); s.acc[id]=1; savePet(s); },
+    petTouch:function(line){ var s=petState(); if(!s.pet||s.pet.trip) return; touch(s.pet); savePet(s); if(line) flash.push('🎰 '+esc(s.pet.name)+'：'+esc(line)); }};
+
   /* ---------- 什麼時候重畫 ---------- */
   function paintAll(){ deCache=null; paintSubjects(); paintKbPace(); paintBooks(); paintPet(); paintBank(); paintAch(); paintCustom(); }
+  // 效能（2026-11-02）：切分頁、切回來時只畫正在看的那一頁（以前每次都全部重算，切一次分頁多 30–100 毫秒，手機更久）。
+  // 寵物每次都算：「今天」的小卡、「獎勵」的紅點都靠它。紀錄＝4（科班考古題配速、分科進度）、獎勵＝5、設定＝7（教材進度）
+  function paintFor(g){
+    deCache=null; paintPet();
+    if(g===4){ paintKbPace(); paintSubjects(); }
+    if(g===5){ paintBank(); paintAch(); paintCustom(); }
+    if(g===7) paintBooks();
+  }
   paintAll(); paintToc();
-  document.addEventListener('plan:tab',function(){ paintToc(); paintAll(); });
+  document.addEventListener('plan:tab',function(e){ paintFor(e.detail); });
   document.addEventListener('change',function(e){
-    if(e.target.closest && (e.target.closest('#td-list')||e.target.closest('#kp-list'))) setTimeout(paintAll,60);
+    if(e.target.closest && (e.target.closest('#td-list')||e.target.closest('#kp-list'))) setTimeout(function(){ paintFor(window.__tab); },60);
   });
-  document.addEventListener('visibilitychange',function(){ if(!document.hidden) paintAll(); });
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) paintFor(window.__tab); });
   function busy(el){ return el && document.activeElement && el.contains(document.activeElement) && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName); }
   setInterval(function(){
     if(document.hidden) return;
@@ -7547,6 +7807,22 @@ section{padding-top:40px}
     });
   });
   var kp=document.getElementById('kp-card'); if(kp) fold(kp,'kp',false,['kp-top','kp-pace']);
+})();
+</script>
+<script>
+/* ===== 單字賭場：打開「獎勵 → 單字賭場」才載入 casino.js（它再載入 vocab.js），平常不佔載入時間 ===== */
+(function(){
+  var asked=false;
+  function check(){
+    if(window.__tab!==5 || window.__sub!==22) return;
+    if(window.__casino){ window.__casino.show(); return; }
+    if(asked) return; asked=true;
+    var s=document.createElement('script'); s.src='casino.js?v=20261102a';
+    s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
+    document.head.appendChild(s);
+  }
+  document.addEventListener('plan:tab',check);
+  check();
 })();
 </script>
 </body>
