@@ -1,5 +1,5 @@
 /* ===== 單字賭場（2026-11-02；規則見 claude 科班\單字賭場_設計_20261101.md） =====
-   只有打開「獎勵 → 單字賭場」才載入這個檔案和 vocab.js，不拖慢網站。
+   只有打開「獎勵 → 單字賭場」才載入這個檔案和 vocab.js、toeic.js（多益 5 級，2026-11-03 加入），不拖慢網站。
    資料：plan.vocab.v1（籌碼、每個字的答對紀錄、錯字本、統計、設定）、plan.vrev.v1（每天錯字本複習秒數，算英文讀書分鐘）。
    寵物、銀行、點數都透過 index.html 給的 window.__petApi、window.__award、window.__pts。 */
 (function(){
@@ -75,10 +75,12 @@
     {id:'sprint',n:'限時衝刺',e:'⏱️',say:'60 秒答越多越好：拿回 注×（答對−答錯）÷10×平均倍率，最多 3 倍'},
     {id:'duel',n:'跟寵物對賭',e:'🐾',say:'同一組 10 題比答對數：贏拿 注×平均倍率、平手退錢；牠的實力照你最近 100 題'},
     {id:'slot',n:'拉霸轉倍率',e:'🎰',say:'先轉出 ×0～×10（長期平均約 ×1），再答一題：答對拿 注×拉霸×題目倍率'}];
-  // 單字難度：來源決定（之後加康軒、多益）
-  var SRC={kb:{n:'會考基本 1200',m:1},ka:{n:'會考進階 800',m:1.2},pb:{n:'片語',m:1},pa:{n:'片語（較難）',m:1.2}};
-  var RANGES=[{id:'kb',n:'會考基本 1200'},{id:'ka',n:'會考進階 800'},{id:'ph',n:'片語'},{id:'wb',n:'錯字本'}];
-  var SOON='康軒課本（第 2～5 冊）、多益 5 級之後加入';
+  // 單字難度：來源決定（之後加康軒）。多益倍率：使用者 2026-11-02 定 Level 5 ×5（字長、對國中生難），中間照級別遞增
+  var SRC={kb:{n:'會考基本 1200',m:1},ka:{n:'會考進階 800',m:1.2},pb:{n:'片語',m:1},pa:{n:'片語（較難）',m:1.2},
+    t1:{n:'多益 Level 1',m:1.5},t2:{n:'多益 Level 2',m:2},t3:{n:'多益 Level 3',m:3},t4:{n:'多益 Level 4',m:4},t5:{n:'多益 Level 5',m:5}};
+  var RANGES=[{id:'kb',n:'會考基本 1200'},{id:'ka',n:'會考進階 800'},{id:'ph',n:'片語'},
+    {id:'t1',n:'多益 Lv1'},{id:'t2',n:'多益 Lv2'},{id:'t3',n:'多益 Lv3'},{id:'t4',n:'多益 Lv4'},{id:'t5',n:'多益 Lv5'},{id:'wb',n:'錯字本'}];
+  var SOON='康軒課本（第 2～5 冊）之後加入';
   var POSF=[['n.','名詞'],['v.','動詞'],['adj.','形容詞'],['adv.','副詞'],['etc','其他']];
   var SLOT=[[0,.34],[.5,.24],[1,.19],[2,.12],[3,.065],[5,.03],[10,.015]];   // 期望值 ×1.045
   var INT=[1,3,7];            // 錯字本：隔 1、3、7 天再出現，連對 3 次移出
@@ -164,18 +166,29 @@
 
   /* ---------- 單字庫（vocab.js） ---------- */
   var ALL=null, BYKEY={}, loading=false, loadErr='';
+  // vocab.js（會考 2000＋片語）一定要有；toeic.js（多益）載不到就先不出多益
   function loadVocab(){
     if(ALL||loading) return; loading=true;
-    var sc=document.createElement('script'); sc.src='vocab.js?v=20261102a';
-    sc.onload=function(){ loading=false; build(); render(); };
-    sc.onerror=function(){ loading=false; loadErr='單字庫載入失敗（網路不通？）。重新整理再試一次。'; render(); };
-    document.head.appendChild(sc);
+    var need=[['VOCAB','vocab.js?v=20261102a'],['VOCAB_T','toeic.js?v=20261103a']].filter(function(x){ return !window[x[0]]; }), left=need.length;
+    function one(){ if(--left===0 && !loadErr){ loading=false; build(); render(); } }
+    if(!left){ loading=false; build(); render(); return; }
+    need.forEach(function(x){
+      var sc=document.createElement('script'); sc.src=x[1]; sc.onload=one;
+      sc.onerror=function(){ if(x[0]==='VOCAB'){ loading=false; loadErr='單字庫載入失敗（網路不通？）。重新整理再試一次。'; render(); } else one(); };
+      document.head.appendChild(sc);
+    });
   }
   function build(){
     var V=window.VOCAB; if(!V){ loadErr='單字庫是空的。'; return; }
     ALL=[];
     (V.w||[]).forEach(function(r){ var it={key:'w:'+r[0], w:r[0], alt:r[1]?r[1].split('|'):[], pos:r[2]||'', zh:r[3], src:r[4], ph:0}; if(!BYKEY[it.key]){ BYKEY[it.key]=it; ALL.push(it); } });
     (V.p||[]).forEach(function(r){ var it={key:'p:'+r[0], w:r[0], alt:[], pos:'phr.', zh:r[1], s:r[2], f:r[3], src:r[4]==='a'?'pa':'pb', ph:1}; if(!BYKEY[it.key]){ BYKEY[it.key]=it; ALL.push(it); } });
+    var T=window.VOCAB_T;   // 多益：o＝會考也有的字（標上多益級別），w＝[字, 其他拼法, 詞性, 中文, 級別]
+    if(T){
+      (T.o||[]).forEach(function(r){ var it=BYKEY['w:'+r[0]]; if(it && !it.tl) it.tl=r[1]; });
+      (T.w||[]).forEach(function(r){ var k='w:'+r[0]; if(BYKEY[k]){ if(!BYKEY[k].tl) BYKEY[k].tl=r[4]; return; }
+        var it={key:k, w:r[0], alt:r[1]?r[1].split('|'):[], pos:r[2]||'', zh:r[3], src:'t'+r[4], tl:r[4], ph:0}; BYKEY[k]=it; ALL.push(it); });
+    }
   }
   function posHas(pos,p){
     var P=String(pos).split(/\s+/);
@@ -183,7 +196,7 @@
     return P.indexOf(p)>=0;
   }
   function inRange(it,rg,s){
-    return (rg.indexOf('kb')>=0&&it.src==='kb')||(rg.indexOf('ka')>=0&&it.src==='ka')||(rg.indexOf('ph')>=0&&it.ph)||(rg.indexOf('wb')>=0&&!!s.wb[it.key]);
+    return (rg.indexOf('kb')>=0&&it.src==='kb')||(rg.indexOf('ka')>=0&&it.src==='ka')||(rg.indexOf('ph')>=0&&it.ph)||(!!it.tl&&rg.indexOf('t'+it.tl)>=0)||(rg.indexOf('wb')>=0&&!!s.wb[it.key]);
   }
   function poolOf(set,s){
     if(!ALL) return [];
@@ -195,10 +208,20 @@
       return true;
     });
   }
-  function srcMul(it){ return (SRC[it.src]||{m:1}).m; }
+  // 倍率看這次選的範圍：會考、多益都有的字，選會考範圍照會考、選多益範圍照多益級別；只選錯字本就照字本來的來源
+  function srcMul(it,rg){
+    var m=0; rg=rg||[];
+    if(rg.indexOf(it.src)>=0 || (it.ph && rg.indexOf('ph')>=0)) m=(SRC[it.src]||{m:1}).m;
+    if(it.tl && rg.indexOf('t'+it.tl)>=0) m=Math.max(m,SRC['t'+it.tl].m);
+    return m||(SRC[it.src]||{m:1}).m;
+  }
   function diffOf(id){ return DIFF.filter(function(d){ return d.id===id; })[0]||DIFF[0]; }
   function modeOf(id){ return MODES.filter(function(m){ return m.id===id; })[0]||MODES[0]; }
-  function qMult(it,diff,s){ return mastered(s,it.key)?1:r2(diffOf(diff).m*srcMul(it)); }
+  function qMult(it,diff,s){ return mastered(s,it.key)?1:r2(diffOf(diff).m*srcMul(it,s&&s.set?s.set.rg:null)); }
+  function fam(x){ return /^t/.test(x.src)?'t':'k'; }   // 選項只從同一套字庫抽（多益的字配多益的字）
+  // 題目上方顯示的來源：照倍率是從哪個範圍算的（會考也有的字，選多益範圍就顯示多益級別）
+  function srcName(it,rg){ rg=rg||[]; var own=(rg.indexOf(it.src)>=0||(it.ph&&rg.indexOf('ph')>=0))?(SRC[it.src]||{m:0}).m:0;
+    if(it.tl && rg.indexOf('t'+it.tl)>=0 && SRC['t'+it.tl].m>=own) return SRC['t'+it.tl].n; return SRC[it.src]?SRC[it.src].n:''; }
 
   /* ---------- 出題 ---------- */
   function lev(a,b){
@@ -211,7 +234,7 @@
   function posMain(p){ return String(p).split(/\s+/)[0]; }
   function senses(z){ return String(z).replace(/（[^）]*）/g,'').split(/[；;、]/).map(function(x){ return x.trim(); }).filter(Boolean); }
   function zhOptions(it,n){
-    var mine=senses(it.zh), pool=ALL.filter(function(x){ return x.ph===it.ph && x.key!==it.key && x.zh!==it.zh; });
+    var mine=senses(it.zh), pool=ALL.filter(function(x){ return x.ph===it.ph && x.key!==it.key && x.zh!==it.zh && fam(x)===fam(it); });
     var same=it.ph?pool:pool.filter(function(x){ return posMain(x.pos)===posMain(it.pos); });
     var out=[], used=mine.slice();
     function tryAdd(x){ if(out.length>=n) return; var ss=senses(x.zh); if(ss.some(function(z){ return used.indexOf(z)>=0; })) return; out.push(x.zh); used=used.concat(ss); }
@@ -222,7 +245,7 @@
   function enOptions(it,n){
     var w=it.w.toLowerCase(), cand=[];
     ALL.forEach(function(x){
-      if(x.ph!==it.ph||x.key===it.key||x.zh===it.zh) return; var y=x.w.toLowerCase(); if(y===w) return;
+      if(x.ph!==it.ph||x.key===it.key||x.zh===it.zh||fam(x)!==fam(it)) return; var y=x.w.toLowerCase(); if(y===w) return;
       var sc=0; if(y.charAt(0)===w.charAt(0)) sc+=2; if(Math.abs(y.length-w.length)<=1) sc+=2;
       sc+=Math.max(0,4-lev(w,y)); if(!it.ph && posMain(x.pos)===posMain(it.pos)) sc+=1;
       cand.push([sc+Math.random()*1.5,x.w]);
@@ -340,7 +363,7 @@
     var s=st(), set=setDef(s);
     app.className='card vc-card'+(s.set.bg?' '+s.set.bg:'');
     if(loadErr){ app.innerHTML='<div class="vc-body"><p class="fp-care bad">'+esc(loadErr)+'</p></div>'; return; }
-    if(!ALL){ loadVocab(); app.innerHTML='<div class="vc-body"><p class="fp-gone">🎰 正在載入單字庫…</p></div>'; return; }
+    if(!ALL){ loadVocab(); if(!ALL) app.innerHTML='<div class="vc-body"><p class="fp-gone">🎰 正在載入單字庫…</p></div>'; return; }
     if(view==='game' && G) return renderGame();
     if(view==='result' && R) return renderResult();
     if(view==='review') return renderReview();
@@ -373,7 +396,7 @@
       +'<div class="vc-chips vc-let">'+'abcdefghijklmnopqrstuvwxyz'.split('').map(function(c){ return chipBtn('data-let',c,set.let.indexOf(c)>=0,c.toUpperCase()); }).join('')+'<button type="button" data-let="*">全部</button></div>'
       +'<div class="vc-chips">'+POSF.map(function(p){ return chipBtn('data-pos',p[0],set.pos.indexOf(p[0])>=0,p[1]); }).join('')+'</div></details>'
       +'<p class="vc-sub">這個範圍 <b>'+pool.length+'</b> 個字、熟字 '+nm+'（'+(pool.length?Math.round(nm/pool.length*100):0)+'%）。熟字（連對 '+MASTER+' 次）倍率只有 ×1，想賺就往更難的範圍走。</p></div>';
-    o+='<div class="vc-row"><h4>題型 <span>倍率＝題型 × 單字難度（會考基本 ×1、進階 ×1.2、片語 ×1／×1.2）</span></h4><div class="bn-terms">'
+    o+='<div class="vc-row"><h4>題型 <span>倍率＝題型 × 單字難度（會考基本 ×1、進階 ×1.2、片語 ×1／×1.2、多益 Lv1～5 ×1.5／2／3／4／5）</span></h4><div class="bn-terms">'
       +DIFF.map(function(d){ var dis=d.id==='hell'&&!canSpeak(); return '<button type="button" role="radio" data-diff="'+d.id+'" aria-pressed="'+(set.diff===d.id)+'" aria-checked="'+(set.diff===d.id)+'"'+(dis?' disabled':'')+'><b>'+d.n+'</b><span>×'+d.m+'</span><small>'+(dis?'這個瀏覽器不能發音':d.say)+'</small></button>'; }).join('')+'</div>'
       +'<p class="vc-sub">這個範圍＋題型，平均每題 ×'+avgM+'。</p></div>';
     o+='<div class="vc-row"><h4>玩法</h4><div class="vc-modes">'+MODES.map(function(m){
@@ -514,7 +537,7 @@
     if(g.mode==='slot' && (g.spinning||!q)){ o+='<div class="vc-slot">'+ART.slot('×?')+'<p class="vc-sub">'+(g.spinning?'轉轉轉…':'')+'</p></div></div>'; app.innerHTML=o; return; }
     if(!q){ app.innerHTML=o+'</div>'; return; }
     o+='<div class="vc-q'+(q.done?(q.ok?' ok':' bad'):'')+'">';
-    o+='<div class="vc-qmeta"><span>'+esc(SRC[it.src]?SRC[it.src].n:'')+'</span><span class="vc-mul'+(q.mast?' m':'')+'">×'+q.m+(q.mast?'（熟字）':'')+'</span>'+(q.limit&&!q.done?'<span class="vc-qtimer">'+q.limit+' 秒</span>':'')+'</div>';
+    o+='<div class="vc-qmeta"><span>'+esc(srcName(it,st().set.rg))+'</span><span class="vc-mul'+(q.mast?' m':'')+'">×'+q.m+(q.mast?'（熟字）':'')+'</span>'+(q.limit&&!q.done?'<span class="vc-qtimer">'+q.limit+' 秒</span>':'')+'</div>';
     if(g.diff==='easy') o+='<div class="vc-prompt en">'+esc(it.w)+(canSpeak()?' <button type="button" class="vc-say" data-say="1" aria-label="發音">🔊</button>':'')+'</div><small class="vc-pos">'+esc(it.pos)+'</small>';
     else if(g.diff==='norm') o+='<div class="vc-prompt">'+esc(it.zh)+'</div><small class="vc-pos">'+esc(it.pos)+'</small>';
     else if(g.diff==='hard'){
@@ -663,8 +686,8 @@
   /* ---------- 統計 ---------- */
   function statsHtml(s){
     var o='<div class="vc-row"><h4>各範圍熟字 <span>連對 '+MASTER+' 次算熟字</span></h4><div class="vc-bars">';
-    [['kb','會考基本 1200'],['ka','會考進階 800'],['ph','片語']].forEach(function(r){
-      var L=ALL.filter(function(it){ return inRange(it,[r[0]],s); }), m=L.filter(function(it){ return mastered(s,it.key); }).length, seen=L.filter(function(it){ return s.ws[it.key]; }).length;
+    [['kb','會考基本 1200'],['ka','會考進階 800'],['ph','片語'],['t1','多益 Level 1'],['t2','多益 Level 2'],['t3','多益 Level 3'],['t4','多益 Level 4'],['t5','多益 Level 5']].forEach(function(r){
+      var L=ALL.filter(function(it){ return inRange(it,[r[0]],s); }); if(!L.length) return; var m=L.filter(function(it){ return mastered(s,it.key); }).length, seen=L.filter(function(it){ return s.ws[it.key]; }).length;
       o+='<div><span>'+r[1]+'</span><div class="bar"><i style="width:'+(L.length?Math.round(m/L.length*100):0)+'%"></i></div><small>熟字 '+m+' / '+L.length+'・考過 '+seen+'</small></div>'; });
     o+='</div></div>';
     var a=s.rec.length?Math.round(s.rec.reduce(function(x,y){ return x+y; },0)/s.rec.length*100):0;
