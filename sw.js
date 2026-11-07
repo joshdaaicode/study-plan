@@ -1,4 +1,4 @@
-const CACHE='study-plan-v9';
+const CACHE='study-plan-v10';
 const ASSETS=['./','./index.html','./plan.js','./manifest.json'];
 self.addEventListener('install',e=>{
   self.skipWaiting();
@@ -12,6 +12,8 @@ self.addEventListener('fetch',e=>{
   const req=e.request, u=new URL(req.url);
   if(req.method!=='GET' || u.origin!==self.location.origin) return;
   const nav=req.mode==='navigate';
+  // 只有讀書網站本身（./、index.html）走這套；家長版 parent.html 等其他頁面直接連網路，不能被當成 index.html 存起來
+  if(nav && !/\/(index\.html)?$/.test(u.pathname)) return;
   e.respondWith((async()=>{
     const cache=await caches.open(CACHE);
     const net=fetch(req,{cache:'no-cache'}).then(r=>{

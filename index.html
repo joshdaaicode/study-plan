@@ -892,6 +892,7 @@ section{padding-top:40px}
 .fp-chk .d{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--ink-faint);grid-row:span 2}
 .fp-chk .st{font-size:12px;color:var(--warn)}
 .fp-chk.pass .st{color:var(--cap)} .fp-chk.dead .st{color:var(--ink-faint)}
+.fp-chk.late .st{color:var(--rest);font-weight:600}
 .fp-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .fp-cards svg{width:100%;height:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .fp-chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r-btn);background:var(--card)}
@@ -1977,7 +1978,7 @@ section{padding-top:40px}
     </div>
     <label style="display:flex;gap:9px;align-items:center;font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;cursor:pointer">
       <input type="checkbox" id="cl-auto" style="width:15px;height:15px;accent-color:var(--sci)">
-      自動同步：資料有變動就在 30 秒後自動上傳
+      自動同步：資料一有變動，約 2 秒內就上傳（一直在改時最多每 10 秒傳一次）
     </label>
     <div class="bar-btns" style="margin-top:0">
       <button class="btn" id="cl-test" type="button">測試連線</button>
@@ -2040,8 +2041,8 @@ section{padding-top:40px}
 
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">給爸媽的週報</h3>
-    <p class="sub">三行摘要，省掉「你到底有沒有在讀書」這種對話。按了會複製到剪貼簿。</p>
-    <div class="bar-btns" style="margin-top:0"><button class="btn" id="pr-go" type="button">產生並複製</button></div>
+    <p class="sub">三行摘要，省掉「你到底有沒有在讀書」這種對話。按了會複製到剪貼簿。<br><b>家長網頁</b>：爸媽打開就能隨時看你今天讀了沒、哪些作業還沒給 Claude 檢查（只能看、不能改，不顯示成績）。資料來自雲端同步，要先在「設定 → 雲端同步」開好自動同步。</p>
+    <div class="bar-btns" style="margin-top:0"><button class="btn" id="pr-go" type="button">產生並複製</button><button class="btn ghost" id="pr-link" type="button">複製家長網頁連結</button></div>
     <pre id="pr-out" style="margin:12px 0 0;white-space:pre-wrap;font-family:inherit;font-size:13.5px;color:var(--ink-soft)"></pre>
   </div>
 
@@ -2089,6 +2090,26 @@ section{padding-top:40px}
     if(window.__quotaWarned) return; window.__quotaWarned=1;
     alert('瀏覽器儲存空間滿了，資料沒存進去。\n\n請先到「設定 → 備份與轉移」按「下載成檔案」，再到「設定 → 本機快照」按「只留最新一份快照」騰出空間。');
   };
+  // 一有改動就通知雲端同步（2026-11-07 使用者：「自動同步改成一發現有變化就馬上更新上雲端」）
+  // 包住 localStorage 的存檔：要同步的資料內容真的變了才通知（同樣內容重存不算），雲端同步那段用 window.__onData 接
+  try{
+    var KS={}; K.forEach(function(k){ KS[k]=1; });
+    var SP=Storage.prototype, oGet=SP.getItem, oSet=SP.setItem, oDel=SP.removeItem;
+    var tell=function(k){ if(window.__onData){ try{ window.__onData(k); }catch(e){} } };
+    SP.setItem=function(k,v){
+      var hit=false;
+      if(this===window.localStorage && KS[k]){ try{ hit=oGet.call(this,k)!==String(v); }catch(e){ hit=true; } }
+      var r=oSet.apply(this,arguments);   // 存檔失敗（空間滿）會丟例外，不會通知
+      if(hit) tell(k);
+      return r;
+    };
+    SP.removeItem=function(k){
+      var hit=false; try{ hit=this===window.localStorage && !!KS[k] && oGet.call(this,k)!==null; }catch(e){}
+      var r=oDel.apply(this,arguments);
+      if(hit) tell(k);
+      return r;
+    };
+  }catch(e){}
   // 共用的跳脫（使用者打的字放進 innerHTML 前一定要過這個）
   window.__esc=function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
 })();
@@ -4106,16 +4127,29 @@ section{padding-top:40px}
 
   var lastSig=sig(), pending=false, lastCheck=0, firstCheck=true;
   function changed(){ return sig()!==lastSig; }
+  // 一有改動就上傳（2026-11-07）：資料一變，約 2 秒後上傳（同一個動作連續存好幾個檔併成一次）；
+  //   一直在改（例如玩單字賭場）時最多每 10 秒傳一次；上傳途中又改了，傳完馬上補一次。每 30 秒的檢查留著當備用。
+  var PUSH_WAIT=2000, PUSH_GAP=10000, pushT=null, lastPushAt=0, again=false, checking=false;
+  function pushSoon(){
+    if(!cl.auto||!cl.token||!cl.gist||held||window.__noSync) return;
+    if(pending){ again=true; return; }
+    if(pushT) return;   // 已經排了一次，到時候會一起傳
+    pushT=setTimeout(function(){ pushT=null; autoPush(); }, Math.max(PUSH_WAIT, lastPushAt+PUSH_GAP-Date.now()));
+  }
+  window.__onData=pushSoon;
   function autoPush(){
     if(!cl.auto||!cl.token||!cl.gist||pending||held||window.__noSync) return;
     if(!changed()) return;
-    pending=true;
-    upload(true).then(function(){ pending=false; },function(){ pending=false; });
+    if(pushT){ clearTimeout(pushT); pushT=null; }
+    if(checking){ pushSoon(); return; }   // 正在看雲端有沒有別台的新資料：等它看完再傳
+    pending=true; again=false; lastPushAt=Date.now();
+    upload(true).then(function(){ pending=false; if(again){ again=false; pushSoon(); } },function(){ pending=false; again=false; });
   }
   // 看雲端有沒有別台傳的新資料：這台沒改過就直接拉下來；這台從沒同步過就問；兩邊都改過就暫停等你決定
   function checkRemote(){
     if(!cl.token||window.__noSync||pending) return;
     var now=Date.now(); if(now-lastCheck<60000) return; lastCheck=now;
+    checking=true;   // 看雲端的途中先不要上傳（剛打開網站時，別台的新資料要先拉下來）
     (cl.gist?Promise.resolve(cl.gist):findGist()).then(function(id){
       if(!id) return;
       return api('/gists/'+id).then(function(g){
@@ -4135,7 +4169,7 @@ section{padding-top:40px}
           if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),false);
         }
       });
-    }).catch(function(){});
+    }).catch(function(){}).then(function(){ checking=false; });
   }
 
   window.__cloudNotice=function(at,fresh){
@@ -4179,7 +4213,7 @@ section{padding-top:40px}
     elT.addEventListener('change',function(){ saveCl(); if(cl.token){ lastCheck=0; checkRemote(); } });
 
     checkRemote();
-    // 每 30 秒看一次有沒有改動；切到背景（手機切 App、關分頁）時馬上傳；切回來時看雲端有沒有別台的新資料
+    // 平常靠 pushSoon（一有改動就傳）；每 30 秒再看一次當備用；切到背景（手機切 App、關分頁）時馬上傳；切回來時看雲端有沒有別台的新資料
     setInterval(autoPush,30000);
     setInterval(function(){ if(!document.hidden) checkRemote(); },5*60000);
     document.addEventListener('visibilitychange',function(){ if(document.hidden) autoPush(); else checkRemote(); });
@@ -4915,6 +4949,16 @@ section{padding-top:40px}
     document.getElementById('pr-out').textContent=txt;
     try{ navigator.clipboard.writeText(txt); }catch(e){}
   });
+  // 家長網頁連結（2026-11-07）：parent.html#g=<Gist ID>。只有 Gist ID，沒有 token，爸媽只能讀、不能改。
+  var prl=document.getElementById('pr-link');
+  if(prl) prl.addEventListener('click',function(){
+    var out=document.getElementById('pr-out'), c=ls('plan.cloud.v1',{})||{};
+    if(!c.gist){ out.textContent='還沒有雲端備份：先到「設定 → 雲端同步」貼 token、按「上傳到雲端」一次，再回來複製。'; return; }
+    var base=location.origin+location.pathname.replace(/[^\/]*$/,'');   // /study-plan/index.html 或 /study-plan/ → /study-plan/
+    var url=base+'parent.html#g='+c.gist;
+    out.textContent='家長網頁連結（已複製）：\n'+url+'\n\n這個連結看得到你的讀書紀錄，只傳給爸媽，不要貼到公開的地方。'+(c.auto?'':'\n⚠ 你的自動同步沒開，爸媽會看到舊資料。');
+    try{ navigator.clipboard.writeText(url); }catch(e){}
+  });
 
   /* ---------- 本機快照 ---------- */
   // 每天第一次打開留一份（網站一直開著也會在換日時補一份）；還原、匯入、下載雲端前也先留一份「還原前」，可以反悔。最多 4 份。
@@ -5154,11 +5198,12 @@ section{padding-top:40px}
   // 使用者 2026-10-26 定的規則：
   // 懲罰「重」：1 天沒照顧不理你、2 天生病、5 天離家；沒照顧的日子最新 5 棵樹枯萎，3 天內沒救回就死；番茄鐘中途放棄留下枯樹樁；
   //   讀書時段來看、一天待超過 15 分鐘，牠也不理你。
-  // 訂正、題本要 Claude 檢查才過關（過關連結有簽章）；沒檢查只種樹苗、不給飼料，3 天沒交就枯死。
+  // 訂正、題本要 Claude 檢查才過關（過關連結有簽章）；沒檢查只種樹苗、不給飼料。
+  //   2026-11-07 使用者改：3 天內交都沒事；超過就扣點（逾期第 n 天扣 5n），逾期超過 5 天樹苗才枯，但還是要交，沒過關就一直扣。
   // 無限循環：每日任務＋每週挑戰、樹會長成神木、森林一塊種滿才開下一塊、寵物越大吃越多。旅行照旅蛙。
   // v4（10-26 晚）：寵物改成自己畫的角色（走路、眨眼、搖尾巴、把戲）、天氣跟照顧掛勾、親密度、今日加成、森林銀行、成就。
   var PK='plan.pet.v1', VK='plan.petview.v1', CK='plan.checks.v1';
-  var SICK_AT=2, LEAVE_AT=5, WILT_N=5, WILT_DIE=3, VIEW_MAX=15*60*1000, CHECK_DAYS=3;
+  var SICK_AT=2, LEAVE_AT=5, WILT_N=5, WILT_DIE=3, VIEW_MAX=15*60*1000, CHECK_DAYS=3, LATE_PEN=5, LATE_DIE=5;
   var PUBKEY={kty:'EC',crv:'P-256',x:'Ebpis9DgYaUWiZCOn1Mfw9ROGd4fxe53fcajRNcESZo',y:'Rs2KjSBng3Woe_cGXb32MB2nE0pLEux7iifJrmArqP4'};
   // 要給 Claude 檢查的任務：訂正、考古題限時作答、模考卷、歷屆會考、錯題重做
   var CHECK_RE=/(訂正|限時作答|模考卷|歷屆會考|限時重做|整份限時|錯題重做|雄中考古題)/;
@@ -5334,7 +5379,7 @@ section{padding-top:40px}
         var full=e.a>0 && e.d===e.a; if(full) allClear++;
         doneList(e).forEach(function(t){
           var chk=t.n && needsCheck(t.n), it=chk? C.items[k+'|'+t.n] : null;
-          trees.push({sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?it.st:'pending'):'ok', n:t.n});
+          trees.push({sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?((it.wd||it.old)?'dead':it.st):'pending'):'ok', n:t.n});   // 逾期枯死的，之後過關也不復活
           if(since && pk(k)>=since && (!chk || (it&&it.st==='pass'))) tasks++;
         });
         if(since && pk(k)>=since && full) clear++;
@@ -5408,15 +5453,41 @@ section{padding-top:40px}
   function nextTrick(p){ var b=(p&&p.bond)||0; return TRICKS.filter(function(t){ return b<t.b; })[0]||null; }
 
   /* ---- 每天的結算：檢查到期、森林枯萎、寵物飢餓與生病 ---- */
+  // 逾期沒交檢查（2026-11-07 使用者定）：勾完 3 天內交都沒事；之後每天扣點，逾期第 1 天扣 5、第 2 天扣 10…（第 n 天扣 5n）。
+  //   逾期超過 5 天（第 6 天）樹苗枯死，但還是要交，沒過關就繼續扣；過關就停止扣點（已扣的不退），枯死前過關樹苗照常長大。
+  //   it.ls＝逾期第 1 天、it.pd＝扣到逾期第幾天、it.pt＝累計扣了幾點、it.wd＝枯死那天（之後過關也不會復活）。
+  //   以前（舊規則）就枯掉的也照新規則（11-07 使用者：「之前枯死的…要照現在的規則」）：從原本期限的隔天算逾期第 1 天，
+  //   該扣的一次補扣；逾期還沒超過 5 天的救回來，超過的維持枯掉、繼續扣到過關。
+  function addDays(k,n){ var d=pk(k); d.setDate(d.getDate()+n); return kk(d); }
+  function lateDay(it,today){ return (it.st==='pass'||it.old||!it.ls)?0:Math.max(0,daysBetween(pk(it.ls),today)+1); }
   function checksAdvance(C,h){
-    var today=d0(), tk=kk(today), changed=false;
+    var today=d0(), tk=kk(today), changed=false, pen=[];
     Object.keys(h).forEach(function(k){ (h[k].dn||[]).forEach(function(n){ if(needsCheck(n) && !C.items[k+'|'+n]){ C.items[k+'|'+n]={k:k,n:n,st:'pending'}; changed=true; } }); });
     Object.keys(C.items).forEach(function(key){
       var it=C.items[key];
       if(it.st==='pending' && it.k===tk && !((h[tk]||{}).dn||[]).some(function(n){ return n===it.n; })){ delete C.items[key]; changed=true; return; }   // 今天取消勾選
-      if(it.st==='pending' && daysBetween(pk(it.k),today)>CHECK_DAYS){ it.st='dead'; changed=true; }
+      if(it.st==='pass' || it.old) return;
+      if(!it.ls){
+        var due=addDays(it.k,CHECK_DAYS+1);   // 照規則的逾期第 1 天
+        if(pk(due)>today) return;             // 還在 3 天內
+        it.ls=due;
+        if(it.st==='dead') it.st='late';      // 舊規則枯掉的先救回來，下面照逾期天數決定要不要再枯
+        changed=true;
+      }
+      var n=lateDay(it,today); if(n<1) return;
+      if(it.st==='pending'){ it.st='late'; changed=true; }
+      var pd=it.pd||0;
+      if(n>pd){ var amt=0; for(var d=pd+1;d<=n;d++) amt+=LATE_PEN*d; it.pd=n; it.pt=(it.pt||0)+amt; pen.push({n:it.n, a:pd+1, b:n, amt:amt}); changed=true; }
+      if(n>LATE_DIE && it.st!=='dead'){ it.st='dead'; it.wd=addDays(it.ls,LATE_DIE); changed=true; }
     });
     if(changed) saveChecks(C);
+    // 先存檢查狀態再扣點：就算扣點那步出錯，也不會重複扣
+    pen.forEach(function(p){
+      if(window.__award) window.__award(-p.amt,'逾期沒交檢查：'+p.n+'（逾期第 '+(p.a===p.b?p.b:p.a+'～'+p.b)+' 天）',true);
+    });
+    if(pen.length){ var tot=pen.reduce(function(a,p){ return a+p.amt; },0), msg='⏰ 逾期沒交檢查，扣 '+tot+' 點（'+pen.length+' 份）。交給 Claude 檢查過關就不會再扣。';
+      if(flash) flash.push(msg);
+      if(window.__fx && window.__fx.banner) window.__fx.banner(msg); }
   }
   function forestAdvance(s,h,trees,lv){
     var y=d0(); y.setDate(y.getDate()-1);
@@ -5746,9 +5817,10 @@ section{padding-top:40px}
       +'<g'+(isNew?' class="fp-new"':'')+'><g'+(sway&&state!=='dead'?' class="fp-sw" style="animation-delay:-'+delay.toFixed(1)+'s"':'')+'>';
     var end='</g></g></g>';
     if(state==='dead') return g+'<rect x="-3" y="-7" width="6" height="7" rx="1" fill="#7A5236"/><ellipse cx="0" cy="-7" rx="3" ry="1.3" fill="#B98A5E"/><path d="M-6 0 h12" stroke="#6b4a32" stroke-width="1.4" stroke-linecap="round"/>'+end;
-    if(state==='pending'||stg===0){
-      g+='<ellipse cx="0" cy="0" rx="7" ry="2.4" fill="#8B6B47" opacity=".55"/><path d="M0 0 V-12" stroke="#6F9E4F" stroke-width="2.4" stroke-linecap="round"/><path d="M0 -10 C-10 -16 -12 -6 0 -8 Z M0 -12 C10 -20 13 -9 0 -10 Z" fill="'+(state==='wilt'?WILTC:'#7CC25B')+'"/>';
+    if(state==='pending'||state==='late'||stg===0){
+      g+='<ellipse cx="0" cy="0" rx="7" ry="2.4" fill="#8B6B47" opacity=".55"/><path d="M0 0 V-12" stroke="#6F9E4F" stroke-width="2.4" stroke-linecap="round"/><path d="M0 -10 C-10 -16 -12 -6 0 -8 Z M0 -12 C10 -20 13 -9 0 -10 Z" fill="'+(state==='wilt'||state==='late'?WILTC:'#7CC25B')+'"/>';
       if(state==='pending') g+='<circle cx="9" cy="-20" r="7" fill="#fff" stroke="#E0A030" stroke-width="1.2"/><text x="9" y="-16.5" font-size="9" text-anchor="middle">⏳</text>';
+      if(state==='late') g+='<circle cx="9" cy="-20" r="7" fill="#fff" stroke="#D9534F" stroke-width="1.4"/><text x="9" y="-16.5" font-size="9" text-anchor="middle">⏰</text>';
       return g+end;
     }
     var w=state==='wilt', C=function(c){ return w?WILTC:c; };
@@ -5871,7 +5943,7 @@ section{padding-top:40px}
     }
     // 這塊地上的樹（含枯樹樁）
     var a0=landStart(li), a1=a0+L.cap, items=[], leaf={};
-    for(var n=a0;n<Math.min(a1,T.trees.length);n++){ var t=T.trees[n]; items.push({t:t, n:n-a0, gi:n, st:trees.state[n]||(t.st==='dead'?'dead':(t.st==='pending'?'pending':'')), stg:treeStage(t,cc)}); }
+    for(var n=a0;n<Math.min(a1,T.trees.length);n++){ var t=T.trees[n]; items.push({t:t, n:n-a0, gi:n, st:trees.state[n]||(t.st==='dead'?'dead':(t.st==='pending'||t.st==='late'?t.st:'')), stg:treeStage(t,cc)}); }
     if(li===trees.curLand) s.stumps.slice(-30).forEach(function(st,j){ items.push({t:{sp:'',k:st.k}, n:1000+j, gi:-1, st:'dead', stg:1}); });
     var placed=items.map(function(q){
       var fx, fy, y, x, tr=0;
@@ -6388,7 +6460,7 @@ section{padding-top:40px}
     s.dead.forEach(function(i){ state[i]='dead'; deadSet[i]=1; });
     s.wilt.forEach(function(w){ w.idx.forEach(function(i){ if(!deadSet[i]) state[i]='wilt'; }); });
     T.trees.forEach(function(t,i){ if(t.st==='dead'){ state[i]='dead'; deadSet[i]=1; } });
-    var nDead=Object.keys(deadSet).length, nWilt=s.wilt.reduce(function(a,w){ return a+w.idx.length; },0), nPend=T.trees.filter(function(t){ return t.st==='pending'; }).length;
+    var nDead=Object.keys(deadSet).length, nWilt=s.wilt.reduce(function(a,w){ return a+w.idx.length; },0), nPend=T.trees.filter(function(t){ return t.st==='pending'||t.st==='late'; }).length;
     var curLand=T.trees.length? landOfIndex(T.trees.length-1).i : 0;
     var li=Math.max(0,Math.min(v.land===undefined?(p&&!att.away?(p.land||0):curLand):v.land, curLand));   // 預設看寵物在的那塊地
     var cc=caredCum(h,lv), stageCnt=[0,0,0,0];
@@ -6423,7 +6495,7 @@ section{padding-top:40px}
     var charms=Math.max(0,T.allClear+s.clover-(s.charmsUsed||0));
     var questReady=quests.filter(function(q){ var r=q.f(x); return r[0]>=r[1] && !(s.quests[tk]||{})[q.id]; }).length
       + weekly.filter(function(c){ var r=c.f(wdat); return r[0]>=r[1] && !(s.weekly[wk]||{})[c.id]; }).length;
-    var pendList=Object.keys(C.items).map(function(key){ return C.items[key]; }).filter(function(it){ return it.st==='pending'; });
+    var pendList=Object.keys(C.items).map(function(key){ return C.items[key]; }).filter(function(it){ return it.st!=='pass' && !it.old; });   // 還要交的（含逾期、逾期枯死的）
     // 成就：先算進度（成就頁、家具、寵物稱號都用）
     lastSnap={s:s,h:h,C:C,T:T,stageCnt:stageCnt,curLand:curLand,nDead:nDead,alive:trees.alive,info:info,lv:lv};
     var newAch=achUpdate(achStats(lastSnap)), achReady=achClaimable();
@@ -6437,7 +6509,8 @@ section{padding-top:40px}
       mini.hidden=false;
       var chips=[];   // 手機上小卡不要拉太長：待辦併成一行
       // 每個小標點了直接到那一頁（以前全部都跳到森林，點「成就 3」卻看不到成就）
-      if(pendList.length) chips.push('<span data-go="check" style="color:var(--warn)">⏳ 檢查 '+pendList.length+'</span>');
+      if(pendList.length){ var nLate=pendList.filter(function(it){ return lateDay(it,d0())>0; }).length;
+        chips.push('<span data-go="check" style="color:'+(nLate?'var(--rest)':'var(--warn)')+'">'+(nLate?'⏰':'⏳')+' 檢查 '+pendList.length+(nLate?'（逾期 '+nLate+'，每天扣點）':'')+'</span>'); }
       if(questReady) chips.push('<span data-go="quest" style="color:var(--cap)">🎁 任務 '+questReady+'</span>');
       if(achReady) chips.push('<span data-go="ach" style="color:var(--cap)">🏆 成就 '+achReady+'</span>');
       if(bk.loan) chips.push('<span data-go="bank" style="color:'+(bk.loan.late?'var(--rest)':'var(--warn)')+'">🏦 欠 '+bk.loan.owe+(bk.loan.late?' 逾期':'')+'</span>');
@@ -6571,11 +6644,16 @@ section{padding-top:40px}
       var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
       body+='<div class="fp-panel"><h4>給 Claude 檢查 <span>訂正、考古題限時作答、模考卷、歷屆會考、錯題重做</span></h4>'
         +'<p class="fp-gone">做法：在「今天」勾掉這類任務 → 把寫好的題本、訂正拍照傳給 Claude，說「檢查：任務名稱」→ Claude 檢查過關會給你一個連結，點開就過關。'
-        +'沒過關的話 Claude 會告訴你哪裡要重做。'+CHECK_DAYS+' 天內沒交，樹苗會枯死、也拿不到獎勵。過關：A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。</p>'
+        +'沒過關的話 Claude 會告訴你哪裡要重做。過關：A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。<br>'
+        +'<b>補檢查</b>：勾完 '+CHECK_DAYS+' 天內交都沒事；超過就每天扣點，逾期第 1 天扣 '+LATE_PEN+'、第 2 天扣 '+(LATE_PEN*2)+'、第 3 天扣 '+(LATE_PEN*3)+'…；'
+        +'逾期超過 '+LATE_DIE+' 天樹苗枯死，但還是要交，沒過關會一直扣。過關就停止扣點（已扣的不退）。</p>'
         +(items.length?items.slice(0,30).map(function(it){
-          var left=CHECK_DAYS-daysBetween(pk(it.k),d0());
-          return '<div class="fp-chk '+it.st+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'
-            +(it.st==='pass'?'✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):''):(it.st==='dead'?'🪦 沒交檢查，樹苗枯了':'⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')))+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有要檢查的任務。</p>')
+          var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
+          if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.wd?'　樹苗已枯':'');
+          else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
+          else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
+          else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
+          return '<div class="fp-chk '+cls+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'+txt+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有要檢查的任務。</p>')
         +'</div>';
     }
     if(tabk==='shop'){
@@ -7378,7 +7456,7 @@ section{padding-top:40px}
       if(!name || !needsCheck(name) || lab.classList.contains('tk-pre')) return;   // 熬夜時已寫完的，檢查算在寫的那天
       var it=C.items[tk+'|'+name], tag=document.createElement('span'); tag.className='td-chk';
       if(it&&it.st==='pass'){ tag.className+=' ok'; tag.textContent='✅ Claude 檢查過關（'+it.g+'）'; }
-      else if(cb.checked){ tag.className+=' wait'; tag.textContent='⏳ 拍照傳給 Claude 檢查，過關才算數（'+CHECK_DAYS+' 天內）'; }
+      else if(cb.checked){ tag.className+=' wait'; tag.textContent='⏳ 拍照傳給 Claude 檢查，過關才算數（'+CHECK_DAYS+' 天內，超過每天扣點）'; }
       else tag.textContent='🔍 寫完要給 Claude 檢查才算過關';
       sp.appendChild(tag);
     });
@@ -7410,10 +7488,12 @@ section{padding-top:40px}
       C.used[pl.i]=Date.now();
       var key=pl.k+'|'+pl.n, prev=C.items[key];
       if(prev && prev.st==='pass'){ saveChecks(C); passBanner('這份已經過關了。'); return; }
-      C.items[key]={k:pl.k, n:pl.n, st:'pass', g:pl.g, m:pl.m||'', passAt:Date.now()};
+      var wasLate=prev && prev.st!=='pass' && !prev.old && prev.ls;   // 逾期中過關：停止扣點（已扣的、枯死的樹不變）
+      C.items[key]=Object.assign({}, prev||{}, {k:pl.k, n:pl.n, st:'pass', g:pl.g, m:pl.m||'', passAt:Date.now()});
       saveChecks(C);
       var s=petState(); s.gold+=(pl.g==='A'?2:1); s.bonusFood+=(pl.g==='A'?3:2); savePet(s);
-      passBanner('✅ Claude 檢查過關（'+esc(pl.g)+'）：'+esc(pl.n)+(pl.m?'——'+esc(pl.m):'')+'。🌟 +'+(pl.g==='A'?2:1)+'、飼料 +'+(pl.g==='A'?3:2)+'。', true);
+      passBanner('✅ Claude 檢查過關（'+esc(pl.g)+'）：'+esc(pl.n)+(pl.m?'——'+esc(pl.m):'')+'。🌟 +'+(pl.g==='A'?2:1)+'、飼料 +'+(pl.g==='A'?3:2)+'。'
+        +(wasLate?'逾期扣點停止了（逾期共扣 '+(prev.pt||0)+' 點）'+(prev.wd?'，樹苗已經枯了不會復活':'')+'。':''), true);
       if(window.__fx) window.__fx.unlock(null,'Claude 檢查過關');
       afterPaint.push(function(){ petDo('flip',{dur:1}); petDo('say',{txt:'過關了！好厲害！'}); });
       tagToday(); paintPet();

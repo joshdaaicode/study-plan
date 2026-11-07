@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#EEF5FA">
+<title>讀書狀況・家長版</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<!--
+  家長版（2026-11-07）：只讀孩子讀書網站自動備份到 GitHub Gist 的那份資料，不能改任何東西，也不需要 token。
+  Gist ID 從「家長連結」的 #g=… 帶進來，只存在這台裝置；網頁原始碼裡沒有任何人的資料。
+  不顯示成績（孩子 2026-10-26 說不要給爸媽看成績）。
+-->
+<style>
+:root{
+  --ink:#131C26; --ink-soft:#4E5B67; --ink-faint:#6B7782;
+  --paper:#EEF5FA; --card:#FFFFFF; --rule:#D6E0E8;
+  --sky:#1C7EBB; --sky-tint:#E2F0F9;
+  --ok:#0D7F63; --ok-tint:#E3F2EC;
+  --warn:#A65A0C; --warn-tint:#FBEEDF;
+  --bad:#B83227; --bad-tint:#FBE8E6;
+  --bar:#3A9AD9; --bar-empty:#DCE6EE;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#E6EDF3; --ink-soft:#B4C0CB; --ink-faint:#8B98A5;
+    --paper:#0F171E; --card:#17222C; --rule:#2A3742;
+    --sky:#62B7EC; --sky-tint:#15303F;
+    --ok:#4CC3A0; --ok-tint:#12302A;
+    --warn:#E39B4F; --warn-tint:#33261A;
+    --bad:#F07A6E; --bad-tint:#3A1F1C;
+    --bar:#5DB4EA; --bar-empty:#26333E;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#E6EDF3; --ink-soft:#B4C0CB; --ink-faint:#8B98A5;
+  --paper:#0F171E; --card:#17222C; --rule:#2A3742;
+  --sky:#62B7EC; --sky-tint:#15303F;
+  --ok:#4CC3A0; --ok-tint:#12302A;
+  --warn:#E39B4F; --warn-tint:#33261A;
+  --bad:#F07A6E; --bad-tint:#3A1F1C;
+  --bar:#5DB4EA; --bar-empty:#26333E;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Noto Sans TC',system-ui,sans-serif;font-size:15px;line-height:1.65;padding:0 16px 48px}
+.wrap{max-width:640px;margin:0 auto}
+header{padding:22px 0 10px}
+h1{font-size:21px;margin:0;letter-spacing:.02em}
+.eyebrow{font-size:12.5px;color:var(--ink-faint);margin:2px 0 0}
+.fresh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--ink-soft)}
+.fresh b{font-family:'IBM Plex Mono',monospace;font-weight:600}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 14px;font-size:13px}
+.btn:hover{border-color:var(--sky);color:var(--sky)}
+.btn.solid{background:var(--sky);border-color:var(--sky);color:#fff}
+.note{border-radius:12px;padding:10px 14px;font-size:13.5px;margin:12px 0 0}
+.note.warn{background:var(--warn-tint);color:var(--warn)}
+.note.bad{background:var(--bad-tint);color:var(--bad)}
+.note.info{background:var(--sky-tint);color:var(--ink-soft)}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px;margin-top:14px}
+.card h2{font-size:16px;margin:0 0 2px}
+.card .sub{font-size:12.5px;color:var(--ink-faint);margin:0 0 10px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 4px}
+.tile{background:var(--paper);border-radius:12px;padding:10px 10px 8px;min-width:0}
+.tile .v{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;line-height:1.2;color:var(--ink)}
+.tile .v small{font-size:13px;color:var(--ink-faint);font-weight:400}
+.tile .k{font-size:12px;color:var(--ink-faint)}
+.now{font-size:13.5px;color:var(--ink-soft);margin:6px 0 2px}
+ul.tasks{list-style:none;margin:8px 0 0;padding:0}
+ul.tasks li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:0 6px;padding:7px 0;border-top:1px solid var(--rule);font-size:14px}
+ul.tasks li .ic{font-size:14px;line-height:1.6;text-align:center}
+ul.tasks li .n{overflow-wrap:anywhere}
+ul.tasks li .m{display:block;font-size:12px;color:var(--ink-faint)}
+ul.tasks li.done .n{color:var(--ink-soft)}
+.tag{display:inline-block;font-size:11.5px;border-radius:999px;padding:0 8px;margin-left:4px;vertical-align:1px}
+.tag.bk{background:var(--warn-tint);color:var(--warn)}
+.tag.ok{background:var(--ok-tint);color:var(--ok)}
+.tag.bad{background:var(--bad-tint);color:var(--bad)}
+.tag.wait{background:var(--sky-tint);color:var(--sky)}
+.chk{padding:8px 0;border-top:1px solid var(--rule);font-size:14px}
+.chk .d{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);margin-right:6px}
+.chk .s{display:block;font-size:12.5px;margin-top:1px}
+.chk .s.ok{color:var(--ok)} .chk .s.wait{color:var(--sky)} .chk .s.bad{color:var(--bad);font-weight:500} .chk .s.old{color:var(--ink-faint)}
+.chart{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:18px;padding-right:44px;border-bottom:1px solid var(--rule);position:relative}
+.chart .gl{position:absolute;left:0;right:0;border-top:1px dashed var(--rule);font-size:10.5px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace}
+.chart .gl span{position:absolute;right:0;top:-9px;background:var(--card);padding-left:4px;line-height:1.5}
+.bar{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;background:none;border:0;padding:0;position:relative;z-index:1}
+.bar i{display:block;width:100%;border-radius:4px 4px 0 0;background:var(--bar);min-height:3px}
+.bar.zero i{background:var(--bar-empty)}
+.bar.sel i{outline:2px solid var(--ink);outline-offset:1px}
+.bar:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.xlab{display:flex;gap:4px;margin-top:4px;padding-right:44px}
+.xlab span{flex:1;min-width:0;text-align:center;font-size:10.5px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden}
+.xlab span.wk{color:var(--ink);font-weight:600}
+.detail{min-height:22px;font-size:13px;color:var(--ink-soft);margin-top:8px}
+.sum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13.5px;margin-top:10px}
+.sum b{font-family:'IBM Plex Mono',monospace}
+.ex{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--rule);font-size:14px}
+.ex b{font-family:'IBM Plex Mono',monospace;color:var(--sky)}
+.setup label{display:block;font-size:13.5px;margin:10px 0 6px}
+.setup input{width:100%;font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink)}
+footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
+footer a{color:var(--ink-faint)}
+@media (max-width:380px){ .tile .v{font-size:19px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>joshdaai 的讀書狀況</h1>
+    <p class="eyebrow">家長版・只能看、不能改・資料來自他讀書網站的自動備份</p>
+    <div class="fresh" id="fresh"></div>
+  </header>
+  <div id="app"><p class="note info">讀取中…</p></div>
+  <footer>
+    這一頁讀的是孩子讀書網站自動上傳的備份：他打開網站、勾了任務，幾秒內就會上傳，這頁每 10 分鐘自動更新一次（也可以按「重新整理」）；網站沒打開的時候，這裡不會變。
+    這裡只看讀書進度，不顯示成績。<br>
+    <button class="btn" id="forget" type="button" style="margin-top:8px">清掉這台裝置記住的連結</button>
+  </footer>
+</div>
+<script src="plan.js"></script>
+<script>
+(function(){
+  var GK='parent.gist.v1', FILE='study-plan-backup.json', OWNER='joshdaaicode';
+  var CHECK_DAYS=3, LATE_PEN=5, LATE_DIE=5;
+  var WD='日一二三四五六';
+  var app=document.getElementById('app'), fresh=document.getElementById('fresh');
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function lsGet(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }
+  function lsSet(k,v){ try{ if(v) localStorage.setItem(k,v); else localStorage.removeItem(k); }catch(e){} }
+  function d0(){ var d=new Date(); d.setHours(0,0,0,0); return d; }
+  function key(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function pk(k){ var p=String(k).split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+  function md(k){ var p=String(k).split('-'); return (+p[1])+'/'+(+p[2]); }
+  function days(a,b){ return Math.round((b-a)/864e5); }
+  function addD(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function hm(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+  function ago(t){ var m=Math.round((Date.now()-t)/60000); if(m<1) return '剛剛'; if(m<60) return m+' 分鐘前'; var h=Math.floor(m/60); if(h<24) return h+' 小時前'; return Math.floor(h/24)+' 天前'; }
+  function J(o,k,dflt){ try{ var v=o[k]; if(v==null) return dflt; var x=typeof v==='string'?JSON.parse(v):v; return x==null?dflt:x; }catch(e){ return dflt; } }
+
+  // ---- 連結：#g=<Gist ID> 存起來就把網址上的拿掉 ----
+  var m=location.hash.match(/[#&]g=([0-9a-f]{20,40})/i);
+  if(m){ lsSet(GK,m[1].toLowerCase()); try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
+  var gid=lsGet(GK);
+  document.getElementById('forget').addEventListener('click',function(){
+    if(!confirm('清掉這台裝置記住的家長連結？之後要再點一次孩子給的連結才看得到。')) return;
+    lsSet(GK,''); gid=''; setup();
+  });
+
+  function setup(msg){
+    fresh.innerHTML='';
+    app.innerHTML='<div class="card setup"><h2>第一次使用</h2><p class="sub">請孩子在讀書網站「紀錄 → 進度回測 → 給爸媽的週報」按「複製家長網頁連結」，傳給你，點開就好；或把連結貼在下面。</p>'
+      +(msg?'<p class="note bad">'+esc(msg)+'</p>':'')
+      +'<label for="gin">家長連結</label><input id="gin" type="text" autocomplete="off" placeholder="https://joshdaaicode.github.io/study-plan/parent.html#g=…">'
+      +'<p style="margin:10px 0 0"><button class="btn solid" id="gok" type="button">開始看</button></p></div>';
+    document.getElementById('gok').addEventListener('click',function(){
+      var v=document.getElementById('gin').value, mm=v.match(/([0-9a-f]{20,40})/i);
+      if(!mm){ setup('看不懂這個連結，請整串貼上。'); return; }
+      lsSet(GK,mm[1].toLowerCase()); gid=mm[1].toLowerCase(); load();
+    });
+  }
+
+  // ---- 讀 Gist：先用 GitHub API（沒登入，一小時 60 次）；被限制就改讀 raw 檔 ----
+  function fetchData(){
+    return fetch('https://api.github.com/gists/'+gid,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'}).then(function(r){
+      if(r.status===404) throw new Error('找不到資料：連結可能不完整，請孩子重新複製一次。');
+      if(r.status===403||r.status===429) return fetchRaw();
+      if(!r.ok) throw new Error('GitHub 回應 '+r.status+'，等一下再試。');
+      return r.json().then(function(g){
+        var f=g.files&&g.files[FILE];
+        if(!f) throw new Error('這個連結裡沒有讀書資料。');
+        if(f.truncated&&f.raw_url) return fetch(f.raw_url,{cache:'no-store'}).then(function(x){ if(!x.ok) throw new Error('讀不到完整資料。'); return x.text(); });
+        return f.content;
+      });
+    });
+  }
+  function fetchRaw(){
+    return fetch('https://gist.githubusercontent.com/'+OWNER+'/'+gid+'/raw/'+FILE+'?t='+Date.now()).then(function(r){
+      if(!r.ok) throw new Error('GitHub 暫時限制讀取次數，過幾分鐘再按「重新整理」。'); return r.text(); });
+  }
+
+  var loading=false, lastLoad=0;
+  function load(){
+    if(!gid){ setup(); return; }
+    if(loading) return; loading=true;
+    fresh.innerHTML='<span>讀取中…</span>';
+    fetchData().then(function(txt){
+      var o=JSON.parse(txt); loading=false; lastLoad=Date.now(); render(o);
+    }).catch(function(e){
+      loading=false;
+      if(/找不到資料|沒有讀書資料/.test(e.message)){ setup(e.message); return; }
+      fresh.innerHTML='<span style="color:var(--bad)">'+esc(e.message||'讀取失敗')+'</span> <button class="btn" type="button" id="rl">重新整理</button>';
+      document.getElementById('rl').addEventListener('click',load);
+    });
+  }
+
+  // ---- 檢查的逾期天數（和讀書網站同一套：勾完 3 天內交；之後逾期第 n 天扣 5n 點，超過 5 天樹苗枯） ----
+  function lateDay(it,today){
+    if(it.st==='pass'||it.old) return 0;
+    if(it.ls) return Math.max(0,days(pk(it.ls),today)+1);
+    return days(addD(pk(it.k),CHECK_DAYS+1),today)>=0 ? -1 : 0;   // -1：過了期限，但他還沒用新版網站開過（還沒開始扣）
+  }
+
+  function render(o){
+    var today=d0(), tk=key(today), now=new Date();
+    var st=J(o,'plan.state.v3',{}), hist=J(o,'plan.hist.v1',{}), pomo=J(o,'plan.pomo.v1',{}), C=J(o,'plan.checks.v1',{}),
+        shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{});
+    var plog=Array.isArray(pomo.log)?pomo.log:[];
+    var items=C.items||{};
+    var at=o._at?new Date(o._at).getTime():0;
+
+    // 資料新不新
+    fresh.innerHTML='資料更新：<b>'+(at?hm(at):'不明')+'</b>（'+(at?ago(at):'—')+'）<button class="btn" type="button" id="rl">重新整理</button>';
+    document.getElementById('rl').addEventListener('click',load);
+    var html='';
+    var stale=at && Date.now()-at>6*3600e3;
+    if(stale) html+='<p class="note warn">已經 '+ago(at).replace('前','')+'沒有新資料：可能他還沒打開讀書網站，或網站的自動同步沒開。</p>';
+
+    // ---- 今天 ----
+    var opened=st.day===tk, list=opened?(st.list||[]).filter(function(x){ return !x.pre; }):[], done=st.done||{};
+    var real=list.filter(function(x){ return !x.f; }), rd=real.filter(function(x){ return done[x.id]; });
+    var fixedN=list.length-real.length, fixedD=list.filter(function(x){ return x.f && done[x.id]; }).length;
+    var tMin=rd.reduce(function(a,x){ return a+(+x.m||0); },0)+Math.round((+vrev[tk]||0)/60);
+    var tp=plog.filter(function(e){ return e&&e.k===tk; }), tpMin=tp.reduce(function(a,e){ return a+(+e.m||25); },0);
+    var plan=(window.PLAN&&window.PLAN.days)?window.PLAN.days[tk]:null;
+    html+='<section class="card"><h2>今天　'+(today.getMonth()+1)+'/'+today.getDate()+'（週'+WD[today.getDay()]+'）</h2>';
+    html+='<p class="sub">'+(plan?esc(plan.lab)+(plan.note?'・'+esc(plan.note):''):'')+(easy[tk]?'・今天是降級／休息日':'')+'</p>';
+    if(plan){
+      var nm=now.getHours()*60+now.getMinutes(), cur=null;
+      (plan.b||[]).forEach(function(b){ var a=b[0].split(':'), e=b[1].split(':'), s=+a[0]*60+(+a[1]), t=+e[0]*60+(+e[1]); if(t<s) t+=1440; if(nm>=s&&nm<t) cur=b; });
+      if(cur) html+='<p class="now">現在排的是：<b>'+esc(cur[0])+'–'+esc(cur[1])+'</b>　'+esc(cur[3])+'</p>';
+    }
+    if(opened){
+      html+='<div class="tiles"><div class="tile"><div class="v">'+rd.length+'<small>／'+real.length+'</small></div><div class="k">讀書任務完成</div></div>'
+        +'<div class="tile"><div class="v">'+tMin+'<small> 分</small></div><div class="k">完成的讀書時間</div></div>'
+        +'<div class="tile"><div class="v">'+tp.length+'<small> 顆</small></div><div class="k">番茄鐘（'+tpMin+' 分）</div></div></div>';
+      if(fixedN) html+='<p class="sub" style="margin:4px 0 0">上學、上課、補習：'+fixedD+'／'+fixedN+' 已打勾</p>';
+      html+='<ul class="tasks">'+real.map(function(x){
+        var ok=!!done[x.id], ck=items[tk+'|'+x.n], tag='';
+        if(x.bk) tag+='<span class="tag bk">欠帳</span>';
+        if(ck&&ck.st==='pass') tag+='<span class="tag ok">Claude 檢查過關 '+esc(ck.g||'')+'</span>';
+        else if(ok&&/(訂正|限時作答|模考卷|歷屆會考|限時重做|整份限時|錯題重做|雄中考古題)/.test(x.n)&&!/補習|錯題本：到期題/.test(x.n)) tag+='<span class="tag wait">等 Claude 檢查</span>';
+        return '<li class="'+(ok?'done':'')+'"><span class="ic" aria-label="'+(ok?'完成':'還沒做')+'">'+(ok?'✅':'⬜')+'</span><span class="n">'+esc(x.n)+tag
+          +'<span class="m">'+esc(x.t||'')+(x.m?'・'+x.m+' 分':'')+'</span></span></li>'; }).join('')+'</ul>';
+      if(!real.length) html+='<p class="sub">今天沒有排讀書任務。</p>';
+    } else {
+      var last=st.day?md(st.day):'';
+      html+='<p class="note warn">今天他還沒打開讀書網站'+(last?'（上一次是 '+last+'）':'')+'。</p>';
+      if(plan){ var sb=(plan.b||[]).filter(function(b){ return b[5]===0; });
+        if(sb.length) html+='<p class="sub" style="margin-top:10px">今天原本排的讀書任務（'+sb.length+' 項）：</p><ul class="tasks">'+sb.map(function(b){
+          return '<li><span class="ic">⬜</span><span class="n">'+esc(b[3])+'<span class="m">'+esc(b[0])+'–'+esc(b[1])+'</span></span></li>'; }).join('')+'</ul>';
+      }
+    }
+    html+='</section>';
+
+    // ---- 給 Claude 檢查 ----
+    var arr=Object.keys(items).map(function(k){ return items[k]; }).filter(function(it){ return it&&it.k; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
+    var open=arr.filter(function(it){ return it.st!=='pass' && !it.old; });
+    var lateN=open.filter(function(it){ return lateDay(it,today)!==0; }).length;
+    var wk0=addD(today,-6), passWk=arr.filter(function(it){ return it.st==='pass' && it.passAt && it.passAt>=wk0.getTime(); });
+    var pen7=(shop.log||[]).filter(function(l){ return l&&l.t>=wk0.getTime() && /^逾期沒交檢查/.test(l.w||''); })
+      .reduce(function(a,l){ return a+Math.abs(parseInt(String(l.n).replace(/[^\d]/g,''),10)||0); },0);
+    html+='<section class="card"><h2>給 Claude 檢查的作業</h2><p class="sub">訂正、考古題、模考卷寫完要拍照給 Claude 檢查才算過關；勾完 3 天內要交，之後逾期第 1 天扣 5 點、第 2 天扣 10 點…，超過 5 天樹苗枯掉，還是要交。</p>';
+    html+='<div class="tiles"><div class="tile"><div class="v">'+open.length+'</div><div class="k">還沒過關</div></div>'
+      +'<div class="tile"><div class="v" style="color:'+(lateN?'var(--bad)':'var(--ink)')+'">'+lateN+'</div><div class="k">已經逾期</div></div>'
+      +'<div class="tile"><div class="v">'+passWk.length+'</div><div class="k">這 7 天過關</div></div></div>';
+    if(pen7) html+='<p class="sub" style="margin:2px 0 0">這 7 天因為逾期被扣 '+pen7+' 點。</p>';
+    var show=open.concat(arr.filter(function(it){ return it.st==='pass' && pk(it.k)>=addD(today,-13); })).slice(0,20);
+    html+=show.map(function(it){
+      var n=lateDay(it,today), s, cls;
+      if(it.st==='pass'){ cls='ok'; s='✅ 過關（'+esc(it.g||'')+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'・逾期被扣 '+it.pt+' 點':''); }
+      else if(n>0){ cls='bad'; s=(it.st==='dead'?'🪦 樹苗已枯，':'⏰ ')+'逾期第 '+n+' 天・已扣 '+(it.pt||0)+' 點・明天再扣 '+(LATE_PEN*(n+1))+' 點'; }
+      else if(n<0){ cls='bad'; s='⏰ 已經超過 3 天期限'; }
+      else { var left=CHECK_DAYS-days(pk(it.k),today); cls='wait'; s='⏳ 等檢查，'+(left>0?'還有 '+left+' 天':'今天是最後一天'); }
+      return '<div class="chk"><span class="d">'+md(it.k)+'</span>'+esc(it.n)+'<span class="s '+cls+'">'+s+'</span></div>'; }).join('');
+    if(!show.length) html+='<p class="sub">最近沒有要檢查的作業。</p>';
+    html+='</section>';
+
+    // ---- 最近 14 天 ----
+    var D=[];
+    for(var i=13;i>=0;i--){
+      var d=addD(today,-i), k=key(d), e=hist[k], mins=0, a=0, dn=0, has=false;
+      if(k===tk && opened){ mins=tMin; a=real.length; dn=rd.length; has=true; }
+      else if(e){ has=true; mins=(+e.m||0)+Math.round((+vrev[k]||0)/60);
+        if(e.cat){ Object.keys(e.cat).forEach(function(c){ a+=e.cat[c].a||0; dn+=e.cat[c].d||0; }); } else { a=e.a||0; dn=e.d||0; } }
+      var pc=plog.filter(function(x){ return x&&x.k===k; }).length;
+      D.push({k:k, d:d, m:mins, a:a, dn:dn, has:has, pomo:pc, easy:!!easy[k]});
+    }
+    var mx=Math.max(60,Math.max.apply(null,D.map(function(x){ return x.m; })));
+    var step=mx>360?120:(mx>180?60:30), top=Math.ceil(mx/step)*step;
+    var grid='';
+    for(var g=step; g<=top; g+=step) grid+='<div class="gl" style="bottom:'+(g/top*111).toFixed(1)+'px"><span>'+g+' 分</span></div>';   // 圖高 130－上方留白 18－底線 1＝111px
+    html+='<section class="card"><h2>最近 14 天的讀書時間</h2><p class="sub">每天完成的讀書任務分鐘數；點一下長條看那天的細節。</p>'
+      +'<div class="chart" id="chart">'+grid+D.map(function(x,j){
+        var h=x.m?Math.max(3,x.m/top*100):3;
+        return '<button type="button" class="bar'+(x.m?'':' zero')+'" data-j="'+j+'" aria-label="'+md(x.k)+' '+x.m+' 分鐘"><i style="height:'+h.toFixed(1)+'%"></i></button>'; }).join('')+'</div>'
+      +'<div class="xlab">'+D.map(function(x,j){ var lab=(j===13?'今':String(x.d.getDate())); return '<span'+(x.d.getDay()===1?' class="wk"':'')+'>'+lab+'</span>'; }).join('')+'</div>'
+      +'<p class="sub" style="margin:2px 0 0;text-align:right;padding-right:44px">'+md(D[0].k)+'～今天・粗體是週一</p>'
+      +'<div class="detail" id="detail" aria-live="polite"></div>';
+    var W=D.slice(7), wm=W.reduce(function(a,x){ return a+x.m; },0), wa=W.reduce(function(a,x){ return a+x.a; },0), wd=W.reduce(function(a,x){ return a+x.dn; },0),
+        wp=W.reduce(function(a,x){ return a+x.pomo; },0), wgood=W.filter(function(x){ return x.m>=60; }).length, wnone=W.filter(function(x){ return !x.has; }).length;
+    html+='<div class="sum"><span>這 7 天讀書　<b>'+(wm/60).toFixed(1)+'</b> 小時</span><span>任務完成率　<b>'+(wa?Math.round(wd/wa*100):0)+'%</b></span>'
+      +'<span>讀滿 1 小時　<b>'+wgood+'</b>／7 天</span><span>番茄鐘　<b>'+wp+'</b> 顆</span>'
+      +(wnone?'<span style="grid-column:1/-1;color:var(--warn)">有 '+wnone+' 天沒有紀錄（那天沒打開網站）</span>':'')+'</div></section>';
+
+    // ---- 接下來的考試 ----
+    var EX=((window.PLAN&&window.PLAN.exams)||[]).filter(function(e){ return !/第二天/.test(e[3]); }).map(function(e){ return {n:e[3].replace(/ 第一天$/,''), d:new Date(e[0],e[1]-1,e[2])}; })
+      .filter(function(e){ return e.d>=today; }).slice(0,4);
+    if(window.PLAN&&window.PLAN.sci){ var sc=window.PLAN.sci, sd=new Date(sc[0],sc[1]-1,sc[2]); if(sd>=today && !EX.some(function(e){ return /科學班/.test(e.n); })) EX.push({n:'雄中科學班初試（暫定）', d:sd}); }
+    if(window.PLAN&&window.PLAN.cap){ var cp=window.PLAN.cap, cd=new Date(cp[0],cp[1]-1,cp[2]); if(cd>=today && !EX.some(function(e){ return /會考/.test(e.n); })) EX.push({n:'國中教育會考', d:cd}); }
+    EX.sort(function(a,b){ return a.d-b.d; });
+    if(EX.length) html+='<section class="card"><h2>接下來的考試</h2>'+EX.map(function(e){
+      return '<div class="ex"><span>'+esc(e.n)+'　<span style="color:var(--ink-faint);font-size:12.5px">'+(e.d.getMonth()+1)+'/'+e.d.getDate()+'</span></span><span>還有 <b>'+days(today,e.d)+'</b> 天</span></div>'; }).join('')+'</section>';
+
+    app.innerHTML=html;
+    var det=document.getElementById('detail'), bars=app.querySelectorAll('.bar');
+    function pickBar(j){
+      Array.prototype.forEach.call(bars,function(b){ b.classList.toggle('sel',+b.getAttribute('data-j')===j); });
+      var x=D[j];
+      det.textContent=md(x.k)+'（週'+WD[x.d.getDay()]+'）　'+(x.has?('讀書 '+x.m+' 分・任務 '+x.dn+'／'+x.a+'・番茄鐘 '+x.pomo+' 顆'+(x.easy?'・降級／休息日':'')):'沒有紀錄（那天沒打開網站）');
+    }
+    Array.prototype.forEach.call(bars,function(b){ b.addEventListener('click',function(){ pickBar(+b.getAttribute('data-j')); }); });
+    pickBar(13);
+  }
+
+  // 頁面開著時，每 10 分鐘自動更新一次；切回來超過 3 分鐘也更新
+  setInterval(function(){ if(!document.hidden && gid) load(); },600000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden && gid && Date.now()-lastLoad>180000) load(); });
+  load();
+})();
+</script>
+</body>
+</html>
