@@ -5284,7 +5284,41 @@ html.pv .wrap{max-width:none;padding:0}
     {id:'ticket',n:'旅行券',e:'🎟️',c:2,say:'下次旅行一定去遠的地方'},{id:'bento',n:'特製便當',e:'🍙',c:3,say:'打包時用，旅行 24–48 小時、明信片機會加倍'},
     {id:'seed',n:'神木種子',e:'🌰',c:4,say:'種下去直接是大樹，30 天照顧就成神木'},
     // 單字賭場用籌碼換的飾品（chip：不在金幸運草商店賣，每週挑戰也抽不到）
-    {id:'visor',n:'發牌員遮陽帽',e:'🧢',c:0,acc:1,chip:1},{id:'pokerhat',n:'撲克牌紳士帽',e:'🃏',c:0,acc:1,chip:1}];
+    {id:'visor',n:'發牌員遮陽帽',e:'🧢',c:0,acc:1,chip:1},{id:'pokerhat',n:'撲克牌紳士帽',e:'🃏',c:0,acc:1,chip:1},
+    // 寵物用品店用點數買的飾品（pshop：不在金幸運草商店賣，每週挑戰也抽不到）
+    {id:'flower',n:'花圈',e:'💐',c:0,acc:1,pshop:1},{id:'party',n:'派對帽',e:'🥳',c:0,acc:1,pshop:1},{id:'halo',n:'天使光環',e:'😇',c:0,acc:1,pshop:1}];
+  // 寵物用品店（2026-11-07 使用者要的：專門買寵物用品，用點數買，價格比較貴）
+  // food／mood／heal 買了馬上用；furn 放在家裡（每種一個，只是好看）；acc 買了自動換上，之後到「家」換。
+  var PSHOP=[
+    {id:'meat',n:'高級肉泥',e:'🥩',c:300,k:'food',h:35,m:10,say:'飽足 +35、心情 +10'},
+    {id:'sashimi',n:'頂級生魚片',e:'🍣',c:800,k:'food',h:70,m:20,say:'飽足 +70、心情 +20'},
+    {id:'chew',n:'潔牙骨',e:'🦴',c:250,k:'mood',m:15,b:0,say:'心情 +15'},
+    {id:'newtoy',n:'新玩具',e:'🪀',c:500,k:'mood',m:30,b:1,say:'心情 +30、親密度 +1'},
+    {id:'spa',n:'寵物美容',e:'🛁',c:900,k:'mood',m:20,b:3,say:'心情 +20、親密度 +3'},
+    {id:'vet',n:'看獸醫',e:'💊',c:1500,k:'heal',m:10,say:'馬上治好生病、心情 +10'},
+    {id:'cushion',n:'寵物床墊',e:'🛏️',c:1800,k:'furn',say:'放在家裡'},
+    {id:'fountain',n:'自動飲水機',e:'⛲',c:1500,k:'furn',say:'放在家裡'},
+    {id:'portrait',n:'寵物畫像',e:'🖼️',c:2000,k:'furn',say:'掛在牆上'},
+    {id:'tent',n:'寵物帳篷',e:'⛺',c:2200,k:'furn',say:'放在家裡'},
+    {id:'cattree',n:'跳台',e:'🪜',c:2500,k:'furn',say:'放在家裡'},
+    {id:'tank',n:'魚缸',e:'🐠',c:3000,k:'furn',say:'放在家裡'},
+    {id:'flower',n:'花圈',e:'💐',c:1200,k:'acc',say:'戴在頭上'},
+    {id:'party',n:'派對帽',e:'🥳',c:1500,k:'acc',say:'戴在頭上'},
+    {id:'halo',n:'天使光環',e:'😇',c:3000,k:'acc',say:'頭上發光'}];
+  // 現在能不能買這樣：回傳不能買的原因，可以買就回傳空字串（點數夠不夠另外看）
+  function pshopWhy(a,s,att){
+    var p=s.pet;
+    if(att && att.sulk==='study') return '讀書時段不能逛';
+    if(a.k==='furn') return (s.pfurn||{})[a.id]?'已經有了':'';
+    if(a.k==='acc') return s.acc[a.id]?'已經有了':'';
+    if(!p) return '先領養寵物';
+    if(att && att.away) return '牠去旅行了';
+    if(att && att.sleep) return '牠睡了';
+    if(a.k==='heal') return p.sick?'':'牠沒生病';
+    if(a.k==='food') return (p.hunger||0)>=100?'牠吃飽了':'';
+    if(a.k==='mood') return ((p.mood||0)>=(p.sick?40:100) && !a.b)?'心情已經滿了':'';
+    return '';
+  }
   // 森林：一塊地種滿才開下一塊；第 7 塊以後一直有新森林
   var LANDS=[
     {n:'小山丘',cap:40,sky:['#BFE2F6','#EAF6FC'],ground:['#A9D88F','#86C46E'],deco:'hills',e:'🌳'},
@@ -5774,6 +5808,12 @@ html.pv .wrap{max-width:none;padding:0}
       +'<g transform="translate(3.8 -9.5) rotate(16)"><rect x="-2.3" y="-3.1" width="4.6" height="6.2" rx=".7" fill="#fff" stroke="#9A9A9A" stroke-width=".3"/><path d="M0 1.6 L-1.5 -.2 Q-1.6 -1.6 0 -.8 Q1.6 -1.6 1.5 -.2 Z" fill="#C0392B"/></g></g>';
     if(id==='shades') return '<g><rect x="'+(E[0]-3.2)+'" y="'+(E[2]-2.6)+'" width="6.2" height="4.4" rx="1.8" fill="#1A1A1A"/><rect x="'+(E[1]-3)+'" y="'+(E[2]-2.6)+'" width="6.2" height="4.4" rx="1.8" fill="#1A1A1A"/>'
       +'<path d="M'+(E[0]+3)+' '+(E[2]-1.4)+' H'+(E[1]-3)+'" stroke="#1A1A1A" stroke-width="1.1"/><path d="M'+(E[0]-2.2)+' '+(E[2]-1.5)+' l1.5 -.7" stroke="#fff" stroke-width=".8" opacity=".6"/></g>';
+    // 寵物用品店的飾品
+    if(id==='flower'){ var fl='', fc=['#F28CB1','#FFD75E','#FFFFFF','#B79CF2','#F28CB1'];
+      [-7,-3.5,0,3.5,7].forEach(function(x,i){ var y=Math.abs(x)*.22; fl+='<circle cx="'+(x-1.4)+'" cy="'+(y+.6)+'" r="1.3" fill="#6BBF59"/><circle cx="'+x+'" cy="'+y+'" r="2.1" fill="'+fc[i]+'" stroke="#E3779F" stroke-width=".35"/><circle cx="'+x+'" cy="'+y+'" r=".8" fill="#F2B530"/>'; });
+      return '<g transform="translate(1 '+(T+.8)+')">'+fl+'</g>'; }
+    if(id==='party') return '<g transform="translate(2 '+(T+1.5)+') rotate(-10)"><path d="M-5.5 0 L0 -13 L5.5 0 Z" fill="#5AA9E6"/><path d="M-3.9 -3.6 H3.9 M-2.3 -7.6 H2.3" stroke="#F2C230" stroke-width="1.3"/><path d="M-6.2 0 H6.2" stroke="#E5536B" stroke-width="1.6" stroke-linecap="round"/><circle cy="-13.6" r="1.9" fill="#E5536B"/></g>';
+    if(id==='halo') return '<g><ellipse cx="1" cy="'+(T-6)+'" rx="8" ry="2.4" fill="#FFF3B0" opacity=".45"/><ellipse cx="1" cy="'+(T-6)+'" rx="7" ry="2" fill="none" stroke="#F2C230" stroke-width="1.6"/></g>';
     return '';
   }
   function scarfSVG(x,y){ return '<g transform="translate('+x+' '+y+')"><path d="M-6 -2 q6 4.5 12 -.5 l.8 4.2 q-7 5 -13.6 .6 Z" fill="#D9534F"/><path d="M-3 2 l-2.2 7.5 l3.2 .3 l1.4 -6.8 Z" fill="#B83A36"/><path d="M-5 .5 q5 3 10 -.2" stroke="#F3B3A6" stroke-width=".8" fill="none"/></g>'; }
@@ -6081,6 +6121,22 @@ html.pv .wrap{max-width:none;padding:0}
     }
     return '';
   }
+  // 寵物用品店的家具：每種一個，固定位置
+  function pfurnSVG(s,p){
+    var F=s.pfurn||{}, o='';
+    if(F.portrait){ var em=p?petEmoji(p):'🐾';
+      o+='<g transform="translate(192 84)"><rect width="40" height="34" rx="2" fill="#B5894F"/><rect x="3.5" y="3.5" width="33" height="27" fill="#FDF3E1"/><text x="20" y="25" font-size="18" text-anchor="middle">'+em+'</text></g>'; }
+    if(F.cattree) o+='<g transform="translate(262 254)"><rect x="-3.5" y="-96" width="7" height="96" fill="#B08960"/><path d="M-3.5 -80 h7 M-3.5 -60 h7 M-3.5 -40 h7 M-3.5 -20 h7" stroke="#9A7650" stroke-width="1.4"/>'
+      +'<rect x="-24" y="-5" width="48" height="9" rx="4" fill="#E7D3B5"/><rect x="-20" y="-52" width="40" height="8" rx="4" fill="#E7D3B5"/><rect x="-16" y="-100" width="32" height="8" rx="4" fill="#E7D3B5"/>'
+      +'<circle cx="12" cy="-43" r="3.2" fill="#E5536B"/><path d="M12 -48 v4" stroke="#9A7650" stroke-width="1"/></g>';
+    if(F.tank) o+='<g transform="translate(302 214)"><rect x="-4" y="30" width="72" height="12" rx="2" fill="#8C6A4A"/><rect x="0" y="0" width="64" height="32" rx="3" fill="#BFE6F7" stroke="#7FB8D6" stroke-width="2"/>'
+      +'<rect x="2" y="20" width="60" height="10" fill="#E8D7A8" opacity=".8"/><path d="M10 30 q3 -10 0 -16 M14 30 q-3 -8 2 -14" stroke="#4FA36B" stroke-width="2" fill="none"/>'
+      +'<text x="38" y="20" font-size="13" text-anchor="middle">🐠</text><circle cx="52" cy="9" r="1.6" fill="#fff" opacity=".8"/><circle cx="55" cy="4" r="1.1" fill="#fff" opacity=".8"/></g>';
+    if(F.cushion) o+='<g transform="translate(176 274)"><ellipse cx="0" cy="4" rx="32" ry="8" fill="#000" opacity=".1"/><ellipse cx="0" cy="0" rx="30" ry="10" fill="#C46A6A"/><ellipse cx="0" cy="-2" rx="23" ry="6.5" fill="#F3C5C5"/></g>';
+    if(F.fountain) o+='<g transform="translate(112 292)"><ellipse cx="0" cy="2" rx="14" ry="3.5" fill="#000" opacity=".1"/><rect x="-12" y="-10" width="24" height="12" rx="5" fill="#7FC4E8"/><rect x="-4" y="-18" width="8" height="9" rx="3" fill="#5AA9E6"/><path d="M0 -18 q4 -5 7 1" stroke="#BFE6F7" stroke-width="1.6" fill="none"/></g>';
+    if(F.tent) o+='<g transform="translate(560 292)"><ellipse cx="0" cy="0" rx="36" ry="5" fill="#000" opacity=".1"/><path d="M-32 0 L0 -40 L32 0 Z" fill="#F2A65A"/><path d="M-10 0 L0 -40 L10 0 Z" fill="#7A4A2A"/><path d="M0 -40 v-6" stroke="#7A4A2A" stroke-width="2"/><path d="M0 -46 l9 3 l-9 3 Z" fill="#E5536B"/></g>';
+    return o;
+  }
   function homeSVG(s,p,info,att,fedToday,ph,wx,furn,sav){
     var night=ph==='night', has={}; furn.forEach(function(f){ has[f.id]=1; });
     var ws=skyOf(LANDS[0],ph,wx==='rainbow'?'sunny':wx);
@@ -6139,6 +6195,7 @@ html.pv .wrap{max-width:none;padding:0}
       +'<path d="M456 186 h106 v18 h-106 Z" fill="#8DB8E0"/><path d="M470 186 v18 M490 186 v18 M510 186 v18 M530 186 v18 M550 186 v18" stroke="#A9CBEA" stroke-width="5"/>';
     // 碗、玩具箱、背包掛勾
     o+='<g transform="translate(84 236)"><rect x="0" y="0" width="56" height="34" rx="4" fill="#E9A23B"/><rect x="0" y="0" width="56" height="8" rx="3" fill="#D38C26"/><text x="16" y="4" font-size="14" text-anchor="middle">🧸</text><text x="38" y="5" font-size="12" text-anchor="middle">⚽</text></g>';
+    o+=pfurnSVG(s,p);   // 寵物用品店買的家具（畫在寵物、旅行留言後面）
     if(p && (p.bag||p.trip)) o+='<g transform="translate(206 66)"><circle r="3" fill="#7A5A3D"/>'+(p.bag&&!p.trip?'<text x="0" y="30" font-size="24" text-anchor="middle">🎒</text>':'<path d="M-8 6 h16 v18 h-16 Z" fill="none" stroke="#C9A77C" stroke-dasharray="3 3"/>')+'</g>';
     if(p && p.trip) o+='<g transform="translate(330 236)"><rect x="-74" y="-16" width="148" height="26" rx="13" fill="#fff" opacity=".92" stroke="#E5D3BB"/><text y="2" font-size="12" text-anchor="middle" fill="#6b4a32">💌 去'+esc(p.trip.dest)+'旅行了，家裡空空的</text></g>';
     if(p && !att.away){
@@ -6597,7 +6654,7 @@ html.pv .wrap{max-width:none;padding:0}
       +tbtn('scene','forest','🌲 森林',scene==='forest')+tbtn('scene','home','🏠 家',scene==='home')+'<span class="fp-sep"></span>'
       +tbtn('tab','main','狀態',tabk==='main')+tbtn('tab','quest','📋 任務'+(questReady?' <b class="fp-dot">'+questReady+'</b>':''),tabk==='quest')
       +tbtn('tab','check','🔍 檢查'+(pendList.length?' <b class="fp-dot">'+pendList.length+'</b>':''),tabk==='check')
-      +tbtn('tab','shop','🌟 '+s.gold,tabk==='shop')+tbtn('tab','album','📮 '+s.album.length,tabk==='album')
+      +tbtn('tab','shop','🌟 '+s.gold,tabk==='shop')+tbtn('tab','pshop','🐾 用品店',tabk==='pshop')+tbtn('tab','album','📮 '+s.album.length,tabk==='album')
       +tbtn('tab','souv','🎁 '+Object.keys(s.souv).length,tabk==='souv')+tbtn('tab','dex','📖 '+Object.keys(s.dex).length+'/'+ANIMALS.length,tabk==='dex')+'</div>';
     if(scene==='forest'){
       top+='<div class="fp-lands">'; for(var L2=0;L2<=curLand;L2++){ var LL=land(L2), cnt2=Math.max(0,Math.min(LL.cap,T.trees.length-landStart(L2)));
@@ -6721,10 +6778,23 @@ html.pv .wrap{max-width:none;padding:0}
     }
     if(tabk==='shop'){
       body+='<div class="fp-panel"><h4>🌟 金幸運草商店 <span>你有 🌟 '+s.gold+'。金幸運草只有 Claude 檢查過關、每日任務全清、每週挑戰、成就拿得到</span></h4><div class="fp-items">'
-        +SHOP.filter(function(a){ return !a.chip; }).map(function(a){ var own=a.acc&&s.acc[a.id];
+        +SHOP.filter(function(a){ return !a.chip && !a.pshop; }).map(function(a){ var own=a.acc&&s.acc[a.id];
           return '<button type="button" data-buy="'+a.id+'"'+(own||s.gold<a.c?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n+'<small>'+(own?'已擁有':('🌟 '+a.c+(a.say?'・'+a.say:'')))+'</small></button>'; }).join('')+'</div>'
         +'<p class="fp-gone">持有：🍀 護身符 '+charms+'・🎟️ 旅行券 '+s.tickets+'・🍙 特製便當 '+s.bentos+'・🌰 已種神木種子 '+s.seeds.length+'。🌟 也可以到銀行換成點數。</p></div>'
         +'<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p>';
+    }
+    if(tabk==='pshop'){
+      var pts=window.__pts?window.__pts():0, PF=s.pfurn||{};
+      var pitem=function(a){ var why=pshopWhy(a,s,att), own=(a.k==='furn'&&PF[a.id])||(a.k==='acc'&&s.acc[a.id]);
+        return '<button type="button" data-pbuy="'+a.id+'"'+(why||pts<a.c?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n
+          +'<small>'+(own?'已擁有':(a.c+' 點・'+(why&&!/點數/.test(why)?why:a.say)))+'</small></button>'; };
+      body+='<div class="fp-panel"><h4>🐾 寵物用品店 <span>用點數買（你有 '+pts+' 點）；比許願商店貴，買了不能退</span></h4>'
+        +(att.sulk==='study'?'<p class="fp-care bad">現在是讀書時段，讀完這段再來逛。</p>':'')
+        +'<div class="fp-row"><h4>吃的・玩的・保養<span>買了馬上用在'+(p?esc(p.name):'寵物')+'身上</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='food'||a.k==='mood'||a.k==='heal'; }).map(pitem).join('')+'</div></div>'
+        +'<div class="fp-row"><h4>家具<span>放在「🏠 家」裡，每種一個</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='furn'; }).map(pitem).join('')+'</div></div>'
+        +'<div class="fp-row"><h4>穿戴<span>買了馬上換上，之後在「🏠 家」可以換別的</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='acc'; }).map(pitem).join('')+'</div></div>'
+        +'<p class="fp-gone">吃的只補飽足和心情，不算「有照顧」——照顧還是要靠讀書。生病看獸醫可以馬上好。</p>'
+        +'<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p></div>';
     }
     if(tabk==='album') body+='<div class="fp-panel"><h4>明信片 '+s.album.length+' 張</h4>'+(s.album.length?'<div class="fp-cards">'+s.album.slice(0,24).map(cardSVG).join('')+'</div>'+(s.album.length>24?'<p class="fp-gone">只列最新 24 張。</p>':''):'<p class="fp-gone">還沒有明信片。到「家」幫牠打包便當，牠出門旅行時你做番茄鐘，牠就會寄回來。</p>')+'</div>';
     if(tabk==='souv'){ var ks=Object.keys(s.souv); body+='<div class="fp-panel"><h4>紀念品 '+ks.length+' / '+DESTS.length+'</h4>'+(ks.length?'<div class="fp-items">'+ks.map(function(nm){ var D=DESTS.filter(function(d){ return d.s===nm; })[0]; return '<span class="fp-chip"><span class="e">'+(D?D.se:'🎁')+'</span>'+esc(nm)+(D?'<small>'+D.n+'</small>':'')+' ×'+s.souv[nm]+'</span>'; }).join('')+'</div>':'<p class="fp-gone">還沒有紀念品。旅行回來會帶當地特產。</p>')
@@ -6824,19 +6894,51 @@ html.pv .wrap{max-width:none;padding:0}
       } else {
         var wk=weekKey(d0()), c=weeklyChallenges().filter(function(z){ return z.id===parts2[1]; })[0]; if(!c) return; var r2=c.f(weekData(s,h)); if(r2[0]<r2[1]) return;
         s.weekly[wk]=s.weekly[wk]||{}; if(s.weekly[wk][c.id]) return; s.weekly[wk][c.id]=1; s.gold+=2;
-        var prizes=SHOP.filter(function(a){ return a.acc && !a.chip && !s.acc[a.id]; }), prize;
+        var prizes=SHOP.filter(function(a){ return a.acc && !a.chip && !a.pshop && !s.acc[a.id]; }), prize;
         if(prizes.length && Math.random()<.5){ prize=pickR(prizes); s.acc[prize.id]=1; flash.push('🌟 ×2，抽到飾品 '+prize.e+' '+prize.n+'！'); }
         else { var g=pickR(['ticket','bento']); if(g==='ticket'){ s.tickets++; flash.push('🌟 ×2，抽到 🎟️ 旅行券！'); } else { s.bentos++; flash.push('🌟 ×2，抽到 🍙 特製便當！'); } }
       }
       savePet(s); if(window.__fx) window.__fx.task(b,0); afterPaint.push(function(){ petDo('jump'); }); paintPet(); return;
     }
     if(b.dataset.buy){
-      var it=SHOP.filter(function(a){ return a.id===b.dataset.buy && !a.chip; })[0]; if(!it||s.gold<it.c) return;
+      var it=SHOP.filter(function(a){ return a.id===b.dataset.buy && !a.chip && !a.pshop; })[0]; if(!it||s.gold<it.c) return;
       if(it.acc){ if(s.acc[it.id]) return; s.acc[it.id]=1; }
       else if(it.id==='ticket') s.tickets++;
       else if(it.id==='bento') s.bentos++;
       else if(it.id==='seed') s.seeds.push({k:tk});
       s.gold-=it.c; savePet(s); flash.push('買了 '+it.e+' '+it.n+(it.id==='seed'?'，已經種在森林裡了':(it.acc?'，到「家」可以幫牠穿上':''))+'。'); paintPet(); return;
+    }
+    if(b.dataset.pbuy){   // 寵物用品店（用點數）
+      var pa=PSHOP.filter(function(a){ return a.id===b.dataset.pbuy; })[0]; if(!pa) return;
+      var why=pshopWhy(pa,s,attitude(s,h,v,p?(p.lvSeen||1):1));
+      if(why){ flash.push('🐾 '+why+'。'); paintPet(); return; }
+      var have=window.__pts?window.__pts():0;
+      if(have<pa.c){ flash.push('🐾 點數不夠：'+pa.n+'要 '+pa.c+' 點，你有 '+have+' 點。'); paintPet(); return; }
+      if(!confirm('用 '+pa.c+' 點買「'+pa.e+' '+pa.n+'」？買了不能退。')) return;
+      if(window.__award) window.__award(-pa.c,'寵物用品店：'+pa.n,true);
+      s=petState(); p=s.pet;   // 扣點可能觸發重畫，重新讀一次
+      var line='';
+      if(pa.k==='furn'){
+        s.pfurn=s.pfurn||{}; s.pfurn[pa.id]=1; line='買了 '+pa.e+' '+pa.n+'，已經放在「🏠 家」裡了。';
+        afterPaint.push(function(){ petDo('jump'); petDo('say',{txt:'哇，新家具！'}); });
+      } else if(pa.k==='acc'){
+        s.acc[pa.id]=1; if(p) p.wear=pa.id; line='買了 '+pa.e+' '+pa.n+(p?'，'+esc(p.name)+'已經戴上了':'')+'。';
+        afterPaint.push(function(){ petDo('spin',{dur:.9}); if(petA) spawn('spark',petA.x,petA.y-petA.hh); });
+      } else if(p){
+        if(pa.k==='heal') p.sick=false;
+        var cap=p.sick?40:100;
+        if(pa.h) p.hunger=Math.min(100,(p.hunger||0)+pa.h);
+        if(pa.m) p.mood=Math.min(cap,(p.mood||0)+pa.m);
+        if(pa.b) p.bond=(p.bond||0)+pa.b;
+        touch(p);
+        line=pa.e+' '+esc(p.name)+(pa.k==='food'?' 吃了'+pa.n:(pa.k==='heal'?' 看了獸醫，病好了！':' 得到'+pa.n))+'（'+pa.say+'）。';
+        afterPaint.push(function(){
+          if(pa.k==='heal'){ petDo('jump'); petDo('say',{txt:'我好了！謝謝你'}); }
+          else if(pa.k==='food'){ petDo('wiggle',{dur:1.2}); petDo('say',{txt:pickR(['好好吃！','太幸福了','還有嗎？'])}); }
+          else playToy(pa.e);
+        });
+      }
+      savePet(s); flash.push('🐾 '+line+'（−'+pa.c+' 點）'); paintPet(); return;
     }
     if(b.dataset.sp){ pick=b.dataset.sp; app.querySelectorAll('.fp-adopt button').forEach(function(z){ z.setAttribute('aria-pressed',z.dataset.sp===pick); z.setAttribute('aria-checked',z.dataset.sp===pick); }); return; }
     if(b.id==='fp-adopt'){
@@ -7572,14 +7674,21 @@ html.pv .wrap{max-width:none;padding:0}
     petTouch:function(line){ var s=petState(); if(!s.pet||s.pet.trip) return; touch(s.pet); savePet(s); if(line) flash.push('🎰 '+esc(s.pet.name)+'：'+esc(line)); },
     // 家長版：家長頁按了摸摸／留言／加點，讓寵物在畫面上有反應（只有動畫）
     anim:function(kind,txt){
-      if(kind==='pat'){ petDo('wiggle',{dur:1.2}); petDo('say',{txt:pickR(['好舒服～','再摸一下！','嘿嘿','（蹭蹭）'])}); }
-      else if(kind==='msg'){ petDo('jump'); petDo('say',{txt:'我會轉告他：'+String(txt||'').slice(0,30)}); }
-      else if(kind==='pts'){ petDo('flip',{dur:1}); petDo('say',{txt:'謝謝！我會跟他說'}); }
+      // 說話泡泡直接畫（生氣、睡覺時動作佇列不會跑，泡泡還是要出來）
+      var line=String(txt||'').slice(0,30);
+      if(kind==='pat'){ petDo('pat',{dur:1.3}); say(line||'好舒服～',2.8); }
+      else if(kind==='ball'){ playToy('⚾'); if(line) say(line,2.8); }
+      else if(kind==='treat'){ petDo('jump'); petDo('wiggle',{dur:1}); say(line||'好好吃！',2.8); }
+      else if(kind==='talk'){ petDo('turn',{dur:.6}); say(line||'嗯嗯！',3.2); }
+      else if(kind==='msg'){ petDo('jump'); say('我會轉告他：'+line,3.2); }
+      else if(kind==='pts'){ petDo('flip',{dur:1}); say('謝謝！我會跟他說',2.8); }
     }};
 
   /* ---- 家長的互動（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（家長頻道），
      雲端同步讀回來交給這裡套用。規則：加點每天（照家長按的那天）最多 30 點；摸摸每天最多 5 次有效（心情 +3、親密度 +1）；
      不能餵食（照顧還是要靠讀書）。套用過的記在 plan.parent.v1（會同步），家長頁看得到「已收到」。 ---- */
+  // 點數變了（做完任務、番茄鐘…）而且正開著寵物用品店：重畫，按鈕才會跟著亮起來
+  document.addEventListener('plan:points',function(){ try{ if(window.__tab===5 && viewState().tab==='pshop' && !document.hidden) setTimeout(paintPet,0); }catch(e){} });
   var PARK='plan.parent.v1', PAR_MAX=30, PAT_MAX=5;
   function parState(){ var x=ls(PARK,null)||{}; x.seen=x.seen||{}; x.day=x.day||{}; x.pat=x.pat||{}; x.log=Array.isArray(x.log)?x.log:[]; return x; }
   window.__parentApply=function(list){

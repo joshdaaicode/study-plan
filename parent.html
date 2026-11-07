@@ -109,6 +109,9 @@ ul.tasks li.done .n{color:var(--ink-soft)}
 .act span{display:block;font-size:22px}
 .act small{display:block;font-size:11.5px;color:var(--ink-faint)}
 .act[aria-pressed="true"]{border-color:var(--sky);background:var(--sky-tint)}
+.acts.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:420px){ .acts.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.say{margin:10px 0 0;font-size:14px;background:var(--paper);border-radius:12px;padding:8px 12px;color:var(--ink-soft)}
 .form{margin-top:10px;background:var(--paper);border-radius:12px;padding:12px}
 .form label{display:block;font-size:13px;margin:0 0 6px;color:var(--ink-soft)}
 .form input[type=text],.form input[type=password],.setup input{width:100%;font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink)}
@@ -360,10 +363,11 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
         +'<div class="pet-st">'+sp[0]+'・Lv '+(p.lvSeen||1)+'・'+stt+'</div></div></div>';
       var meter=function(lab,v,max){ var pc=Math.max(0,Math.min(100,Math.round(v/max*100))); return '<div class="meter'+(max===100&&v<30?' low':'')+'">'+lab+'　<b>'+v+'</b><div class="bar"><i style="width:'+pc+'%"></i></div></div>'; };
       html+='<div class="meters">'+meter('飽足',p.hunger||0,100)+meter('心情',p.mood||0,100)+meter('親密度',p.bond||0,Math.max(30,p.bond||0))+'</div>';
-      html+='<p class="sub" style="margin:4px 0 0">寵物靠他讀書照顧：完成任務有飼料、番茄鐘陪牠玩。你可以摸摸牠（心情 +3、親密度 +1，一天最多 5 次有效），但不能餵牠。</p>';
+      html+='<p class="sub" style="margin:4px 0 0">寵物靠他讀書照顧：完成任務有飼料、番茄鐘陪牠玩。你在這裡摸摸牠、跟牠玩，牠會有反應（只在你這邊，不會改到他的寵物）。</p>';
       html+='<p style="margin:10px 0 0"><button class="btn solid" type="button" id="pv-open">'+(document.getElementById('pvf')?'收起森林':'🌳 打開他的森林（可以點寵物）')+'</button></p><div id="pv-box"></div>';
     } else html+='<p class="sub">他還沒有領養寵物。</p>';
-    html+='<div id="act"></div></section>';
+    html+='<div id="play"></div></section>';
+    html+='<section class="card"><h2>幫他加點</h2><div id="act"></div></section>';
 
     // 給 Claude 檢查
     var arr=Object.keys(items).map(function(k){ return items[k]; }).filter(function(it){ return it&&it.k; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
@@ -401,7 +405,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
       return '<div class="ex"><span>'+esc(e.n)+'　<span style="color:var(--ink-faint);font-size:12.5px">'+(e.d.getMonth()+1)+'/'+e.d.getDate()+'</span></span><span>還有 <b>'+days(today,e.d)+'</b> 天</span></div>'; }).join('')+'</section>';
 
     // 互動設定
-    html+='<section class="card"><details class="fold" id="chan-set"'+(chan.token?'':' open')+'><summary>家長互動設定</summary><div class="setup" id="setup-box"></div></details></section>';
+    html+='<section class="card"><details class="fold" id="chan-set"'+(chan.token?'':' open')+'><summary>加點設定（要幫他加點才需要）</summary><div class="setup" id="setup-box"></div></details></section>';
 
     // 森林開著的話，重畫後放回去（iframe 換位置會重新載入，所以先換成新資料）
     var keep=document.getElementById('pvf'); if(keep) keep.remove();
@@ -422,62 +426,80 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     f=document.createElement('iframe'); f.id='pvf'; f.title='他的森林（家長版，只能看）'; f.src='index.html?pv=1'; f.style.height='520px';
     box.appendChild(f); b.textContent='收起森林';
     var fit=function(){ try{ var d=f.contentDocument; if(!d||!d.body) return; var h=Math.max(320,d.documentElement.scrollHeight); if(Math.abs(parseFloat(f.style.height)-h)>4) f.style.height=h+'px'; }catch(e){} };
-    f.addEventListener('load',function(){ fit(); try{ if(window.ResizeObserver) new ResizeObserver(fit).observe(f.contentDocument.body); }catch(e){} var n=0, iv=setInterval(function(){ fit(); if(++n>20||!document.getElementById('pvf')) clearInterval(iv); },500); });
+    f.addEventListener('load',function(){ f.dataset.ready='1'; fit(); try{ if(window.ResizeObserver) new ResizeObserver(fit).observe(f.contentDocument.body); }catch(e){} var n=0, iv=setInterval(function(){ fit(); if(++n>20||!document.getElementById('pvf')) clearInterval(iv); },500); });
   }
 
-  // 互動區
+  // 跟寵物玩（11-07 使用者：「只要能互動、有反應就好，不需回傳」）：只在家長這邊有反應，不會送到孩子的網站、不用 token
+  var PLAYS=[{k:'pat',e:'👋',n:'摸摸牠'},{k:'ball',e:'🎾',n:'丟球'},{k:'treat',e:'🦴',n:'給零食'},{k:'talk',e:'💬',n:'跟牠說話'}];
+  var LINES={pat:['好舒服～','再摸一下！','嘿嘿','（蹭蹭你的手）','（瞇眼睛）'],ball:['我接到了！','再丟一次！','（叼回來給你）','看我跳！'],treat:['好好吃！','謝謝！','還要～','（開心地轉圈）']};
+  var lastSay='', talkOpen=false;
+  function pickOne(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function replyFor(t){
+    t=String(t||'');
+    if(/加油|努力|考試|科班|會考/.test(t)) return '我會陪他一起加油！';
+    if(/讀書|功課|寫|唸/.test(t)) return '他今天有在讀喔，我都看著';
+    if(/想你|愛你|喜歡/.test(t)) return '我也最喜歡你了！';
+    if(/乖|聽話/.test(t)) return '我很乖！';
+    if(/睡|晚安/.test(t)) return '晚安～';
+    if(/吃|餓/.test(t)) return '肚子有點餓…';
+    return pickOne(['嗯嗯！','我聽到了～','（歪頭）','好喔！','我會跟他說！']);
+  }
+  function petFrame(cb){   // 森林沒開就先打開，載入好再做動作
+    var f=document.getElementById('pvf');
+    if(!f){ togglePet(); f=document.getElementById('pvf'); }
+    if(!f) return;
+    if(f.dataset.ready) cb(); else f.addEventListener('load',function(){ setTimeout(cb,900); },{once:true});
+  }
+  function react(kind,txt){
+    var p=J(lastO||{},'plan.pet.v1',{}).pet; if(!p) return;
+    if(p.trip){ lastSay=p.name+' 去'+(p.trip.dest||'旅行')+'了，不在家。'; paintPlay(); return; }
+    var line=kind==='talk'?replyFor(txt):pickOne(LINES[kind]||['嗯？']);
+    lastSay=(kind==='talk'?'你：'+txt+'　→　':'')+p.name+'：'+line;
+    paintPlay();
+    petFrame(function(){ anim(kind,line); });
+  }
+  function paintPlay(){
+    var el=document.getElementById('play'); if(!el) return;
+    var p=J(lastO||{},'plan.pet.v1',{}).pet; if(!p){ el.innerHTML=''; return; }
+    el.innerHTML='<div class="acts four">'+PLAYS.map(function(a){ return '<button type="button" class="act" data-play="'+a.k+'"'+(a.k==='talk'?' aria-pressed="'+talkOpen+'"':'')+'><span>'+a.e+'</span>'+a.n+'</button>'; }).join('')+'</div>'
+      +(talkOpen?'<div class="form"><label for="talk-in">想跟'+esc(p.name)+'說什麼？</label><input id="talk-in" type="text" maxlength="40" placeholder="例：要陪他好好讀書喔"><p style="margin:10px 0 0"><button class="btn solid" type="button" id="talk-go">說</button></p></div>':'')
+      +'<p class="say" aria-live="polite">'+(lastSay?esc(lastSay):'點上面的按鈕，'+esc(p.name)+'會有反應（森林會自動打開）。')+'</p>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-play]'),function(b){ b.addEventListener('click',function(){
+      var k=b.getAttribute('data-play');
+      if(k==='talk'){ talkOpen=!talkOpen; paintPlay(); var i=document.getElementById('talk-in'); if(i) i.focus(); return; }
+      react(k);
+    }); });
+    var tg=document.getElementById('talk-go'), ti=document.getElementById('talk-in');
+    var say=function(){ var t=(ti.value||'').trim(); if(!t){ toast('先打一句話。'); return; } react('talk',t.slice(0,40)); };
+    if(tg) tg.addEventListener('click',say);
+    if(ti) ti.addEventListener('keydown',function(e){ if(e.key==='Enter') say(); });
+  }
+
+  // 幫他加點（要送到孩子的網站才算數，所以要 token；家長每天合計最多 30 點）
   function paintActs(){
+    paintPlay();
     var el=document.getElementById('act'); if(!el) return;
-    var p=J(lastO||{},'plan.pet.v1',{}).pet;
     if(!chan.token){
-      el.innerHTML='<p class="note info">想摸摸牠、留言、幫他加點，要先在下面的「家長互動設定」貼上 token（只要設定一次）。</p>';
+      el.innerHTML='<p class="sub" style="margin:0">加點要送到他的讀書網站才算數，所以這支手機要先設定一次（最下面「加點設定」）。只想看、跟寵物玩的話不用設定。</p>';
       return;
     }
-    var used=todayUsed(), left=Math.max(0,PAR_MAX-used), pats=todayPats();
-    var h='<div class="acts">'
-      +'<button type="button" class="act" data-a="pat"'+(p?'':' disabled')+' aria-pressed="'+(form==='pat')+'"><span>👋</span>摸摸牠<small>今天 '+Math.min(pats,PAT_MAX)+'／'+PAT_MAX+' 次有效</small></button>'
-      +'<button type="button" class="act" data-a="msg" aria-pressed="'+(form==='msg')+'"><span>📣</span>留言給他<small>寵物會轉告</small></button>'
-      +'<button type="button" class="act" data-a="pts"'+(left?'':' disabled')+' aria-pressed="'+(form==='pts')+'"><span>⭐</span>幫他加點<small>今天還能加 '+left+' 點</small></button></div>';
-    if(chanErr) h+='<p class="note bad">家長頻道：'+esc(chanErr)+'</p>';
-    if(chanActs===null && !chanErr) h+='<p class="sub" style="margin-top:8px">讀取家長頻道中…</p>';
-    if(form==='msg') h+='<div class="form"><label for="msg-in">留言（最多 60 字，他打開網站時會跳出來，寵物也會說）</label><input id="msg-in" type="text" maxlength="60" placeholder="例：今天辛苦了，晚餐有你愛吃的"><p style="margin:10px 0 0"><button class="btn solid" type="button" id="msg-go">送出留言</button></p></div>';
-    if(form==='pts'){
-      if(pick>left) pick=left;
-      h+='<div class="form"><label>加幾點？（家長每天合計最多 '+PAR_MAX+' 點，今天已加 '+used+' 點）</label><div class="chips">'
-        +[5,10,15,20,30].map(function(n){ return '<button type="button" data-n="'+n+'"'+(n>left?' disabled':'')+' aria-pressed="'+(pick===n)+'">+'+n+'</button>'; }).join('')+'</div>'
-        +'<label for="pts-why">理由（可以不寫）</label><input id="pts-why" type="text" maxlength="40" placeholder="例：今天全部完成">'
+    var used=todayUsed(), left=Math.max(0,PAR_MAX-used);
+    if(pick>left) pick=left;
+    if(!pick && left) pick=Math.min(10,left);
+    var h='<p class="sub" style="margin:0 0 8px">家長每天合計最多 '+PAR_MAX+' 點：今天已加 <b>'+used+'</b> 點，還能加 <b>'+left+'</b> 點。他下次打開讀書網站時會收到。</p>';
+    if(chanErr) h+='<p class="note bad">'+esc(chanErr)+'</p>';
+    if(left){
+      h+='<div class="chips">'+[5,10,15,20,30].map(function(n){ return '<button type="button" data-n="'+n+'"'+(n>left?' disabled':'')+' aria-pressed="'+(pick===n)+'">+'+n+'</button>'; }).join('')+'</div>'
+        +'<div class="form" style="margin-top:0"><label for="pts-why">理由（可以不寫）</label><input id="pts-why" type="text" maxlength="40" placeholder="例：今天全部完成">'
         +'<p style="margin:10px 0 0"><button class="btn solid" type="button" id="pts-go"'+(pick>0?'':' disabled')+'>送出 +'+pick+' 點</button></p></div>';
-    }
-    // 送出紀錄：家長頻道裡的（還沒送到的）＋孩子網站回報收到的
-    var P=J(lastO||{},'plan.parent.v1',{}), got={}; (P.log||[]).forEach(function(l){ if(l&&l.id) got[l.id]=l; });
-    var rows=(chanActs||[]).slice().sort(function(a,b){ return (b.t||0)-(a.t||0); }).slice(0,10);
-    if(rows.length){
-      h+='<div style="margin-top:12px;font-size:13px;font-weight:700">最近送出的</div><ul class="alog">'+rows.map(function(a){
-        var g=got[a.id], what=a.kind==='pts'?('⭐ 加 '+(+a.n||0)+' 點'+(a.text?'：'+esc(a.text):'')):(a.kind==='pat'?'👋 摸摸寵物':'📣 '+esc(a.text||''));
-        var stt=g?(a.kind==='pts'&&g.n<(+a.n||0)?'<span style="color:var(--warn)">已收到，'+(g.n?'只加到 '+g.n+' 點':'今天已滿 30 點')+'</span>':(a.kind==='pat'&&!g.n?'<span style="color:var(--warn)">已收到（今天摸滿了）</span>':'<span style="color:var(--ok)">✓ 已收到</span>')):'<span style="color:var(--ink-faint)">⏳ 等他打開網站</span>';
-        return '<li><span>'+what+'<small>'+esc(a.who||'家長')+'・'+hm(a.t)+'</small></span><span class="st">'+stt+'</span></li>'; }).join('')+'</ul>';
-    }
+    } else h+='<p class="note ok">今天已經加滿 '+PAR_MAX+' 點了，明天再加。</p>';
     el.innerHTML=h;
-    Array.prototype.forEach.call(el.querySelectorAll('[data-a]'),function(b){ b.addEventListener('click',function(){
-      var k=b.getAttribute('data-a');
-      if(k==='pat'){
-        if(todayPats()>=PAT_MAX && !confirm('今天已經摸 '+PAT_MAX+' 次了，再摸不會加心情。還是要送嗎？')) return;
-        doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'pat'},'送出了！他下次打開網站時，牠會知道你摸摸牠。'); return;
-      }
-      form=(form===k?'':k); paintActs();
-      var inp=document.getElementById(k==='msg'?'msg-in':'pts-why'); if(inp) inp.focus();
-    }); });
     Array.prototype.forEach.call(el.querySelectorAll('[data-n]'),function(b){ b.addEventListener('click',function(){ pick=+b.getAttribute('data-n'); paintActs(); }); });
-    var mg=document.getElementById('msg-go');
-    if(mg) mg.addEventListener('click',function(){
-      var t=(document.getElementById('msg-in').value||'').trim(); if(!t){ toast('先寫留言。'); return; }
-      doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'msg', text:t.slice(0,60)},'留言送出了！他打開網站時會看到。');
-    });
     var pg=document.getElementById('pts-go');
     if(pg) pg.addEventListener('click',function(){
       var n=Math.min(pick,Math.max(0,PAR_MAX-todayUsed())); if(!n){ toast('今天已經加滿 30 點了。'); return; }
       var why=(document.getElementById('pts-why').value||'').trim().slice(0,40);
-      doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'pts', n:n, text:why},'送出 +'+n+' 點！他下次打開網站時會收到。');
+      doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'pts', n:n, text:why},'送出 +'+n+' 點！他下次打開讀書網站時會收到。');
     });
   }
 
@@ -485,7 +507,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   function paintSetup(){
     var el=document.getElementById('setup-box'); if(!el) return;
     var who=chan.who||'';
-    el.innerHTML='<p class="sub" style="margin-top:8px">摸摸、留言、加點會寫進孩子 GitHub 帳號裡一個專門的「家長頻道」，所以這支手機要有一把鑰匙（token）。只要設定一次；token 只存在這支手機。</p>'
+    el.innerHTML='<p class="sub" style="margin-top:8px">加點要寫進孩子 GitHub 帳號裡一個專門的「家長頻道」，他的網站才收得到，所以這支手機要有一把鑰匙（token）。只要設定一次；token 只存在這支手機。跟寵物玩不需要設定。</p>'
       +'<label>你是</label><div class="chips">'+['爸爸','媽媽'].map(function(n){ return '<button type="button" data-who="'+n+'" aria-pressed="'+(who===n)+'">'+n+'</button>'; }).join('')+'</div>'
       +'<input id="who-in" type="text" maxlength="8" placeholder="或自己打稱呼" value="'+(who&&who!=='爸爸'&&who!=='媽媽'?esc(who):'')+'">'
       +'<label for="tok-in">GitHub token</label><input id="tok-in" type="password" autocomplete="off" placeholder="'+(chan.token?'已設定（要換才重貼）':'github_pat_…')+'">'
