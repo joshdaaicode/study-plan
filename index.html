@@ -3371,6 +3371,23 @@ html.pv .wrap{max-width:none;padding:0}
     if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘'+(via?'（'+via+'）':''));
   };
 
+  // Claude 補登（#fix 連結，2026-11-07）：番茄鐘做完卻因為手機清掉資料沒記到時，補一顆到原本那天。
+  // 已經有那個時間附近（15 分鐘內）的紀錄就不重複加；雲端還原回來、還在跑的同一顆（endAt 差 30 分鐘內）順便停掉，免得之後又算一次。
+  window.__pomoFix=function(f){
+    var k=String(f.k||dayKey()), t=+f.t||Date.now(), m=Math.max(1,Math.min(120,Math.round(+f.m||25))), sj=String(f.s||''), stopped=false;
+    P.log=Array.isArray(P.log)?P.log:[];
+    if(running && mode==='work' && f.e && Math.abs(endAt-(+f.e))<30*60000){ running=false; mode='work'; left=P.w*60; elGo.textContent='開始'; saveRun(); stopped=true; }
+    if(P.log.some(function(e){ return e && e.k===k && Math.abs((+e.t||0)-t)<15*60000; })){ paintPomo(); return {dup:true, stopped:stopped}; }
+    if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; }
+    if(k===dayKey()) P.done++;
+    P.total=(P.total||0)+1;
+    P.log.push({k:k, t:t, s:sj, m:m, via:'Claude 補登'});
+    if(P.log.length>4000) P.log=P.log.slice(-4000);
+    s(PK,P); paintPomo();
+    if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘（Claude 補登）');
+    return {dup:false, stopped:stopped};
+  };
+
   window.__baseTitle=document.title;
   elGo.textContent=running?'暫停':'開始';
   paintPomo(); tickNow(); autoSubj();
@@ -7649,6 +7666,7 @@ html.pv .wrap{max-width:none;padding:0}
     }).then(function(ok){
       if(!ok){ passBanner('❌ 這個過關連結無效（內容被改過，或不是 Claude 發的）。'); return; }
       var pl=JSON.parse(new TextDecoder().decode(b64uBytes(m[1])));
+      if(pl.d){ passBanner('❌ 這不是過關連結。'); return; }   // 補登連結（d:'fix'）同一把鑰匙簽的，不能拿來當過關
       var C=checks(); if(C.used[pl.i]){ passBanner('這個過關連結已經用過了。'); return; }
       C.used[pl.i]=Date.now();
       var key=pl.k+'|'+pl.n, prev=C.items[key];
@@ -7666,6 +7684,41 @@ html.pv .wrap{max-width:none;padding:0}
   }
   handlePass();
   window.addEventListener('hashchange',handlePass);
+
+  /* ---- Claude 補登連結：#fix=內容.簽章（2026-11-07 使用者要的「接口」）----
+     番茄鐘做完卻被手機清掉、點數算錯時，Claude 在筆電用 tools/make_fix.mjs 簽一個連結，點開就補上。
+     和過關連結同一把鑰匙；內容一定有 d:'fix'，每個連結只能用一次（記在 plan.checks.v1 的 used）。 */
+  var FIX_SUBJ={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kbm:'科班資優數學',kbs:'科班自然學科'};
+  function handleFix(){
+    var m=location.hash.match(/^#fix=([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/); if(!m) return;
+    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    if(window.__pv) return;
+    if(!(window.crypto&&crypto.subtle)){ passBanner('這個瀏覽器沒辦法驗證補登連結，換 Chrome 或 Safari 再點一次。'); return; }
+    crypto.subtle.importKey('jwk',PUBKEY,{name:'ECDSA',namedCurve:'P-256'},false,['verify']).then(function(key){
+      return crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,b64uBytes(m[2]),new TextEncoder().encode(m[1]));
+    }).then(function(ok){
+      if(!ok){ passBanner('❌ 這個補登連結無效（內容被改過，或不是 Claude 發的）。'); return; }
+      var pl=JSON.parse(new TextDecoder().decode(b64uBytes(m[1])));
+      if(pl.d!=='fix'){ passBanner('❌ 這不是補登連結。'); return; }
+      var C=checks(); if(C.used[pl.i]){ passBanner('這個補登連結已經用過了。'); return; }
+      var why=pl.why?'（'+esc(pl.why)+'）':'', msg;
+      if(pl.kind==='pomo'){
+        if(!window.__pomoFix){ passBanner('番茄鐘還沒載入好，重新整理後再點一次連結。'); return; }
+        var r=window.__pomoFix({k:pl.k, t:pl.t, m:pl.m, s:pl.s, e:pl.e});
+        msg=r.dup?'這顆番茄鐘已經有紀錄了，沒有重複加'+(r.stopped?'；還在跑的同一顆已經停掉':'')+'。'
+          :'✅ Claude 補登一顆番茄鐘：'+md(pl.k)+' '+hm(new Date(pl.t).getHours()*60+new Date(pl.t).getMinutes())+' 結束、'+pl.m+' 分鐘、'+(FIX_SUBJ[pl.s]||'沒選科目')+why+'。森林多一棵樹'+(r.stopped?'，還在跑的同一顆計時也停掉了（避免算兩次）':'')+'。';
+      } else if(pl.kind==='pts'){
+        var n=Math.round(+pl.n||0); if(!n || Math.abs(n)>500){ passBanner('❌ 補登的點數不對。'); return; }
+        if(window.__award) window.__award(n,'Claude 補登'+why,true);
+        msg='✅ Claude 補登點數 '+(n>0?'+':'−')+Math.abs(n)+why+'。';
+      } else { passBanner('❌ 看不懂這個補登連結的內容。'); return; }
+      C=checks(); C.used[pl.i]=Date.now(); saveChecks(C);
+      passBanner(msg,true);
+      try{ paintPet(); }catch(e){}
+    }).catch(function(){ passBanner('❌ 補登連結讀不出來，請把整串連結重新點一次。'); });
+  }
+  handleFix();
+  window.addEventListener('hashchange',handleFix);
 
   /* ---- 給單字賭場（casino.js，打開才載入）用的出入口 ---- */
   window.__petApi={allHist:allHist, studyBlockNow:studyBlockNow, easyMap:easyMap, petState:petState, savePet:savePet, petMini:petMini, bankState:bankState, talent:talLv,
