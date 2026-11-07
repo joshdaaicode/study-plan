@@ -10,9 +10,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <!--
-  家長版（2026-11-07）：只讀孩子讀書網站自動備份到 GitHub Gist 的那份資料，不能改任何東西，也不需要 token。
-  Gist ID 從「家長連結」的 #g=… 帶進來，只存在這台裝置；網頁原始碼裡沒有任何人的資料。
-  不顯示成績（孩子 2026-10-26 說不要給爸媽看成績）。
+  家長版（2026-11-07）：
+  - 看：讀孩子讀書網站自動備份到 GitHub Gist 的那份資料（沒登入的 API），不需要 token。Gist ID 從家長連結 #g=… 帶進來，只存在這台裝置。
+  - 寵物：用 iframe 打開 index.html?pv=1，資料放在記憶體，怎麼點都不會改到孩子的資料。
+  - 互動（摸摸、留言、加點每天最多 30）：寫進孩子帳號裡另一個 Gist「家長頻道」（study-plan-parent.json），
+    要先在這支手機貼一個 GitHub token（Gists 讀寫）；孩子的網站同步時讀回來套用。絕不寫孩子的備份 Gist。
+  - 不顯示成績（孩子 2026-10-26 說不要給爸媽看成績）。
 -->
 <style>
 :root{
@@ -57,9 +60,11 @@ button{font:inherit;cursor:pointer}
 .btn{border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:999px;padding:5px 14px;font-size:13px}
 .btn:hover{border-color:var(--sky);color:var(--sky)}
 .btn.solid{background:var(--sky);border-color:var(--sky);color:#fff}
+.btn:disabled{opacity:.45;cursor:default}
 .note{border-radius:12px;padding:10px 14px;font-size:13.5px;margin:12px 0 0}
 .note.warn{background:var(--warn-tint);color:var(--warn)}
 .note.bad{background:var(--bad-tint);color:var(--bad)}
+.note.ok{background:var(--ok-tint);color:var(--ok)}
 .note.info{background:var(--sky-tint);color:var(--ink-soft)}
 .card{background:var(--card);border:1px solid var(--rule);border-radius:16px;padding:16px;margin-top:14px}
 .card h2{font-size:16px;margin:0 0 2px}
@@ -79,55 +84,75 @@ ul.tasks li.done .n{color:var(--ink-soft)}
 .tag{display:inline-block;font-size:11.5px;border-radius:999px;padding:0 8px;margin-left:4px;vertical-align:1px}
 .tag.bk{background:var(--warn-tint);color:var(--warn)}
 .tag.ok{background:var(--ok-tint);color:var(--ok)}
-.tag.bad{background:var(--bad-tint);color:var(--bad)}
 .tag.wait{background:var(--sky-tint);color:var(--sky)}
 .chk{padding:8px 0;border-top:1px solid var(--rule);font-size:14px}
 .chk .d{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);margin-right:6px}
 .chk .s{display:block;font-size:12.5px;margin-top:1px}
-.chk .s.ok{color:var(--ok)} .chk .s.wait{color:var(--sky)} .chk .s.bad{color:var(--bad);font-weight:500} .chk .s.old{color:var(--ink-faint)}
-.chart{display:flex;align-items:flex-end;gap:4px;height:130px;padding-top:18px;padding-right:44px;border-bottom:1px solid var(--rule);position:relative}
-.chart .gl{position:absolute;left:0;right:0;border-top:1px dashed var(--rule);font-size:10.5px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace}
-.chart .gl span{position:absolute;right:0;top:-9px;background:var(--card);padding-left:4px;line-height:1.5}
-.bar{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end;background:none;border:0;padding:0;position:relative;z-index:1}
-.bar i{display:block;width:100%;border-radius:4px 4px 0 0;background:var(--bar);min-height:3px}
-.bar.zero i{background:var(--bar-empty)}
-.bar.sel i{outline:2px solid var(--ink);outline-offset:1px}
-.bar:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
-.xlab{display:flex;gap:4px;margin-top:4px;padding-right:44px}
-.xlab span{flex:1;min-width:0;text-align:center;font-size:10.5px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;white-space:nowrap;overflow:hidden}
-.xlab span.wk{color:var(--ink);font-weight:600}
-.detail{min-height:22px;font-size:13px;color:var(--ink-soft);margin-top:8px}
-.sum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 12px;font-size:13.5px;margin-top:10px}
-.sum b{font-family:'IBM Plex Mono',monospace}
+.chk .s.ok{color:var(--ok)} .chk .s.wait{color:var(--sky)} .chk .s.bad{color:var(--bad);font-weight:500}
 .ex{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--rule);font-size:14px}
 .ex b{font-family:'IBM Plex Mono',monospace;color:var(--sky)}
+/* 寵物 */
+.pet-top{display:flex;gap:12px;align-items:center}
+.pet-face{width:56px;height:56px;border-radius:16px;background:var(--sky-tint);display:grid;place-items:center;font-size:32px;flex:none}
+.pet-name{font-size:16px;font-weight:700}
+.pet-st{font-size:12.5px;color:var(--ink-faint)}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 4px}
+.meter{font-size:12px;color:var(--ink-faint)}
+.meter b{font-family:'IBM Plex Mono',monospace;color:var(--ink);font-size:14px}
+.meter .bar{height:6px;border-radius:99px;background:var(--bar-empty);overflow:hidden;margin-top:3px}
+.meter .bar i{display:block;height:100%;background:var(--bar);border-radius:99px}
+.meter.low .bar i{background:var(--bad)}
+#pv-box iframe{display:block;width:100%;border:0;border-radius:12px;background:var(--paper);margin-top:10px}
+/* 互動 */
+.acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+.act{border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:14px;padding:10px 6px;font-size:13.5px;line-height:1.35;text-align:center}
+.act span{display:block;font-size:22px}
+.act small{display:block;font-size:11.5px;color:var(--ink-faint)}
+.act[aria-pressed="true"]{border-color:var(--sky);background:var(--sky-tint)}
+.form{margin-top:10px;background:var(--paper);border-radius:12px;padding:12px}
+.form label{display:block;font-size:13px;margin:0 0 6px;color:var(--ink-soft)}
+.form input[type=text],.form input[type=password],.setup input{width:100%;font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.chips button{border:1px solid var(--rule);background:var(--card);color:var(--ink);border-radius:999px;padding:4px 12px;font-size:13px}
+.chips button[aria-pressed="true"]{background:var(--sky);border-color:var(--sky);color:#fff}
+.chips button:disabled{opacity:.4}
+.alog{list-style:none;margin:10px 0 0;padding:0}
+.alog li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:6px 0;border-top:1px solid var(--rule);font-size:13px}
+.alog li small{font-size:11.5px;color:var(--ink-faint)}
+.alog li .st{font-size:12px;text-align:right;white-space:nowrap}
 .setup label{display:block;font-size:13.5px;margin:10px 0 6px}
-.setup input{width:100%;font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink)}
+.setup ol{margin:6px 0 0;padding-left:20px;font-size:13px;color:var(--ink-soft)}
+details.fold summary{cursor:pointer;font-size:16px;font-weight:700;list-style:none}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary::after{content:'▾';float:right;color:var(--ink-faint)}
+details.fold[open] summary::after{content:'▴'}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:50;max-width:608px;margin:0 auto;background:var(--ink);color:var(--card);border-radius:14px;padding:10px 14px;font-size:13.5px;text-align:center}
 footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
-footer a{color:var(--ink-faint)}
-@media (max-width:380px){ .tile .v{font-size:19px} }
+@media (max-width:380px){ .tile .v{font-size:19px} .act{font-size:12.5px} }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>joshdaai 的讀書狀況</h1>
-    <p class="eyebrow">家長版・只能看、不能改・資料來自他讀書網站的自動備份</p>
+    <p class="eyebrow">家長版・資料來自他讀書網站的自動備份</p>
     <div class="fresh" id="fresh"></div>
   </header>
   <div id="app"><p class="note info">讀取中…</p></div>
   <footer>
-    這一頁讀的是孩子讀書網站自動上傳的備份：他打開網站、勾了任務，幾秒內就會上傳，這頁每 10 分鐘自動更新一次（也可以按「重新整理」）；網站沒打開的時候，這裡不會變。
-    這裡只看讀書進度，不顯示成績。<br>
+    這一頁讀的是孩子讀書網站自動上傳的備份：他打開網站、勾了任務，幾秒內就會上傳；這頁每 10 分鐘自動更新一次（也可以按「重新整理」）。網站沒打開的時候，這裡不會變。
+    讀書時間：那天有番茄鐘就算番茄鐘，沒有才算完成任務的表定時間。這裡只看讀書進度，不顯示成績。<br>
     <button class="btn" id="forget" type="button" style="margin-top:8px">清掉這台裝置記住的連結</button>
   </footer>
 </div>
 <script src="plan.js"></script>
+<script src="daychart.js"></script>
 <script>
 (function(){
-  var GK='parent.gist.v1', FILE='study-plan-backup.json', OWNER='joshdaaicode';
-  var CHECK_DAYS=3, LATE_PEN=5, LATE_DIE=5;
+  var GK='parent.gist.v1', CK='parent.chan.v1', FILE='study-plan-backup.json', PFILE='study-plan-parent.json', OWNER='joshdaaicode';
+  var CHECK_DAYS=3, LATE_PEN=5, PAR_MAX=30, PAT_MAX=5;
   var WD='日一二三四五六';
+  var SPECIES={cat:['貓','🐱'],dog:['狗','🐶'],hamster:['倉鼠','🐹'],rabbit:['兔子','🐰'],fox:['狐狸','🦊'],panda:['熊貓','🐼'],penguin:['企鵝','🐧'],chick:['小雞','🐥']};
   var app=document.getElementById('app'), fresh=document.getElementById('fresh');
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function lsGet(k){ try{ return localStorage.getItem(k)||''; }catch(e){ return ''; } }
@@ -141,16 +166,17 @@ footer a{color:var(--ink-faint)}
   function hm(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
   function ago(t){ var m=Math.round((Date.now()-t)/60000); if(m<1) return '剛剛'; if(m<60) return m+' 分鐘前'; var h=Math.floor(m/60); if(h<24) return h+' 小時前'; return Math.floor(h/24)+' 天前'; }
   function J(o,k,dflt){ try{ var v=o[k]; if(v==null) return dflt; var x=typeof v==='string'?JSON.parse(v):v; return x==null?dflt:x; }catch(e){ return dflt; } }
+  var tt=null;
+  function toast(m){ var t=document.querySelector('.toast'); if(!t){ t=document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); document.body.appendChild(t); } t.textContent=m; clearTimeout(tt); tt=setTimeout(function(){ t.remove(); },3200); }
 
-  // ---- 連結：#g=<Gist ID> 存起來就把網址上的拿掉 ----
+  // ---- 看：家長連結 #g=<Gist ID> ----
   var m=location.hash.match(/[#&]g=([0-9a-f]{20,40})/i);
   if(m){ lsSet(GK,m[1].toLowerCase()); try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} }
-  var gid=lsGet(GK);
+  var gid=lsGet(GK), gOwner='', lastO=null, lastAt=0;
   document.getElementById('forget').addEventListener('click',function(){
     if(!confirm('清掉這台裝置記住的家長連結？之後要再點一次孩子給的連結才看得到。')) return;
     lsSet(GK,''); gid=''; setup();
   });
-
   function setup(msg){
     fresh.innerHTML='';
     app.innerHTML='<div class="card setup"><h2>第一次使用</h2><p class="sub">請孩子在讀書網站「紀錄 → 進度回測 → 給爸媽的週報」按「複製家長網頁連結」，傳給你，點開就好；或把連結貼在下面。</p>'
@@ -163,14 +189,13 @@ footer a{color:var(--ink-faint)}
       lsSet(GK,mm[1].toLowerCase()); gid=mm[1].toLowerCase(); load();
     });
   }
-
-  // ---- 讀 Gist：先用 GitHub API（沒登入，一小時 60 次）；被限制就改讀 raw 檔 ----
   function fetchData(){
     return fetch('https://api.github.com/gists/'+gid,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'}).then(function(r){
       if(r.status===404) throw new Error('找不到資料：連結可能不完整，請孩子重新複製一次。');
       if(r.status===403||r.status===429) return fetchRaw();
       if(!r.ok) throw new Error('GitHub 回應 '+r.status+'，等一下再試。');
       return r.json().then(function(g){
+        gOwner=(g.owner&&g.owner.login)||gOwner;
         var f=g.files&&g.files[FILE];
         if(!f) throw new Error('這個連結裡沒有讀書資料。');
         if(f.truncated&&f.raw_url) return fetch(f.raw_url,{cache:'no-store'}).then(function(x){ if(!x.ok) throw new Error('讀不到完整資料。'); return x.text(); });
@@ -182,7 +207,6 @@ footer a{color:var(--ink-faint)}
     return fetch('https://gist.githubusercontent.com/'+OWNER+'/'+gid+'/raw/'+FILE+'?t='+Date.now()).then(function(r){
       if(!r.ok) throw new Error('GitHub 暫時限制讀取次數，過幾分鐘再按「重新整理」。'); return r.text(); });
   }
-
   var loading=false, lastLoad=0;
   function load(){
     if(!gid){ setup(); return; }
@@ -190,6 +214,7 @@ footer a{color:var(--ink-faint)}
     fresh.innerHTML='<span>讀取中…</span>';
     fetchData().then(function(txt){
       var o=JSON.parse(txt); loading=false; lastLoad=Date.now(); render(o);
+      if(chan.token) refreshChan();
     }).catch(function(e){
       loading=false;
       if(/找不到資料|沒有讀書資料/.test(e.message)){ setup(e.message); return; }
@@ -198,34 +223,104 @@ footer a{color:var(--ink-faint)}
     });
   }
 
-  // ---- 檢查的逾期天數（和讀書網站同一套：勾完 3 天內交；之後逾期第 n 天扣 5n 點，超過 5 天樹苗枯） ----
+  // ---- 互動：家長頻道 Gist（要 token） ----
+  var chan={}; try{ chan=JSON.parse(lsGet(CK)||'{}')||{}; }catch(e){ chan={}; }
+  var chanActs=null, chanErr='';   // 讀到的家長頻道內容（所有家長送的）
+  function saveChan(){ lsSet(CK,JSON.stringify(chan)); }
+  function gh(path,opt){
+    opt=opt||{};
+    opt.headers=Object.assign({'Authorization':'Bearer '+chan.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'},opt.headers||{});
+    return fetch('https://api.github.com'+path,opt).then(function(r){
+      if(r.status===401) throw new Error('token 無效或過期了');
+      if(r.status===403) throw new Error('token 沒有 Gists 的讀寫權限');
+      if(r.status===404) throw new Error('找不到');
+      if(!r.ok) throw new Error('GitHub 回應 '+r.status);
+      return r.json();
+    });
+  }
+  function findChan(create){
+    if(chan.gist) return Promise.resolve(chan.gist);
+    return gh('/gists?per_page=100').then(function(list){
+      var hit=(list||[]).filter(function(g){ return g.files && g.files[PFILE] && g.id!==gid; })[0];
+      if(hit){ chan.gist=hit.id; saveChan(); return hit.id; }
+      if(!create) return '';
+      return gh('/gists',{method:'POST',body:JSON.stringify({public:false,description:'joshdaai的讀書專屬計畫 · 家長互動（摸摸、留言、加點）',
+        files:(function(){ var f={}; f[PFILE]={content:JSON.stringify({v:1,actions:[]})}; return f; })()})}).then(function(g){ chan.gist=g.id; saveChan(); return g.id; });
+    });
+  }
+  function readChan(id){
+    if(!id) return Promise.resolve([]);
+    if(id===gid) return Promise.reject(new Error('設定錯了：家長頻道不能是孩子的備份'));
+    return gh('/gists/'+id).then(function(g){
+      var f=g.files&&g.files[PFILE];
+      if(!f){ chan.gist=''; saveChan(); throw new Error('家長頻道不見了，重新送一次會自動重建'); }
+      var get=(f.truncated&&f.raw_url)?fetch(f.raw_url).then(function(r){ return r.text(); }):Promise.resolve(f.content);
+      return get.then(function(t){ var o={}; try{ o=JSON.parse(t||'{}'); }catch(e){} return Array.isArray(o.actions)?o.actions:[]; });
+    });
+  }
+  function refreshChan(){
+    if(!chan.token) return Promise.resolve();
+    return findChan(false).then(readChan).then(function(a){ chanActs=a; chanErr=''; paintActs(); },function(e){ chanErr=e.message||String(e); paintActs(); });
+  }
+  function seenMap(){ var P=J(lastO||{},'plan.parent.v1',{}), s={}; Object.keys(P.seen||{}).forEach(function(k){ s[k]=1; }); (P.log||[]).forEach(function(l){ if(l&&l.id) s[l.id]=1; }); return s; }
+  function send(a){
+    if(!chan.token) return Promise.reject(new Error('還沒設定 token'));
+    return findChan(true).then(function(id){
+      return readChan(id).then(function(acts){
+        var seen=seenMap(), now=Date.now();
+        // 已經送到、超過 3 天的拿掉；14 天前的一律拿掉，檔案才不會越來越大
+        acts=acts.filter(function(x){ return x && x.id && x.t>now-14*864e5 && !(seen[x.id] && x.t<now-3*864e5); });
+        acts.push(a);
+        var files={}; files[PFILE]={content:JSON.stringify({v:1,actions:acts})};
+        return gh('/gists/'+id,{method:'PATCH',body:JSON.stringify({files:files})}).then(function(){
+          // 兩個家長同時送可能互蓋：再讀一次確認有寫進去，沒有就再送一次
+          return readChan(id).then(function(after){
+            if(after.some(function(x){ return x&&x.id===a.id; })){ chanActs=after; return; }
+            after.push(a); files[PFILE]={content:JSON.stringify({v:1,actions:after})};
+            return gh('/gists/'+id,{method:'PATCH',body:JSON.stringify({files:files})}).then(function(){ chanActs=after; });
+          });
+        });
+      });
+    });
+  }
+  function newId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+  // 今天加了幾點：家長頻道裡今天送的（含還沒送到的）和孩子網站回報已加的，取大的
+  function todayUsed(){ var tk=key(d0()), sent=(chanActs||[]).filter(function(x){ return x&&x.kind==='pts'&&x.day===tk; }).reduce(function(s,x){ return s+(+x.n||0); },0);
+    var got=+((J(lastO||{},'plan.parent.v1',{}).day||{})[tk])||0; return Math.max(sent,got); }
+  function todayPats(){ var tk=key(d0()); return (chanActs||[]).filter(function(x){ return x&&x.kind==='pat'&&x.day===tk; }).length; }
+  function anim(kind,txt){ var f=document.getElementById('pvf'); try{ if(f&&f.contentWindow&&f.contentWindow.__pvAnim) f.contentWindow.__pvAnim(kind,txt); }catch(e){} }
+  function doSend(a,okMsg){
+    var bs=app.querySelectorAll('#act button'); Array.prototype.forEach.call(bs,function(b){ b.disabled=true; });
+    send(a).then(function(){ anim(a.kind,a.text); toast(okMsg); form=''; paintActs(); },function(e){ toast('沒送出：'+(e.message||e)); paintActs(); });
+  }
+
+  // ---- 畫面 ----
+  var form='', pick=10, dcHandle=null;
   function lateDay(it,today){
     if(it.st==='pass'||it.old) return 0;
     if(it.ls) return Math.max(0,days(pk(it.ls),today)+1);
-    return days(addD(pk(it.k),CHECK_DAYS+1),today)>=0 ? -1 : 0;   // -1：過了期限，但他還沒用新版網站開過（還沒開始扣）
+    return days(addD(pk(it.k),CHECK_DAYS+1),today)>=0 ? -1 : 0;
   }
-
   function render(o){
+    var changed=!lastO || o._at!==(lastO&&lastO._at);
+    lastO=o;
     var today=d0(), tk=key(today), now=new Date();
-    var st=J(o,'plan.state.v3',{}), hist=J(o,'plan.hist.v1',{}), pomo=J(o,'plan.pomo.v1',{}), C=J(o,'plan.checks.v1',{}),
-        shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{});
-    var plog=Array.isArray(pomo.log)?pomo.log:[];
-    var items=C.items||{};
-    var at=o._at?new Date(o._at).getTime():0;
-
-    // 資料新不新
+    var st=J(o,'plan.state.v3',{}), pomo=J(o,'plan.pomo.v1',{}), C=J(o,'plan.checks.v1',{}),
+        shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{}), pet=J(o,'plan.pet.v1',{});
+    var plog=Array.isArray(pomo.log)?pomo.log:[], items=C.items||{};
+    var at=o._at?new Date(o._at).getTime():0; lastAt=at;
     fresh.innerHTML='資料更新：<b>'+(at?hm(at):'不明')+'</b>（'+(at?ago(at):'—')+'）<button class="btn" type="button" id="rl">重新整理</button>';
     document.getElementById('rl').addEventListener('click',load);
     var html='';
-    var stale=at && Date.now()-at>6*3600e3;
-    if(stale) html+='<p class="note warn">已經 '+ago(at).replace('前','')+'沒有新資料：可能他還沒打開讀書網站，或網站的自動同步沒開。</p>';
+    if(at && Date.now()-at>6*3600e3) html+='<p class="note warn">已經 '+ago(at).replace('前','')+'沒有新資料：可能他還沒打開讀書網站，或網站的自動同步沒開。</p>';
 
-    // ---- 今天 ----
+    // 今天
     var opened=st.day===tk, list=opened?(st.list||[]).filter(function(x){ return !x.pre; }):[], done=st.done||{};
     var real=list.filter(function(x){ return !x.f; }), rd=real.filter(function(x){ return done[x.id]; });
     var fixedN=list.length-real.length, fixedD=list.filter(function(x){ return x.f && done[x.id]; }).length;
-    var tMin=rd.reduce(function(a,x){ return a+(+x.m||0); },0)+Math.round((+vrev[tk]||0)/60);
+    var taskMin=rd.reduce(function(a,x){ return a+(+x.m||0); },0)+Math.round((+vrev[tk]||0)/60);
     var tp=plog.filter(function(e){ return e&&e.k===tk; }), tpMin=tp.reduce(function(a,e){ return a+(+e.m||25); },0);
+    var studyMin=tpMin>0?tpMin:taskMin;
     var plan=(window.PLAN&&window.PLAN.days)?window.PLAN.days[tk]:null;
     html+='<section class="card"><h2>今天　'+(today.getMonth()+1)+'/'+today.getDate()+'（週'+WD[today.getDay()]+'）</h2>';
     html+='<p class="sub">'+(plan?esc(plan.lab)+(plan.note?'・'+esc(plan.note):''):'')+(easy[tk]?'・今天是降級／休息日':'')+'</p>';
@@ -235,8 +330,8 @@ footer a{color:var(--ink-faint)}
       if(cur) html+='<p class="now">現在排的是：<b>'+esc(cur[0])+'–'+esc(cur[1])+'</b>　'+esc(cur[3])+'</p>';
     }
     if(opened){
-      html+='<div class="tiles"><div class="tile"><div class="v">'+rd.length+'<small>／'+real.length+'</small></div><div class="k">讀書任務完成</div></div>'
-        +'<div class="tile"><div class="v">'+tMin+'<small> 分</small></div><div class="k">完成的讀書時間</div></div>'
+      html+='<div class="tiles"><div class="tile"><div class="v">'+rd.length+'<small>／'+real.length+'</small></div><div class="k">讀書任務完成'+(real.length?'（'+Math.round(rd.length/real.length*100)+'%）':'')+'</div></div>'
+        +'<div class="tile"><div class="v">'+studyMin+'<small> 分</small></div><div class="k">讀書時間（'+(tpMin>0?'番茄鐘':'表定')+'）</div></div>'
         +'<div class="tile"><div class="v">'+tp.length+'<small> 顆</small></div><div class="k">番茄鐘（'+tpMin+' 分）</div></div></div>';
       if(fixedN) html+='<p class="sub" style="margin:4px 0 0">上學、上課、補習：'+fixedD+'／'+fixedN+' 已打勾</p>';
       html+='<ul class="tasks">'+real.map(function(x){
@@ -248,8 +343,7 @@ footer a{color:var(--ink-faint)}
           +'<span class="m">'+esc(x.t||'')+(x.m?'・'+x.m+' 分':'')+'</span></span></li>'; }).join('')+'</ul>';
       if(!real.length) html+='<p class="sub">今天沒有排讀書任務。</p>';
     } else {
-      var last=st.day?md(st.day):'';
-      html+='<p class="note warn">今天他還沒打開讀書網站'+(last?'（上一次是 '+last+'）':'')+'。</p>';
+      html+='<p class="note warn">今天他還沒打開讀書網站'+(st.day?'（上一次是 '+md(st.day)+'）':'')+'。</p>';
       if(plan){ var sb=(plan.b||[]).filter(function(b){ return b[5]===0; });
         if(sb.length) html+='<p class="sub" style="margin-top:10px">今天原本排的讀書任務（'+sb.length+' 項）：</p><ul class="tasks">'+sb.map(function(b){
           return '<li><span class="ic">⬜</span><span class="n">'+esc(b[3])+'<span class="m">'+esc(b[0])+'–'+esc(b[1])+'</span></span></li>'; }).join('')+'</ul>';
@@ -257,7 +351,21 @@ footer a{color:var(--ink-faint)}
     }
     html+='</section>';
 
-    // ---- 給 Claude 檢查 ----
+    // 寵物＋互動
+    var p=pet&&pet.pet;
+    html+='<section class="card" id="pet-card"><h2>他的寵物</h2>';
+    if(p){
+      var sp=SPECIES[p.sp]||['寵物','🐾'], stt=p.trip?('去'+esc(p.trip.dest||'旅行')+'旅行了'):(p.sick?'生病了，要他多讀書照顧牠':((p.hunger||0)<30?'肚子餓了':'精神不錯'));
+      html+='<div class="pet-top"><div class="pet-face" aria-hidden="true">'+sp[1]+'</div><div><div class="pet-name">'+esc(p.name)+'</div>'
+        +'<div class="pet-st">'+sp[0]+'・Lv '+(p.lvSeen||1)+'・'+stt+'</div></div></div>';
+      var meter=function(lab,v,max){ var pc=Math.max(0,Math.min(100,Math.round(v/max*100))); return '<div class="meter'+(max===100&&v<30?' low':'')+'">'+lab+'　<b>'+v+'</b><div class="bar"><i style="width:'+pc+'%"></i></div></div>'; };
+      html+='<div class="meters">'+meter('飽足',p.hunger||0,100)+meter('心情',p.mood||0,100)+meter('親密度',p.bond||0,Math.max(30,p.bond||0))+'</div>';
+      html+='<p class="sub" style="margin:4px 0 0">寵物靠他讀書照顧：完成任務有飼料、番茄鐘陪牠玩。你可以摸摸牠（心情 +3、親密度 +1，一天最多 5 次有效），但不能餵牠。</p>';
+      html+='<p style="margin:10px 0 0"><button class="btn solid" type="button" id="pv-open">'+(document.getElementById('pvf')?'收起森林':'🌳 打開他的森林（可以點寵物）')+'</button></p><div id="pv-box"></div>';
+    } else html+='<p class="sub">他還沒有領養寵物。</p>';
+    html+='<div id="act"></div></section>';
+
+    // 給 Claude 檢查
     var arr=Object.keys(items).map(function(k){ return items[k]; }).filter(function(it){ return it&&it.k; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
     var open=arr.filter(function(it){ return it.st!=='pass' && !it.old; });
     var lateN=open.filter(function(it){ return lateDay(it,today)!==0; }).length;
@@ -280,34 +388,10 @@ footer a{color:var(--ink-faint)}
     if(!show.length) html+='<p class="sub">最近沒有要檢查的作業。</p>';
     html+='</section>';
 
-    // ---- 最近 14 天 ----
-    var D=[];
-    for(var i=13;i>=0;i--){
-      var d=addD(today,-i), k=key(d), e=hist[k], mins=0, a=0, dn=0, has=false;
-      if(k===tk && opened){ mins=tMin; a=real.length; dn=rd.length; has=true; }
-      else if(e){ has=true; mins=(+e.m||0)+Math.round((+vrev[k]||0)/60);
-        if(e.cat){ Object.keys(e.cat).forEach(function(c){ a+=e.cat[c].a||0; dn+=e.cat[c].d||0; }); } else { a=e.a||0; dn=e.d||0; } }
-      var pc=plog.filter(function(x){ return x&&x.k===k; }).length;
-      D.push({k:k, d:d, m:mins, a:a, dn:dn, has:has, pomo:pc, easy:!!easy[k]});
-    }
-    var mx=Math.max(60,Math.max.apply(null,D.map(function(x){ return x.m; })));
-    var step=mx>360?120:(mx>180?60:30), top=Math.ceil(mx/step)*step;
-    var grid='';
-    for(var g=step; g<=top; g+=step) grid+='<div class="gl" style="bottom:'+(g/top*111).toFixed(1)+'px"><span>'+g+' 分</span></div>';   // 圖高 130－上方留白 18－底線 1＝111px
-    html+='<section class="card"><h2>最近 14 天的讀書時間</h2><p class="sub">每天完成的讀書任務分鐘數；點一下長條看那天的細節。</p>'
-      +'<div class="chart" id="chart">'+grid+D.map(function(x,j){
-        var h=x.m?Math.max(3,x.m/top*100):3;
-        return '<button type="button" class="bar'+(x.m?'':' zero')+'" data-j="'+j+'" aria-label="'+md(x.k)+' '+x.m+' 分鐘"><i style="height:'+h.toFixed(1)+'%"></i></button>'; }).join('')+'</div>'
-      +'<div class="xlab">'+D.map(function(x,j){ var lab=(j===13?'今':String(x.d.getDate())); return '<span'+(x.d.getDay()===1?' class="wk"':'')+'>'+lab+'</span>'; }).join('')+'</div>'
-      +'<p class="sub" style="margin:2px 0 0;text-align:right;padding-right:44px">'+md(D[0].k)+'～今天・粗體是週一</p>'
-      +'<div class="detail" id="detail" aria-live="polite"></div>';
-    var W=D.slice(7), wm=W.reduce(function(a,x){ return a+x.m; },0), wa=W.reduce(function(a,x){ return a+x.a; },0), wd=W.reduce(function(a,x){ return a+x.dn; },0),
-        wp=W.reduce(function(a,x){ return a+x.pomo; },0), wgood=W.filter(function(x){ return x.m>=60; }).length, wnone=W.filter(function(x){ return !x.has; }).length;
-    html+='<div class="sum"><span>這 7 天讀書　<b>'+(wm/60).toFixed(1)+'</b> 小時</span><span>任務完成率　<b>'+(wa?Math.round(wd/wa*100):0)+'%</b></span>'
-      +'<span>讀滿 1 小時　<b>'+wgood+'</b>／7 天</span><span>番茄鐘　<b>'+wp+'</b> 顆</span>'
-      +(wnone?'<span style="grid-column:1/-1;color:var(--warn)">有 '+wnone+' 天沒有紀錄（那天沒打開網站）</span>':'')+'</div></section>';
+    // 長條圖
+    html+='<section class="card"><h2>每天的讀書長條圖</h2><div id="dc"></div></section>';
 
-    // ---- 接下來的考試 ----
+    // 考試
     var EX=((window.PLAN&&window.PLAN.exams)||[]).filter(function(e){ return !/第二天/.test(e[3]); }).map(function(e){ return {n:e[3].replace(/ 第一天$/,''), d:new Date(e[0],e[1]-1,e[2])}; })
       .filter(function(e){ return e.d>=today; }).slice(0,4);
     if(window.PLAN&&window.PLAN.sci){ var sc=window.PLAN.sci, sd=new Date(sc[0],sc[1]-1,sc[2]); if(sd>=today && !EX.some(function(e){ return /科學班/.test(e.n); })) EX.push({n:'雄中科學班初試（暫定）', d:sd}); }
@@ -316,18 +400,119 @@ footer a{color:var(--ink-faint)}
     if(EX.length) html+='<section class="card"><h2>接下來的考試</h2>'+EX.map(function(e){
       return '<div class="ex"><span>'+esc(e.n)+'　<span style="color:var(--ink-faint);font-size:12.5px">'+(e.d.getMonth()+1)+'/'+e.d.getDate()+'</span></span><span>還有 <b>'+days(today,e.d)+'</b> 天</span></div>'; }).join('')+'</section>';
 
+    // 互動設定
+    html+='<section class="card"><details class="fold" id="chan-set"'+(chan.token?'':' open')+'><summary>家長互動設定</summary><div class="setup" id="setup-box"></div></details></section>';
+
+    // 森林開著的話，重畫後放回去（iframe 換位置會重新載入，所以先換成新資料）
+    var keep=document.getElementById('pvf'); if(keep) keep.remove();
     app.innerHTML=html;
-    var det=document.getElementById('detail'), bars=app.querySelectorAll('.bar');
-    function pickBar(j){
-      Array.prototype.forEach.call(bars,function(b){ b.classList.toggle('sel',+b.getAttribute('data-j')===j); });
-      var x=D[j];
-      det.textContent=md(x.k)+'（週'+WD[x.d.getDay()]+'）　'+(x.has?('讀書 '+x.m+' 分・任務 '+x.dn+'／'+x.a+'・番茄鐘 '+x.pomo+' 顆'+(x.easy?'・降級／休息日':'')):'沒有紀錄（那天沒打開網站）');
-    }
-    Array.prototype.forEach.call(bars,function(b){ b.addEventListener('click',function(){ pickBar(+b.getAttribute('data-j')); }); });
-    pickBar(13);
+    window.__pvData=o;
+    if(keep && document.getElementById('pv-box')) document.getElementById('pv-box').appendChild(keep);
+    var po=document.getElementById('pv-open'); if(po) po.addEventListener('click',togglePet);
+    var dcEl=document.getElementById('dc');
+    if(window.DayChart && dcEl) dcHandle=window.DayChart.mount(dcEl,{get:function(){ return lastO||{}; }});
+    paintActs(); paintSetup();
   }
 
-  // 頁面開著時，每 10 分鐘自動更新一次；切回來超過 3 分鐘也更新
+  // 森林（iframe）
+  function togglePet(){
+    var box=document.getElementById('pv-box'), f=document.getElementById('pvf'), b=document.getElementById('pv-open');
+    if(f){ f.remove(); b.textContent='🌳 打開他的森林（可以點寵物）'; return; }
+    window.__pvData=lastO;
+    f=document.createElement('iframe'); f.id='pvf'; f.title='他的森林（家長版，只能看）'; f.src='index.html?pv=1'; f.style.height='520px';
+    box.appendChild(f); b.textContent='收起森林';
+    var fit=function(){ try{ var d=f.contentDocument; if(!d||!d.body) return; var h=Math.max(320,d.documentElement.scrollHeight); if(Math.abs(parseFloat(f.style.height)-h)>4) f.style.height=h+'px'; }catch(e){} };
+    f.addEventListener('load',function(){ fit(); try{ if(window.ResizeObserver) new ResizeObserver(fit).observe(f.contentDocument.body); }catch(e){} var n=0, iv=setInterval(function(){ fit(); if(++n>20||!document.getElementById('pvf')) clearInterval(iv); },500); });
+  }
+
+  // 互動區
+  function paintActs(){
+    var el=document.getElementById('act'); if(!el) return;
+    var p=J(lastO||{},'plan.pet.v1',{}).pet;
+    if(!chan.token){
+      el.innerHTML='<p class="note info">想摸摸牠、留言、幫他加點，要先在下面的「家長互動設定」貼上 token（只要設定一次）。</p>';
+      return;
+    }
+    var used=todayUsed(), left=Math.max(0,PAR_MAX-used), pats=todayPats();
+    var h='<div class="acts">'
+      +'<button type="button" class="act" data-a="pat"'+(p?'':' disabled')+' aria-pressed="'+(form==='pat')+'"><span>👋</span>摸摸牠<small>今天 '+Math.min(pats,PAT_MAX)+'／'+PAT_MAX+' 次有效</small></button>'
+      +'<button type="button" class="act" data-a="msg" aria-pressed="'+(form==='msg')+'"><span>📣</span>留言給他<small>寵物會轉告</small></button>'
+      +'<button type="button" class="act" data-a="pts"'+(left?'':' disabled')+' aria-pressed="'+(form==='pts')+'"><span>⭐</span>幫他加點<small>今天還能加 '+left+' 點</small></button></div>';
+    if(chanErr) h+='<p class="note bad">家長頻道：'+esc(chanErr)+'</p>';
+    if(chanActs===null && !chanErr) h+='<p class="sub" style="margin-top:8px">讀取家長頻道中…</p>';
+    if(form==='msg') h+='<div class="form"><label for="msg-in">留言（最多 60 字，他打開網站時會跳出來，寵物也會說）</label><input id="msg-in" type="text" maxlength="60" placeholder="例：今天辛苦了，晚餐有你愛吃的"><p style="margin:10px 0 0"><button class="btn solid" type="button" id="msg-go">送出留言</button></p></div>';
+    if(form==='pts'){
+      if(pick>left) pick=left;
+      h+='<div class="form"><label>加幾點？（家長每天合計最多 '+PAR_MAX+' 點，今天已加 '+used+' 點）</label><div class="chips">'
+        +[5,10,15,20,30].map(function(n){ return '<button type="button" data-n="'+n+'"'+(n>left?' disabled':'')+' aria-pressed="'+(pick===n)+'">+'+n+'</button>'; }).join('')+'</div>'
+        +'<label for="pts-why">理由（可以不寫）</label><input id="pts-why" type="text" maxlength="40" placeholder="例：今天全部完成">'
+        +'<p style="margin:10px 0 0"><button class="btn solid" type="button" id="pts-go"'+(pick>0?'':' disabled')+'>送出 +'+pick+' 點</button></p></div>';
+    }
+    // 送出紀錄：家長頻道裡的（還沒送到的）＋孩子網站回報收到的
+    var P=J(lastO||{},'plan.parent.v1',{}), got={}; (P.log||[]).forEach(function(l){ if(l&&l.id) got[l.id]=l; });
+    var rows=(chanActs||[]).slice().sort(function(a,b){ return (b.t||0)-(a.t||0); }).slice(0,10);
+    if(rows.length){
+      h+='<div style="margin-top:12px;font-size:13px;font-weight:700">最近送出的</div><ul class="alog">'+rows.map(function(a){
+        var g=got[a.id], what=a.kind==='pts'?('⭐ 加 '+(+a.n||0)+' 點'+(a.text?'：'+esc(a.text):'')):(a.kind==='pat'?'👋 摸摸寵物':'📣 '+esc(a.text||''));
+        var stt=g?(a.kind==='pts'&&g.n<(+a.n||0)?'<span style="color:var(--warn)">已收到，'+(g.n?'只加到 '+g.n+' 點':'今天已滿 30 點')+'</span>':(a.kind==='pat'&&!g.n?'<span style="color:var(--warn)">已收到（今天摸滿了）</span>':'<span style="color:var(--ok)">✓ 已收到</span>')):'<span style="color:var(--ink-faint)">⏳ 等他打開網站</span>';
+        return '<li><span>'+what+'<small>'+esc(a.who||'家長')+'・'+hm(a.t)+'</small></span><span class="st">'+stt+'</span></li>'; }).join('')+'</ul>';
+    }
+    el.innerHTML=h;
+    Array.prototype.forEach.call(el.querySelectorAll('[data-a]'),function(b){ b.addEventListener('click',function(){
+      var k=b.getAttribute('data-a');
+      if(k==='pat'){
+        if(todayPats()>=PAT_MAX && !confirm('今天已經摸 '+PAT_MAX+' 次了，再摸不會加心情。還是要送嗎？')) return;
+        doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'pat'},'送出了！他下次打開網站時，牠會知道你摸摸牠。'); return;
+      }
+      form=(form===k?'':k); paintActs();
+      var inp=document.getElementById(k==='msg'?'msg-in':'pts-why'); if(inp) inp.focus();
+    }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-n]'),function(b){ b.addEventListener('click',function(){ pick=+b.getAttribute('data-n'); paintActs(); }); });
+    var mg=document.getElementById('msg-go');
+    if(mg) mg.addEventListener('click',function(){
+      var t=(document.getElementById('msg-in').value||'').trim(); if(!t){ toast('先寫留言。'); return; }
+      doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'msg', text:t.slice(0,60)},'留言送出了！他打開網站時會看到。');
+    });
+    var pg=document.getElementById('pts-go');
+    if(pg) pg.addEventListener('click',function(){
+      var n=Math.min(pick,Math.max(0,PAR_MAX-todayUsed())); if(!n){ toast('今天已經加滿 30 點了。'); return; }
+      var why=(document.getElementById('pts-why').value||'').trim().slice(0,40);
+      doSend({id:newId(), t:Date.now(), day:key(d0()), who:chan.who||'家長', kind:'pts', n:n, text:why},'送出 +'+n+' 點！他下次打開網站時會收到。');
+    });
+  }
+
+  // 設定區
+  function paintSetup(){
+    var el=document.getElementById('setup-box'); if(!el) return;
+    var who=chan.who||'';
+    el.innerHTML='<p class="sub" style="margin-top:8px">摸摸、留言、加點會寫進孩子 GitHub 帳號裡一個專門的「家長頻道」，所以這支手機要有一把鑰匙（token）。只要設定一次；token 只存在這支手機。</p>'
+      +'<label>你是</label><div class="chips">'+['爸爸','媽媽'].map(function(n){ return '<button type="button" data-who="'+n+'" aria-pressed="'+(who===n)+'">'+n+'</button>'; }).join('')+'</div>'
+      +'<input id="who-in" type="text" maxlength="8" placeholder="或自己打稱呼" value="'+(who&&who!=='爸爸'&&who!=='媽媽'?esc(who):'')+'">'
+      +'<label for="tok-in">GitHub token</label><input id="tok-in" type="password" autocomplete="off" placeholder="'+(chan.token?'已設定（要換才重貼）':'github_pat_…')+'">'
+      +'<p style="margin:10px 0 0;display:flex;gap:8px;flex-wrap:wrap"><button class="btn solid" type="button" id="tok-save">儲存並測試</button>'+(chan.token?'<button class="btn" type="button" id="tok-clear">清掉這支手機的 token</button>':'')+'</p>'
+      +'<p class="sub" id="tok-msg" style="margin:8px 0 0"></p>'
+      +'<details style="margin-top:8px"><summary style="cursor:pointer;font-size:13px;color:var(--sky)">token 怎麼做（請孩子幫忙）</summary><ol>'
+      +'<li>在 GitHub 網站登入孩子的帳號，右上角頭像 → Settings → 最下面 Developer settings。</li>'
+      +'<li>Personal access tokens → Fine-grained tokens → Generate new token。名稱寫「家長」，期限選 1 年。</li>'
+      +'<li>Permissions 裡找到 <b>Gists</b>，選 <b>Read and write</b>（其他都不用開）→ Generate token。</li>'
+      +'<li>複製那串 github_pat_… 貼在上面。<b>不要傳到聊天室、也不要給 Claude。</b></li></ol></details>';
+    Array.prototype.forEach.call(el.querySelectorAll('[data-who]'),function(b){ b.addEventListener('click',function(){ chan.who=b.getAttribute('data-who'); saveChan(); paintSetup(); paintActs(); }); });
+    document.getElementById('who-in').addEventListener('change',function(e){ var v=e.target.value.trim(); if(v){ chan.who=v.slice(0,8); saveChan(); paintSetup(); } });
+    document.getElementById('tok-save').addEventListener('click',function(){
+      var v=(document.getElementById('tok-in').value||'').trim(), msg=document.getElementById('tok-msg');
+      if(v){ chan.token=v; chan.gist=''; }
+      if(!chan.token){ msg.textContent='先貼上 token。'; return; }
+      if(!chan.who){ chan.who='家長'; }
+      saveChan(); msg.textContent='測試中…';
+      gh('/user').then(function(u){
+        if(gOwner && u.login!==gOwner){ msg.innerHTML='<span style="color:var(--bad)">這個 token 是 '+esc(u.login)+' 的，不是孩子的帳號（'+esc(gOwner)+'），他的網站讀不到你的互動。</span>'; return; }
+        return findChan(false).then(function(id){ msg.innerHTML='<span style="color:var(--ok)">連線成功 ✓　帳號 '+esc(u.login)+(id?'，找到家長頻道':'，第一次送出時會建立家長頻道')+'。</span>'; return refreshChan(); });
+      }).catch(function(e){ msg.innerHTML='<span style="color:var(--bad)">沒成功：'+esc(e.message||e)+'</span>'; });
+    });
+    var tc=document.getElementById('tok-clear');
+    if(tc) tc.addEventListener('click',function(){ if(!confirm('清掉這支手機的 token？之後就不能摸摸、留言、加點，要再貼一次。')) return; chan.token=''; chan.gist=''; saveChan(); chanActs=null; paintSetup(); paintActs(); });
+  }
+
   setInterval(function(){ if(!document.hidden && gid) load(); },600000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden && gid && Date.now()-lastLoad>180000) load(); });
   load();

@@ -893,6 +893,12 @@ section{padding-top:40px}
 .fp-chk .st{font-size:12px;color:var(--warn)}
 .fp-chk.pass .st{color:var(--cap)} .fp-chk.dead .st{color:var(--ink-faint)}
 .fp-chk.late .st{color:var(--rest);font-weight:600}
+/* 家長版看寵物（?pv=1，在 parent.html 的 iframe 裡）：只留森林 */
+html.pv body{padding:0 2px 6px;background:transparent}
+html.pv .hero,html.pv #hero-mini,html.pv .tabs-wrap,html.pv footer,html.pv .rem-banner,html.pv .sec-head,html.pv .sec-rules{display:none!important}
+html.pv section{margin-top:0!important;padding-top:0!important}
+html.pv .wrap{max-width:none;padding:0}
+.pv-toast{position:fixed;left:8px;right:8px;bottom:8px;z-index:70;background:var(--ink);color:var(--card);border-radius:12px;padding:8px 12px;font-size:13px;text-align:center}
 .fp-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
 .fp-cards svg{width:100%;height:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .fp-chip{display:inline-flex;align-items:center;gap:5px;font-size:13px;padding:5px 10px;border:1px solid var(--rule);border-radius:var(--r-btn);background:var(--card)}
@@ -1786,7 +1792,7 @@ section{padding-top:40px}
   <div class="sec-head"><h2>我的森林</h2><span class="eyebrow">讀書種樹，寵物住在你的森林裡</span></div>
   <details class="sec-rules"><summary>森林規則</summary><p class="sec-note">完成一項任務種一棵樹，<b>每完成一顆番茄鐘也種一棵</b>（樹種看科目，番茄鐘開始前選這顆讀什麼）。
     <b>樹靠番茄鐘長大</b>：讀哪一科只照顧那一科的樹，免得偏科；讀科班的資優數學、自然學科會照顧全部的樹，但只算一半時間。同一種樹累積 50 分鐘變小樹、175 分鐘變大樹、750 分鐘變神木；一塊地種滿才開下一塊。
-    訂正、考古題、模考卷、歷屆會考要<b>拍照給 Claude 檢查，過關才算數</b>（只種樹苗、3 天沒交就枯死）。
+    訂正、考古題、模考卷、歷屆會考要<b>拍照給 Claude 檢查，過關才算數</b>（只種樹苗；3 天內沒交開始扣點，逾期第 n 天扣 5n，超過 5 天樹苗枯，但還是要交、繼續扣，過關才停）。爸媽在家長版可以摸摸牠、留言、幫你加點（每天最多 30 點）。
     <b>1 天沒照顧牠不理你、2 天生病、5 天離家出走；沒照顧的日子樹會枯，3 天沒救回就死；番茄鐘中途放棄留下枯樹樁；讀書時段跑來看、一天待超過 15 分鐘，牠也不理你。</b>
     牠越大吃越多：Lv5 起每天要讀 90 分或完成 60%，Lv12 起 120 分或 70%。降級模式和休息日算有照顧，沒打開網站的日子算沒照顧。
     <br>點寵物會表演把戲，親密度越高學越多（有照顧的日子 +1、那天有餵或陪玩再 +1、沒照顧 −3）。天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。
@@ -2021,6 +2027,7 @@ section{padding-top:40px}
 <section>
   <div class="sec-head"><h2>進度回測</h2><span class="eyebrow">看趨勢，不看單日</span></div>
   <p class="sec-note">138 項研究、近 2 萬名參與者的統合分析顯示，監控目標進度確實能提升達成率（d = 0.40），而且<b>把進度實際記錄下來</b>時效果更強。這頁就是那個記錄。</p>
+  <div class="card" id="dc-card" style="padding:14px 16px;margin-bottom:14px"><h3 style="margin:0 0 6px">每天的讀書長條圖</h3><div id="dc-mine"><p class="sub">載入中…</p></div></div>
   <div class="td-budget" id="bt-sum"></div>
   <div class="card" id="bt-chart" style="padding:14px 16px;margin-bottom:14px"></div>
   <div class="tbl-scroll"><table id="bt-table">
@@ -2065,14 +2072,29 @@ section{padding-top:40px}
 
 </div>
 <script src="plan.js"></script>
+<script src="daychart.js"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
   // 要備份、同步的資料（介面狀態像目前在哪個分頁不算，切分頁不該觸發上傳）
   var K=['plan.tpl.v3','plan.dayedit.v1','plan.kbscore.v1','plan.state.v3','plan.pomo.v1','plan.shop.v1','plan.scores.v1','plan.scores.v2','plan.quiz.v1','plan.rules.v1',
     'plan.notes.v1','plan.theme.v1','plan.wrong.v1','plan.meta.v1','plan.a11y.v1','plan.hist.v1','plan.journal.v1','plan.unlock.v1','plan.ask.v1','plan.pace.v1',
-    'plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1','plan.checks.v1','plan.bank.v1','plan.ach.v1','plan.vocab.v1','plan.vrev.v1'];
+    'plan.books.v1','plan.review.v1','plan.wrongcfg.v1','plan.easy.v1','plan.todo.v1','plan.pet.v1','plan.checks.v1','plan.bank.v1','plan.ach.v1','plan.vocab.v1','plan.vrev.v1',
+    'plan.parent.v1'];
   window.__DATA_KEYS=K;
+  // 家長版看寵物（2026-11-07）：parent.html 用 iframe 打開 index.html?pv=1，資料拿家長頁讀到的雲端備份，
+  // 放進記憶體裡的假 localStorage——這一頁怎麼點都不會寫回任何地方、也不會同步（沒有 token）。
+  if(/[?&]pv=1(&|$)/.test(location.search)){
+    var src=null; try{ if(window.parent!==window) src=window.parent.__pvData; }catch(e){}
+    if(!src){ try{ src=JSON.parse(sessionStorage.getItem('pv.data')||'null'); }catch(e){} }
+    var mem={};
+    if(src) Object.keys(src).forEach(function(k){ if(/^plan\./.test(k) && k!=='plan.cloud.v1') mem[k]=typeof src[k]==='string'?src[k]:JSON.stringify(src[k]); });
+    var fake={getItem:function(k){ return Object.prototype.hasOwnProperty.call(mem,k)?mem[k]:null; }, setItem:function(k,v){ mem[k]=String(v); },
+      removeItem:function(k){ delete mem[k]; }, clear:function(){ mem={}; }, key:function(i){ return Object.keys(mem)[i]||null; }};
+    Object.defineProperty(fake,'length',{get:function(){ return Object.keys(mem).length; }});
+    try{ Object.defineProperty(window,'localStorage',{value:fake,configurable:true,writable:true}); }catch(e){}
+    if(window.localStorage===fake){ window.__pv=true; document.documentElement.classList.add('pv'); }
+  }
   function pick(){ var o={}; K.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
   // 雲端同步用：這台「上次同步之後有沒有改過」要拿開頁那一刻比，其他程式開頁時會先補算當天的東西
   try{ window.__bootSig=JSON.stringify(pick()); }catch(e){ window.__bootSig=null; }
@@ -2839,7 +2861,9 @@ section{padding-top:40px}
     var dn=real.filter(function(x){return st.done[x.id];});
     var cat={};
     real.forEach(function(x){ var c=x.c||'other', o=cat[c]=cat[c]||{a:0,d:0,m:0}; o.a++; if(st.done[x.id]){ o.d++; o.m+=x.m||0; } });
-    return {a:all.length, d:all.filter(function(x){return st.done[x.id];}).length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;})};
+    // un：沒完成的讀書任務名稱（2026-11-07 加，長條圖點一天要看得到哪些沒做）
+    return {a:all.length, d:all.filter(function(x){return st.done[x.id];}).length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;}),
+      un:real.filter(function(x){return !st.done[x.id];}).map(function(x){return x.n;})};
   }
   // 重新產生今天的任務，但保留已勾的（照任務名稱對）和自己加的任務
   // 勾選照名稱對，但一個勾只還給一項（2026-11-02 修：欠帳和今天同名的「雄科班補習作業」，勾一個、重新產生後會兩個都勾上）
@@ -4169,7 +4193,32 @@ section{padding-top:40px}
           if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),false);
         }
       });
-    }).catch(function(){}).then(function(){ checking=false; });
+    }).catch(function(){}).then(function(){ checking=false; pullParent(); });
+  }
+  // 家長頻道（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（檔名 study-plan-parent.json）。
+  // 這裡只讀，讀到的交給寵物那段 window.__parentApply 套用（每天加點最多 30 點，那段會再擋一次）。
+  var PFILE='study-plan-parent.json', lastPar=0, lastParList=0;
+  function findParGist(){
+    if(cl.pg) return Promise.resolve(cl.pg);
+    if(Date.now()-lastParList<10*60000) return Promise.resolve('');   // 找不到的話 10 分鐘內不再翻
+    lastParList=Date.now();
+    return api('/gists?per_page=100').then(function(list){
+      var hit=(list||[]).filter(function(g){ return g.files && g.files[PFILE]; })[0];
+      if(hit && hit.id!==cl.gist){ cl.pg=hit.id; save(CLK,cl); return hit.id; }
+      return '';
+    });
+  }
+  function pullParent(){
+    if(!cl.token||window.__noSync||held||window.__pv||!window.__parentApply) return;
+    var now=Date.now(); if(now-lastPar<60000) return; lastPar=now;
+    findParGist().then(function(id){
+      if(!id) return;
+      return api('/gists/'+id).then(function(g){
+        var f=g.files&&g.files[PFILE]; if(!f){ cl.pg=''; save(CLK,cl); return; }
+        var get=(f.truncated&&f.raw_url)?fetch(f.raw_url).then(function(r){ return r.text(); }):Promise.resolve(f.content);
+        return get.then(function(txt){ var o=JSON.parse(txt||'{}'); window.__parentApply(o.actions||[]); });
+      });
+    }).catch(function(e){ if(/找不到/.test((e&&e.message)||'')){ cl.pg=''; save(CLK,cl); } });
   }
 
   window.__cloudNotice=function(at,fresh){
@@ -4215,8 +4264,8 @@ section{padding-top:40px}
     checkRemote();
     // 平常靠 pushSoon（一有改動就傳）；每 30 秒再看一次當備用；切到背景（手機切 App、關分頁）時馬上傳；切回來時看雲端有沒有別台的新資料
     setInterval(autoPush,30000);
-    setInterval(function(){ if(!document.hidden) checkRemote(); },5*60000);
-    document.addEventListener('visibilitychange',function(){ if(document.hidden) autoPush(); else checkRemote(); });
+    setInterval(function(){ if(!document.hidden){ checkRemote(); pullParent(); } },5*60000);
+    document.addEventListener('visibilitychange',function(){ if(document.hidden) autoPush(); else { checkRemote(); pullParent(); } });
     window.addEventListener('pagehide',autoPush);
   }
   // 沒設定雲端同步：一天提醒一次（資料只在這台，換裝置或瀏覽器清資料就沒了）
@@ -4542,7 +4591,7 @@ section{padding-top:40px}
   /* 離線 */
   if('serviceWorker' in navigator){
     window.addEventListener('load',function(){
-      navigator.serviceWorker.register('sw.js').catch(function(){});
+      if(!window.__pv) navigator.serviceWorker.register('sw.js').catch(function(){});
     });
   }
   var ss=document.getElementById('sw-status');
@@ -4670,7 +4719,9 @@ section{padding-top:40px}
     if(!ks.length){ sum.innerHTML='還沒有資料。在「今天」勾任務，隔天這裡就會開始累積。'; return; }
     var last7=ks.slice(-7), last30=ks.slice(-30);
     function rate(list){ var a=0,d=0; list.forEach(function(k){a+=m[k].a;d+=m[k].d;}); return a?Math.round(d/a*100):0; }
-    var mins=last7.reduce(function(x,k){return x+(m[k].m||0);},0);
+    // 讀書時間：那天有番茄鐘就算番茄鐘分鐘，沒有才算任務的表定分鐘（11-07 使用者定）
+    var pm={}; try{ ((JSON.parse(localStorage.getItem('plan.pomo.v1'))||{}).log||[]).forEach(function(e){ if(e&&e.k) pm[e.k]=(pm[e.k]||0)+(+e.m||25); }); }catch(e){}
+    var mins=last7.reduce(function(x,k){return x+(pm[k]||m[k].m||0);},0);
     sum.innerHTML='<b>近 7 天完成率 '+rate(last7)+'%</b>　近 30 天 '+rate(last30)+'%　'
       +'連續達標 <b>'+streak(m)+'</b> 天'
       +'<div class="bar"><i style="width:'+rate(last7)+'%"></i></div>'
@@ -4710,6 +4761,17 @@ section{padding-top:40px}
   paintBT();
   setInterval(paintBT,30000);
   document.addEventListener('plan:tab',function(e){ if(e.detail===4) setTimeout(paintBT,30); });
+  // 每天的讀書長條圖（daychart.js，家長版也用同一份）：打開「紀錄」才畫
+  var dcm=null;
+  function paintDC(){
+    var el=document.getElementById('dc-mine'); if(!el || !window.DayChart) return;
+    if(dcm){ dcm.refresh(); return; }
+    dcm=window.DayChart.mount(el,{get:function(){ var o={};
+      ['plan.state.v3','plan.hist.v1','plan.pomo.v1','plan.checks.v1','plan.shop.v1','plan.vrev.v1','plan.easy.v1','plan.parent.v1'].forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; });
+      return o; }});
+  }
+  document.addEventListener('plan:tab',function(e){ if(e.detail===4) setTimeout(paintDC,40); });
+  if(window.__tab===4) setTimeout(paintDC,40);
 })();
 </script>
 <script>
@@ -4821,7 +4883,7 @@ section{padding-top:40px}
         var due=(window.__wrongDue?window.__wrongDue():[]).length;
         if(!due) return;
         if(ls(NK,'')===kk(d0())) return;
-        if(!(ls('plan.pomo.v1',{})||{}).notify) return;   // 沒開「時段提醒」就不發
+        if(window.__pv || !(ls('plan.pomo.v1',{})||{}).notify) return;   // 沒開「時段提醒」就不發；家長版不發
         if(window.__sysNotify && window.__sysNotify('今天有 '+due+' 題錯題到期','闔上答案重做一次，做對就往後排')) sv(NK,kk(d0()));
       }catch(e){}
     },4000);
@@ -4934,8 +4996,9 @@ section{padding-top:40px}
     var t=window.__todayStat?window.__todayStat():null;
     if(t&&t.day) hist[t.day]=Object.assign(hist[t.day]||{},{a:t.a,d:t.d,m:t.m});
     var ks=Object.keys(hist).filter(function(k){return hist[k].a;}).sort(function(a,b){return dnum(b)-dnum(a);}).slice(0,7);
-    var a=0,dn=0,mins=0;
-    ks.forEach(function(k){ a+=hist[k].a; dn+=hist[k].d; mins+=(hist[k].m||0); });
+    var a=0,dn=0,mins=0, pm={};
+    (((ls('plan.pomo.v1',{})||{}).log)||[]).forEach(function(e){ if(e&&e.k) pm[e.k]=(pm[e.k]||0)+(+e.m||25); });
+    ks.forEach(function(k){ a+=hist[k].a; dn+=hist[k].d; mins+=(pm[k]||hist[k].m||0); });   // 有番茄鐘照番茄鐘算
     var rate=a?Math.round(dn/a*100):0;
     var EX=((window.PLAN&&window.PLAN.exams)||[]).filter(function(e){ return !/第二天/.test(e[3]); })
       .map(function(e){ return [e[0],e[1],e[2],e[3].replace(/ 第一天$/,'')]; });
@@ -7506,7 +7569,55 @@ section{padding-top:40px}
   window.__petApi={allHist:allHist, studyBlockNow:studyBlockNow, easyMap:easyMap, petState:petState, savePet:savePet, petMini:petMini, bankState:bankState, talent:talLv,
     hasAcc:function(id){ return !!petState().acc[id]; },
     giveAcc:function(id){ var s=petState(); s.acc[id]=1; savePet(s); },
-    petTouch:function(line){ var s=petState(); if(!s.pet||s.pet.trip) return; touch(s.pet); savePet(s); if(line) flash.push('🎰 '+esc(s.pet.name)+'：'+esc(line)); }};
+    petTouch:function(line){ var s=petState(); if(!s.pet||s.pet.trip) return; touch(s.pet); savePet(s); if(line) flash.push('🎰 '+esc(s.pet.name)+'：'+esc(line)); },
+    // 家長版：家長頁按了摸摸／留言／加點，讓寵物在畫面上有反應（只有動畫）
+    anim:function(kind,txt){
+      if(kind==='pat'){ petDo('wiggle',{dur:1.2}); petDo('say',{txt:pickR(['好舒服～','再摸一下！','嘿嘿','（蹭蹭）'])}); }
+      else if(kind==='msg'){ petDo('jump'); petDo('say',{txt:'我會轉告他：'+String(txt||'').slice(0,30)}); }
+      else if(kind==='pts'){ petDo('flip',{dur:1}); petDo('say',{txt:'謝謝！我會跟他說'}); }
+    }};
+
+  /* ---- 家長的互動（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（家長頻道），
+     雲端同步讀回來交給這裡套用。規則：加點每天（照家長按的那天）最多 30 點；摸摸每天最多 5 次有效（心情 +3、親密度 +1）；
+     不能餵食（照顧還是要靠讀書）。套用過的記在 plan.parent.v1（會同步），家長頁看得到「已收到」。 ---- */
+  var PARK='plan.parent.v1', PAR_MAX=30, PAT_MAX=5;
+  function parState(){ var x=ls(PARK,null)||{}; x.seen=x.seen||{}; x.day=x.day||{}; x.pat=x.pat||{}; x.log=Array.isArray(x.log)?x.log:[]; return x; }
+  window.__parentApply=function(list){
+    if(window.__pv) return 0;
+    var R=parState(), s=petState(), p=s.pet, n=0, petChanged=false, msgs=[], tot=0, pats=0;
+    (Array.isArray(list)?list:[]).slice().sort(function(a,b){ return (a.t||0)-(b.t||0); }).forEach(function(a){
+      if(!a || !a.id || R.seen[a.id]) return;
+      if(a.kind!=='pts' && a.kind!=='pat' && a.kind!=='msg') return;
+      R.seen[a.id]=1; n++;
+      var who=String(a.who||'家長').slice(0,8), day=/^\d{4}-\d{1,2}-\d{1,2}$/.test(a.day)?a.day:kk(d0());
+      var rec={id:String(a.id).slice(0,40), t:+a.t||0, at:Date.now(), who:who, kind:a.kind, day:day};
+      if(a.kind==='pts'){
+        var want=Math.max(0,Math.min(PAR_MAX,Math.round(+a.n||0))), used=R.day[day]||0, give=Math.max(0,Math.min(want,PAR_MAX-used));
+        rec.n=give; rec.want=want; rec.text=String(a.text||'').slice(0,40);
+        if(give>0){ R.day[day]=used+give; tot+=give; if(window.__award) window.__award(give,'家長加點（'+who+'）'+(rec.text?'：'+rec.text:''),true); }
+      } else if(a.kind==='pat'){
+        var c=R.pat[day]||0; rec.n=0;
+        if(p && !p.trip && c<PAT_MAX){ R.pat[day]=c+1; p.mood=Math.min(100,(p.mood||0)+3); p.bond=(p.bond||0)+1; petChanged=true; rec.n=1; pats++; }
+      } else {
+        rec.text=String(a.text||'').slice(0,60); msgs.push(who+'：'+rec.text);
+      }
+      R.log.unshift(rec);
+    });
+    if(!n) return 0;
+    R.log=R.log.slice(0,80);
+    var ids=Object.keys(R.seen); if(ids.length>500){ var keep={}; ids.slice(-500).forEach(function(id){ keep[id]=1; }); R.seen=keep; }
+    sv(PARK,R);
+    if(petChanged) savePet(s);
+    var lines=[];
+    if(tot) lines.push('⭐ 家長幫你加了 '+tot+' 點');
+    if(pats && p) lines.push('👋 家長摸摸了 '+esc(p.name)+(pats>1?' '+pats+' 次':'')+'（心情 +'+(3*pats)+'）');
+    msgs.forEach(function(m){ lines.push('📣 '+esc(m)); });
+    lines.forEach(function(l){ flash.push(l); });
+    if(lines.length && window.__fx && window.__fx.banner) window.__fx.banner(lines.join('　'));
+    if(p && msgs.length) afterPaint.push(function(){ petDo('jump'); petDo('say',{txt:msgs[msgs.length-1].slice(0,40)}); });
+    try{ paintPet(); }catch(e){}
+    return n;
+  };
 
   /* ---------- 什麼時候重畫 ---------- */
   function paintAll(){ deCache=null; paintSubjects(); paintKbPace(); paintBooks(); paintPet(); paintBank(); paintAch(); paintCustom(); }
@@ -7903,6 +8014,25 @@ section{padding-top:40px}
   }
   document.addEventListener('plan:tab',check);
   check();
+})();
+</script>
+<script>
+/* ===== 家長版看寵物（?pv=1）：只開「我的森林」；會改資料的按鈕擋掉（摸摸、留言、加點用家長頁的按鈕，那些才會送到孩子的網站） ===== */
+(function(){
+  if(!window.__pv) return;
+  try{ if(window.__showTab) window.__showTab(5,15); }catch(e){}
+  var tt=null;
+  function toast(m){ var t=document.querySelector('.pv-toast'); if(!t){ t=document.createElement('div'); t.className='pv-toast'; document.body.appendChild(t); } t.textContent=m; clearTimeout(tt); tt=setTimeout(function(){ t.remove(); },2600); }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest && e.target.closest('button,a,input,select,label,summary,[data-go]');
+    if(!b) return;   // 點寵物、點動物：表演把戲，可以
+    var app=document.getElementById('fp-app');
+    if(app && app.contains(b) && b.tagName==='BUTTON' && (b.dataset.tab||b.dataset.scene||b.dataset.land)) return;   // 切換森林的分頁、場景、地塊：可以
+    e.preventDefault(); e.stopPropagation();
+    toast('家長版只能看。要摸摸牠、留言、加點，請用下面的按鈕。');
+  },true);
+  // 家長頁按「摸摸」「留言」「加點」時，讓寵物在畫面上有反應（只是動畫，真正的效果在孩子打開網站時套用）
+  window.__pvAnim=function(kind,txt){ try{ if(window.__petApi && window.__petApi.anim) window.__petApi.anim(kind,txt); }catch(e){} };
 })();
 </script>
 </body>

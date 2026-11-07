@@ -60,6 +60,9 @@ const st = J(o, 'plan.state.v3', {}), hist = J(o, 'plan.hist.v1', {}), pomo = J(
 const plog = Array.isArray(pomo.log) ? pomo.log : [], items = C.items || {};
 const at = o._at ? new Date(o._at).getTime() : 0;
 
+// 讀書時間（11-07 使用者定）：那天有番茄鐘就算番茄鐘分鐘，沒有才算完成任務的表定分鐘
+const pomoMin = (k) => plog.filter((e) => e && e.k === k).reduce((a, e) => a + (+e.m || 25), 0);
+const studyMin = (k, taskMin) => pomoMin(k) || taskMin;
 const out = { 資料時間: at ? hm(at) : '不明', 幾小時前: at ? +((Date.now() - at) / 36e5).toFixed(1) : null, 點數: shop.pts ?? null };
 
 // 今天
@@ -67,7 +70,7 @@ const opened = st.day === tk, done = st.done || {};
 const list = opened ? (st.list || []).filter((x) => !x.pre && !x.f) : [];
 out.今天 = opened ? {
   完成: list.filter((x) => done[x.id]).length + '/' + list.length,
-  完成分鐘: list.filter((x) => done[x.id]).reduce((a, x) => a + (+x.m || 0), 0) + Math.round((+vrev[tk] || 0) / 60),
+  讀書分鐘: studyMin(tk, list.filter((x) => done[x.id]).reduce((a, x) => a + (+x.m || 0), 0) + Math.round((+vrev[tk] || 0) / 60)),
   番茄鐘: plog.filter((e) => e && e.k === tk).length,
   已完成: list.filter((x) => done[x.id]).map((x) => (x.bk ? '[欠帳] ' : '') + x.n),
   還沒做: list.filter((x) => !done[x.id]).map((x) => (x.bk ? '[欠帳] ' : '') + x.n),
@@ -80,7 +83,7 @@ for (let i = nDays - 1; i >= 0; i--) {
   if (k === tk) continue;
   if (!e) { out.最近.push(md(k) + ' 週' + WD[d.getDay()] + '：沒紀錄'); continue; }
   let a = 0, dn = 0; if (e.cat) Object.values(e.cat).forEach((c) => { a += c.a || 0; dn += c.d || 0; }); else { a = e.a || 0; dn = e.d || 0; }
-  const m = (+e.m || 0) + Math.round((+vrev[k] || 0) / 60), pc = plog.filter((x) => x && x.k === k).length;
+  const m = studyMin(k, (+e.m || 0) + Math.round((+vrev[k] || 0) / 60)), pc = plog.filter((x) => x && x.k === k).length;
   out.最近.push(md(k) + ' 週' + WD[d.getDay()] + '：讀書 ' + m + ' 分、任務 ' + dn + '/' + a + '、番茄鐘 ' + pc + (easy[k] ? '（降級日）' : ''));
 }
 
@@ -99,7 +102,7 @@ if (args.includes('--json')) { console.log(JSON.stringify(out, null, 2)); proces
 console.log('資料時間：' + out.資料時間 + (out.幾小時前 != null ? '（' + out.幾小時前 + ' 小時前）' : '') + '　點數：' + out.點數);
 if (typeof out.今天 === 'string') console.log('今天：' + out.今天);
 else {
-  console.log('今天：完成 ' + out.今天.完成 + '、' + out.今天.完成分鐘 + ' 分、番茄鐘 ' + out.今天.番茄鐘 + ' 顆');
+  console.log('今天：完成 ' + out.今天.完成 + '、讀書 ' + out.今天.讀書分鐘 + ' 分、番茄鐘 ' + out.今天.番茄鐘 + ' 顆');
   out.今天.已完成.forEach((n) => console.log('  ✓ ' + n));
   out.今天.還沒做.forEach((n) => console.log('  ○ ' + n));
 }
