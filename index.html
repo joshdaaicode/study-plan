@@ -810,6 +810,20 @@ section{padding-top:40px}
 .sp-tbl td,.sp-tbl th{white-space:nowrap}
 .sp-tbl td.n{font-family:'IBM Plex Mono',monospace;text-align:right}
 .sp-tbl .behind{color:var(--warn);font-weight:700}
+/* 教材進度詳細（11-07）：每本書展開看每一段的排程和完成時間 */
+#bk-auto .sp-tbl td:first-child,#bk-auto .sp-tbl td:last-child{white-space:normal;min-width:9em}
+.bk-d{border-top:1px solid var(--rule);padding:8px 0}
+.bk-d>summary{cursor:pointer;font-size:14px;line-height:1.5}
+.bk-d>summary span{display:block;font-size:12.5px;color:var(--ink-faint)}
+.bk-d>summary em{font-style:normal;color:var(--warn);font-weight:700}
+.bk-t{width:100%;min-width:0;border-collapse:collapse;font-size:13px;margin-top:6px}   /* 手機上不要橫向捲：內容那欄自己換行 */
+.bk-t th{font-size:12px;color:var(--ink-faint);text-align:left;font-weight:500;padding:4px 6px;border-bottom:1px solid var(--rule)}
+.bk-t td{padding:5px 6px;border-bottom:1px solid var(--rule);vertical-align:top}
+.bk-t td.d{white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-soft)}
+.bk-t td.st{font-size:12.5px;min-width:5.5em}
+@media (max-width:480px){ .bk-t th,.bk-t td{padding:5px 4px} .bk-t td.d{font-size:11.5px} }
+.bk-t tr.ok td.st{color:var(--cap)} .bk-t tr.behind td.st{color:var(--warn);font-weight:700} .bk-t tr.today td.st{color:var(--sci)} .bk-t tr.fut td{color:var(--ink-faint)}
+.bk-more>summary{cursor:pointer;font-size:13px;color:var(--sci);margin-top:6px}
 .sp-tbl .ok{color:var(--cap)}
 .sp-bar{display:inline-block;width:60px;height:6px;border-radius:999px;background:var(--rule2);vertical-align:middle;margin-right:6px;overflow:hidden}
 .sp-bar i{display:block;height:100%;background:var(--cap)}
@@ -1625,7 +1639,7 @@ html.pv .wrap{max-width:none;padding:0}
 
 <section>
   <div class="sec-head"><h2>科學班進度表</h2><span class="eyebrow">兩本考古題 71 份，二月中寫完</span></div>
-  <p class="sec-note">考古題 A 本（台南一中、嘉中、彰中）35 份、B 本（台中一中、武陵、建中、北一女）36 份。<b>從 112 年寫到 114 年</b>，最新的留到最後當模擬；同一年內數學、物理、化學、生物、地科交錯，作答和訂正分開兩段（隔一段再訂正，記得更牢）。</p>
+  <p class="sec-note">P&amp;C《科學班歷屆試題Q》兩本：112–114 南一中、嘉中、彰中 35 份；112–114 中一中、武陵、建中、北一女 36 份。<b>從 112 年寫到 114 年</b>，最新的留到最後當模擬；同一年內數學、物理、化學、生物、地科交錯，作答和訂正分開兩段（隔一段再訂正，記得更牢）。</p>
   <div class="tbl-scroll"><table>
     <thead><tr><th>期間</th><th>考古題</th><th>其他</th></tr></thead>
     <tbody>
@@ -1638,7 +1652,7 @@ html.pv .wrap{max-width:none;padding:0}
       <tr><td class="t">3/7–3/12</td><td colspan="2">複試準備：自我介紹、實驗總整理、數據處理、經驗說明、模擬提問</td></tr>
     </tbody>
   </table></div>
-  <p class="w-note">A 本目前手上沒有解答檔的話，訂正時先自己重算，真的卡住的記到「今天 → 要問老師」，週末帶去補習班問。</p>
+  <p class="w-note">南一中、嘉中、彰中那本目前手上沒有解答檔的話，訂正時先自己重算，真的卡住的記到「今天 → 要問老師」，週末帶去補習班問。</p>
 </section>
 
 <section>
@@ -1779,7 +1793,7 @@ html.pv .wrap{max-width:none;padding:0}
   </div>
 
   <div class="card" id="kp-card" style="margin-top:18px">
-    <div class="sec-head" style="margin-bottom:6px"><h3>科班考古題進度</h3><span class="eyebrow">A 本 35 份＋B 本 36 份</span></div>
+    <div class="sec-head" style="margin-bottom:6px"><h3>科班考古題進度</h3><span class="eyebrow">科學班歷屆試題Q 兩本，35＋36 份</span></div>
     <p class="sub">寫完打勾、填分數（換算成百分比）。在「今天」勾掉某份考古題的「限時作答」時，這裡會自動打勾。</p>
     <div class="kp-top" id="kp-top"></div>
     <p class="sub" id="kp-pace" style="margin:-4px 0 10px"></p>
@@ -2862,8 +2876,11 @@ html.pv .wrap{max-width:none;padding:0}
     var cat={};
     real.forEach(function(x){ var c=x.c||'other', o=cat[c]=cat[c]||{a:0,d:0,m:0}; o.a++; if(st.done[x.id]){ o.d++; o.m+=x.m||0; } });
     // un：沒完成的讀書任務名稱（2026-11-07 加，長條圖點一天要看得到哪些沒做）
+    // dt：和 dn 同順序的完成時間（毫秒；11/7 以前勾的沒有，記 0）
+    var at=st.doneAt||{};
     return {a:all.length, d:all.filter(function(x){return st.done[x.id];}).length, m:dn.reduce(function(s,x){return s+(x.m||0);},0), cat:cat, dn:dn.map(function(x){return x.n;}),
-      un:real.filter(function(x){return !st.done[x.id];}).map(function(x){return x.n;})};
+      un:real.filter(function(x){return !st.done[x.id];}).map(function(x){return x.n;}),
+      dt:dn.map(function(x){return at[x.id]||0;})};
   }
   // 重新產生今天的任務，但保留已勾的（照任務名稱對）和自己加的任務
   // 勾選照名稱對，但一個勾只還給一項（2026-11-02 修：欠帳和今天同名的「雄科班補習作業」，勾一個、重新產生後會兩個都勾上）
@@ -2893,7 +2910,7 @@ html.pv .wrap{max-width:none;padding:0}
       // 錯題複習（w 開頭）每天會依到期題數重新產生，沒做完不另外算欠帳
       st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !x.pre && !st.done[x.id] && !/^w/.test(x.id); })
         .map(function(x){ return {n:x.n, m:x.m, c:x.c||''}; });
-      st.done={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
+      st.done={}; st.doneAt={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
     } else if (!st.list || !st.list.length){
       st.done={}; st.bonus=0;   // 清單是空的就重建：沒有任務可以對，留下的勾選一律清掉
       st.list=buildList(d, st.backlog||[]); save(SK,st);
@@ -2939,10 +2956,11 @@ html.pv .wrap{max-width:none;padding:0}
         // 畫面還是昨天的清單（換日後還沒重畫）：這一下不算，先換成今天的清單
         if(st.day && st.day!==key(today0())){ cb.checked=!cb.checked; stamp=new Date().toDateString(); render(); return; }
         var pv=(window.__rules?window.__rules().task:5);
-        if(cb.checked){ st.done[x.id]=1; var got=window.__award?window.__award(pv,'完成：'+x.n):pv;
+        if(cb.checked){ st.done[x.id]=1; st.doneAt=st.doneAt||{}; st.doneAt[x.id]=Date.now();   // 完成時間（教材進度看得到幾點完成）
+          var got=window.__award?window.__award(pv,'完成：'+x.n):pv;
           if(window.__kbMark) window.__kbMark(x.n);
           if(window.__fx) window.__fx.task(lab,got||pv); }
-        else { delete st.done[x.id]; var lost=window.__award?window.__award(-pv,'取消勾選：'+x.n):-pv;
+        else { delete st.done[x.id]; if(st.doneAt) delete st.doneAt[x.id]; var lost=window.__award?window.__award(-pv,'取消勾選：'+x.n):-pv;
           if(window.__fx) window.__fx.undo(lab,Math.abs(lost||pv)); }
         save(SK,st); paintBudget();
       });
@@ -5201,34 +5219,91 @@ html.pv .wrap{max-width:none;padding:0}
     while((m=re.exec(s))){ best=Math.max(best,+(m[2]||m[1])); }
     return best;
   }
+  // 教材進度（2026-11-07 改詳細，使用者：「幾月幾號要寫到哪裡的歷史紀錄和我完成的時間都要列出來，不要說是 a 本還是什麼本，去看標題」）
+  // 每本講義／題本：排程裡每一段（哪天要寫到哪）＋實際完成的日期與時間。
+  // 完成時間：11/7 起勾任務會記下時間（dayStat 的 dt）；以前的從點數紀錄「完成：…」找（只留最近 200 筆），再找不到就只有日期。
+  var BOOK_KEYS=['chi','m1','m2','e1','e2','phy','bio','ear','his','geo','civ','mock','past','A','B'];
+  var BOOK_SUBJ={chi:'國文',m1:'數學',m2:'數學',e1:'英文',e2:'英文',phy:'理化',bio:'生物',ear:'地科',his:'歷史',geo:'地理',civ:'公民',mock:'會考',past:'會考',A:'科班',B:'科班'};
+  // 考古題兩本的封面標題（P&C 科學教育中心）
+  var BOOK_TITLE={A:'P&C 科學班歷屆試題Q（112–114 南一中、嘉中、彰中）', B:'P&C 科學班歷屆試題Q（112–114 中一中、武陵、建中、北一女）'};
+  function bookTitle(key){ return BOOK_TITLE[key]||PL.books[key]||key; }
+  function bookShort(n,b){   // 列表裡的內容：拿掉「國文｜」這類前綴和書名，考古題的「（考古題 A 本 p.x）」改成「p.x」
+    var s=String(n).replace(/^[^｜]{1,12}｜/,'');
+    if(s.indexOf(b)===0) s=s.slice(b.length);
+    s=s.replace(/（考古題 [AB] 本 (p\.[^）]*)）/,' $1').replace(/考古題 [AB] 本/g,'歷屆試題Q');
+    return s.replace(/\s+/g,' ').trim();
+  }
+  function hmT(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate()+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+  function doneIndex(){   // 任務名稱 → [{k:那天, t:完成時間（可能沒有）}]
+    var h=allHist(), idx={}, log=(window.__shopLog?window.__shopLog():[])||[];
+    Object.keys(h).forEach(function(k){
+      var e=h[k], dn=e.dn||[], dt=Array.isArray(e.dt)?e.dt:[];
+      dn.forEach(function(n,i){ (idx[n]=idx[n]||[]).push({k:k, t:+dt[i]||0}); });
+    });
+    // 沒有記到時間的：從點數紀錄找同一天最後一次「完成：任務名稱」
+    Object.keys(idx).forEach(function(n){
+      idx[n].forEach(function(r){
+        if(r.t) return;
+        var d0_=pk(r.k).getTime(), d1_=d0_+864e5, best=0;
+        log.forEach(function(l){ if(l && l.t>=d0_ && l.t<d1_ && String(l.w||'').indexOf('完成：'+n)===0 && l.t>best) best=l.t; });
+        r.t=best;
+      });
+      idx[n].sort(function(a,b){ return pk(a.k)-pk(b.k); });
+    });
+    return idx;
+  }
+  var bkOpen={};   // 這次開著的那本（重畫時保持展開）
   function paintBooks(){
     var box=document.getElementById('bk-auto'); if(!box) return;
-    var today=d0(), h=allHist();
-    var names=['chi','m1','m2','e1','e2','phy','bio','ear','his','geo','civ','A','B'].map(function(k){ return PL.books[k]; }).filter(Boolean);
-    var doneNames=[]; Object.keys(h).forEach(function(k){ (h[k].dn||[]).forEach(function(n){ doneNames.push(n); }); });
-    var rows=names.map(function(b){
-      var planTo=0, next=null;
+    var today=d0(), tk=kk(today), idx=doneIndex();
+    var books=BOOK_KEYS.filter(function(key){ return PL.books[key]; }).map(function(key){
+      var b=PL.books[key], segs=[];
       DAYS.forEach(function(k){
-        var d=pk(k);
         studyBlocks(k).forEach(function(x){
-          if(String(x.n).indexOf(b)<0) return;
-          var p=maxPage(x.n);
-          if(d<today) planTo=Math.max(planTo,p);
-          else if(!next) next={k:k, n:x.n};
+          var n=String(x.n); if(n.indexOf(b)<0) return;
+          if(/可對照/.test(n) && n.indexOf('可對照')<n.indexOf(b)) return;   // 二段課本旁邊寫的「可對照某講義」不算
+          var dn=idx[n]||[], r=dn[0]||null;
+          segs.push({k:k, n:n, p:maxPage(n), done:r});
         });
       });
-      var doneTo=0; doneNames.forEach(function(n){ if(n.indexOf(b)>=0) doneTo=Math.max(doneTo,maxPage(n)); });
-      return {b:b, planTo:planTo, doneTo:doneTo, next:next};
-    });
-    box.innerHTML='<div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>講義</th><th>照計畫到昨天</th><th>你做到</th><th>下一次排在</th></tr></thead><tbody>'
-      +rows.map(function(r){
-        var beh=r.planTo && r.doneTo<r.planTo;
-        // 一段任務可能寫了兩本書，頁碼取這本書名後面的第一個範圍
-        var nx=r.next? md(r.next.k)+'（'+WD[pk(r.next.k).getDay()]+'） '+esc((String(r.next.n).slice(String(r.next.n).indexOf(r.b)).match(/p\.\d+(?:[–-]\d+)?/)||[''])[0]) : '—';
-        return '<tr><td>'+esc(r.b)+'</td><td class="n">'+(r.planTo?'p.'+r.planTo:'—')+'</td>'
-          +'<td class="n '+(beh?'behind':(r.doneTo?'ok':''))+'">'+(r.doneTo?'p.'+r.doneTo:'—')+'</td><td>'+nx+'</td></tr>';
-      }).join('')+'</tbody></table></div>'
-      +'<p class="w-note">頁碼取任務名稱裡最後面的頁數；同一本書排了第二輪的，會以排過最遠的那一頁為準。</p>';
+      var due=segs.filter(function(s){ return pk(s.k)<=today; });
+      var doneN=segs.filter(function(s){ return s.done; }).length, dueDone=due.filter(function(s){ return s.done; }).length;
+      var late=due.filter(function(s){ return !s.done && s.k!==tk; });
+      var next=segs.filter(function(s){ return pk(s.k)>today && !s.done; })[0]||null;
+      var planTo=0; due.forEach(function(s){ if(s.k!==tk) planTo=Math.max(planTo,s.p); });
+      var doneTo=0; segs.forEach(function(s){ if(s.done) doneTo=Math.max(doneTo,s.p); });
+      var last=null; segs.forEach(function(s){ if(s.done && (!last || (s.done.t||pk(s.done.k).getTime())>(last.t||pk(last.k).getTime()))) last=s.done; });
+      return {key:key, b:b, title:bookTitle(key), segs:segs, due:due.length, dueDone:dueDone, doneN:doneN, late:late, next:next, planTo:planTo, doneTo:doneTo, last:last};
+    }).filter(function(r){ return r.segs.length; });
+    var html='<div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>講義／題本</th><th>到今天</th><th>落後</th><th>下一次排在</th></tr></thead><tbody>'
+      +books.map(function(r){
+        var nx=r.next? md(r.next.k)+'（'+WD[pk(r.next.k).getDay()]+'）'+esc(bookShort(r.next.n,r.b)) : '全部排完了';
+        return '<tr><td><b>'+esc(BOOK_SUBJ[r.key]||'')+'</b>　'+esc(r.title)+'</td><td class="n '+(r.late.length?'behind':(r.dueDone?'ok':''))+'">'+r.dueDone+'／'+r.due+'</td>'
+          +'<td class="n'+(r.late.length?' behind':'')+'">'+(r.late.length?r.late.length+' 段':'—')+'</td><td>'+nx+'</td></tr>'; }).join('')
+      +'</tbody></table></div>'
+      +'<p class="w-note">「到今天」＝排到今天的段數裡完成幾段（今天排的還沒做不算落後）。點下面的書名看每一段排在哪天、你哪天幾點完成。</p>';
+    html+=books.map(function(r){
+      var rows=r.segs.map(function(s){
+        var st, cls;
+        if(s.done){ var dd=s.done; cls='ok';
+          st='✓ '+(dd.t?hmT(dd.t):md(dd.k))+(dd.k!==s.k?(pk(dd.k)<pk(s.k)?'（提早）':'（晚 '+Math.round((pk(dd.k)-pk(s.k))/864e5)+' 天）'):'');
+        } else if(s.k===tk){ cls='today'; st='今天要寫'; }
+        else if(pk(s.k)<today){ cls='behind'; st='⚠ 還沒寫'; }
+        else { cls='fut'; st='—'; }
+        return {k:s.k, html:'<tr class="'+cls+'"><td class="d">'+md(s.k)+'（'+WD[pk(s.k).getDay()]+'）</td><td>'+esc(bookShort(s.n,r.b))+'</td><td class="st">'+st+'</td></tr>'};
+      });
+      var past=rows.filter(function(x){ return pk(x.k)<=today; }), fut=rows.filter(function(x){ return pk(x.k)>today; });
+      var head='<thead><tr><th>排定</th><th>內容</th><th>完成</th></tr></thead>';
+      return '<details class="bk-d" data-bk="'+r.key+'"'+(bkOpen[r.key]?' open':'')+'><summary><b>'+esc(BOOK_SUBJ[r.key]||'')+'｜'+esc(r.title)+'</b>'
+        +'<span>完成 '+r.doneN+'／'+r.segs.length+' 段'+(r.late.length?'・<em>落後 '+r.late.length+' 段</em>':'')+(r.last?'・最近完成 '+(r.last.t?hmT(r.last.t):md(r.last.k)):'')+'</span></summary>'
+        +(r.planTo||r.doneTo?'<p class="sub" style="margin:6px 0">照計畫到昨天應寫到 p.'+(r.planTo||'—')+'，你寫到 p.'+(r.doneTo||'—')+'。</p>':'')
+        +(past.length?'<div class="tbl-scroll"><table class="bk-t">'+head+'<tbody>'+past.map(function(x){ return x.html; }).join('')+'</tbody></table></div>':'<p class="sub">還沒排到。</p>')
+        +(fut.length?'<details class="bk-more"><summary>之後的排程（'+fut.length+' 段，到 '+md(fut[fut.length-1].k)+'）</summary><div class="tbl-scroll"><table class="bk-t">'+head+'<tbody>'+fut.map(function(x){ return x.html; }).join('')+'</tbody></table></div></details>':'')
+        +'</details>';
+    }).join('');
+    html+='<p class="w-note">完成時間：11/7 起勾任務會記下幾點幾分；以前的從點數紀錄找（只留最近 200 筆），找不到就只顯示日期。提早＝熬夜往前寫掉的；晚幾天＝當欠帳補的。</p>';
+    box.innerHTML=html;
+    Array.prototype.forEach.call(box.querySelectorAll('details.bk-d'),function(d){ d.addEventListener('toggle',function(){ bkOpen[d.getAttribute('data-bk')]=d.open; }); });
   }
 
   /* ---------- 日程搜尋 ---------- */
@@ -7904,7 +7979,7 @@ html.pv .wrap{max-width:none;padding:0}
       PL.papers.filter(function(p){ return p[3]===y; }).forEach(function(p){
         var k=id(p), r=data[k]||{};
         html+='<div class="kp-row'+(r.d?' on':'')+'"><input type="checkbox" data-k="'+k+'"'+(r.d?' checked':'')+' aria-label="'+k+' 已寫">'
-          +'<span class="kp-name"><span class="kp-tag c-'+(CAT[p[2]]||'kb')+'">'+p[2]+'</span>'+p[1]+'<small>'+p[0]+' 本 p.'+p[4]+'–'+p[5]+'</small></span>'
+          +'<span class="kp-name"><span class="kp-tag c-'+(CAT[p[2]]||'kb')+'">'+p[2]+'</span>'+p[1]+'<small>歷屆試題Q p.'+p[4]+'–'+p[5]+'</small></span>'
           +'<input type="number" min="0" max="100" placeholder="%" data-s="'+k+'" value="'+(r.s!==undefined?r.s:'')+'" aria-label="'+k+' 分數"></div>';
       });
       html+='</div>';
