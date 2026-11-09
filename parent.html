@@ -304,9 +304,12 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     if(it.ls) return Math.max(0,days(pk(it.ls),today)+1);
     return days(addD(pk(it.k),CHECK_DAYS+1),today)>=0 ? -1 : 0;
   }
+  var lastDay='';
   function render(o){
     var changed=!lastO || o._at!==(lastO&&lastO._at);
-    lastO=o;
+    // 11-09：資料沒變、也還是同一天，就不重畫——以前每 10 分鐘整頁重建，森林的 iframe 會整個重新載入（約 0.9 MB），長條圖也會跳回今天
+    if(!changed && lastDay===key(d0()) && app.firstChild){ lastO=o; return; }
+    lastO=o; lastDay=key(d0());
     var today=d0(), tk=key(today), now=new Date();
     var st=J(o,'plan.state.v3',{}), pomo=J(o,'plan.pomo.v1',{}), C=J(o,'plan.checks.v1',{}),
         shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{}), pet=J(o,'plan.pet.v1',{});
@@ -425,7 +428,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     window.__pvData=lastO;
     f=document.createElement('iframe'); f.id='pvf'; f.title='他的森林（家長版，只能看）'; f.src='index.html?pv=1'; f.style.height='520px';
     box.appendChild(f); b.textContent='收起森林';
-    var fit=function(){ try{ var d=f.contentDocument; if(!d||!d.body) return; var h=Math.max(320,d.documentElement.scrollHeight); if(Math.abs(parseFloat(f.style.height)-h)>4) f.style.height=h+'px'; }catch(e){} };
+    var fit=function(){ try{ var d=f.contentDocument; if(!d||!d.body) return; var h=Math.max(320,d.body.scrollHeight+24);   /* 11-09：量 body，以前量整頁只會變高、不會變矮 */ if(Math.abs(parseFloat(f.style.height)-h)>4) f.style.height=h+'px'; }catch(e){} };
     f.addEventListener('load',function(){ f.dataset.ready='1'; fit(); try{ if(window.ResizeObserver) new ResizeObserver(fit).observe(f.contentDocument.body); }catch(e){} var n=0, iv=setInterval(function(){ fit(); if(++n>20||!document.getElementById('pvf')) clearInterval(iv); },500); });
   }
 

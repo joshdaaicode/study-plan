@@ -991,6 +991,10 @@ html.pv .wrap{max-width:none;padding:0}
 [data-dark] .tab-btn[aria-selected="true"],[data-dark] .dv-day.sel,[data-dark] .dv-day.sel b{color:#0B1620}
 [data-dark] .dv-day.sel i{background:#0B1620}
 [data-dark] .dv-item.now .dv-time::after{color:#0B1620}
+/* 11-09 修 B12：夜間主題（21:00 起）主色變亮，這幾個白字只剩約 2.3:1 對比，看不清楚 → 跟上面一樣改深色字 */
+[data-dark] .p-x,[data-dark] .p-s,[data-dark] .dowbox button.on,[data-dark] .mood-row button.on,[data-dark] .fp-dot{color:#0B1620}
+/* 11-09 修 B11：手機版分頁按鈕的 padding（約 337 行）被上面沒有條件的 .tab-btn{padding:9px 17px} 蓋掉，這裡再寫一次讓手機版生效 */
+@media (max-width:640px){ .tab-btn{padding:7px 12px} }
 .tk-del{min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:17px}
 @media (prefers-reduced-motion:reduce){.fp-new,.fp-sw,.fp-grass,.fp-glow,.fp-tw,.fp-shim,.fp-rain,.fp-snow,.fp-bulb,.fp-anger,.fp-mini-pet .rg-b,.fp-adopt button svg .rg-b{animation:none}}
 .no-motion .fp-new,.no-motion .fp-sw,.no-motion .fp-grass,.no-motion .fp-glow,.no-motion .fp-tw,.no-motion .fp-shim,.no-motion .fp-rain,.no-motion .fp-snow,.no-motion .fp-bulb,.no-motion .fp-anger,.no-motion .fp-mini-pet .rg-b{animation:none}
@@ -1234,6 +1238,7 @@ html.pv .wrap{max-width:none;padding:0}
     </div>
     <aside class="td-side">
   <div class="card fp-mini" id="fp-mini" hidden></div>
+  <div class="card qt-card" id="qt-card" hidden></div><!-- 11-09：每日任務、每週挑戰的進度（只看；領取在森林） -->
   <div class="nowcard">
     <div>
       <span class="eyebrow">現在</span>
@@ -2046,6 +2051,8 @@ html.pv .wrap{max-width:none;padding:0}
 <section>
   <div class="sec-head"><h2>進度回測</h2><span class="eyebrow">看趨勢，不看單日</span></div>
   <p class="sec-note">138 項研究、近 2 萬名參與者的統合分析顯示，監控目標進度確實能提升達成率（d = 0.40），而且<b>把進度實際記錄下來</b>時效果更強。這頁就是那個記錄。</p>
+  <!-- 11-09：「給 Claude 檢查」從森林頁搬來（使用者：不該放在森林的東西移出來，不然看一下就被扣心情） -->
+  <div class="card" id="chk-card" style="padding:14px 16px;margin-bottom:14px"></div>
   <div class="card" id="dc-card" style="padding:14px 16px;margin-bottom:14px"><h3 style="margin:0 0 6px">每天的讀書長條圖</h3><div id="dc-mine"><p class="sub">載入中…</p></div></div>
   <div class="td-budget" id="bt-sum"></div>
   <div class="card" id="bt-chart" style="padding:14px 16px;margin-bottom:14px"></div>
@@ -2146,6 +2153,13 @@ html.pv .wrap{max-width:none;padding:0}
           ['dn','un'].forEach(function(f){ if(Array.isArray(e[f])) e[f]=e[f].map(function(s){ var t=rn(s); if(t!==s) hc=true; return t; }); });
         });
         if(hc) S('plan.hist.v1',H); }
+      // 欠帳和今天清單裡的舊名稱也要改（B2），不然勾掉時會把 112 記成已寫。只在 1/30 之前做：那天起計畫表裡會出現真的 112
+      if(new Date()<new Date(2027,0,30)){
+        var ST=J('plan.state.v3');
+        if(ST){ var sc=false;
+          ['list','backlog'].forEach(function(f){ if(Array.isArray(ST[f])) ST[f].forEach(function(x){ if(x&&x.n){ var t=rn(x.n); if(t!==x.n){ x.n=t; sc=true; } } }); });
+          if(sc) S('plan.state.v3',ST); }
+      }
       var B=J('plan.kbscore.v1');
       if(B&&!B._m1109){
         [['台南一中 112 物理','台南一中 114 物理'],['台南一中 112 化學','台南一中 114 化學']].forEach(function(x){
@@ -2966,6 +2980,17 @@ html.pv .wrap{max-width:none;padding:0}
     if(stale.length){ stale.forEach(function(id){ delete st.done[id]; }); save(SK,st); }
     return d;
   }
+  // 錯題複習（11-09 修）：早上第一次打開時，今天清單在錯題本程式載入「之前」就建好了，那時 __wrongDue 還沒定義，
+  // 「錯題複習 N 題」就漏掉。錯題本定義好 __wrongDue 後會呼叫這個：今天清單裡沒有錯題複習、又有到期的題目，就補上。
+  window.__todaySyncWrong=function(){
+    try{
+      var k=key(today0()); if(st.day!==k || !st.list) return;
+      if(st.list.some(function(x){ return /^w/.test(x.id); })) return;
+      var due=(window.__wrongDue?window.__wrongDue():[]).length; if(!due) return;
+      st.list.push({id:'w'+st.list.length+'@'+k, n:'錯題複習 '+due+' 題（闔上答案重做）', t:'錯題本', m:Math.min(60,due*6)});
+      save(SK,st); render();
+    }catch(e){}
+  };
 
   var elWhen=document.getElementById('td-when'), elList=document.getElementById('td-list'),
       elBud=document.getElementById('td-budget'), elEd=document.getElementById('td-editor'),
@@ -3080,7 +3105,9 @@ html.pv .wrap{max-width:none;padding:0}
     var all=st.list.filter(function(x){return !x.pre;}).length;
     var done=st.list.filter(function(x){return !x.pre && st.done[x.id];}).length;
     var pct=all?Math.round(done/all*100):100;
-    if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st);
+    // 11-09 修 B8：開頁時點數引擎（__award）還沒載入，一打開就全清的話，以前會記成「已領」卻沒加到點數；改成等整頁載入完再算一次
+    if(all && done===all && !st.bonus && !window.__award){ if(!render.waitAward){ render.waitAward=1; window.addEventListener('load',function(){ render(); },{once:true}); } }
+    else if(all && done===all && !st.bonus){ st.bonus=1; save(SK,st);
       if(window.__award) window.__award((window.__rules?window.__rules().allclear:15),'今日全清');
       if(window.__fx) setTimeout(function(){ window.__fx.allClear(); },260); }
     var m=(easy?'<b style="color:var(--warn)">降級模式</b>　只做最重要的一項就算數，今天不計欠帳、不扣娛樂、不斷連續紀錄。<br>':'')
@@ -4505,6 +4532,7 @@ html.pv .wrap{max-width:none;padding:0}
   // 換了複習間隔（固定 5 級 ↔ 費氏 8 級）後，原本「已精熟」的題目可能又回到複習中，沒有到期日就從今天開始
   (function(){ var fixd=false; W.forEach(function(x){ if(x.lv<IV.length && isNaN(parse(x.due).getTime())){ x.due=kk(d0()); fixd=true; } }); if(fixd) save(); })();
   window.__wrongDue=function(){ var t=d0(); return W.filter(function(x){ return x.lv<IV.length && parse(x.due)<=t; }); };
+  if(window.__todaySyncWrong) window.__todaySyncWrong();   // 今天清單比這裡早建，補上「錯題複習」（B1）
 
   var elDue=document.getElementById('wr-due'), elAll=document.getElementById('wr-all'), elStat=document.getElementById('wr-stat');
   if(!elDue) return;
@@ -4583,8 +4611,8 @@ html.pv .wrap{max-width:none;padding:0}
     var subs=Object.keys(subC).sort(function(a,b){return subC[b]-subC[a];})
       .map(function(k){return k+' '+subC[k];}).join('　');
     elStat.innerHTML='<b>待攻克 '+act+' 題</b>　已精熟 '+done+' 題　今日到期 <b>'+window.__wrongDue().length+'</b> 題'
-      +(subs?'<br><span style="font-size:12.5px;color:var(--ink-faint)">'+subs+'</span>':'')
-      +(top?'<br><span style="font-size:12.5px;color:var(--warn)">最常見的錯因：'+top+'（'+whyC[top]+' 次）</span>':'');
+      +(subs?'<br><span style="font-size:12.5px;color:var(--ink-faint)">'+window.__esc(subs)+'</span>':'')   // 11-09 修 B13：科目、錯因是自己打的字，放進網頁前要跳脫
+      +(top?'<br><span style="font-size:12.5px;color:var(--warn)">最常見的錯因：'+window.__esc(top)+'（'+whyC[top]+' 次）</span>':'');
   }
 
   document.getElementById('wr-add').addEventListener('click',function(){
@@ -4838,9 +4866,13 @@ html.pv .wrap{max-width:none;padding:0}
     });
   }
 
-  paintBT();
-  setInterval(paintBT,30000);
-  document.addEventListener('plan:tab',function(e){ if(e.detail===4) setTimeout(paintBT,30); });
+  // 11-09 修 C3：以前開頁就畫、之後每 30 秒不管在哪一頁（螢幕關著也算）都重算一次，還會量寬度逼整頁重新排版。
+  // 改成：只有正在看「紀錄 → 進度回測」時才畫；切過來、從背景切回來時畫一次，在這頁時每 30 秒更新
+  function btOn(){ return window.__tab===4 && window.__sub===21 && !document.hidden; }
+  if(btOn()) paintBT();
+  setInterval(function(){ if(btOn()) paintBT(); },30000);
+  document.addEventListener('plan:tab',function(e){ if(e.detail===4) setTimeout(function(){ if(btOn()) paintBT(); },30); });
+  document.addEventListener('visibilitychange',function(){ if(btOn()) paintBT(); });
   // 每天的讀書長條圖（daychart.js，家長版也用同一份）：打開「紀錄」才畫
   var dcm=null;
   function paintDC(){
@@ -5207,7 +5239,7 @@ html.pv .wrap{max-width:none;padding:0}
       var d=pk(k); if(d<from||d>=today) return;
       studyBlocks(k).forEach(function(x){ plan[x.c]=(plan[x.c]||0)+1; });
     });
-    var lim=new Date(today); lim.setDate(lim.getDate()-13);
+    var lim=new Date(today); lim.setDate(lim.getDate()-14);   // 11-09 修 B7：以前是 -13，只算到 13 天
     Object.keys(h).forEach(function(k){
       var c=h[k].cat; if(!c) return; var d=pk(k);
       Object.keys(c).forEach(function(cat){
@@ -5556,7 +5588,14 @@ html.pv .wrap{max-width:none;padding:0}
   function viewState(){ var v=ls(VK,null)||{}; if(v.day!==kk(d0())) v={day:kk(d0()),ms:0,peek:{},warned:0,pets:0,scene:v.scene||'forest',tab:v.tab||'main',land:v.land,seenTrees:v.seenTrees,btab:v.btab,afil:v.afil}; return v; }   // 只存在這台，不同步
   function saveView(v){ sv(VK,v); }
   function easyMap(){ return ls('plan.easy.v1',{})||{}; }
-  function pomoState(){ return ls('plan.pomo.v1',{})||{}; }
+  // 11-09 修 C1：森林每棵樹算大小時都會叫到這裡（growIdx），以前每次都 JSON.parse 整份番茄鐘紀錄，
+  // 樹越多、番茄鐘越多就越慢（兩者相乘）。改成：存的文字沒變就用上次解析好的。呼叫的地方都只讀不改
+  var PS_RAW, PS_VAL=null;
+  function pomoState(){
+    var raw=null; try{ raw=localStorage.getItem('plan.pomo.v1'); }catch(e){}
+    if(raw!==PS_RAW || !PS_VAL){ PS_RAW=raw; try{ PS_VAL=JSON.parse(raw)||{}; }catch(e){ PS_VAL={}; } }
+    return PS_VAL;
+  }
   function pomoTotal(){ return pomoState().total||0; }
   function rnd(str){ var h=2166136261; for(var i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); } return ((h>>>0)%100000)/100000; }
   function pickR(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
@@ -5602,7 +5641,9 @@ html.pv .wrap{max-width:none;padding:0}
   var POMO_SUBJ={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kbm:'科班資優數學',kbs:'科班自然學科'};
   function pomoLog(){ var L=pomoState().log; return Array.isArray(L)?L:[]; }
   function collect(h, C, s, since){
-    var mins=0, tasks=0, clear=0, allClear=0, trees=[], byDay={};
+    var mins=0, tasks=0, clear=0, allClear=0, trees=[], byDay={}, seen={};
+    // 每棵樹一個固定編號（11-09 修 B9）：枯樹、死樹的標記以前記「第幾棵」，補登番茄鐘、新的樹、許願種子都會讓標記跑到別棵
+    function uid(base){ var n=seen[base]||0; seen[base]=n+1; return n?base+'#'+n:base; }
     pomoLog().forEach(function(p){ if(p&&p.k) (byDay[p.k]=byDay[p.k]||[]).push(p); });
     var keys=Object.keys(h); Object.keys(byDay).forEach(function(k){ if(!h[k]) keys.push(k); });
     keys.sort(function(a,b){ return pk(a)-pk(b); });
@@ -5613,14 +5654,14 @@ html.pv .wrap{max-width:none;padding:0}
         var full=e.a>0 && e.d===e.a; if(full) allClear++;
         doneList(e).forEach(function(t){
           var chk=t.n && needsCheck(t.n), it=chk? C.items[k+'|'+t.n] : null;
-          trees.push({sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?((it.wd||it.old)?'dead':it.st):'pending'):'ok', n:t.n});   // 逾期枯死的，之後過關也不復活
+          trees.push({id:uid('t|'+k+'|'+(t.n||t.c)), sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?((it.wd||it.old)?'dead':it.st):'pending'):'ok', n:t.n});   // 逾期枯死的，之後過關也不復活
           if(since && pk(k)>=since && (!chk || (it&&it.st==='pass'))) tasks++;
         });
         if(since && pk(k)>=since && full) clear++;
       }
-      (byDay[k]||[]).forEach(function(p){ trees.push({sp:POMO_TREE[p.s]||'bush', k:k, st:'ok', pomo:1, n:'番茄鐘：'+(POMO_SUBJ[p.s]||'沒選科目')}); });
+      (byDay[k]||[]).forEach(function(p){ trees.push({id:uid('p|'+k+'|'+(p.t||'')), sp:POMO_TREE[p.s]||'bush', k:k, st:'ok', pomo:1, n:'番茄鐘：'+(POMO_SUBJ[p.s]||'沒選科目')}); });
     });
-    s.seeds.forEach(function(sd){ trees.push({sp:'holy', k:sd.k, st:'ok', seed:1}); });
+    s.seeds.forEach(function(sd,j){ trees.push({id:'s|'+j+'|'+sd.k, sp:'holy', k:sd.k, st:'ok', seed:1}); });
     return {hours:mins/60, tasks:tasks, clear:clear, allClear:allClear, trees:trees};
   }
   // 樹怎麼長（2026-10-29 改）：GROW_CUT 以前照「有照顧的日子」長（已經長的不會縮回去），之後只靠番茄鐘。
@@ -5728,13 +5769,15 @@ html.pv .wrap{max-width:none;padding:0}
     if(!s.fLast){ s.fLast=kk(y); return; }   // 第一次：不追溯以前
     var d=pk(s.fLast); d.setDate(d.getDate()+1);
     var easy=easyMap(), dead=s.dead.slice(), wilt=s.wilt.slice(), changed=false;
+    // 先枯「最近種的」：照種下的日期排（許願種子也照日期，以前排在最後面，總是最先枯）
+    var tkey=trees.map(function(t){ return pk(t.k).getTime(); }), order=trees.map(function(t,i){ return i; }).sort(function(a,b){ return tkey[b]-tkey[a] || b-a; });
     while(d<=y){
       var k=kk(d); changed=true;
       if(cared(k,h,easy,lv)) wilt=[];
       else {
-        var taken={}; dead.forEach(function(i){ taken[i]=1; }); wilt.forEach(function(w){ w.idx.forEach(function(i){ taken[i]=1; }); });
-        var idx=[];
-        for(var i=trees.length-1;i>=0 && idx.length<WILT_N;i--){ if(pk(trees[i].k)<=d && !taken[i] && trees[i].st==='ok') idx.push(i); }
+        var taken={}; dead.forEach(function(id){ taken[id]=1; }); wilt.forEach(function(w){ w.idx.forEach(function(id){ taken[id]=1; }); });
+        var idx=[];   // 存樹的固定編號（不是第幾棵）
+        for(var j=0;j<order.length && idx.length<WILT_N;j++){ var t=trees[order[j]]; if(tkey[order[j]]<=d.getTime() && !taken[t.id] && t.st==='ok') idx.push(t.id); }
         if(idx.length) wilt.push({d:k, idx:idx});
         wilt=wilt.filter(function(w){ if(daysBetween(pk(w.d),d)>=WILT_DIE){ dead=dead.concat(w.idx); return false; } return true; });
       }
@@ -5873,8 +5916,11 @@ html.pv .wrap{max-width:none;padding:0}
   }
   function weekData(s,h){
     var wk=weekKey(d0()), start=pk(wk), C=checks(), lv=s.pet?(s.pet.lvSeen||1):1, easy=easyMap(), care=0, mins=0, clear=0, pomo=0, pass=0;
+    // 11-09 修 B5：以前今天一律不算照顧（週日就永遠數不到），番茄鐘只看寵物存的每日數（漏掉 Claude 補登的、半夜前最後幾顆）。
+    // 今天已經達到照顧標準就算；番茄鐘照紀錄本身數，跟寵物存的取大的（10/29 以前還沒有逐顆紀錄）
+    var byDay={}; pomoLog().forEach(function(x){ if(x&&x.k) byDay[x.k]=(byDay[x.k]||0)+1; });
     for(var i=0;i<7;i++){ var d=new Date(start); d.setDate(d.getDate()+i); if(d>d0()) break; var k=kk(d), e=h[k];
-      if(d<d0() && cared(k,h,easy,lv)) care++; if(e){ mins+=e.m||0; if(e.a>0&&e.d===e.a) clear++; } pomo+=s.pomoLog[k]||0; }
+      if(cared(k,h,easy,lv)) care++; if(e){ mins+=e.m||0; if(e.a>0&&e.d===e.a) clear++; } pomo+=Math.max(s.pomoLog[k]||0, byDay[k]||0); }
     Object.keys(C.items).forEach(function(key){ var it=C.items[key]; if(it.st==='pass' && it.passAt && new Date(it.passAt)>=start) pass++; });
     return {care:care, hours:mins/60, clear:clear, pomo:pomo, pass:pass};
   }
@@ -6702,20 +6748,24 @@ html.pv .wrap{max-width:none;padding:0}
     var rare=loot.filter(function(L){ return /clover|chips|star/.test(L.k); });
     if(rare.length && window.__fx && window.__fx.banner) window.__fx.banner('🍅 番茄鐘掉寶：'+rare.map(function(L){ return L.txt; }).join('、'));
     var T=collect(h,C,s,s.pet?pk(s.pet.born):null);
+    if(s.markV!==2){   // 舊資料：標記是「第幾棵」，照現在的順序換成固定編號（只做一次）
+      var toId=function(i){ return typeof i==='number'&&T.trees[i]?T.trees[i].id:(typeof i==='string'?i:null); };
+      s.dead=s.dead.map(toId).filter(Boolean); s.wilt.forEach(function(w){ w.idx=(w.idx||[]).map(toId).filter(Boolean); }); s.markV=2;
+    }
     forestAdvance(s,h,T.trees,lv);
     var ev=petAdvance(s,h,lv);
     var p=s.pet, att=attitude(s,h,v,lv);
     ev=ev.concat(tripTick(s,att)); p=s.pet; att=attitude(s,h,v,lv);
-    var onTab=window.__tab===5 && !document.hidden;
+    var onTab=rewardIdle();   // 在單字賭場背單字不算「讀書時段來逛」、也不算待太久（B4）
     if(p && onTab && att.sulk==='study'){ var bk0=tk+'@'+att.blk.a; if(!v.peek[bk0]){ v.peek[bk0]=1; p.mood=Math.max(0,p.mood-5); saveView(v); ev.push('peek'); } }
     if(p && onTab && att.sulk==='toolong' && !v.warned){ v.warned=1; p.mood=Math.max(0,p.mood-10); saveView(v); ev.push('toolong'); }
     // 銀行每日結算；欠款逾期，寵物會擔心（心情最多 60）
     var bev=bankSettle(h,lv), bk=bankState();
     if(p && bk.loan && bk.loan.late) p.mood=Math.min(p.mood,60);
     // 樹的狀態
-    var state={}, deadSet={};
-    s.dead.forEach(function(i){ state[i]='dead'; deadSet[i]=1; });
-    s.wilt.forEach(function(w){ w.idx.forEach(function(i){ if(!deadSet[i]) state[i]='wilt'; }); });
+    var state={}, deadSet={}, posOf={}; T.trees.forEach(function(t,i){ posOf[t.id]=i; });
+    s.dead.forEach(function(id){ var i=posOf[id]; if(i!==undefined){ state[i]='dead'; deadSet[i]=1; } });
+    s.wilt.forEach(function(w){ w.idx.forEach(function(id){ var i=posOf[id]; if(i!==undefined && !deadSet[i]) state[i]='wilt'; }); });
     T.trees.forEach(function(t,i){ if(t.st==='dead'){ state[i]='dead'; deadSet[i]=1; } });
     var nDead=Object.keys(deadSet).length, nWilt=s.wilt.reduce(function(a,w){ return a+w.idx.length; },0), nPend=T.trees.filter(function(t){ return t.st==='pending'||t.st==='late'; }).length;
     var curLand=T.trees.length? landOfIndex(T.trees.length-1).i : 0;
@@ -6784,13 +6834,24 @@ html.pv .wrap{max-width:none;padding:0}
         mini.innerHTML='<span class="e" aria-hidden="true" style="font-size:38px">🌱</span><div><b>森林 '+trees.alive+' 棵樹</b><p>'+(s.justLeft?esc(s.justLeft)+'，到「獎勵」重新領養':'到「獎勵 → 我的森林」領養一隻寵物')+'</p>'+extra+'</div>';
       }
     }
-    if(!app || window.__tab!==5){ afterPaint=[]; flash=flash.slice(-6); tagToday(); return; }   // 沒在看「獎勵」就不畫森林（切過去時會重畫），手機比較順
+    // 「今天」的任務小卡（11-09）：每日任務、每週挑戰只看進度；領取還是在森林的「📋 任務」（那頁不計時）
+    var qt=document.getElementById('qt-card');
+    if(qt){
+      var qcl=s.quests[tk]||{}, wcl1=s.weekly[wk]||{};
+      var ql=function(t,r,cl){ var ok=r[0]>=r[1]; return '<div class="fp-q'+(cl?' done':'')+'"><div><b>'+esc(t)+'</b><div class="bar"><i style="width:'+Math.min(100,Math.round(r[0]/r[1]*100))+'%"></i></div><small>'+Math.min(r[0],r[1])+' / '+r[1]+'</small></div><span class="st">'+(cl?'已領 ✓':(ok?'<b>可以領</b>':''))+'</span></div>'; };
+      qt.hidden=false;
+      qt.innerHTML='<div class="fp-panel"><h4>今天的任務 <span>完成一個 🍀×1；三個都領完再 🌟×1</span></h4>'+quests.map(function(q){ return ql(q.t,q.f(x),qcl[q.id]); }).join('')+'</div>'
+        +'<div class="fp-panel"><h4>本週挑戰 <span>每個 🌟×2；週一換新</span></h4>'+weekly.map(function(c){ return ql(c.t,c.f(wdat),wcl1[c.id]); }).join('')+'</div>'
+        +(questReady?'<button type="button" class="btn solid" data-go="quest">到森林領 '+questReady+' 個</button>':'<p class="fp-gone" style="margin:0">領取在「獎勵 → 我的森林 → 📋 任務」，在那頁不會被算進待太久。</p>');
+    }
+    if(!app || window.__tab!==5 || (window.__sub!==15 && !window.__pv)){ afterPaint=[]; flash=flash.slice(-6); tagToday(); return; }   // 只有在「我的森林」子頁才畫森林（11-09 C7）   // 沒在看「獎勵」就不畫森林（切過去時會重畫），手機比較順
     var scene=v.scene||'forest', tabk=v.tab||'main';
+    if(tabk==='check') tabk='main';   // 檢查搬到「紀錄 → 進度」了（11-09）
     var fedToday=p&&p.fedDay===tk?(FOODS.filter(function(f){ return f.n===p.fedWhat; })[0]||{}).e:'';
     var top='<div class="fp-tabs" role="tablist" aria-label="森林分頁">'
       +tbtn('scene','forest','🌲 森林',scene==='forest')+tbtn('scene','home','🏠 家',scene==='home')+'<span class="fp-sep"></span>'
       +tbtn('tab','main','狀態',tabk==='main')+tbtn('tab','quest','📋 任務'+(questReady?' <b class="fp-dot">'+questReady+'</b>':''),tabk==='quest')
-      +tbtn('tab','check','🔍 檢查'+(pendList.length?' <b class="fp-dot">'+pendList.length+'</b>':''),tabk==='check')
+      +'<button type="button" data-gochk="1" title="檢查搬到「紀錄 → 進度」了">🔍 檢查'+(pendList.length?' <b class="fp-dot">'+pendList.length+'</b>':'')+' ↗</button>'   // 11-09 搬到紀錄：看檢查不算逛森林
       +tbtn('tab','shop','🌟 '+s.gold,tabk==='shop')+tbtn('tab','pshop','🐾 用品店',tabk==='pshop')+tbtn('tab','album','📮 '+s.album.length,tabk==='album')
       +tbtn('tab','souv','🎁 '+Object.keys(s.souv).length,tabk==='souv')+tbtn('tab','dex','📖 '+Object.keys(s.dex).length+'/'+ANIMALS.length,tabk==='dex')+'</div>';
     if(scene==='forest'){
@@ -6897,22 +6958,6 @@ html.pv .wrap{max-width:none;padding:0}
       body+='<div class="fp-panel"><h4>本週挑戰 <span>每個 🌟 ×2，再抽一個飾品或道具；週一換新</span></h4>'+weekly.map(function(c){ var r=c.f(wdat); return qrow('w',c.id,c.t,r[0],r[1],wcl[c.id]); }).join('')+'</div>';
       body+='<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p>';
     }
-    if(tabk==='check'){
-      var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
-      body+='<div class="fp-panel"><h4>給 Claude 檢查 <span>訂正、考古題限時作答、模考卷、歷屆會考、錯題重做</span></h4>'
-        +'<p class="fp-gone">做法：在「今天」勾掉這類任務 → 把寫好的題本、訂正拍照傳給 Claude，說「檢查：任務名稱」→ Claude 檢查過關會給你一個連結，點開就過關。'
-        +'沒過關的話 Claude 會告訴你哪裡要重做。過關：A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。<br>'
-        +'<b>補檢查</b>：勾完 '+CHECK_DAYS+' 天內交都沒事；超過就每天扣點，逾期第 1 天扣 '+LATE_PEN+'、第 2 天扣 '+(LATE_PEN*2)+'、第 3 天扣 '+(LATE_PEN*3)+'…；'
-        +'逾期超過 '+LATE_DIE+' 天樹苗枯死，但還是要交，沒過關會一直扣。過關就停止扣點（已扣的不退）。</p>'
-        +(items.length?items.slice(0,30).map(function(it){
-          var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
-          if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.wd?'　樹苗已枯':'');
-          else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
-          else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
-          else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
-          return '<div class="fp-chk '+cls+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'+txt+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有要檢查的任務。</p>')
-        +'</div>';
-    }
     if(tabk==='shop'){
       body+='<div class="fp-panel"><h4>🌟 金幸運草商店 <span>你有 🌟 '+s.gold+'。金幸運草只有 Claude 檢查過關、每日任務全清、每週挑戰、成就拿得到</span></h4><div class="fp-items">'
         +SHOP.filter(function(a){ return !a.chip && !a.pshop; }).map(function(a){ var own=a.acc&&s.acc[a.id];
@@ -6962,6 +7007,25 @@ html.pv .wrap{max-width:none;padding:0}
   function tbtn(kind,k,t,on){ return '<button type="button" data-'+kind+'="'+k+'" aria-pressed="'+on+'">'+t+'</button>'; }
   function stat(lab,v){ return '<div class="fp-stat'+(v<30?' low':'')+'">'+lab+'　<b class="mono">'+v+'</b><div class="bar"><i style="width:'+v+'%"></i></div></div>'; }
   function row(t,sub,items){ return '<div class="fp-row"><h4>'+t+'<span>'+sub+'</span></h4><div class="fp-items">'+items+'</div></div>'; }
+  // 給 Claude 檢查的清單（11-09 從森林頁搬到「紀錄 → 進度」；只顯示，沒有按鈕）
+  function checkPanelHTML(C){
+      var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
+      return '<div class="fp-panel"><h4>給 Claude 檢查 <span>訂正、考古題限時作答、模考卷、歷屆會考、錯題重做</span></h4>'
+        +'<p class="fp-gone">做法：在「今天」勾掉這類任務 → 把寫好的題本、訂正拍照傳給 Claude，說「檢查：任務名稱」→ Claude 檢查過關會給你一個連結，點開就過關。'
+        +'沒過關的話 Claude 會告訴你哪裡要重做。過關：A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。<br>'
+        +'<b>補檢查</b>：勾完 '+CHECK_DAYS+' 天內交都沒事；超過就每天扣點，逾期第 1 天扣 '+LATE_PEN+'、第 2 天扣 '+(LATE_PEN*2)+'、第 3 天扣 '+(LATE_PEN*3)+'…；'
+        +'逾期超過 '+LATE_DIE+' 天樹苗枯死，但還是要交，沒過關會一直扣。過關就停止扣點（已扣的不退）。</p>'
+        +(items.length?items.slice(0,30).map(function(it){
+          var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
+          if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.wd?'　樹苗已枯':'');
+          else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
+          else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
+          else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
+          return '<div class="fp-chk '+cls+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'+txt+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有要檢查的任務。</p>')
+        +'</div>';
+      }
+  window.__goChecks=function(){ if(window.__showTab) window.__showTab(4,21); setTimeout(function(){ var el=document.getElementById('chk-card'); if(el) try{ el.scrollIntoView({block:'start'}); }catch(e){} },60); };
+  function paintChecks(){ var el=document.getElementById('chk-card'); if(el) el.innerHTML=checkPanelHTML(checks()); }
   function qrow(kind,id,t,cur,goal,claimed){
     var ok=cur>=goal, pct=Math.min(100,Math.round(cur/goal*100));
     return '<div class="fp-q'+(claimed?' done':'')+'"><div><b>'+t+'</b><div class="bar"><i style="width:'+pct+'%"></i></div><small>'+Math.min(cur,goal)+' / '+goal+'</small></div>'
@@ -7001,6 +7065,7 @@ html.pv .wrap{max-width:none;padding:0}
 
   if(app) app.addEventListener('click',function(e){
     var b=e.target.closest('button');
+    if(b && b.dataset.gochk){ window.__goChecks(); return; }
     if(!b){
       if(e.target.closest('#fp-piggy')){ goBank(); return; }
       var ag=e.target.closest('[data-actor]');
@@ -7151,11 +7216,14 @@ html.pv .wrap{max-width:none;padding:0}
       if(to==='ach'){ window.__showTab(5,16); return; }
       if(to==='bank'){ var vb=viewState(); vb.btab='loan'; saveView(vb); window.__showTab(5,17); return; }
       if(to==='vocab'){ window.__showTab(5,22); return; }
-      if(to==='check'||to==='quest'){ var vv=viewState(); vv.tab=to; saveView(vv); }
+      if(to==='check'){ window.__goChecks(); return; }   // 檢查在「紀錄 → 進度」（11-09）
+      if(to==='quest'){ var vv=viewState(); vv.tab=to; saveView(vv); }
       if(window.__showTab) window.__showTab(5,15); var a=document.getElementById('fp-app'); if(a) setTimeout(function(){ a.scrollIntoView({block:'start'}); },30); };
     mini.addEventListener('click',goF);
     mini.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); goF(); } });
   }
+  var qtEl=document.getElementById('qt-card');   // 今天的任務小卡：「到森林領」
+  if(qtEl) qtEl.addEventListener('click',function(e){ var g=e.target.closest('[data-go]'); if(!g) return; var vv=viewState(); vv.tab='quest'; saveView(vv); if(window.__showTab) window.__showTab(5,15); });
   function goBank(){ if(window.__showTab) window.__showTab(5,17); window.scrollTo(0,0); }
   // 「更多」打開或收起要記住（每分鐘重畫時才不會自己收起來）
   if(app) app.addEventListener('toggle',function(e){ var d=e.target; if(!d||!d.dataset||!d.dataset.more) return; var v=viewState(); v[d.dataset.more==='forest'?'more':d.dataset.more]=d.open; saveView(v); },true);
@@ -7187,9 +7255,17 @@ html.pv .wrap{max-width:none;padding:0}
     savePet(s); flash.push('🪵 番茄鐘中途放棄，森林多了一根枯樹樁'+(s.pet?'，'+esc(s.pet.name)+' 心情 −10':'')+'。');
     paintPet();
   };
-  // 在森林頁面待多久（只算這台）
+  // 在獎勵頁待多久（只算這台）：森林（含檢查、任務）、成就、銀行、商店都算；單字賭場（子頁 22）不算——
+  // 那是背單字，錯字本複習會算英文讀書分鐘、還會補英文番茄鐘，不能同時被當成「逃避讀書」（11-09 B4）
+  // 11-09 使用者選：檢查、任務搬出森林；成就、銀行留在獎勵但不計時 → 只有森林（狀態、家、商店、用品店、明信片、圖鑑）和許願商店算
+  function rewardIdle(){
+    if(document.hidden || window.__tab!==5) return false;
+    var sub=window.__sub; if(sub===18) return true;   // 許願商店
+    if(sub!==15) return false;                         // 成就 16、銀行 17、單字賭場 22 不算
+    var t=viewState().tab||'main'; return t!=='quest' && t!=='check';   // 森林裡的「📋 任務」頁不算
+  }
   setInterval(function(){
-    if(document.hidden || window.__tab!==5 || !app) return;
+    if(!rewardIdle() || !app) return;
     var v=viewState(), before=v.ms; v.ms+=5000; saveView(v);
     if(before<=VIEW_MAX && v.ms>VIEW_MAX) paintPet();
   },5000);
@@ -7773,7 +7849,7 @@ html.pv .wrap{max-width:none;padding:0}
     var b=document.createElement('div'); b.className='rem-banner'+(ok?' ok':''); b.style.display='flex';
     b.innerHTML='<span>'+m+'</span>';
     var go=document.createElement('button'); go.type='button'; go.textContent='去看森林';
-    go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(5,15); var v=viewState(); v.tab='check'; saveView(v); paintPet(); });
+    go.addEventListener('click',function(){ b.remove(); window.__goChecks(); });   // 檢查在「紀錄 → 進度」（11-09）
     var x=document.createElement('button'); x.type='button'; x.textContent='知道了'; x.addEventListener('click',function(){ b.remove(); });
     b.appendChild(go); b.appendChild(x); document.body.appendChild(b);
   }
@@ -7907,11 +7983,11 @@ html.pv .wrap{max-width:none;padding:0}
   // 寵物每次都算：「今天」的小卡、「獎勵」的紅點都靠它。紀錄＝4（科班考古題配速、分科進度）、獎勵＝5、設定＝7（教材進度）
   function paintFor(g){
     deCache=null; paintPet();
-    if(g===4){ paintKbPace(); paintSubjects(); }
-    if(g===5){ paintBank(); paintAch(); paintCustom(); }
+    if(g===4){ paintChecks(); paintKbPace(); paintSubjects(); }
+    if(g===5){ var sb=window.__sub; if(sb===17) paintBank(); if(sb===16) paintAch(); paintCustom(); }   // 11-09 C7：只畫正在看的子頁
     if(g===7) paintBooks();
   }
-  paintAll(); paintToc();
+  paintFor(window.__tab); if(window.__tab!==5) paintCustom(); paintToc();   // 11-09 C2：開頁只畫正在看的分頁（自訂獎勵的解鎖提示照舊檢查）
   document.addEventListener('plan:tab',function(e){ paintFor(e.detail); });
   document.addEventListener('change',function(e){
     if(e.target.closest && (e.target.closest('#td-list')||e.target.closest('#kp-list'))) setTimeout(function(){ paintFor(window.__tab); },60);
@@ -7920,11 +7996,12 @@ html.pv .wrap{max-width:none;padding:0}
   function busy(el){ return el && document.activeElement && el.contains(document.activeElement) && /INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName); }
   setInterval(function(){
     if(document.hidden) return;
-    paintPet();
-    if(window.__tab===5 && !busy(bnApp)) paintBank();
-    if(window.__tab===5 && !busy(acApp)) paintAch();
+    if(!busy(app) && !busy(mini)) paintPet();   // 11-09 修 B6：正在幫寵物取名字（打字中）就先不重畫，不然打的字會被清掉
+    if(window.__tab===5 && window.__sub===17 && !busy(bnApp)) paintBank();
+    if(window.__tab===5 && window.__sub===16 && !busy(acApp)) paintAch();
   },60000);
-  window.__petRefresh=paintAll;
+  // 11-09 修 C2：賭場每答一題、銀行每按一次、領成就都會叫這個。以前是 paintAll（連看不到的教材進度 436 列都重算），改成只畫正在看的分頁
+  window.__petRefresh=function(){ paintFor(window.__tab); };
 })();
 </script>
 
@@ -8006,7 +8083,7 @@ html.pv .wrap{max-width:none;padding:0}
   var data=ls();
   var CAT={'數學':'math','物理':'kb','化學':'kbfix','生物':'sci','地科':'kbr','自然綜合':'fu'};
   function id(p){ return p[1]+' '+p[3]+' '+p[2]; }
-  function paint(){
+  function paintTop(){   // 只更新上面的總數和各科（打勾、填分數時用，不重建整個清單）
     var done=0, by={}, sum={}, cnt={};
     PL.papers.forEach(function(p){
       var r=data[id(p)]||{};
@@ -8018,6 +8095,9 @@ html.pv .wrap{max-width:none;padding:0}
       +'<span class="sub" style="margin:0">目標：2/13 全部寫完並訂正</span>';
     document.getElementById('kp-subj').innerHTML=Object.keys(by).map(function(s){
       return '<span>'+s+' '+by[s][0]+'/'+by[s][1]+(cnt[s]?'　平均 '+Math.round(sum[s]/cnt[s])+'%':'')+'</span>'; }).join('');
+  }
+  function paint(){
+    paintTop();
     var html='';
     [112,113,114].forEach(function(y){
       html+='<div class="kp-year"><h4>'+y+' 年</h4>';
@@ -8030,13 +8110,19 @@ html.pv .wrap{max-width:none;padding:0}
       html+='</div>';
     });
     box.innerHTML=html;
-    Array.prototype.forEach.call(box.querySelectorAll('input[type=checkbox]'),function(c){
-      c.addEventListener('change',function(){ var r=data[c.dataset.k]||{}; r.d=c.checked?1:0; data[c.dataset.k]=r; sv(data); paint(); });
-    });
-    Array.prototype.forEach.call(box.querySelectorAll('input[type=number]'),function(c){
-      c.addEventListener('change',function(){ var r=data[c.dataset.s]||{}; r.s=c.value===''?'':Math.max(0,Math.min(100,+c.value)); if(c.value!=='') r.d=1; data[c.dataset.s]=r; sv(data); paint(); });
-    });
   }
+  // 打勾、填分數（11-09 修 B3）：以前每次都重建整個 71 列清單——
+  // 打勾時，事件還沒冒泡到上層，勾選框就被換掉了，「照計畫應寫幾份」那行不會跟著更新；
+  // 填完一格點下一格時，下一格也被換掉，手機鍵盤會收起來。改成只改那一列和上面的總數。
+  box.addEventListener('change',function(e){
+    var c=e.target, k=c.dataset.k||c.dataset.s; if(!k) return;
+    var r=data[k]||{}, row=c.closest('.kp-row');
+    if(c.type==='checkbox') r.d=c.checked?1:0;
+    else { r.s=c.value===''?'':Math.max(0,Math.min(100,+c.value)); if(c.value!==''){ r.d=1; c.value=r.s; } }
+    data[k]=r; sv(data);
+    if(row){ row.classList.toggle('on',!!r.d); var cb=row.querySelector('input[type=checkbox]'); if(cb) cb.checked=!!r.d; }
+    paintTop();
+  });
   // 「今天」勾掉「科班考古｜台南一中 112 數學 限時作答…」就自動打勾（分前後半的，後半勾掉才算）
   window.__kbMark=function(name){
     var m=String(name).match(/^科班考古｜(\S+) (\d{3}) (\S+) 限時作答/);
