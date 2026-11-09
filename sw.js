@@ -1,5 +1,5 @@
 const CACHE='study-plan-v11';
-const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js'];   // 11-09：daychart.js 補進離線清單
+const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261109a'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'}))).catch(()=>{})));

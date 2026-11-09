@@ -200,5 +200,6 @@
     render();
     return {refresh:render};
   }
-  window.DayChart={mount:mount, dayInfo:dayInfo, parse:parse};
+  // CHECK_RE：哪些任務要給 Claude 檢查。11-09 D：index.html、parent.html 都讀這一份，改規則只要改這裡
+  window.DayChart={mount:mount, dayInfo:dayInfo, parse:parse, CHECK_RE:CHECK_RE};
 })();

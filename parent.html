@@ -149,7 +149,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   </footer>
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js"></script>
+<script src="daychart.js?v=20261109a"></script>
 <script>
 (function(){
   var GK='parent.gist.v1', CK='parent.chan.v1', FILE='study-plan-backup.json', PFILE='study-plan-parent.json', OWNER='joshdaaicode';
@@ -305,18 +305,22 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     return days(addD(pk(it.k),CHECK_DAYS+1),today)>=0 ? -1 : 0;
   }
   var lastDay='';
+  function paintFresh(o){
+    var at=o._at?new Date(o._at).getTime():0; lastAt=at;
+    fresh.innerHTML='資料更新：<b>'+(at?hm(at):'不明')+'</b>（'+(at?ago(at):'—')+'）<button class="btn" type="button" id="rl">重新整理</button>';
+    document.getElementById('rl').addEventListener('click',load);
+    return at;
+  }
   function render(o){
     var changed=!lastO || o._at!==(lastO&&lastO._at);
     // 11-09：資料沒變、也還是同一天，就不重畫——以前每 10 分鐘整頁重建，森林的 iframe 會整個重新載入（約 0.9 MB），長條圖也會跳回今天
-    if(!changed && lastDay===key(d0()) && app.firstChild){ lastO=o; return; }
+    if(!changed && lastDay===key(d0()) && app.firstChild){ lastO=o; paintFresh(o); return; }   // 只更新「資料更新：幾分鐘前」那一行
     lastO=o; lastDay=key(d0());
     var today=d0(), tk=key(today), now=new Date();
     var st=J(o,'plan.state.v3',{}), pomo=J(o,'plan.pomo.v1',{}), C=J(o,'plan.checks.v1',{}),
         shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{}), pet=J(o,'plan.pet.v1',{});
     var plog=Array.isArray(pomo.log)?pomo.log:[], items=C.items||{};
-    var at=o._at?new Date(o._at).getTime():0; lastAt=at;
-    fresh.innerHTML='資料更新：<b>'+(at?hm(at):'不明')+'</b>（'+(at?ago(at):'—')+'）<button class="btn" type="button" id="rl">重新整理</button>';
-    document.getElementById('rl').addEventListener('click',load);
+    var at=paintFresh(o);
     var html='';
     if(at && Date.now()-at>6*3600e3) html+='<p class="note warn">已經 '+ago(at).replace('前','')+'沒有新資料：可能他還沒打開讀書網站，或網站的自動同步沒開。</p>';
 
@@ -344,7 +348,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
         var ok=!!done[x.id], ck=items[tk+'|'+x.n], tag='';
         if(x.bk) tag+='<span class="tag bk">欠帳</span>';
         if(ck&&ck.st==='pass') tag+='<span class="tag ok">Claude 檢查過關 '+esc(ck.g||'')+'</span>';
-        else if(ok&&/(訂正|限時作答|模考卷|歷屆會考|限時重做|整份限時|錯題重做|雄中考古題)/.test(x.n)&&!/補習|錯題本：到期題/.test(x.n)) tag+='<span class="tag wait">等 Claude 檢查</span>';
+        else if(ok&&((window.DayChart&&window.DayChart.CHECK_RE)||/(訂正|限時作答|模考卷|歷屆會考|限時重做|整份限時|錯題重做|雄中考古題)/).test(x.n)&&!/補習|錯題本：到期題/.test(x.n)) tag+='<span class="tag wait">等 Claude 檢查</span>';
         return '<li class="'+(ok?'done':'')+'"><span class="ic" aria-label="'+(ok?'完成':'還沒做')+'">'+(ok?'✅':'⬜')+'</span><span class="n">'+esc(x.n)+tag
           +'<span class="m">'+esc(x.t||'')+(x.m?'・'+x.m+' 分':'')+'</span></span></li>'; }).join('')+'</ul>';
       if(!real.length) html+='<p class="sub">今天沒有排讀書任務。</p>';
