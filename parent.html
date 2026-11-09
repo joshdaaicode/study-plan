@@ -182,7 +182,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   });
   function setup(msg){
     fresh.innerHTML='';
-    app.innerHTML='<div class="card setup"><h2>第一次使用</h2><p class="sub">請孩子在讀書網站「紀錄 → 進度回測 → 給爸媽的週報」按「複製家長網頁連結」，傳給你，點開就好；或把連結貼在下面。</p>'
+    app.innerHTML='<div class="card setup"><h2>第一次使用</h2><p class="sub">請孩子在讀書網站「紀錄 → 進度 → 給爸媽的週報」按「複製家長網頁連結」，傳給你，點開就好；或把連結貼在下面。</p>'
       +(msg?'<p class="note bad">'+esc(msg)+'</p>':'')
       +'<label for="gin">家長連結</label><input id="gin" type="text" autocomplete="off" placeholder="https://joshdaaicode.github.io/study-plan/parent.html#g=…">'
       +'<p style="margin:10px 0 0"><button class="btn solid" id="gok" type="button">開始看</button></p></div>';

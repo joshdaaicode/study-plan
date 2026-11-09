@@ -26,7 +26,7 @@ else if (g) {
   fs.writeFileSync(CFG, gid + '\n');
   console.error('已記住 Gist（' + CFG + '）');
 } else if (fs.existsSync(CFG)) gid = fs.readFileSync(CFG, 'utf8').trim();
-if (!gid) { console.error('還沒有 Gist ID：請使用者在網站「紀錄 → 進度回測 → 給爸媽的週報」按「複製家長網頁連結」，再跑 --gist <連結>'); process.exit(1); }
+if (!gid) { console.error('還沒有 Gist ID：請使用者在網站「紀錄 → 進度 → 給爸媽的週報」按「複製家長網頁連結」，再跑 --gist <連結>'); process.exit(1); }
 const nDays = Math.max(1, Math.min(60, +(opt('--days') || 7)));
 
 async function fetchText() {

@@ -305,6 +305,10 @@ body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env
     linear-gradient(90deg,color-mix(in srgb,var(--ink) 16%,transparent),transparent) 0 0/12px 100% no-repeat scroll,
     linear-gradient(270deg,color-mix(in srgb,var(--ink) 16%,transparent),transparent) 100% 0/12px 100% no-repeat scroll,
     var(--card)}
+/* 11-09 A8：左右滑的時候第一欄（科目、書名、日期）固定不動，才知道是哪一列；數字等寬好對齊 */
+.tbl-scroll table{font-variant-numeric:tabular-nums}
+.tbl-scroll th:first-child,.tbl-scroll td:first-child{position:sticky;left:0;z-index:1;background:var(--card);box-shadow:1px 0 0 var(--rule2)}
+.tbl-scroll thead th:first-child{background:var(--card2)}
 tr.sumrow td{background:var(--hi2)}
 tr.sumrow td.t{color:var(--warn);font-weight:600}
 tr.sumrow.todayrow td{background:var(--hi)}
@@ -529,7 +533,7 @@ html,body{overflow-x:hidden}
 .count .tag{font-family:'Noto Sans TC',sans-serif;font-size:12px;letter-spacing:.08em;font-weight:700}
 .count,.card,.tl,.cal,.tbl-scroll,.todo,.now,.td-budget,.nowcard,.floor,.method,.phases,.cal-focus,.dv-card,.td-editor,.ul-item{
   box-shadow:0 1px 2px rgba(16,32,44,.05),0 12px 28px -20px rgba(16,32,44,.28)}
-.tabs{background:color-mix(in srgb,var(--paper) 84%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);
+.tabs{background:var(--paper);   /* 11-09 C10：拿掉 backdrop-filter 模糊——外層本來就是不透明底色，看不出效果，卻每次捲動都要重算 */
   border-bottom-color:transparent;box-shadow:0 1px 0 var(--rule)}
 .tab-btn{transition:background .18s ease,color .18s ease}
 .tab-btn:hover{color:var(--ink)}
@@ -642,7 +646,7 @@ section{padding-top:40px}
 @media (min-width:1180px){ .wrap{max-width:1120px} }
 .td-grid{display:flex;flex-direction:column}
 .td-main,.td-side{display:contents}
-.td-side .nowcard{order:1} #td-note2{order:2} #td-budget{order:3} #td-list{order:4} .td-bar{order:5} #td-editor{order:6} .td-side .fp-mini{order:7} .td-side .bar-btns{order:8} .td-side .td-ask{order:9}   /* 手機：現在→進度→任務→按鈕→寵物→提醒→問老師 */
+#td-note2{order:1} #td-list{order:2} .td-bar{order:3} .td-side .nowcard{order:4} #td-budget{order:5} #td-editor{order:6} .td-side .fp-mini{order:7} .td-side .bar-btns{order:8} .td-side .td-ask{order:9}   /* 手機（11-09 A2 改）：記事→任務→按鈕→現在＋番茄鐘→今日進度→寵物→提醒→問老師；第一個畫面就要看到第一項任務 */
 .td-main .td-bar{order:6} #td-editor{order:7} .td-ask{order:8;margin-top:16px}
 @media (min-width:1100px){
   .td-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
@@ -786,8 +790,13 @@ section{padding-top:40px}
 .hero-mini{display:none;align-items:baseline;gap:6px 14px;flex-wrap:wrap;padding:12px 0 4px;font-size:12.5px;color:var(--ink-faint)}
 .hero-mini b{font-family:'Noto Serif TC',serif;font-size:15px;color:var(--ink);margin-right:auto}
 .hero-mini em{font-style:normal;font-family:'IBM Plex Mono',monospace;color:var(--ink)}
-[data-tab]:not([data-tab="0"]) .hero{display:none}
-[data-tab]:not([data-tab="0"]) .hero-mini{display:flex}
+/* 11-09 A2：大標題區只在「日程 → 整年計畫」顯示；其他頁（包括今天）都只留一行倒數，第一個畫面就看得到第一項任務 */
+.hero{display:none}
+[data-sub="12"] .hero{display:block}
+.hero-mini{display:flex;align-items:center}
+[data-sub="12"] .hero-mini{display:none}
+.gear-btn{margin-left:4px;background:none;border:1px solid var(--rule);border-radius:999px;width:36px;height:36px;font-size:16px;line-height:1;cursor:pointer;flex:0 0 auto}
+.gear-btn[aria-pressed="true"]{background:var(--ink);border-color:var(--ink)}
 /* 可收合的卡片（設定、考古題清單） */
 .fold > .fold-h{cursor:pointer;user-select:none}
 .fold > .fold-h h3,.fold > h3.fold-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -812,6 +821,34 @@ section{padding-top:40px}
 
 /* ---------- 分科進度、教材進度 ---------- */
 .sp-sum{font-size:13.5px;margin:0 0 10px;color:var(--ink-soft)}
+.nw{white-space:nowrap}
+.td-due{margin:0 0 12px;padding:10px 14px;border-radius:var(--r-card,12px);border:1px solid var(--rule);background:var(--card);font-size:13.5px}
+.td-due ul{margin:6px 0 8px;padding-left:18px}
+.td-due li{margin:2px 0}
+.td-due .warn{color:var(--warn);font-weight:600}
+.td-due .when{color:var(--ink-faint)}
+.td-due .btn{padding:5px 12px;font-size:12.5px}
+.td-why{display:block;margin-top:4px;font-size:12.5px;color:var(--ink-soft);line-height:1.55}
+.td-why b{font-weight:600;color:var(--ink-faint);margin:0 4px 0 0}
+.var-list{display:grid;gap:10px}
+.var-card{border:1px solid var(--rule);border-radius:var(--r-card,12px);background:var(--card);padding:12px 14px}
+.var-card b{display:block;margin-bottom:4px}
+.var-card p{margin:2px 0;font-size:13.5px;line-height:1.55}
+.var-card p span{display:inline-block;min-width:3.6em;font-size:12px;color:var(--ink-faint)}
+code.dim{font-size:11.5px;color:var(--ink-faint);background:none;padding:0}
+.td-first{margin:0 0 12px;padding:10px 14px;border-radius:var(--r-card,12px);background:var(--hi,#FFF4D6);font-size:14.5px;line-height:1.5}
+.td-first b{display:block;font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:2px}
+.td-rule{display:inline-block;margin-left:6px;font-size:12.5px;color:var(--ink-faint)}
+.td-rule summary{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1px solid var(--rule);cursor:pointer;list-style:none;font-weight:700}
+.td-rule summary::-webkit-details-marker{display:none}
+.td-rule[open]{display:block;margin:6px 0 0}
+/* 11-09 A5：分科進度只有 4 欄，手機上整張放得下，不用再滑（表格預設最小 520px） */
+#sp-out .sp-tbl{min-width:0}
+#sp-out .sp-tbl th,#sp-out .sp-tbl td{padding:8px 7px}
+#sp-out .sp-tbl td.n{text-align:center}
+#sp-out .sp-bar{width:36px}
+.sp-step{font-size:13.5px;margin:10px 0 0;padding:9px 12px;border-radius:var(--r-in,8px);background:var(--card2)}
+.sp-step b{color:var(--sci);margin-right:4px}
 .sp-tbl td,.sp-tbl th{white-space:nowrap}
 .sp-tbl td.n{font-family:'IBM Plex Mono',monospace;text-align:right}
 .sp-tbl .behind{color:var(--warn);font-weight:700}
@@ -881,7 +918,9 @@ section{padding-top:40px}
 .fp-mini b{font-size:14px}
 .fp-mini p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
 .fp-mini:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
-.td-side .fp-mini{order:3}
+/* .td-side .fp-mini{order:3} ← 11-09 拿掉：跟上面 order:7 打架（後寫的贏），讓寵物卡排在任務前面；A2 要第一個畫面看到任務 */
+.td-side .qt-card{order:9}   /* 11-09：今天的任務小卡排在待辦清單後面（沒寫 order 會跑到最前面） */
+@media (min-width:900px){ .td-side .qt-card{margin-top:14px} }
 
 
 /* ---------- 森林與寵物 v3：分頁、地塊、任務、檢查、收藏 ---------- */
@@ -995,6 +1034,17 @@ html.pv .wrap{max-width:none;padding:0}
 [data-dark] .p-x,[data-dark] .p-s,[data-dark] .dowbox button.on,[data-dark] .mood-row button.on,[data-dark] .fp-dot{color:#0B1620}
 /* 11-09 修 B11：手機版分頁按鈕的 padding（約 337 行）被上面沒有條件的 .tab-btn{padding:9px 17px} 蓋掉，這裡再寫一次讓手機版生效 */
 @media (max-width:640px){ .tab-btn{padding:7px 12px} }
+/* 11-09 A1：手機上主分頁固定在螢幕底部（5 個、不用左右滑），子分頁留在上面黏著 */
+.tabs-wrap::after{display:none}
+@media (max-width:760px){
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));gap:4px;
+    justify-content:space-around;overflow:visible;border-bottom:0;border-top:1px solid var(--rule);box-shadow:0 -4px 14px rgba(16,32,44,.08)}
+  .tab-btn{flex:1 1 0;min-height:48px;padding:6px 2px;font-size:13.5px;border-radius:12px;text-align:center}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .rem-banner{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  .fx-banner{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+  html.pv .tabs{display:none}
+}
 .tk-del{min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:17px}
 @media (prefers-reduced-motion:reduce){.fp-new,.fp-sw,.fp-grass,.fp-glow,.fp-tw,.fp-shim,.fp-rain,.fp-snow,.fp-bulb,.fp-anger,.fp-mini-pet .rg-b,.fp-adopt button svg .rg-b{animation:none}}
 .no-motion .fp-new,.no-motion .fp-sw,.no-motion .fp-grass,.no-motion .fp-glow,.no-motion .fp-tw,.no-motion .fp-shim,.no-motion .fp-rain,.no-motion .fp-snow,.no-motion .fp-bulb,.no-motion .fp-anger,.no-motion .fp-mini-pet .rg-b{animation:none}
@@ -1208,6 +1258,8 @@ html.pv .wrap{max-width:none;padding:0}
 
 <section>
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
+  <p class="td-first" id="td-first" hidden></p><!-- 11-09 A3：昨晚日誌寫的「明天的第一件事」 -->
+  <div class="td-due" id="td-due" hidden></div><!-- 11-09 A7：「待決定」裡 7 天內到期、還沒勾的 -->
   <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來；放假日會從娛樂時間扣（平日娛樂本來就只有 30 分，是下限，不會再扣）。</p>
 
   <div class="td-grid">
@@ -1521,22 +1573,14 @@ html.pv .wrap{max-width:none;padding:0}
 </section>
 
 <section>
-  <div class="sec-head"><h2>還沒定案的變數</h2><span class="eyebrow">確定了就改，日程會跟著動</span></div>
-  <p class="sec-note">下面這些目前用推估值排。確定之後改 <code>tools/gen_plan.py</code> 重新產生一次（或直接跟我說，我幫你重排）。</p>
-  <div class="tbl-scroll"><table>
-    <thead><tr><th>變數</th><th>目前怎麼排</th><th>確定後要做什麼</th></tr></thead>
-    <tbody>
-      <tr class="fix"><td class="t">科學班初試／複試日期</td><td>初試 3/6（六）、複試 3/13（六），都是推估</td><td>一月底簡章公布當天改 <code>EXAM</code>，後面整段會自動重排</td></tr>
-      <tr class="fix"><td class="t">雄中考古題本</td><td>12 月起每週留 1–2 格「雄中考古題」，還沒發就改做考古題錯題重做</td><td>拿到後那些格子就照年份往下寫，不用重排</td></tr>
-      <tr><td class="t">寒輔日期</td><td>暫定 1/21–1/29 平日上午 07:45–12:00</td><td>學校通知後改 <code>HANFU</code></td></tr>
-      <tr><td class="t">補習班寒假、連假、初試後課表</td><td>週末 17–22 照上；遇到連假停；上到 3/7（複試前）</td><td>補習班有加課或停課就跟我說，或在今天分頁編輯當天</td></tr>
-      <tr><td class="t">資優數學寒假是否上課</td><td>週三照上，國定假日停，最後一堂 3/3</td><td>有變動就改 <code>GIFTED_LAST</code> 或當天編輯</td></tr>
-      <tr><td class="t">二段範圍（11/23–24）</td><td>推估：國文 L4–L6＋對聯、英文 L3–L4、數學 1-4～2-2、自然 2-2～3-4、社會各科第 3–4 課（依自修、段考王、文法即時通的段考分界）</td><td>老師公布範圍後告訴我，或在今天分頁編輯當天</td></tr>
-      <tr><td class="t">下學期段考日期</td><td>預定 3/22–23、5/3 與 5/7（未定案，不準備，只標在月曆）</td><td>學校公布後改 <code>DAY_NOTES</code></td></tr>
-      <tr><td class="t">自然學科競賽複賽</td><td>1/7，前一晚排了一格公式卡</td><td>沒晉級那格就改寫補習作業</td></tr>
-      <tr><td class="t">颱風假／生病</td><td>每週日 14:40–16:00 空檔就是緩衝</td><td>掉的進度先用空檔補；連兩週補不完就砍當週最不重要的一項，不要熬夜</td></tr>
-    </tbody>
-  </table></div>
+  <div class="sec-head"><h2>其他還沒定案的</h2><span class="eyebrow">確定了就改，日程會跟著動</span></div>
+  <p class="sec-note">要去問、要等通知的都放在上面的「待決定」。這裡是不用特別去問、遇到再改的。確定之後跟 Claude 說，或改 <code class="dim">tools/gen_plan.py</code> 重新產生。</p>
+  <div class="var-list">
+    <div class="var-card"><b>資優數學寒假是否上課</b><p><span>目前</span>週三照上，國定假日停，最後一堂 3/3</p><p><span>確定後</span>有變動就改 <code class="dim">GIFTED_LAST</code> 或當天編輯</p></div>
+    <div class="var-card"><b>下學期段考日期</b><p><span>目前</span>預定 3/22–23、5/3 與 5/7（未定案，不準備，只標在月曆）</p><p><span>確定後</span>學校公布後改 <code class="dim">DAY_NOTES</code></p></div>
+    <div class="var-card"><b>自然學科競賽複賽</b><p><span>目前</span>1/7，前一晚排了一格公式卡</p><p><span>確定後</span>沒晉級那格就改寫補習作業</p></div>
+    <div class="var-card"><b>颱風假／生病</b><p><span>目前</span>每週日 14:40–16:00 空檔就是緩衝</p><p><span>確定後</span>掉的進度先用空檔補；連兩週補不完就砍當週最不重要的一項，不要熬夜</p></div>
+  </div>
 </section>
 
 <section>
@@ -1703,16 +1747,16 @@ html.pv .wrap{max-width:none;padding:0}
 </section>
 
 <section>
-  <div class="sec-head"><h2>現在就要處理的事</h2><span class="eyebrow">做完就不用再想</span></div>
+  <div class="sec-head"><h2>待決定</h2><span class="eyebrow">有日期的待辦，和現在先怎麼假設</span></div>
+  <p class="sec-note">11/9 把「現在就要處理的事」和「還沒定案的變數」合在一起：重複的只留一份，做完的拿掉。7 天內到期、還沒勾的會出現在「今天」。</p>
   <div class="todo" id="todo-list">
-    <label><input type="checkbox"><span>二模（10/28–29）考完當晚把五科錯題登記進錯題本、模考等級填進「紀錄 → 成績」<span class="when">10/29</span></span></label>
-    <label><input type="checkbox"><span>準備兩本錯題本：科班一本、會考一本（或都用「錯題」分頁）<span class="when">本週</span></span></label>
-    <label><input type="checkbox"><span>二段範圍公布後告訴我，日程裡的推估範圍要換成實際範圍<span class="when">11 月初</span></span></label>
-    <label><input type="checkbox"><span>問補習班：寒假、連假、初試後到複試的課表（目前假設：連假停、上到 3/7）<span class="when">11 月內</span></span></label>
-    <label><input type="checkbox"><span>問學校寒輔的實際日期（目前暫定 1/21–1/29 上午）<span class="when">12 月</span></span></label>
-    <label><input type="checkbox"><span>雄中考古題本拿到後，日程裡「雄中考古題」那幾格就照年份寫<span class="when">拿到當天</span></span></label>
-    <label><input type="checkbox"><span>一月底起每週查雄中科學班簡章，初試、複試日期確定後更新計畫<span class="when">1 月底起</span></span></label>
-    <label><input type="checkbox"><span>從心測中心官網下載並印好歷屆會考 112–115 年試題（英文只要閱讀）<span class="when">3 月底前</span></span></label>
+    <label data-due="2026-11-15"><input type="checkbox"><span>準備兩本錯題本：科班一本、會考一本（或都用「錯題」分頁）<span class="when">本週</span></span></label>
+    <label data-due="2026-11-12"><input type="checkbox"><span>二段範圍公布後告訴我，日程裡的推估範圍要換成實際範圍<span class="when">11 月初</span><small class="td-why"><b>目前假設</b>推估：國文 L4–L6＋對聯、英文 L3–L4、數學 1-4～2-2、自然 2-2～3-4、社會各科第 3–4 課（依自修、段考王、文法即時通的段考分界）　<b>確定後</b>老師公布範圍後告訴我，或在今天分頁編輯當天</small></span></label>
+    <label data-due="2026-11-30"><input type="checkbox"><span>問補習班：寒假、連假、初試後到複試的課表（目前假設：連假停、上到 3/7）<span class="when">11 月內</span><small class="td-why"><b>目前假設</b>週末 17–22 照上；遇到連假停；上到 3/7（複試前）　<b>確定後</b>補習班有加課或停課就跟我說，或在今天分頁編輯當天</small></span></label>
+    <label data-due="2026-12-31"><input type="checkbox"><span>問學校寒輔的實際日期（目前暫定 1/21–1/29 上午）<span class="when">12 月</span><small class="td-why"><b>目前假設</b>暫定 1/21–1/29 平日上午 07:45–12:00　<b>確定後</b>學校通知後改 <code class="dim">HANFU</code></small></span></label>
+    <label><input type="checkbox"><span>雄中考古題本拿到後，日程裡「雄中考古題」那幾格就照年份寫<span class="when">拿到當天</span><small class="td-why"><b>目前假設</b>12 月起每週留 1–2 格「雄中考古題」，還沒發就改做考古題錯題重做　<b>確定後</b>拿到後那些格子就照年份往下寫，不用重排</small></span></label>
+    <label data-due="2027-01-25"><input type="checkbox"><span>一月底起每週查雄中科學班簡章，初試、複試日期確定後更新計畫<span class="when">1 月底起</span><small class="td-why"><b>目前假設</b>初試 3/6（六）、複試 3/13（六），都是推估　<b>確定後</b>一月底簡章公布當天改 <code class="dim">EXAM</code>，後面整段會自動重排</small></span></label>
+    <label data-due="2027-03-31"><input type="checkbox"><span>從心測中心官網下載並印好歷屆會考 112–115 年試題（英文只要閱讀）<span class="when">3 月底前</span></span></label>
   </div>
   <p class="w-note">勾起來會記住（也會跟著備份、雲端同步）。</p>
 </section>
@@ -1974,11 +2018,6 @@ html.pv .wrap{max-width:none;padding:0}
       <button class="btn ghost" id="sw-status" type="button">離線狀態</button>
     </div>
   </div>
-  <div class="card" style="margin-top:14px">
-    <h3 style="margin-bottom:6px">教材進度</h3>
-    <p class="sub">不用自己填：照「今天」勾掉的任務自動算出每本書做到第幾頁，和計畫排到哪裡比。</p>
-    <div id="bk-auto"></div>
-  </div>
 
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">本機快照</h3>
@@ -2049,7 +2088,7 @@ html.pv .wrap{max-width:none;padding:0}
 </section>
 
 <section>
-  <div class="sec-head"><h2>進度回測</h2><span class="eyebrow">看趨勢，不看單日</span></div>
+  <div class="sec-head"><h2>進度</h2><span class="eyebrow">要交的檢查、每天、每科、每本書</span></div>
   <p class="sec-note">138 項研究、近 2 萬名參與者的統合分析顯示，監控目標進度確實能提升達成率（d = 0.40），而且<b>把進度實際記錄下來</b>時效果更強。這頁就是那個記錄。</p>
   <!-- 11-09：「給 Claude 檢查」從森林頁搬來（使用者：不該放在森林的東西移出來，不然看一下就被扣心情） -->
   <div class="card" id="chk-card" style="padding:14px 16px;margin-bottom:14px"></div>
@@ -2061,8 +2100,14 @@ html.pv .wrap{max-width:none;padding:0}
   </table></div>
   <div class="card" id="sp-card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">分科進度</h3>
-    <p class="sub">照計畫到昨天每一科應該完成幾段，和你實際勾掉的比；欠帳補完也算。最右邊是近 14 天的完成率，看哪一科最常被跳過。</p>
+    <p class="sub">照計畫到昨天每一科應該完成幾段，和你實際勾掉的比；欠帳補完也算。最後一欄是近 14 天的完成率，看哪一科最常被跳過。</p>
     <div id="sp-out"></div>
+  </div>
+  <!-- 11-09 A4：教材進度從「設定」搬來，放在分科進度下面（往下捲就能對照） -->
+  <div class="card" id="bk-card" style="margin-top:14px">
+    <h3 style="margin-bottom:6px">教材進度</h3>
+    <p class="sub">不用自己填：照「今天」勾掉的任務自動算出每本書做到第幾頁，和計畫排到哪裡比。</p>
+    <div id="bk-auto"></div>
   </div>
   <div class="card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">每週回顧</h3>
@@ -2318,19 +2363,25 @@ html.pv .wrap{max-width:none;padding:0}
   if (tg) tg.textContent = LINES[Math.floor(Math.random() * LINES.length)].replace(/<br>/g, '');
 
   // 主分頁：依 section 出現順序分組
+  // 11-09 A1：手機底部只放 5 個（今天、日程、錯題、紀錄、獎勵），設定改成右上角齒輪；月曆、計畫變成「日程」裡的子頁。
+  // 分頁編號（window.__tab）不變，其他程式（獎勵=5、紀錄=4、設定=7…）才不用跟著改。
+  // [名稱, 子頁清單, 子頁名稱, 轉到哪個分頁]：子頁可以是一個區塊編號，或好幾個區塊一起顯示（陣列，第一個是它的編號 __sub）
   var GROUPS = [
     ['今天',  [0]],
-    ['日程',  [1]],
-    ['月曆',  [4]],
+    ['日程',  [1, 4, [12,5,2,3,6,7,8,9,10,11]], ['每天','月曆','整年計畫']],
+    ['月曆',  [4], null, 1],          // 舊入口（存過的分頁、別的程式叫 __showTab(2)）→「日程 → 月曆」
     ['錯題',  [13]],
-    ['紀錄',  [14,20,21]],
+    ['紀錄',  [21,14,20], ['進度','成績','日誌']],
     ['獎勵',  [15,22,16,17,18]],
-    ['計畫',  [2,3,5,6,7,8,9,10,11,12]],
+    ['計畫',  [12], null, 1],         // 舊入口 →「日程 → 整年計畫」
     ['設定',  [19]]
   ];
   var secs = document.querySelectorAll('body > .wrap > section');
   var nav = document.getElementById('main-tabs');
   if (!nav || !secs.length) return;
+  // 「整年計畫」要先看「待決定」（12）和「其他還沒定案的」（5）：把這兩區搬到計畫的最前面（secs 是開頁時抓的清單，編號不受影響）
+  try { secs[2].parentNode.insertBefore(secs[12], secs[2]); secs[2].parentNode.insertBefore(secs[5], secs[2]); } catch(e){}
+  function idOf(x){ return Array.isArray(x) ? x[0] : x; }
 
   // 一個分頁有好幾個區塊（紀錄、獎勵、計畫）：上面列子分頁，一次只顯示一個區塊，手機上才不會拖很長
   var toc = document.getElementById('page-toc'), mini = document.getElementById('hero-mini');
@@ -2341,25 +2392,38 @@ html.pv .wrap{max-width:none;padding:0}
     if (!mini) return;
     function tx(id){ var el = document.getElementById(id); return el ? el.textContent.replace(/\s+/g,' ').trim() : '—'; }
     mini.innerHTML = '<b>joshdaai 讀書計畫</b><span>初試 <em>' + tx('c-sci') + '</em></span><span>會考 <em>' + tx('c-cap') + '</em></span>';
+    if (gearBtn) mini.appendChild(gearBtn);
   }
+  // 設定改成齒輪（11-09 A1），放在每一頁最上面那一行倒數的右邊
+  var gearBtn = document.createElement('button');
+  gearBtn.type = 'button'; gearBtn.className = 'gear-btn'; gearBtn.setAttribute('aria-label', '設定'); gearBtn.textContent = '⚙️';
+  gearBtn.addEventListener('click', function(){ show(window.__tab === 7 ? 0 : 7); });
   window.__paintHeroMini = paintMini;
   function show(gi, si){
-    var set = GROUPS[gi][1];
+    if (GROUPS[gi] && GROUPS[gi][3] !== undefined){ var sec0 = idOf(GROUPS[gi][1][0]); return show(GROUPS[gi][3], si !== undefined ? si : sec0); }
+    var set = GROUPS[gi][1], ids = set.map(idOf);
     if (si === undefined) si = sub[gi];
-    if (set.indexOf(si) === -1) si = set[0];
+    if (ids.indexOf(si) === -1){   // 叫的是組合子頁裡的某一區（例如 5）→ 換成那個子頁的編號
+      var hit = set.filter(function(x){ return Array.isArray(x) && x.indexOf(si) >= 0; })[0];
+      si = hit ? idOf(hit) : ids[0];
+    }
+    var cur = set[ids.indexOf(si)], vis = Array.isArray(cur) ? cur : [cur];
     sub[gi] = si;
     try { localStorage.setItem(SUBK, JSON.stringify(sub)); } catch(e){}
     window.__tab = gi; window.__sub = si;
     document.documentElement.setAttribute('data-tab', gi);
-    secs.forEach(function(s, i){ s.hidden = set.length > 1 ? i !== si : set.indexOf(i) === -1; });
+    document.documentElement.setAttribute('data-sub', si);
+    secs.forEach(function(s, i){ s.hidden = vis.indexOf(i) === -1; });
     Array.prototype.forEach.call(nav.children, function(b, i){
       b.setAttribute('aria-selected', i === gi ? 'true' : 'false');
     });
+    if (gearBtn) gearBtn.setAttribute('aria-pressed', gi === 7 ? 'true' : 'false');
     if (toc){
       toc.innerHTML = '';
       toc.hidden = set.length < 2;
-      if (set.length > 1) set.forEach(function(i){
-        var b = document.createElement('button'); b.type = 'button'; b.textContent = secTitle(secs[i]); b.dataset.si = i;
+      if (set.length > 1) set.forEach(function(x, j){
+        var i = idOf(x), b = document.createElement('button'); b.type = 'button';
+        b.textContent = GROUPS[gi][2] ? GROUPS[gi][2][j] : secTitle(secs[i]); b.dataset.si = i;
         b.setAttribute('aria-pressed', i === si ? 'true' : 'false');
         b.addEventListener('click', function(){ show(gi, i); });
         toc.appendChild(b);
@@ -2367,8 +2431,7 @@ html.pv .wrap{max-width:none;padding:0}
     }
     paintMini();
     if (window.__subDots) window.__subDots();   // 子分頁上的小圓點（哪一頁有東西可以領）
-    var ab = nav.children[gi];
-    if (ab) { try { nav.scrollLeft = Math.max(0, ab.offsetLeft - (nav.clientWidth - ab.offsetWidth) / 2); } catch(e){} }
+    // （11-09 C6：底部分頁 5 個都看得到，不用再捲到目前分頁；以前這裡量寬度會逼整頁重新排版）
     try { localStorage.setItem('plan-tab', gi); } catch(e){}
     try{ window.scrollTo(0,0); }catch(e){}
     try{ document.dispatchEvent(new CustomEvent('plan:tab',{detail:gi})); }catch(e){}
@@ -2380,6 +2443,7 @@ html.pv .wrap{max-width:none;padding:0}
     var b = document.createElement('button');
     b.className = 'tab-btn'; b.type = 'button'; b.setAttribute('role','tab');
     b.textContent = g[0];
+    if (g[3] !== undefined || i === 7) b.hidden = true;   // 月曆、計畫在「日程」裡；設定是齒輪（按鈕還在，第幾個不變）
     // 「獎勵」上有紅點時，點下去直接到有東西可以領的那一頁（2026-11-02：使用者看到「獎勵 4」翻遍了還找不到）
     b.addEventListener('click', function(){ var to = (i === 5 && window.__rewardJump) ? window.__rewardJump() : undefined; show(i, to); });
     nav.appendChild(b);
@@ -3007,7 +3071,11 @@ html.pv .wrap{max-width:none;padding:0}
     else if (HOL[key(D)]) extra='　國定假日';
     elWhen.textContent=(D.getMonth()+1)+'/'+D.getDate()+'　週'+WD[D.getDay()]+(pd?'':'　'+label(pf))+extra+(nt?'　'+nt.t:'');
     var tdn=document.getElementById('td-note');
-    if(tdn && pd) tdn.innerHTML='<b>'+pd.ph+'</b>　'+(pd.tip||'')+'<br><span style="font-size:12.5px;color:var(--ink-faint)">勾掉完成的任務；沒勾的隔天變成「欠帳」，放假日從娛樂時間扣（娛樂最少留 30 分）。每段的做法寫在任務名稱下方。</span>';
+    if(tdn && pd) tdn.innerHTML='<b>'+pd.ph+'</b>　'+(pd.tip||'')+'<details class="td-rule"><summary aria-label="欠帳規則">?</summary>勾掉完成的任務；沒勾的隔天變成「欠帳」，放假日從娛樂時間扣（娛樂最少留 30 分）。每段的做法寫在任務名稱下方。</details>';   // 11-09 A2：每天都一樣的說明收成「?」
+    // 11-09 A3：昨晚日誌寫的「明天的第一件事：幾點、在哪、做什麼」放在今天最上面（計畫要在該行動的時候出現）
+    var tf=document.getElementById('td-first');
+    if(tf){ var yk=key(new Date(D.getFullYear(),D.getMonth(),D.getDate()-1)), jj=null; try{ jj=(JSON.parse(localStorage.getItem('plan.journal.v1'))||{})[yk]; }catch(e){}
+      if(jj&&jj.n){ tf.hidden=false; tf.innerHTML='<b>昨晚決定的第一件事</b>'+window.__esc(jj.n); } else tf.hidden=true; }
     var nEl=document.getElementById('td-note2');
     if(nEl){ if(nt&&(nt.b||nt.t)){ nEl.hidden=false; nEl.innerHTML='<b>'+window.__esc(nt.t||'記事')+'</b>'+(nt.b?'<br>'+window.__esc(nt.b).replace(/\n/g,'<br>'):''); } else nEl.hidden=true; }
 
@@ -4904,8 +4972,23 @@ html.pv .wrap{max-width:none;padding:0}
       var cb=l.querySelector('input'), sp=l.querySelector('span'); if(!cb||!sp) return;
       var key=(sp.firstChild?sp.firstChild.textContent:sp.textContent).trim();
       cb.checked=!!done[key];
-      cb.addEventListener('change',function(){ if(cb.checked) done[key]=1; else delete done[key]; sv(TDK,done); });
+      cb.addEventListener('change',function(){ if(cb.checked) done[key]=1; else delete done[key]; sv(TDK,done); paintDue(); });
     });
+    // 11-09 A7：7 天內到期（或已經過期）、還沒勾的，放到「今天」上面；點了跳到「日程 → 整年計畫」的待決定
+    function paintDue(){
+      var el=document.getElementById('td-due'); if(!el) return;
+      var t=d0(), out=[];
+      Array.prototype.forEach.call(box.querySelectorAll('label[data-due]'),function(l){
+        var cb=l.querySelector('input'); if(!cb||cb.checked) return;
+        var p=l.dataset.due.split('-'), due=new Date(+p[0],+p[1]-1,+p[2]), left=Math.round((due-t)/864e5); if(left>7) return;
+        var sp=l.querySelector('span'), txt=(sp.firstChild?sp.firstChild.textContent:sp.textContent).trim();
+        out.push('<li>'+window.__esc(txt)+'　<span class="'+(left<0?'warn':'when')+'">'+(left<0?'已經過了 '+(-left)+' 天':(left?'還有 '+left+' 天':'今天'))+'</span></li>');
+      });
+      el.hidden=!out.length;
+      el.innerHTML=out.length?'<b>待決定，快到期了</b><ul>'+out.join('')+'</ul><button type="button" class="btn ghost" id="td-due-go">看全部</button>':'';
+      var g=document.getElementById('td-due-go'); if(g) g.addEventListener('click',function(){ if(window.__showTab) window.__showTab(1,12); });
+    }
+    paintDue();
   })();
 
   /* ---------- 要問老師 ---------- */
@@ -5221,7 +5304,7 @@ html.pv .wrap{max-width:none;padding:0}
   function dayEdits(){ var n=Date.now(); if(!deCache||n-deT>2000){ deCache=ls('plan.dayedit.v1',{})||{}; deT=n; } return deCache; }
   function studyBlocks(k){
     var de=dayEdits();
-    if(de[k]) return de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n}; });
+    if(de[k]) return de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n, t:(String(x.t||'').match(/\d{1,2}:\d{2}/)||[''])[0]}; });
     var day=PL.days[k]; if(!day) return [];
     return day.b.filter(function(b){ return b[5]===0; }).map(function(b){ return {c:b[2], n:b[3], t:b[0], d:b[4]}; });
   }
@@ -5259,12 +5342,18 @@ html.pv .wrap{max-width:none;padding:0}
       ? '從今天開始記錄，明天起就看得出哪一科落後。'
       : (worst? '落後最多：<b>'+CATN[worst.c]+' '+worst.beh+' 段</b>（照計畫到昨天應完成 '+worst.p+' 段）。' : '每一科都跟上計畫了 ✓')
         +(low? '　近 14 天最常沒做完：<b>'+CATN[low.c]+'</b>（'+low.r+'%）。' : '');
-    box.innerHTML='<p class="sp-sum">'+sum+'</p><div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>科目</th><th>應完成（到昨天）</th><th>已完成</th><th>落後</th><th>近 14 天完成率</th></tr></thead><tbody>'
+    // 11-09 A5：「落後」移到第二欄（手機上不用滑就看得到）、表下加一行「下一步」：落後最多的那科下一次排在哪一格
+    var step='';
+    if(worst){ var nowM=new Date().getHours()*60+new Date().getMinutes(), nxt=null;
+      for(var di=0; di<DAYS.length && !nxt; di++){ var kd=DAYS[di], dd=pk(kd); if(dd<today) continue;
+        studyBlocks(kd).some(function(x){ if(x.c!==worst.c) return false; if(kd===tk && x.t){ var tt=x.t.split(':'); if((+tt[0])*60+(+tt[1])<=nowM) return false; } nxt={k:kd,x:x}; return true; }); }
+      step='<p class="sp-step"><b>下一步</b>　'+CATN[worst.c]+'落後 '+worst.beh+' 段 → '+(nxt?'下一次排在 <span class="nw">'+md(nxt.k)+'（'+WD[pk(nxt.k).getDay()]+'）'+(nxt.x.t?' '+esc(nxt.x.t):'')+'</span>，那格先補最舊的一段；':'')+'也可以用週日 14:40 的空檔補。</p>'; }
+    box.innerHTML='<p class="sp-sum">'+sum+'</p><div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>科目</th><th>落後</th><th>完成／應完成</th><th>近 14 天</th></tr></thead><tbody>'
       +rows.map(function(r){
-        return '<tr><td>'+CATN[r.c]+'</td><td class="n">'+r.p+'</td><td class="n">'+r.dn+'</td>'
-          +'<td class="n '+(r.beh?'behind':'ok')+'">'+(r.beh?r.beh+' 段':'—')+'</td>'
+        return '<tr><td>'+CATN[r.c]+'</td><td class="n '+(r.beh?'behind':'ok')+'">'+(r.beh?r.beh+' 段 ▼':'—')+'</td>'
+          +'<td class="n">'+r.dn+'／'+r.p+'</td>'
           +'<td>'+(r.r===null?'<span style="color:var(--ink-faint)">—</span>':'<span class="sp-bar"><i style="width:'+r.r+'%"></i></span><span class="mono">'+r.r+'%</span>')+'</td></tr>';
-      }).join('')+'</tbody></table></div>'
+      }).join('')+'</tbody></table></div>'+step
       +'<p class="w-note">記錄從 '+md(kk(from))+' 開始；在那之前的日子不算。</p>';
   }
 
@@ -5340,7 +5429,7 @@ html.pv .wrap{max-width:none;padding:0}
           var n=String(x.n); if(n.indexOf(b)<0) return;
           if(/可對照/.test(n) && n.indexOf('可對照')<n.indexOf(b)) return;   // 二段課本旁邊寫的「可對照某講義」不算
           var dn=idx[n]||[], r=dn[0]||null;
-          segs.push({k:k, n:n, p:maxPage(n), done:r});
+          segs.push({k:k, n:n, p:maxPage(n), done:r, t:x.t||''});
         });
       });
       var due=segs.filter(function(s){ return pk(s.k)<=today; });
@@ -5354,7 +5443,7 @@ html.pv .wrap{max-width:none;padding:0}
     }).filter(function(r){ return r.segs.length; });
     var html='<div class="tbl-scroll"><table class="sp-tbl"><thead><tr><th>講義／題本</th><th>到今天</th><th>落後</th><th>下一次排在</th></tr></thead><tbody>'
       +books.map(function(r){
-        var nx=r.next? md(r.next.k)+'（'+WD[pk(r.next.k).getDay()]+'）'+esc(bookShort(r.next.n,r.b)) : '全部排完了';
+        var nx=r.next? '<span class="nw">'+md(r.next.k)+'（'+WD[pk(r.next.k).getDay()]+'）'+(r.next.t?' '+esc(r.next.t):'')+'</span> '+esc(bookShort(r.next.n,r.b)) : '全部排完了';   // 11-09 A6：加上幾點
         return '<tr><td><b>'+esc(BOOK_SUBJ[r.key]||'')+'</b>　'+esc(r.title)+'</td><td class="n '+(r.late.length?'behind':(r.dueDone?'ok':''))+'">'+r.dueDone+'／'+r.due+'</td>'
           +'<td class="n'+(r.late.length?' behind':'')+'">'+(r.late.length?r.late.length+' 段':'—')+'</td><td>'+nx+'</td></tr>'; }).join('')
       +'</tbody></table></div>'
@@ -7983,9 +8072,8 @@ html.pv .wrap{max-width:none;padding:0}
   // 寵物每次都算：「今天」的小卡、「獎勵」的紅點都靠它。紀錄＝4（科班考古題配速、分科進度）、獎勵＝5、設定＝7（教材進度）
   function paintFor(g){
     deCache=null; paintPet();
-    if(g===4){ paintChecks(); paintKbPace(); paintSubjects(); }
+    if(g===4){ var s4=window.__sub; if(s4===21){ paintChecks(); paintSubjects(); paintBooks(); } if(s4===14) paintKbPace(); }   // 11-09：只畫正在看的子頁；教材進度搬到這裡（A4）
     if(g===5){ var sb=window.__sub; if(sb===17) paintBank(); if(sb===16) paintAch(); paintCustom(); }   // 11-09 C7：只畫正在看的子頁
-    if(g===7) paintBooks();
   }
   paintFor(window.__tab); if(window.__tab!==5) paintCustom(); paintToc();   // 11-09 C2：開頁只畫正在看的分頁（自訂獎勵的解鎖提示照舊檢查）
   document.addEventListener('plan:tab',function(e){ paintFor(e.detail); });
@@ -8305,7 +8393,7 @@ html.pv .wrap{max-width:none;padding:0}
     var dd=dir||(d>cur?1:(d<cur?-1:0));
     cur=d; draw(dd);
   }
-  window.__gotoDay=function(k){ go(parse(k)); if(window.__showTab) window.__showTab(1); };
+  window.__gotoDay=function(k){ go(parse(k)); if(window.__showTab) window.__showTab(1,1); };   // 日程裡的「每天」（11-09）
   document.getElementById('dv-prev').addEventListener('click',function(){ go(addD(cur,-1),-1); });
   document.getElementById('dv-next').addEventListener('click',function(){ go(addD(cur,1),1); });
   document.getElementById('dv-prevw').addEventListener('click',function(){ go(addD(cur,-7),-1); });
@@ -8323,7 +8411,7 @@ html.pv .wrap{max-width:none;padding:0}
     },{passive:true});
   }
   document.addEventListener('keydown',function(e){
-    if(window.__tab!==1 || /INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||'')) return;
+    if(window.__tab!==1 || window.__sub!==1 || /INPUT|TEXTAREA|SELECT/.test((e.target||{}).tagName||'')) return;
     if(e.key==='ArrowLeft') go(addD(cur,-1),-1);
     if(e.key==='ArrowRight') go(addD(cur,1),1);
   });
@@ -8332,13 +8420,13 @@ html.pv .wrap{max-width:none;padding:0}
   if(gd) gd.addEventListener('click',function(){ if(gd.dataset.k) window.__gotoDay(gd.dataset.k); });
   // 網址帶 #d=2027-1-27 會直接打開那一天
   var hm=(location.hash||'').match(/d=(\d{4}-\d{1,2}-\d{1,2})/);
-  if(hm && PL.days[hm[1]]){ cur=parse(hm[1]); if(window.__showTab) window.__showTab(1); }
+  if(hm && PL.days[hm[1]]){ cur=parse(hm[1]); if(window.__showTab) window.__showTab(1,1); }
   draw();
   var stamp=new Date().toDateString();
   setInterval(function(){
     var n=new Date().toDateString();
     if(n!==stamp){ stamp=n; cur=clamp(today0()); }
-    if(window.__tab===1) draw();
+    if(window.__tab===1 && window.__sub===1 && !document.hidden) draw();   // 11-09 C8：只在看「每天」時每分鐘更新
   },60000);
 })();
 </script>
