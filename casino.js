@@ -158,8 +158,10 @@
     s.chips=s.chips||0; s.ws=s.ws||{}; s.wb=s.wb||{}; s.rec=s.rec||[]; s.own=s.own||{}; s.log=s.log||[]; s.set=s.set||{};
     s.k=s.k||{}; ['games','ans','ok','best','run','lad10','petW','petL','clr','rvAns','rvOk'].forEach(function(x){ s.k[x]=s.k[x]||0; });
     s.k.net=s.k.net||{pts:0,chip:0,star:0};
+    MUTE=!!s.set.mute;   // 11-09 C14：記下靜音設定，音效不用為了看這個再讀一次整份資料
     return s;
   }
+  var MUTE=null;
   function save(s){ sv(VK,s); }
   function mastered(s,key){ var w=s.ws[key]; return !!(w && w[2]>=MASTER); }
   function acc100(s){ if(s.rec.length<20) return .7; var n=0; s.rec.forEach(function(x){ n+=x; }); return n/s.rec.length; }
@@ -195,6 +197,9 @@
     if(p==='etc') return !P.some(function(x){ return /^(n|v|adj|adv)\.$/.test(x); });
     return P.indexOf(p)>=0;
   }
+  // 11-09 C14：各範圍有幾個字不會變（錯字本除外），算一次記住；以前首頁每點一下就把 4,960 個字掃 8 遍
+  var RC={};
+  function rangeCount(id){ if(RC[id]==null) RC[id]=ALL?ALL.filter(function(it){ return inRange(it,[id],{wb:{}}); }).length:0; return RC[id]; }
   function inRange(it,rg,s){
     return (rg.indexOf('kb')>=0&&it.src==='kb')||(rg.indexOf('ka')>=0&&it.src==='ka')||(rg.indexOf('ph')>=0&&it.ph)||(!!it.tl&&rg.indexOf('t'+it.tl)>=0)||(rg.indexOf('wb')>=0&&!!s.wb[it.key]);
   }
@@ -281,7 +286,7 @@
   function speak(t){ if(!canSpeak()) return; try{ speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=.88; if(voice) u.voice=voice; speechSynthesis.speak(u); }catch(e){} }
   var AC=null;
   function snd(kind){
-    if(st().set.mute) return;
+    if(MUTE===null?st().set.mute:MUTE) return;
     try{
       AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume();
       var seq=kind==='ok'?[660,880]:(kind==='bad'?[300,220]:(kind==='win'?[523,659,784,1047]:[440]));
@@ -391,7 +396,7 @@
     o+=lock.length?'<p class="fp-care bad">🔒 現在不能下注：'+lock.join('；')+'。錯字本複習隨時都可以。</p>'
       :'<p class="fp-care">✅ 可以下注。今天讀了 '+todayMin()+' 分鐘，一次最多押 '+capOf('pts')+' 點／籌碼（讀越多押越大）、🌟 最多 3 顆。</p>';
     o+='<div class="vc-row"><h4>範圍 <span>可以複選；'+esc(SOON)+'</span></h4><div class="vc-chips">'
-      +RANGES.map(function(r){ var n=r.id==='wb'?Object.keys(s.wb).length:ALL.filter(function(it){ return inRange(it,[r.id],s); }).length; return chipBtn('data-rg',r.id,set.rg.indexOf(r.id)>=0,esc(r.n)+' <small>'+n+'</small>'); }).join('')+'</div>'
+      +RANGES.map(function(r){ var n=r.id==='wb'?Object.keys(s.wb).length:rangeCount(r.id); return chipBtn('data-rg',r.id,set.rg.indexOf(r.id)>=0,esc(r.n)+' <small>'+n+'</small>'); }).join('')+'</div>'
       +'<details class="vc-more"'+(set.let||set.pos.length?' open':'')+'><summary>只考某些字母、詞性'+(set.let?'（'+set.let.toUpperCase().split('').join('')+'）':'')+(set.pos.length?'（'+set.pos.map(function(p){ return POSF.filter(function(x){ return x[0]===p; })[0][1]; }).join('、')+'）':'')+'</summary>'
       +'<div class="vc-chips vc-let">'+'abcdefghijklmnopqrstuvwxyz'.split('').map(function(c){ return chipBtn('data-let',c,set.let.indexOf(c)>=0,c.toUpperCase()); }).join('')+'<button type="button" data-let="*">全部</button></div>'
       +'<div class="vc-chips">'+POSF.map(function(p){ return chipBtn('data-pos',p[0],set.pos.indexOf(p[0])>=0,p[1]); }).join('')+'</div></details>'

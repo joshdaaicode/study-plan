@@ -494,7 +494,7 @@ input,select,textarea{border-radius:var(--r-in)!important}
   box-shadow:0 12px 32px rgba(0,0,0,.26);animation:fxBanner 3.4s ease forwards;white-space:nowrap;max-width:92vw;
   overflow:hidden;text-overflow:ellipsis}
 section:not([hidden]){animation:fxRise .3s ease both}
-.pm-time.run{animation:fxRing 2s ease-in-out infinite}
+.pm-time.run{animation:fxRing 2s ease-in-out 3}   /* 11-09 C10：開始時閃 3 下就好；以前外圈發光動整整 25 分鐘（動 box-shadow 很耗電） */
 .ul-item.just-open{position:relative;overflow:hidden}
 .ul-item.just-open::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(100deg,transparent 38%,color-mix(in srgb,var(--cap) 26%,transparent) 50%,transparent 62%);
@@ -990,10 +990,11 @@ html.pv .wrap{max-width:none;padding:0}
 .fp-scene{position:relative;line-height:0;background:#cfe8f7;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .fp-scene svg{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}
 .fp-hud{position:absolute;left:8px;top:8px;display:flex;flex-wrap:wrap;gap:5px;line-height:1.2;pointer-events:none;z-index:1;max-width:calc(100% - 16px)}
-.fp-hud span{font-size:11.5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.82);color:#2b3440;box-shadow:0 1px 3px rgba(0,0,0,.12);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.fp-hud span{font-size:11.5px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.82);color:#2b3440;box-shadow:0 1px 3px rgba(0,0,0,.12)}   /* 11-09 C10：拿掉模糊（底色已經 82% 不透明，看不出來） */
 .fp-click{cursor:pointer}
 .fp-critter{cursor:pointer}
 .fp-new{transform-box:fill-box;transform-origin:50% 100%;animation:fpGrow .9s cubic-bezier(.3,1.4,.5,1) both}
+.fp-off *{animation-play-state:paused!important}   /* 11-09 C10：森林捲出畫面時，草、樹、天氣的動畫暫停 */
 .fp-sw{transform-box:fill-box;transform-origin:50% 100%;animation:fpSway 4.2s ease-in-out infinite alternate}
 @keyframes fpSway{from{transform:rotate(-1.6deg)}to{transform:rotate(1.6deg)}}
 .fp-grass{transform-box:fill-box;transform-origin:50% 100%;animation:fpSway 2.6s ease-in-out infinite alternate}
@@ -2716,7 +2717,10 @@ html.pv .wrap{max-width:none;padding:0}
   });
 
   draw(nowIdx);
-  try{ if(tabs.children[nowIdx]) tabs.children[nowIdx].scrollIntoView({block:'nearest', inline:'center'}); }catch(e){}
+  // 11-09 C6：月曆沒在看時不要捲（開頁就會逼整頁重新排版）；切到月曆時再捲到這個月
+  function calScroll(){ try{ if(tabs.children[nowIdx]) tabs.children[nowIdx].scrollIntoView({block:'nearest', inline:'center'}); }catch(e){} }
+  if(window.__tab===1 && window.__sub===4) calScroll();
+  var calScrolled=false; document.addEventListener('plan:tab',function(e){ if(e.detail===1 && window.__sub===4 && !calScrolled){ calScrolled=true; setTimeout(calScroll,30); } });
 
 
   var stamp = new Date().toDateString();
@@ -3363,7 +3367,8 @@ html.pv .wrap{max-width:none;padding:0}
     if(id===P.subjBlk) return;
     P.subjBlk=id; var g=guessSubj(b);
     if(g){ P.subj=g; selS.value=g; }
-    s(PK,P);
+    // 11-09 C9：不存檔——以前每到新時段就寫一次要同步的番茄鐘資料，觸發一次上傳；兩台裝置都開著還可能被當成「兩邊都改過」。
+    // 開始番茄鐘時會一起存；自己手動選的科目照樣會存（下面的 change）
   }
   selS.addEventListener('change',function(){ var b=curBlock(); P.subj=selS.value; P.subjBlk=b?(b.a+'|'+b.n):''; s(PK,P); });
 
@@ -4042,6 +4047,7 @@ html.pv .wrap{max-width:none;padding:0}
   var grid=document.getElementById('sc-grid'), tbl=document.getElementById('sc-table'), miniW=240;
   // 依實際欄寬畫圖，字和點才不會被縮小
   function measure(){
+    if(!(window.__tab===4 && window.__sub===14)) return miniW;   // 11-09 C6：成績頁沒在看就不量寬度（量寬度會逼整頁重新排版）
     var gw=grid?grid.clientWidth:0; if(!gw) return miniW;
     var cols=Math.max(1,Math.floor((gw+12)/(232+12)));
     return Math.max(200,Math.round((gw-12*(cols-1))/cols-26));
@@ -4145,7 +4151,7 @@ html.pv .wrap{max-width:none;padding:0}
   var lastW=0, rT=null;
   function refit(){ var w=measure(); if(w!==lastW){ lastW=w; renderTrend(); } }
   window.addEventListener('resize',function(){ clearTimeout(rT); rT=setTimeout(refit,150); });
-  document.addEventListener('plan:tab',function(){ setTimeout(refit,30); });
+  document.addEventListener('plan:tab',function(e){ if(e.detail===4 && window.__sub===14) setTimeout(refit,30); });   // 11-09 C6：只有切到「紀錄 → 成績」才重新量
 
   /* ---------- 備份 ---------- */
   // 要備份、同步的資料（介面狀態像目前在哪個分頁不算，切分頁不該觸發上傳）
@@ -4265,6 +4271,15 @@ html.pv .wrap{max-width:none;padding:0}
       say('已上傳 ✓　'+stamp(),'ok');
     });
   }
+  // 11-09 C4：以前每次上傳前都先把整份備份下載下來（GET /gists/{id}），只為了看雲端的更新時間。
+  // 改成先看最新一筆修改紀錄（很小）：確定雲端沒有比這台上次同步更新，就直接上傳；看不出來或比較新，才走原本完整的檢查。
+  function maybeNewer(id){
+    if(!cl.remoteAt) return Promise.resolve(true);
+    return api('/gists/'+id+'/commits?per_page=1').then(function(list){
+      var c=Array.isArray(list)&&list[0]; if(!c||!c.committed_at) return true;
+      return new Date(c.committed_at).getTime() > new Date(cl.remoteAt).getTime()+5000;   // 差 5 秒以內算同一次（自己上傳的那筆）
+    }).catch(function(){ return true; });
+  }
   // force：使用者在確認框按了「用這台覆蓋」
   function upload(silent,force){
     saveCl();
@@ -4273,6 +4288,7 @@ html.pv .wrap{max-width:none;padding:0}
     var pre = cl.gist ? Promise.resolve(cl.gist) : findGist();
     return pre.then(function(id){
       if(!id||force) return realUpload(silent);
+      return maybeNewer(id).then(function(m){ if(!m) return realUpload(silent);
       return api('/gists/'+id).then(function(g){
         if(remoteNewer(g)){
           held=true;
@@ -4288,7 +4304,7 @@ html.pv .wrap{max-width:none;padding:0}
           });
         }
         return realUpload(silent);
-      });
+      }); });
     }).catch(function(e){ say('上傳失敗：'+(e.message||e),'err'); throw e; });
   }
   function fetchBackup(g){
@@ -4325,7 +4341,9 @@ html.pv .wrap{max-width:none;padding:0}
   }
 
   var lastSig=sig(), pending=false, lastCheck=0, firstCheck=true;
-  function changed(){ return sig()!==lastSig; }
+  // 11-09 C4：以前每 30 秒都把全部資料轉成文字比一次；改成資料核心通知「有改過」才比（dirty），比完一樣就放下
+  var dirty=true;
+  function changed(){ if(!dirty) return false; var c=sig()!==lastSig; if(!c) dirty=false; return c; }
   // 一有改動就上傳（2026-11-07）：資料一變，約 2 秒後上傳（同一個動作連續存好幾個檔併成一次）；
   //   一直在改（例如玩單字賭場）時最多每 10 秒傳一次；上傳途中又改了，傳完馬上補一次。每 30 秒的檢查留著當備用。
   var PUSH_WAIT=2000, PUSH_GAP=10000, pushT=null, lastPushAt=0, again=false, checking=false;
@@ -4335,7 +4353,7 @@ html.pv .wrap{max-width:none;padding:0}
     if(pushT) return;   // 已經排了一次，到時候會一起傳
     pushT=setTimeout(function(){ pushT=null; autoPush(); }, Math.max(PUSH_WAIT, lastPushAt+PUSH_GAP-Date.now()));
   }
-  window.__onData=pushSoon;
+  window.__onData=function(k){ dirty=true; pushSoon(); };
   function autoPush(){
     if(!cl.auto||!cl.token||!cl.gist||pending||held||window.__noSync) return;
     if(!changed()) return;
@@ -4351,6 +4369,7 @@ html.pv .wrap{max-width:none;padding:0}
     checking=true;   // 看雲端的途中先不要上傳（剛打開網站時，別台的新資料要先拉下來）
     (cl.gist?Promise.resolve(cl.gist):findGist()).then(function(id){
       if(!id) return;
+      return maybeNewer(id).then(function(m){ if(!m){ firstCheck=false; held=false; return; }   // 11-09 C4：雲端沒更新就不用下載整份
       return api('/gists/'+id).then(function(g){
         // 第一次檢查用「剛打開網站那一刻」的資料比（其他程式開頁時會先補算當天的東西）
         var base=firstCheck&&window.__bootSig!=null?window.__bootSig:sig(); firstCheck=false;
@@ -4367,7 +4386,7 @@ html.pv .wrap{max-width:none;padding:0}
           say('⚠ 雲端有 '+fmt(g.updated_at)+' 的資料，比這台上次同步還新，而且這台也改過。要用雲端的就按「從雲端下載」；確定這台才是對的就按「上傳到雲端」。自動上傳先暫停。','warn');
           if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),false);
         }
-      });
+      }); });
     }).catch(function(){}).then(function(){ checking=false; pullParent(); });
   }
   // 家長頻道（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（檔名 study-plan-parent.json）。
@@ -4694,7 +4713,9 @@ html.pv .wrap{max-width:none;padding:0}
   });
   document.getElementById('wr-filter').addEventListener('change',paint);
   paint();
-  setInterval(paint,60000);
+  // 11-09 C8：以前每分鐘不管在哪一頁都重建兩個清單；改成只在看「錯題」時每分鐘更新，切過來時畫一次
+  setInterval(function(){ if(window.__tab===3 && !document.hidden) paint(); },60000);
+  document.addEventListener('plan:tab',function(e){ if(e.detail===3) paint(); });
 })();
 </script>
 <script>
@@ -5225,21 +5246,25 @@ html.pv .wrap{max-width:none;padding:0}
   function dumpAll(){ var o={_at:new Date().toISOString(), _keys:KEYS}; KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }); return o; }
   function snapList(){ var s=ls(SNK,[]); return Array.isArray(s)?s:[]; }
   function addSnap(label){
-    var snaps=snapList(); snaps.unshift({d:kk(d0()), t:Date.now(), l:label||'', o:dumpAll()});
+    var o=dumpAll(), snaps=snapList(); snaps.unshift({d:kk(d0()), t:Date.now(), l:label||'', o:o, kb:Math.round(JSON.stringify(o).length/1024)});   // kb：存的時候就算好大小，畫清單時不用再整份轉文字
     var keep=snaps.slice(0,4);
     try{ localStorage.setItem(SNK,JSON.stringify(keep)); }
     catch(e){ try{ localStorage.setItem(SNK,JSON.stringify(keep.slice(0,2))); }catch(e2){ if(window.__quota) window.__quota(e2); return false; } }
     paintSnaps(); return true;
   }
   window.__snapNow=addSnap;
-  function daily(){ var today=kk(d0()); if(!snapList().some(function(s){ return s.d===today && !s.l; })) addSnap(''); }
+  // 11-09 修 C5：以前每 10 分鐘都把整份快照（最多 4 份完整資料）讀出來看今天有沒有存過；改成記住「今天存過了」。家長預覽不做快照
+  var snapDay='';
+  function daily(){ if(window.__pv) return; var today=kk(d0()); if(snapDay===today) return; if(!snapList().some(function(s){ return s.d===today && !s.l; })) addSnap(''); snapDay=today; }
   function paintSnaps(){
     var box=document.getElementById('snap-list'); if(!box) return;
+    if(window.__tab!==7){ snapStale=true; return; }   // 只在「設定」打開時畫（11-09 C5）
+    snapStale=false;
     var snaps=snapList();
     box.innerHTML=snaps.map(function(s,i){
       var p=s.d.split('-'), tm=s.t?new Date(s.t):null;
       return '<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule2)">'
-        +'<span class="mono" style="font-size:12.5px;flex:1">'+p[0]+'/'+p[1]+'/'+p[2]+(tm?' '+pad(tm.getHours())+':'+pad(tm.getMinutes()):'')+(s.l?'　'+String(s.l).replace(/</g,'&lt;'):'')+'　'+Math.round(JSON.stringify(s.o).length/1024)+' KB</span>'
+        +'<span class="mono" style="font-size:12.5px;flex:1">'+p[0]+'/'+p[1]+'/'+p[2]+(tm?' '+pad(tm.getHours())+':'+pad(tm.getMinutes()):'')+(s.l?'　'+String(s.l).replace(/</g,'&lt;'):'')+'　'+(s.kb!=null?s.kb:Math.round(JSON.stringify(s.o).length/1024))+' KB</span>'
         +'<button class="btn ghost" type="button" data-i="'+i+'" style="padding:5px 12px;font-size:12.5px">還原</button></div>';
     }).join('');
     if(snaps.length>1){
@@ -5268,7 +5293,9 @@ html.pv .wrap{max-width:none;padding:0}
       location.reload();
     });
   })();
+  var snapStale=true;
   daily(); paintSnaps();
+  document.addEventListener('plan:tab',function(e){ if(e.detail===7 && snapStale) paintSnaps(); });
   setInterval(daily,10*60000);   // 網站一直開著（手機主畫面 App）也會在換日後補一份
 })();
 </script>
@@ -6550,7 +6577,7 @@ html.pv .wrap{max-width:none;padding:0}
     lastT=performance.now(); raf=requestAnimationFrame(step);
   }
   if(window.IntersectionObserver && document.getElementById('fp-app')){
-    new IntersectionObserver(function(es){ inView=es[0].isIntersecting; if(inView) ensureLoop(); },{rootMargin:'60px'}).observe(document.getElementById('fp-app'));
+    new IntersectionObserver(function(es){ inView=es[0].isIntersecting; document.getElementById('fp-app').classList.toggle('fp-off',!inView); if(inView) ensureLoop(); },{rootMargin:'60px'}).observe(document.getElementById('fp-app'));   // 11-09 C10：捲出畫面就暫停 CSS 動畫
   }
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) ensureLoop(); });
   function step(t){
@@ -8464,7 +8491,7 @@ html.pv .wrap{max-width:none;padding:0}
     if(window.__tab!==5 || window.__sub!==22) return;
     if(window.__casino){ window.__casino.show(); return; }
     if(asked) return; asked=true;
-    var s=document.createElement('script'); s.src='casino.js?v=20261103a';
+    var s=document.createElement('script'); s.src='casino.js?v=20261109a';
     s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }
