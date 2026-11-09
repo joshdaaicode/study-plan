@@ -296,10 +296,15 @@ body{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env
   .method div{padding:15px 16px}
   h1{font-size:29px}
 }
-.tbl-scroll{position:relative}
-.tbl-scroll::after{content:"";position:absolute;top:0;right:0;bottom:0;width:22px;pointer-events:none;
-  background:linear-gradient(90deg,transparent,var(--card))}
-@media (min-width:760px){.tbl-scroll::after{display:none}}
+/* 表格太寬就左右滑（11-09 修：下面圓角那條 overflow:hidden 曾把它蓋掉，手機上右邊整欄被剪掉、滑不動）。
+   左右邊緣的陰影提示「還有」：local 那兩層跟著內容走，滑到頭就把陰影蓋掉；舊的 ::after 漸層會跟著內容捲走，拿掉 */
+.tbl-scroll{position:relative;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  background:
+    linear-gradient(90deg,var(--card) 35%,transparent) 0 0/30px 100% no-repeat local,
+    linear-gradient(270deg,var(--card) 35%,transparent) 100% 0/30px 100% no-repeat local,
+    linear-gradient(90deg,color-mix(in srgb,var(--ink) 16%,transparent),transparent) 0 0/12px 100% no-repeat scroll,
+    linear-gradient(270deg,color-mix(in srgb,var(--ink) 16%,transparent),transparent) 100% 0/12px 100% no-repeat scroll,
+    var(--card)}
 tr.sumrow td{background:var(--hi2)}
 tr.sumrow td.t{color:var(--warn);font-weight:600}
 tr.sumrow.todayrow td{background:var(--hi)}
@@ -415,7 +420,7 @@ section[hidden]{display:none}
 .tab-btn{padding:9px 17px}
 .card,.tl,.cal,.floor,.method,.tbl-scroll,.todo,.now,.counts,.phases,.td-budget,.cal-focus,.td-editor,.nowcard{
   border-radius:var(--r-card)}
-.tl,.cal,.tbl-scroll,.floor,.method,.phases,.counts{overflow:hidden}
+.tl,.cal,.floor,.method,.phases,.counts{overflow:hidden}   /* .tbl-scroll 不能放這裡：它要左右滑（overflow-x:auto 本身就會照圓角裁） */
 .pill{border-radius:var(--r-pill)}
 input,select,textarea{border-radius:var(--r-in)!important}
 .ed-row input,.row input,.row select{border-radius:var(--r-in)}
@@ -2112,6 +2117,46 @@ html.pv .wrap{max-width:none;padding:0}
   function pick(){ var o={}; K.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
   // 雲端同步用：這台「上次同步之後有沒有改過」要拿開頁那一刻比，其他程式開頁時會先補算當天的東西
   try{ window.__bootSig=JSON.stringify(pick()); }catch(e){ window.__bootSig=null; }
+  // 2026-11-09 考古題改名：11/3–11/8 排的是台南一中 112 物理、化學，他實際寫的是 114（使用者：「先修網站的標的，不然記錄會亂掉」）。
+  // plan.js 那幾天已改成 114；這裡把舊的檢查紀錄、每日紀錄、考古題進度裡的名稱跟著改。只動那幾天，所以 1/30 換回來的 112 不受影響。
+  // 放在 __bootSig 之後：雲端判斷「這台有沒有改過」仍用改名前的樣子；從雲端拉下舊資料、重新整理後會再改一次（改過的就不會再動）。
+  (function(){
+    var P='科班考古｜台南一中 ', MAP={};
+    MAP[P+'112 物理 限時作答（考古題 A 本 p.13–19）']=P+'114 物理 限時作答（考古題 A 本 p.1–5）';
+    MAP[P+'112 物理 訂正（考古題 A 本 p.13–19）']=P+'114 物理 訂正（考古題 A 本 p.1–5）';
+    MAP[P+'112 化學 限時作答（考古題 A 本 p.33–41）']=P+'114 化學 限時作答（考古題 A 本 p.20–25）';
+    MAP[P+'112 化學 訂正（考古題 A 本 p.33–41）']=P+'114 化學 訂正（考古題 A 本 p.20–25）';
+    var DAYS={'2026-11-3':1,'2026-11-4':1,'2026-11-5':1,'2026-11-6':1,'2026-11-7':1,'2026-11-8':1,'2026-11-9':1};
+    function rn(s){ return Object.prototype.hasOwnProperty.call(MAP,s)?MAP[s]:s; }
+    function J(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } }
+    function S(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+    try{
+      var C=J('plan.checks.v1');
+      if(C&&C.items){ var cc=false;
+        Object.keys(C.items).forEach(function(key){
+          var p=key.indexOf('|'), d=key.slice(0,p), n=key.slice(p+1), nn=rn(n);
+          if(p<0||!DAYS[d]||nn===n) return;
+          var nk=d+'|'+nn; if(!C.items[nk]){ C.items[key].n=nn; C.items[nk]=C.items[key]; }   // 新名稱已經有（例如先點了過關連結）就留新的
+          delete C.items[key]; cc=true;
+        });
+        if(cc) S('plan.checks.v1',C); }
+      var H=J('plan.hist.v1');
+      if(H){ var hc=false;
+        Object.keys(DAYS).forEach(function(d){ var e=H[d]; if(!e) return;
+          ['dn','un'].forEach(function(f){ if(Array.isArray(e[f])) e[f]=e[f].map(function(s){ var t=rn(s); if(t!==s) hc=true; return t; }); });
+        });
+        if(hc) S('plan.hist.v1',H); }
+      var B=J('plan.kbscore.v1');
+      if(B&&!B._m1109){
+        [['台南一中 112 物理','台南一中 114 物理'],['台南一中 112 化學','台南一中 114 化學']].forEach(function(x){
+          var a=B[x[0]]; if(!a) return;
+          var b=B[x[1]]||{}; if(a.d) b.d=1; if(a.s!==undefined&&a.s!==''&&(b.s===undefined||b.s==='')) b.s=a.s;
+          B[x[1]]=b; delete B[x[0]];
+        });
+        var g=B['嘉中 114 生物']||{}; g.d=1; B['嘉中 114 生物']=g;   // 整份寫完了，原本的限時作答格子拿掉，不會再自動打勾
+        B._m1109=1; S('plan.kbscore.v1',B); }
+    }catch(e){}
+  })();
   // 還原（快照、匯入、雲端下載共用）：備份裡有的寫進去；備份當時就認得、但那台是空的 key 刪掉；備份當時還沒有的 key 保留
   window.__restore=function(o){
     var n=0, known=Array.isArray(o._keys)?o._keys:null;
