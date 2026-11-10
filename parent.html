@@ -16,6 +16,8 @@
   - 互動（摸摸、留言、加點每天最多 30）：寫進孩子帳號裡另一個 Gist「家長頻道」（study-plan-parent.json），
     要先在這支手機貼一個 GitHub token（Gists 讀寫）；孩子的網站同步時讀回來套用。絕不寫孩子的備份 Gist。
   - 不顯示成績（孩子 2026-10-26 說不要給爸媽看成績）。
+  - 11-10 加詳細（孩子：「家長頁面再改的詳細一點，不然我爸會一直跑來問我」）：現在在做什麼（番茄鐘、現在的時段、最後一次打勾）、
+    每項任務幾點打勾、今天各科幾分鐘、進度跟欠帳（分科落後、考古題寫幾份、講義到哪）、明天的日程、未來 7 天。一樣只讀、不顯示分數。
 -->
 <style>
 :root{
@@ -91,6 +93,43 @@ ul.tasks li.done .n{color:var(--ink-soft)}
 .chk .s.ok{color:var(--ok)} .chk .s.wait{color:var(--sky)} .chk .s.bad{color:var(--bad);font-weight:500}
 .ex{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--rule);font-size:14px}
 .ex b{font-family:'IBM Plex Mono',monospace;color:var(--sky)}
+/* 11-10：現在在做什麼、各科分鐘、進度跟欠帳、明天、未來 7 天 */
+.live{background:var(--paper);border-radius:12px;padding:8px 12px;margin:8px 0 6px;font-size:13.5px;color:var(--ink-soft)}
+.live p{margin:0;padding:2px 0;overflow-wrap:anywhere}
+.live b{color:var(--ink)}
+.cats{display:flex;flex-wrap:wrap;gap:4px 6px;margin:4px 0 2px}
+.cats span{font-size:12px;border:1px solid var(--rule);border-radius:999px;padding:1px 8px;color:var(--ink-soft)}
+.cats b{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--ink)}
+ul.tasks li .m .at{color:var(--ok)}
+.pg-h{font-size:13.5px;font-weight:700;margin:14px 0 2px}
+.pg{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--rule);font-size:14px}
+.pg>span:first-child{overflow-wrap:anywhere}
+.pg .v{font-size:13px;text-align:right;white-space:nowrap;color:var(--ink-soft)}
+.pg .v b{font-family:'IBM Plex Mono',monospace;color:var(--ink)}
+.pg small{grid-column:1/-1;font-size:12px;color:var(--ink-faint)}
+.pg .behind,.pg .behind b{color:var(--bad);font-weight:600}
+.pg .fine{color:var(--ok)}
+ul.sched{list-style:none;margin:6px 0 0;padding:0}
+ul.sched li{display:grid;grid-template-columns:86px minmax(0,1fr);gap:0 8px;padding:6px 0;border-top:1px solid var(--rule);font-size:14px}
+ul.sched li .tm{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink-faint);line-height:1.95;white-space:nowrap}
+ul.sched li .n{overflow-wrap:anywhere}
+ul.sched li.dim{font-size:13px;color:var(--ink-faint)}
+ul.sched.mins li{grid-template-columns:52px minmax(0,1fr)}
+details.more{margin-top:8px}
+details.more>summary{cursor:pointer;font-size:13px;color:var(--sky)}
+details.day{border-top:1px solid var(--rule);padding:7px 0}
+details.day>summary{cursor:pointer;list-style:none;font-size:14px;position:relative;padding-right:20px}
+details.day>summary::-webkit-details-marker{display:none}
+details.day>summary::after{content:'▾';position:absolute;right:2px;top:0;color:var(--ink-faint)}
+details.day[open]>summary::after{content:'▴'}
+details.day .ds{display:inline-block;white-space:nowrap;font-size:12.5px;color:var(--ink-faint);margin-left:6px}
+details.day ul.sched{margin-top:4px}
+details.day .dn{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px}
+.tg{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.tg .tag{margin:0}
+.tag.ex{background:var(--bad-tint);color:var(--bad)}
+.tag.nt{background:var(--paper);color:var(--ink-soft)}
+.tag.lt{background:var(--warn-tint);color:var(--warn)}
 /* 寵物 */
 .pet-top{display:flex;gap:12px;align-items:center}
 .pet-face{width:56px;height:56px;border-radius:16px;background:var(--sky-tint);display:grid;place-items:center;font-size:32px;flex:none}
@@ -171,6 +210,40 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   function J(o,k,dflt){ try{ var v=o[k]; if(v==null) return dflt; var x=typeof v==='string'?JSON.parse(v):v; return x==null?dflt:x; }catch(e){ return dflt; } }
   var tt=null;
   function toast(m){ var t=document.querySelector('.toast'); if(!t){ t=document.createElement('div'); t.className='toast'; t.setAttribute('role','status'); document.body.appendChild(t); } t.textContent=m; clearTimeout(tt); tt=setTimeout(function(){ t.remove(); },3200); }
+
+  // ---- 11-10：詳細版用的小工具 ----
+  // 科目名稱：daychart.js 沒有匯出，這裡照讀書網站（index.html 分科進度）那份抄；番茄鐘科目 DayChart 以後有匯出就用它的
+  var CATN={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kb:'科班考古題',kbfix:'科班訂正',kbr:'科班複習',
+    hw:'補習作業',mock:'模考／訂正',term:'段考',fu:'複試',other:'其他'};
+  var PG_CATS=Object.keys(CATN);   // 分科進度只看這幾類（跟讀書網站「分科進度」同一份）
+  var POMO_SUBJ=(window.DayChart&&window.DayChart.POMO_SUBJ)||{chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kbm:'科班資優數學',kbs:'科班自然學科'};
+  var BOOK_SUBJ={chi:'國文',m1:'數學',m2:'數學',e1:'英文',e2:'英文',phy:'理化',bio:'生物',ear:'地科',his:'歷史',geo:'地理',civ:'公民',mock:'會考',past:'會考',A:'科班',B:'科班'};
+  var BOOK_TITLE={A:'P&C 科學班歷屆試題Q（112–114 南一中、嘉中、彰中）', B:'P&C 科學班歷屆試題Q（112–114 中一中、武陵、建中、北一女）'};
+  function hhmm(t){ var d=new Date(t); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+  function toMin(s){ var p=String(s).split(':'); return (+p[0])*60+(+p[1]); }
+  function fmtMin(m){ m=Math.round(m); return m>=60?Math.floor(m/60)+' 小時'+(m%60?' '+(m%60)+' 分':''):m+' 分'; }
+  // 某一天的時段：那天孩子手動改過（plan.dayedit.v1）就用改過的，否則用 plan.js（跟讀書網站 dayTpl 同一個順序）
+  // 回傳 [{s:'18:15', e:'19:45', m:分鐘, c:類別, n:名稱, f:0 讀書 1 固定 2 生活 3 娛樂／空檔}]
+  function dayBlocks(de,k){
+    if(de && Array.isArray(de[k])) return de[k].map(function(x){
+      var t=String(x.t||''), r=t.match(/(\d{1,2}:\d{2})\s*[–~-]\s*(\d{1,2}:\d{2})/), s=r?r[1]:((t.match(/\d{1,2}:\d{2}/)||[''])[0]), e=r?r[2]:'';
+      return {s:s, e:e, m:+x.m||0, c:x.c||'other', n:String(x.n==null?'':x.n), f:x.l?2:(x.f?1:(x.e?3:0)), ed:1}; });
+    var d=window.PLAN&&window.PLAN.days&&window.PLAN.days[k]; if(!d) return [];
+    return (d.b||[]).map(function(b){ var whole=b[0]==='—'; return {s:whole?'':b[0], e:whole?'':b[1], m:0, c:b[2], n:String(b[3]), f:b[5]}; });
+  }
+  function blkMin(b){ if(b.m) return b.m; if(!b.s||!b.e) return 0; var d=toMin(b.e)-toMin(b.s); return d<0?d+1440:d; }
+  function blkTime(b){ return b.s?(b.e?b.s+'–'+b.e:b.s):'整天'; }
+  var PDAYS=null;   // plan.js 的所有日子（排好順序；plan.js 不會變，算一次就好）
+  function planDays(){ if(!PDAYS) PDAYS=Object.keys((window.PLAN&&window.PLAN.days)||{}).sort(function(a,b){ return pk(a)-pk(b); }); return PDAYS; }
+  // 接下來的考試（「接下來的考試」和「未來 7 天」共用）
+  function upcomingExams(today){
+    var EX=((window.PLAN&&window.PLAN.exams)||[]).filter(function(e){ return !/第二天/.test(e[3]); }).map(function(e){ return {n:e[3].replace(/ 第一天$/,''), d:new Date(e[0],e[1]-1,e[2])}; })
+      .filter(function(e){ return e.d>=today; }).slice(0,4);
+    if(window.PLAN&&window.PLAN.sci){ var sc=window.PLAN.sci, sd=new Date(sc[0],sc[1]-1,sc[2]); if(sd>=today && !EX.some(function(e){ return /科學班/.test(e.n); })) EX.push({n:'雄中科學班初試（暫定）', d:sd}); }
+    if(window.PLAN&&window.PLAN.cap){ var cp=window.PLAN.cap, cd=new Date(cp[0],cp[1]-1,cp[2]); if(cd>=today && !EX.some(function(e){ return /會考/.test(e.n); })) EX.push({n:'國中教育會考', d:cd}); }
+    EX.sort(function(a,b){ return a.d-b.d; });
+    return EX;
+  }
 
   // ---- 看：家長連結 #g=<Gist ID> ----
   var m=location.hash.match(/[#&]g=([0-9a-f]{20,40})/i);
@@ -314,12 +387,16 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   function render(o){
     var changed=!lastO || o._at!==(lastO&&lastO._at);
     // 11-09：資料沒變、也還是同一天，就不重畫——以前每 10 分鐘整頁重建，森林的 iframe 會整個重新載入（約 0.9 MB），長條圖也會跳回今天
-    if(!changed && lastDay===key(d0()) && app.firstChild){ lastO=o; paintFresh(o); return; }   // 只更新「資料更新：幾分鐘前」那一行
+    if(!changed && lastDay===key(d0()) && app.firstChild){ lastO=o; paintFresh(o); paintLive(); return; }   // 只更新「資料更新：幾分鐘前」那一行＋「現在」那幾行（11-10）
+    // 11-10：重畫前記下哪些「點開看」是開著的，重畫後照樣開著
+    var openK={}; Array.prototype.forEach.call(app.querySelectorAll('details[data-k]'),function(d){ openK[d.getAttribute('data-k')]=d.open; });
+    function op(k){ return openK[k]?' open':''; }
     lastO=o; lastDay=key(d0());
-    var today=d0(), tk=key(today), now=new Date();
+    var today=d0(), tk=key(today);
     var st=J(o,'plan.state.v3',{}), pomo=J(o,'plan.pomo.v1',{}), C=J(o,'plan.checks.v1',{}),
-        shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{}), pet=J(o,'plan.pet.v1',{});
-    var plog=Array.isArray(pomo.log)?pomo.log:[], items=C.items||{};
+        shop=J(o,'plan.shop.v1',{}), vrev=J(o,'plan.vrev.v1',{}), easy=J(o,'plan.easy.v1',{}), pet=J(o,'plan.pet.v1',{}),
+        de=J(o,'plan.dayedit.v1',{});
+    var plog=Array.isArray(pomo.log)?pomo.log:[], items=C.items||{}, doneAt=st.doneAt||{};
     var at=paintFresh(o);
     var html='';
     if(at && Date.now()-at>6*3600e3) html+='<p class="note warn">已經 '+ago(at).replace('前','')+'沒有新資料：可能他還沒打開讀書網站，或網站的自動同步沒開。</p>';
@@ -334,15 +411,22 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     var plan=(window.PLAN&&window.PLAN.days)?window.PLAN.days[tk]:null;
     html+='<section class="card"><h2>今天　'+(today.getMonth()+1)+'/'+today.getDate()+'（週'+WD[today.getDay()]+'）</h2>';
     html+='<p class="sub">'+(plan?esc(plan.lab)+(plan.note?'・'+esc(plan.note):''):'')+(easy[tk]?'・今天是降級／休息日':'')+'</p>';
-    if(plan){
-      var nm=now.getHours()*60+now.getMinutes(), cur=null;
-      (plan.b||[]).forEach(function(b){ var a=b[0].split(':'), e=b[1].split(':'), s=+a[0]*60+(+a[1]), t=+e[0]*60+(+e[1]); if(t<s) t+=1440; if(nm>=s&&nm<t) cur=b; });
-      if(cur) html+='<p class="now">現在排的是：<b>'+esc(cur[0])+'–'+esc(cur[1])+'</b>　'+esc(cur[3])+'</p>';
-    }
+    // 11-10：番茄鐘、現在排的時段、最後一次打勾：會隨時間變，放在自己的 #live（paintLive 畫，每分鐘更新）
+    html+='<div class="live" id="live" aria-live="polite"></div>';
     if(opened){
       html+='<div class="tiles"><div class="tile"><div class="v">'+rd.length+'<small>／'+real.length+'</small></div><div class="k">讀書任務完成'+(real.length?'（'+Math.round(rd.length/real.length*100)+'%）':'')+'</div></div>'
         +'<div class="tile"><div class="v">'+studyMin+'<small> 分</small></div><div class="k">讀書時間（'+(tpMin>0?'番茄鐘':'表定')+'）</div></div>'
         +'<div class="tile"><div class="v">'+tp.length+'<small> 顆</small></div><div class="k">番茄鐘（'+tpMin+' 分）</div></div></div>';
+      // 11-10：今天各科幾分鐘：有番茄鐘照番茄鐘選的科目，沒有才照打勾任務的類別和表定分鐘（跟上面「讀書時間」同一個算法，加起來一樣）
+      var by={};
+      if(tpMin>0) tp.forEach(function(e){ var s=POMO_SUBJ[e.s]||'沒選科目'; by[s]=(by[s]||0)+(+e.m||25); });
+      else {
+        rd.forEach(function(x){ var s=CATN[x.c]||'其他', tm=x.c==='term'&&String(x.n).match(/^[^｜]{1,6}｜([^：:｜\s]{1,4})[：:]/); if(tm) s='段考・'+tm[1]; by[s]=(by[s]||0)+(+x.m||0); });
+        var vm=Math.round((+vrev[tk]||0)/60); if(vm) by['英文單字複習']=(by['英文單字複習']||0)+vm;
+      }
+      var byK=Object.keys(by).filter(function(s){ return by[s]>0; }).sort(function(a,b){ return by[b]-by[a]; });
+      if(byK.length) html+='<p class="sub" style="margin:8px 0 0">今天各科（'+(tpMin>0?'番茄鐘':'打勾任務的表定時間')+'）</p><div class="cats">'
+        +byK.map(function(s){ return '<span>'+esc(s)+' <b>'+by[s]+'</b> 分</span>'; }).join('')+'</div>';
       if(fixedN) html+='<p class="sub" style="margin:4px 0 0">上學、上課、補習：'+fixedD+'／'+fixedN+' 已打勾</p>';
       html+='<ul class="tasks">'+real.map(function(x){
         var ok=!!done[x.id], ck=items[tk+'|'+x.n], tag='';
@@ -350,16 +434,21 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
         if(ck&&ck.st==='pass') tag+='<span class="tag ok">Claude 檢查過關 '+esc(ck.g||'')+'</span>';
         else if(ok&&((window.DayChart&&window.DayChart.CHECK_RE)||/(訂正|限時作答|模考卷|歷屆會考|限時重做|整份限時|錯題重做|雄中考古題)/).test(x.n)&&!/補習|錯題本：到期題/.test(x.n)) tag+='<span class="tag wait">等 Claude 檢查</span>';
         return '<li class="'+(ok?'done':'')+'"><span class="ic" aria-label="'+(ok?'完成':'還沒做')+'">'+(ok?'✅':'⬜')+'</span><span class="n">'+esc(x.n)+tag
-          +'<span class="m">'+esc(x.t||'')+(x.m?'・'+x.m+' 分':'')+'</span></span></li>'; }).join('')+'</ul>';
+          +'<span class="m">'+esc(x.t||'')+(x.m?'・'+x.m+' 分':'')+(ok&&doneAt[x.id]?'・<span class="at">'+hhmm(doneAt[x.id])+' 打勾</span>':'')+'</span></span></li>'; }).join('')+'</ul>';   // 11-10：幾點打勾
       if(!real.length) html+='<p class="sub">今天沒有排讀書任務。</p>';
     } else {
       html+='<p class="note warn">今天他還沒打開讀書網站'+(st.day?'（上一次是 '+md(st.day)+'）':'')+'。</p>';
-      if(plan){ var sb=(plan.b||[]).filter(function(b){ return b[5]===0; });
-        if(sb.length) html+='<p class="sub" style="margin-top:10px">今天原本排的讀書任務（'+sb.length+' 項）：</p><ul class="tasks">'+sb.map(function(b){
-          return '<li><span class="ic">⬜</span><span class="n">'+esc(b[3])+'<span class="m">'+esc(b[0])+'–'+esc(b[1])+'</span></span></li>'; }).join('')+'</ul>';
-      }
+      // 11-10：他手動改過今天的時間表就照改過的
+      var sb=dayBlocks(de,tk).filter(function(b){ return b.f===0; });
+      if(sb.length) html+='<p class="sub" style="margin-top:10px">今天原本排的讀書任務（'+sb.length+' 項）：</p><ul class="tasks">'+sb.map(function(b){
+        return '<li><span class="ic">⬜</span><span class="n">'+esc(b.n)+'<span class="m">'+esc(blkTime(b))+'</span></span></li>'; }).join('')+'</ul>';
     }
     html+='</section>';
+
+    // 11-10：進度跟欠帳（不含任何分數）
+    html+=progressCard(o,st,today,opened,easy,op);
+    // 11-10：明天的日程、未來 7 天
+    html+=aheadCards(de,today,easy,op);
 
     // 寵物＋互動
     var p=pet&&pet.pet;
@@ -403,11 +492,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     html+='<section class="card"><h2>每天的讀書長條圖</h2><div id="dc"></div></section>';
 
     // 考試
-    var EX=((window.PLAN&&window.PLAN.exams)||[]).filter(function(e){ return !/第二天/.test(e[3]); }).map(function(e){ return {n:e[3].replace(/ 第一天$/,''), d:new Date(e[0],e[1]-1,e[2])}; })
-      .filter(function(e){ return e.d>=today; }).slice(0,4);
-    if(window.PLAN&&window.PLAN.sci){ var sc=window.PLAN.sci, sd=new Date(sc[0],sc[1]-1,sc[2]); if(sd>=today && !EX.some(function(e){ return /科學班/.test(e.n); })) EX.push({n:'雄中科學班初試（暫定）', d:sd}); }
-    if(window.PLAN&&window.PLAN.cap){ var cp=window.PLAN.cap, cd=new Date(cp[0],cp[1]-1,cp[2]); if(cd>=today && !EX.some(function(e){ return /會考/.test(e.n); })) EX.push({n:'國中教育會考', d:cd}); }
-    EX.sort(function(a,b){ return a.d-b.d; });
+    var EX=upcomingExams(today);   // 11-10：抽成函式，「未來 7 天」也要用
     if(EX.length) html+='<section class="card"><h2>接下來的考試</h2>'+EX.map(function(e){
       return '<div class="ex"><span>'+esc(e.n)+'　<span style="color:var(--ink-faint);font-size:12.5px">'+(e.d.getMonth()+1)+'/'+e.d.getDate()+'</span></span><span>還有 <b>'+days(today,e.d)+'</b> 天</span></div>'; }).join('')+'</section>';
 
@@ -422,7 +507,169 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     var po=document.getElementById('pv-open'); if(po) po.addEventListener('click',togglePet);
     var dcEl=document.getElementById('dc');
     if(window.DayChart && dcEl) dcHandle=window.DayChart.mount(dcEl,{get:function(){ return lastO||{}; }});
-    paintActs(); paintSetup();
+    paintActs(); paintSetup(); paintLive();
+  }
+
+  // 11-10：「現在」那幾行：番茄鐘（剩幾分、幾點結束）、現在排的時段、今天最後一次打勾。
+  // 資料沒變時 render() 不重畫整頁，所以這裡另外畫；頁面開著時每分鐘也重畫一次（只解析一次資料，之後照快取算時間）
+  var liveC={};
+  function paintLive(){
+    var el=document.getElementById('live'), o=lastO; if(!el||!o) return;
+    var today=d0(), tk=key(today), nowT=Date.now(), nd=new Date(), nm=nd.getHours()*60+nd.getMinutes();
+    if(liveC.at!==o._at || liveC.k!==tk || liveC.o!==o){
+      var st0=J(o,'plan.state.v3',{}), P0=J(o,'plan.pomo.v1',{});
+      liveC={at:o._at, k:tk, o:o, st:st0, run:P0.run||null, subj:P0.subj||'', bl:dayBlocks(J(o,'plan.dayedit.v1',{}),tk),
+        lastP:(Array.isArray(P0.log)?P0.log:[]).reduce(function(a,e){ return (e&&e.k===tk&&+e.t>a)?+e.t:a; },0)};
+    }
+    var st=liveC.st, R=liveC.run, h='';
+    // 番茄鐘：讀書網站存的是 run={mode:'work'|'break'|'long', running, endAt（結束時間，毫秒）, left（秒）}
+    if(R && R.running && +R.endAt>nowT){
+      var left=Math.max(1,Math.ceil((R.endAt-nowT)/60000));
+      if(R.mode==='work'||R.mode==='focus') h+='<p>🍅 <b>正在專注'+(POMO_SUBJ[liveC.subj]?'：'+esc(POMO_SUBJ[liveC.subj]):'（沒選科目）')+'</b>，還剩 '+left+' 分（'+hhmm(R.endAt)+' 結束）</p>';
+      else h+='<p>☕ 番茄鐘'+(R.mode==='long'?'長':'')+'休息中，還剩 '+left+' 分（'+hhmm(R.endAt)+' 休息結束）</p>';
+    } else h+='<p>🍅 番茄鐘現在沒有在跑'+(liveC.lastP?'・今天最後一顆 '+hhmm(liveC.lastP)+' 做完':'')+'</p>';
+    // 現在排的時段（他手動改過今天的時間表就照改過的）
+    var cur=null, nxt=null;
+    liveC.bl.forEach(function(b){ if(!b.s||!b.e) return; var s=toMin(b.s), t=toMin(b.e); if(t<s) t+=1440; if(nm>=s&&nm<t) cur=b; else if(s>nm && (!nxt||s<toMin(nxt.s))) nxt=b; });
+    var opened=st.day===tk, dn=st.done||{};
+    if(cur){
+      var ck=opened && (st.list||[]).some(function(x){ return x.n===cur.n && dn[x.id]; });
+      h+='<p>📍 現在排的是：<b>'+esc(blkTime(cur))+'</b>　'+esc(cur.n)+(ck?'<span class="tag ok">已打勾</span>':'')+'</p>';
+    } else if(nxt) h+='<p>📍 現在沒有排定的時段・下一段 <b>'+esc(nxt.s)+'</b>　'+esc(nxt.n)+'</p>';
+    else if(liveC.bl.length) h+='<p>📍 今天排的時段都過了</p>';
+    // 今天最後一次打勾
+    if(opened){
+      var at=st.doneAt||{}, best=0, bn='';
+      (st.list||[]).forEach(function(x){ var t=+at[x.id]||0; if(!x.pre && dn[x.id] && t>best){ best=t; bn=x.n; } });
+      h+=best?'<p>✔ 今天最後一次打勾：<b>'+hhmm(best)+'</b>（'+ago(best)+'）　'+esc(bn)+'</p>':'<p>✔ 今天還沒有打勾任何任務</p>';
+    }
+    el.innerHTML=h;
+  }
+
+  // 11-10：進度跟欠帳。分科進度、講義進度、考古題份數的算法跟讀書網站「紀錄 → 進度」一樣
+  // （index.html 的 paintSubjects／paintBooks／paintKbPace），兩邊的數字才對得上。只算段數、份數，不看分數。
+  function progress(o,st,today){
+    var PL=window.PLAN||{}, tk=key(today), de=J(o,'plan.dayedit.v1',{}), D=planDays(), SB={};
+    D.forEach(function(k){ SB[k]=dayBlocks(de,k).filter(function(b){ return b.f===0; }); });
+    // 每天的紀錄，再把他手機上目前清單那一天併進去（還沒換日的那天不在紀錄裡；跟讀書網站 allHist 一樣）
+    var h=Object.assign({},J(o,'plan.hist.v1',{}));
+    if(st.day){
+      var real=(st.list||[]).filter(function(x){ return !x.pre && !x.f; }), dn=st.done||{}, cat={};
+      real.forEach(function(x){ var c=x.c||'other', q=cat[c]=cat[c]||{a:0,d:0}; q.a++; if(dn[x.id]) q.d++; });
+      h[st.day]=Object.assign({},h[st.day]||{},{cat:cat, dn:real.filter(function(x){ return dn[x.id]; }).map(function(x){ return x.n; })});
+    }
+    // 分科：照計畫從開始記錄那天到昨天應完成幾段 vs. 實際完成幾段（今天做完的也算）
+    var tracked=Object.keys(h).filter(function(k){ return h[k]&&h[k].cat; }).sort(function(a,b){ return pk(a)-pk(b); });
+    var from=tracked.length?pk(tracked[0]):today, plan={}, done={};
+    D.forEach(function(k){ var d=pk(k); if(d<from||d>=today) return; SB[k].forEach(function(b){ plan[b.c]=(plan[b.c]||0)+1; }); });
+    Object.keys(h).forEach(function(k){ var c=h[k]&&h[k].cat; if(!c) return; Object.keys(c).forEach(function(x){ done[x]=(done[x]||0)+(+(c[x]&&c[x].d)||0); }); });
+    var subj=PG_CATS.filter(function(c){ return plan[c]||done[c]; }).map(function(c){ var p=plan[c]||0, n=done[c]||0; return {c:c, p:p, dn:n, beh:Math.max(0,p-n)}; })
+      .sort(function(a,b){ return b.beh-a.beh; });
+    // 科班考古題：寫完幾份（只數份數）；照計畫到昨天應寫完哪幾份
+    var ks=J(o,'plan.kbscore.v1',{}), got=Object.keys(ks).filter(function(k){ return k.charAt(0)!=='_' && ks[k] && ks[k].d; }).length, exp={};
+    D.forEach(function(k){ if(pk(k)>=today) return; SB[k].forEach(function(b){ var m=b.n.match(/^科班考古｜(\S+) (\d{3}) (\S+) 限時作答/); if(m && !/前半/.test(b.n)) exp[m[1]+' '+m[2]+' '+m[3]]=1; }); });
+    var miss=Object.keys(exp).filter(function(k){ return !(ks[k]&&ks[k].d); });
+    // 講義／題本：排程裡名稱有書名的每一段；那段的名稱出現在任何一天的完成清單裡就算完成
+    var idx={}; Object.keys(h).forEach(function(k){ ((h[k]&&h[k].dn)||[]).forEach(function(n){ idx[n]=1; }); });
+    var books=Object.keys(PL.books||{}).map(function(bk){
+      var t=PL.books[bk], segs=[];
+      D.forEach(function(k){ SB[k].forEach(function(b){ var n=b.n, i=n.indexOf(t); if(i<0) return; if(/可對照/.test(n) && n.indexOf('可對照')<i) return; segs.push({k:k, d:pk(k), ok:!!idx[n]}); }); });
+      var due=segs.filter(function(s){ return s.d<=today; });
+      return {bk:bk, t:BOOK_TITLE[bk]||t, n:segs.length, due:due.length, dueDone:due.filter(function(s){ return s.ok; }).length,
+        late:due.filter(function(s){ return !s.ok && s.k!==tk; }).length, nx:segs.filter(function(s){ return s.d>today; })[0]||null};
+    }).filter(function(r){ return r.n; });
+    return {from:from, subj:subj, got:got, all:(PL.papers||[]).length, expN:Object.keys(exp).length, miss:miss, books:books};
+  }
+  function progressCard(o,st,today,opened,easy,op){
+    var tk=key(today), dn=st.done||{}, P=progress(o,st,today), h='<section class="card"><h2>進度跟欠帳</h2><p class="sub">照他的讀書計畫算：排了幾段、做完幾段。只算份數和段數，不顯示分數。</p>';
+    // 欠帳：以前沒做完、排進今天要補的
+    var left=[], doneN=0, lab='以前沒做完、排進今天要補的';
+    if(opened){
+      var bk=(st.list||[]).filter(function(x){ return x.bk && !x.pre; });
+      left=bk.filter(function(x){ return !dn[x.id]; }); doneN=bk.length-left.length;
+    } else if(st.day && !easy[st.day]){
+      // 今天還沒打開：上次那天沒做完的，他一打開就會變成欠帳（讀書網站換日的規則）
+      left=(st.list||[]).filter(function(x){ return !x.f && !x.pre && !dn[x.id] && !/^w/.test(String(x.id)); });
+      lab='上次打開（'+md(st.day)+'）沒做完的，會變成欠帳';
+    }
+    var leftM=left.reduce(function(a,x){ return a+(+x.m||0); },0);
+    h+='<p class="pg-h" style="margin-top:6px">欠帳</p><div class="pg"><span>'+esc(lab)+'</span>'
+      +(left.length?'<span class="v behind"><b>'+left.length+'</b> 項・<b>'+leftM+'</b> 分</span>':'<span class="v fine">沒有欠帳 ✓</span>')
+      +(doneN?'<small>今天已經補完 '+doneN+' 項</small>':'')+'</div>';
+    if(left.length) h+='<details class="more" data-k="bk-list"'+op('bk-list')+'><summary>看是哪幾項</summary><ul class="sched mins">'+left.map(function(x){
+      return '<li><span class="tm">'+(+x.m||0)+' 分</span><span class="n">'+esc(x.n)+'</span></li>'; }).join('')+'</ul></details>';
+    // 分科進度
+    h+='<p class="pg-h">各科進度（照計畫到昨天）</p>';
+    if(P.from>=today) h+='<p class="sub" style="margin:0">從今天開始記錄，明天起就看得出哪一科落後。</p>';
+    else {
+      var beh=P.subj.filter(function(r){ return r.beh>0; }), fine=P.subj.filter(function(r){ return !r.beh; });
+      h+=beh.map(function(r){ return '<div class="pg"><span>'+esc(CATN[r.c]||r.c)+'</span><span class="v behind">落後 <b>'+r.beh+'</b> 段</span><small>照計畫應完成 '+r.p+' 段，做完 '+r.dn+' 段</small></div>'; }).join('');
+      if(!beh.length) h+='<div class="pg"><span>每一科都跟上計畫了</span><span class="v fine">✓</span></div>';
+      if(fine.length) h+='<p class="sub" style="margin:6px 0 2px">跟上計畫的（做完／應完成段數）：</p><div class="cats">'+fine.map(function(r){ return '<span>'+esc(CATN[r.c]||r.c)+' '+(r.p?'<b>'+r.dn+'/'+r.p+'</b>':'做完 <b>'+r.dn+'</b>')+'</span>'; }).join('')+'</div>';
+      h+='<p class="sub" style="margin:4px 0 0">從 '+md(key(P.from))+' 開始記錄；那之前的不算。</p>';
+    }
+    // 科班考古題：只數寫了幾份
+    h+='<p class="pg-h">科班考古題</p><div class="pg"><span>已經寫完</span><span class="v"><b>'+P.got+'</b>／'+(P.all||'—')+' 份</span>'
+      +(P.expN?'<small>照計畫到昨天應寫完 '+P.expN+' 份'+(P.miss.length?'，還沒寫：'+P.miss.slice(0,4).map(esc).join('、')+(P.miss.length>4?' 等 '+P.miss.length+' 份':''):'，進度正常 ✓')+'</small>':'')+'</div>';
+    // 講義、題本：排到今天的段數裡完成幾段；還沒排到的只列名稱
+    if(P.books.length){
+      var on=P.books.filter(function(r){ return r.due; }), later=P.books.filter(function(r){ return !r.due; }), lateB=on.filter(function(r){ return r.late; }).length;
+      h+='<p class="pg-h">講義、題本'+(lateB?'（落後的有 '+lateB+' 本）':'')+'</p>';
+      h+=on.map(function(r){
+        return '<div class="pg"><span><b>'+esc(BOOK_SUBJ[r.bk]||'')+'</b>｜'+esc(r.t)+'</span><span class="v'+(r.late?' behind':'')+'"><b>'+r.dueDone+'</b>／'+r.due+' 段'+(r.late?'・落後 '+r.late:'')+'</span></div>'; }).join('');
+      if(later.length) h+='<p class="sub" style="margin:6px 0 0">還沒排到：'+later.map(function(r){ return esc(BOOK_SUBJ[r.bk]||'')+'｜'+esc(r.t)+(r.nx?'（'+md(r.nx.k)+' 開始）':''); }).join('、')+'</p>';
+      h+='<p class="sub" style="margin:4px 0 0">「3／5 段」＝排到今天的 5 段裡做完 3 段；今天排的還沒做不算落後。</p>';
+    }
+    return h+'</section>';
+  }
+
+  // 11-10：明天的日程、未來 7 天
+  function dayTags(k,bl,easy,prevPh){
+    var PD=(window.PLAN&&window.PLAN.days)||{}, pd=PD[k], tags=[], note=pd&&pd.note?String(pd.note):'';
+    ((window.PLAN&&window.PLAN.exams)||[]).forEach(function(e){ if(key(new Date(e[0],e[1]-1,e[2]))!==k) return;
+      tags.push('<span class="tag ex">📝 '+esc(e[3])+'</span>');
+      if(note.indexOf(e[3])===0) note=note.slice(e[3].length).replace(/^[：:・\s]+/,''); });   // 備註開頭就是考試名稱的，不重複寫
+    var lt=bl.filter(function(b){ return b.c==='late'; });
+    if(lt.length) tags.push('<span class="tag lt">🌙 熬夜補進度 '+lt.length+' 段</span>');
+    bl.forEach(function(b){ if(b.f===1 && /補習|資優數學/.test(b.n) && !/學校/.test(b.n)) tags.push('<span class="tag wait">🏫 '+esc(b.n)+' '+esc(blkTime(b))+'</span>'); });
+    if(easy[k]) tags.push('<span class="tag nt">降級／休息日</span>');
+    if(pd && prevPh && pd.ph && pd.ph!==prevPh) tags.push('<span class="tag ok">新階段：'+esc(pd.ph)+'</span>');
+    return {tags:tags, note:note};
+  }
+  function schedRow(b){
+    return '<li'+(b.f===0?'':' class="dim"')+'><span class="tm">'+esc(blkTime(b))+'</span><span class="n">'+esc(b.n)+'</span></li>';
+  }
+  function aheadCards(de,today,easy,op){
+    var PD=(window.PLAN&&window.PLAN.days)||{}, tk=key(today), h='';
+    // 明天：讀書任務照時間排，上學、上課、補習灰色；起床、吃飯、休息收進「完整時間表」
+    var tm=addD(today,1), tmk=key(tm), bl=dayBlocks(de,tmk), pd=PD[tmk], sb=bl.filter(function(b){ return b.f===0; }),
+        sm=sb.reduce(function(a,b){ return a+blkMin(b); },0), tg=dayTags(tmk,bl,easy,PD[tk]&&PD[tk].ph);
+    h+='<section class="card"><h2>明天的日程　'+md(tmk)+'（週'+WD[tm.getDay()]+'）</h2><p class="sub">'
+      +[pd?esc(pd.lab):'', tg.note?esc(tg.note):'', de[tmk]?'他手動改過這天的時間表':''].filter(Boolean).join('・')+'</p>';
+    if(tg.tags.length) h+='<div class="tg" style="margin:0 0 6px">'+tg.tags.join('')+'</div>';
+    if(!bl.length) h+='<p class="sub">明天沒有排程。</p>';
+    else {
+      h+='<p class="sub" style="margin:0">讀書 <b>'+sb.length+'</b> 項'+(sm?'・約 '+fmtMin(sm):'')+'；灰色的是上學、上課、補習。</p>';
+      h+='<ul class="sched">'+bl.filter(function(b){ return b.f<=1; }).map(schedRow).join('')+'</ul>';
+      if(bl.some(function(b){ return b.f>1; })) h+='<details class="more" data-k="tmr-all"'+op('tmr-all')+'><summary>完整時間表（含起床、吃飯、休息）</summary><ul class="sched">'+bl.map(schedRow).join('')+'</ul></details>';
+    }
+    h+='</section>';
+    // 未來 7 天：每天一行（點開看那天排什麼），上面是現在的階段和下一個考試
+    var cp=PD[tk]||PD[tmk], EX=upcomingExams(today), ex=EX[0];
+    h+='<section class="card"><h2>未來 7 天</h2>';
+    if(cp&&cp.ph) h+='<p class="sub" style="margin:0 0 4px">現在的階段：<b>'+esc(cp.ph)+'</b></p>';
+    if(cp&&cp.tip) h+='<details class="more" data-k="tip"'+op('tip')+' style="margin:0 0 6px"><summary>這個階段的讀書重點</summary><p class="sub" style="margin:4px 0 0">'+esc(cp.tip)+'</p></details>';
+    if(ex) h+='<div class="ex"><span>下一個考試：'+esc(ex.n)+'　<span style="color:var(--ink-faint);font-size:12.5px">'+(ex.d.getMonth()+1)+'/'+ex.d.getDate()+'</span></span><span>還有 <b>'+days(today,ex.d)+'</b> 天</span></div>';
+    var prev=PD[tk]&&PD[tk].ph;
+    for(var i=1;i<=7;i++){
+      var d=addD(today,i), k=key(d), b=dayBlocks(de,k), p=PD[k], s=b.filter(function(x){ return x.f===0; }), m=s.reduce(function(a,x){ return a+blkMin(x); },0), t=dayTags(k,b,easy,prev);
+      if(p&&p.ph) prev=p.ph;
+      h+='<details class="day" data-k="wk-'+k+'"'+op('wk-'+k)+'><summary><b>'+md(k)+'（'+WD[d.getDay()]+'）</b>　'+(p?esc(p.lab):(b.length?'':'沒有排程'))+(de[k]?'（改過）':'')
+        +(b.length?'<span class="ds">讀書 '+s.length+' 項'+(m?'・'+fmtMin(m):'')+'</span>':'')
+        +(t.tags.length?'<span class="tg">'+t.tags.join('')+'</span>':'')+(t.note?'<span class="dn">'+esc(t.note)+'</span>':'')+'</summary>'
+        +(b.length?'<ul class="sched">'+b.filter(function(x){ return x.f<=1; }).map(schedRow).join('')+'</ul>':'<p class="sub">這天沒有排程。</p>')+'</details>';
+    }
+    return h+'</section>';
   }
 
   // 森林（iframe）
@@ -544,6 +791,9 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
 
   setInterval(function(){ if(!document.hidden && gid) load(); },600000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden && gid && Date.now()-lastLoad>180000) load(); });
+  // 11-10：番茄鐘剩幾分、現在的時段每分鐘更新（只重畫 #live 那幾行，不重新讀資料）；切回這頁時馬上更新一次
+  setInterval(function(){ if(!document.hidden) paintLive(); },60000);
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) paintLive(); });
   load();
 })();
 </script>

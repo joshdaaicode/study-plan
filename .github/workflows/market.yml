@@ -1,0 +1,27 @@
+# 科目股 v2（2026-11-10）：每天自動抓台股收盤資料，更新 market.json。
+# 證交所的公開資料隔天早上一定有，所以每天台灣時間 09:00 抓一次（前一個交易日），平日 17:00 再試一次。
+name: market
+on:
+  schedule:
+    - cron: '0 1 * * *'     # 台灣時間每天 09:00
+    - cron: '0 9 * * 1-5'   # 台灣時間平日 17:00
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node tools/fetch_market.mjs
+      - name: commit
+        run: |
+          if git diff --quiet -- market.json; then echo "沒有新資料"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add market.json
+          git commit -m "股市資料 $(date -u +%F)"
+          git push

@@ -821,6 +821,11 @@ section{padding-top:40px}
 /* ---------- 分科進度、教材進度 ---------- */
 .sp-sum{font-size:13.5px;margin:0 0 10px;color:var(--ink-soft)}
 .nw{white-space:nowrap}
+.stk-st{font-size:13.5px;margin:0 0 8px}
+.stk-st .up{color:var(--cap)}
+.stk-news{display:flex;flex-direction:column;gap:3px;font-size:13px;margin:0 0 10px;padding:8px 10px;border-radius:10px;background:var(--card2)}
+.stk-news b{font-size:12px;color:var(--ink-faint)}
+.bn-stk>small+small{margin-top:2px}
 .sec-fold>.sec-head{cursor:pointer;user-select:none}
 .sec-fold>.sec-head h2::after{content:' ▾';font-size:.6em;color:var(--ink-faint);vertical-align:middle}
 .sec-fold.closed>.sec-head h2::after{content:' ▸'}
@@ -1905,7 +1910,7 @@ html.pv .wrap{max-width:none;padding:0}
   <details class="sec-rules"><summary>銀行規則摘要</summary><p class="sec-note">許願商店的點數可以存進來。<b>只有「有照顧的日子」才有利息，偷懶的日子反而被扣保管費。</b>
     定存要整段期間都乖乖讀書才拿得到高利息；考試定存是押自己下一次模考、段考的成績，考好最多拿回 3 倍；急著換願望可以預支，但要付利息，之後賺的點數會先拿一半去還。
     🌟 可以換成點數，點數可以換 🍀 和 🎟️。
-    <b>科目股</b>：每科一支股票，股價跟著那科前 7 天的任務完成率走——買進落後的科目、把它讀完，股價就漲。另外可以設<b>自動存款</b>（讀書賺的點數先存一部分）和<b>存錢目標</b>（挑一個願望，看幾天存得到）。完整規則在「規則」分頁。</p></details>
+    <b>科目股</b>：每科一支股票，每晚 20:00 開盤、23:00 收盤；股價跟著真實台股、每日新聞、隨機波動走，每週日照那科這週的完成率發財報。另外可以設<b>自動存款</b>（讀書賺的點數先存一部分）和<b>存錢目標</b>（挑一個願望，看幾天存得到）。完整規則在「規則」分頁。</p></details>
   <div class="card bn-card" id="bn-app"></div>
 </section>
 
@@ -7504,22 +7509,106 @@ html.pv .wrap{max-width:none;padding:0}
   };
   // 科目股（2026-11-02 加）：每科一支股票，股價＝前 7 天（不含今天）這科任務的完成率，40～160 點；7 天都沒有這科任務就是 100。
   // 押自己會把落後的科目補起來：買進落後的科目、把它讀完，股價就漲。買賣各收 3% 手續費，成本合計最多 500 點。
-  var STOCKS=[['chi','國文','#7DBF5A'],['math','數學','#2F7D4F'],['eng','英文','#D9583B'],['sci','自然','#E8B931'],['soc','社會','#4E9A45'],['kb','科班','#F4A7C0'],['hw','補習作業','#2B5E45']];
-  var STK={fee:3, cap:500, lo:40, span:120};
+  // ===== 科目股 v2（2026-11-10 使用者：「改得更像真的股票，不要全部都是我控制的，多點隨機性，也可以參考當天時事」）=====
+  // 他選的：真的台股＋網站自編每日新聞；每晚 20:00 開盤、23:00 收盤，漲跌順序開盤前就準備好；每週日財報；整段都能下單；台股用我配的。
+  // 每天收盤價 ＝ 昨天收盤 ×（1＋漲跌），漲跌（最多 ±10%，跟台股漲跌停一樣）＝
+  //   真實台股（對應那支股票「前一個交易日」的漲跌 × 倍數；資料要在今晚 20:00 前抓到才算）
+  // ＋ 每日新聞（照日期抽 0–2 則，網站自己編的）＋ 隨機波動（照日期和股票產生，每支大小不同）＋ 週日財報（這週一到週六那科完成率 vs 預期 70%）
+  // 全部只用固定的資料和照日期產生的亂數，所以手機、電腦算出來一模一樣；20:00–23:00 每 5 分鐘一個價，從開盤走到收盤。
+  //            代號    名稱      顏色       台股    倍數  每天波動
+  var STOCKS=[['chi','國文','#7DBF5A','1216',.8,.012],['math','數學','#2F7D4F','2454',.6,.02],['eng','英文','#D9583B','2618',.8,.02],['sci','自然','#E8B931','6505',.7,.016],
+    ['soc','社會','#4E9A45','2412',.8,.012],['kb','科班','#F4A7C0','2330',.7,.022],['hw','補習作業','#2B5E45','0050',.8,.012]];
+  var STK={fee:3, cap:500, lo:40, span:120, limit:.10, open:20*60, close:23*60, step:5};
+  var V2_START=new Date(2026,10,11);   // 第一天用新算法；前一天的收盤價＝舊算法（完成率換算），持股不會一換版就暴漲暴跌
   function stkCat(c){ return /^(kb|kbfix|kbr|fu)$/.test(c)?'kb':c; }
-  function stkPrice(h,id,day){
+  function stkPriceOld(h,id,day){   // 舊算法（11-02）：前 7 天這科完成率換算成 40～160；只用來算上線前的價格
     var a=0, dn=0;
     for(var i=1;i<=7;i++){ var x=new Date(day); x.setDate(x.getDate()-i); var e=h[kk(x)]; if(!e||!e.cat) continue;
       Object.keys(e.cat).forEach(function(c){ if(stkCat(c)===id){ a+=e.cat[c].a||0; dn+=e.cat[c].d||0; } }); }
     return a?Math.round(STK.lo+STK.span*Math.min(1,dn/a)):100;
   }
-  function stkHist(h,id){ var out=[]; for(var i=13;i>=0;i--){ var d=d0(); d.setDate(d.getDate()-i); out.push(stkPrice(h,id,d)); } return out; }
+  // 照字串產生固定的亂數（同一天、同一支股票，每台裝置都一樣）
+  function seedRng(str){ var h2=1779033703^str.length; for(var i=0;i<str.length;i++){ h2=Math.imul(h2^str.charCodeAt(i),3432918353); h2=h2<<13|h2>>>19; }
+    var a2=h2>>>0, f=function(){ a2|=0; a2=a2+0x6D2B79F5|0; var t=Math.imul(a2^a2>>>15,1|a2); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; f(); f(); return f; }   // 先丟掉前兩個（日期很像的字串，第一個值容易接近）
+  function gauss(r){ var u=Math.max(1e-9,r()), v=r(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+  // 每日新聞（網站自己編的，不是真的新聞）：每則影響哪幾支股票，單位 %
+  var NEWS=[
+    ['AI 晶片訂單爆量，半導體族群全面走高',{kb:3,math:2.5,sci:1}],['國際大廠下修財測，科技股承壓',{kb:-3,math:-2.5}],
+    ['颱風逼近，明天可能停班停課',{chi:-1,math:-1,eng:-1.5,sci:-1,soc:-1,kb:-1,hw:1.5}],['連續假期出遊人潮創新高',{eng:3,soc:1.5}],
+    ['國際油價大漲',{sci:3,eng:-2.5}],['國際油價重挫',{sci:-3,eng:2}],['外資連續買超台股',{kb:2,math:1.5,hw:1.5,soc:.5}],
+    ['美國升息消息讓市場緊張',{kb:-2,math:-2,hw:-1.5,eng:-1}],['教育部公布會考新題型',{chi:2,soc:2,hw:1}],
+    ['科學班簡章提前公布',{kb:3,sci:1.5,math:1}],['英檢報名人數創新高',{eng:3}],['作文比賽得獎名單出爐',{chi:2.5}],
+    ['國際旅遊開放，機票大搶購',{eng:3.5}],['寒流來襲，民眾待在家',{hw:2,chi:1,sci:-1}],['地震後檢查電廠，股市小幅震盪',{sci:-1.5,soc:-1,hw:-.5}],
+    ['政府宣布擴大公共建設',{soc:2.5,sci:1.5}],['電信資費調降，通訊股走弱',{soc:-2.5}],['食品漲價潮，民生股上揚',{chi:2,soc:.5}],
+    ['補習班招生旺季',{hw:3}],['研究：睡眠不足讓成績變差',{hw:-1.5,kb:-1}],['數學奧林匹亞台灣代表奪金',{math:3,kb:1}],
+    ['新航線開航',{eng:2.5}],['航空業缺工，班機延誤',{eng:-3}],['科學展覽參觀人潮爆滿',{sci:2.5,kb:1}],['網路大當機，線上服務暫停',{soc:-2,math:-1}],
+    ['市場平靜，成交量偏低',{}],['投資人觀望，大盤小漲',{hw:.8,kb:.5}],['獲利了結賣壓出籠',{kb:-1.5,math:-1.5,hw:-1}],['好天氣、心情好，買氣回溫',{chi:1,soc:1,hw:1}],
+    ['半導體庫存去化完畢，景氣回升',{kb:2.5,math:2}],['塑化原料報價走弱',{sci:-2.5}],['觀光簽證放寬',{eng:2,soc:1}],['文創市集熱鬧開張',{chi:1.5,soc:1}]];
+  function newsOf(D){   // 這天的新聞：0–2 則，影響大小再乘 0.6–1.4
+    if(D<V2_START) return [];
+    var r=seedRng('news|'+kk(D)), x=r(), n=x<.3?0:(x<.8?1:2), out=[], used={};
+    for(var i=0;i<n;i++){ var j=Math.floor(r()*NEWS.length); if(used[j]) continue; used[j]=1; out.push({t:NEWS[j][0], imp:NEWS[j][1], k:.6+.8*r()}); }
+    return out;
+  }
+  // 真實台股：MK＝market.json（GitHub 每天自動抓證交所收盤資料）；開頁先用存在這台的那份（不同步），背景再抓新的
+  var MKK='plan.market.v1', MK=null, mkAt=0, stkMemo={};
+  try{ MK=JSON.parse(localStorage.getItem(MKK)||'null'); }catch(e){}
+  function loadMarket(){
+    if(Date.now()-mkAt<20*60000) return; mkAt=Date.now();
+    var t=Math.floor(Date.now()/600000), urls=['https://raw.githubusercontent.com/joshdaaicode/study-plan/main/market.json?t='+t,'market.json?t='+t];
+    (function next(i){ if(i>=urls.length) return;
+      fetch(urls[i],{cache:'no-store'}).then(function(r){ if(!r.ok) throw 0; return r.json(); }).then(function(j){
+        if(!j||!j.days) throw 0; var was=JSON.stringify(MK&&MK.days||{}); MK=j; try{ localStorage.setItem(MKK,JSON.stringify(j)); }catch(e){}
+        if(was!==JSON.stringify(j.days)){ stkMemo={}; if(window.__tab===5 && window.__sub===17) paintBank(); }
+      }).catch(function(){ next(i+1); }); })(0);
+  }
+  function realOf(x,D){   // 前一天（台股交易日）的漲跌；要在今晚 20:00 前抓到才算（開盤後才抓到的不算，價格才不會盤中改變）
+    var T=new Date(D); T.setDate(T.getDate()-1); var e=MK&&MK.days&&MK.days[kk(T)]; if(!e||e[x[3]]==null||!e._at) return null;
+    var cut=new Date(D); cut.setHours(20,0,0,0); return new Date(e._at)<cut?e[x[3]]:null;
+  }
+  function earnOf(h,id,D){   // 週日財報：這週一到週六那科的完成率，比預期 70% 好就漲、差就跌，最多 ±6%
+    if(D.getDay()!==0) return null; var a=0, dn=0;
+    for(var i=1;i<=6;i++){ var x=new Date(D); x.setDate(x.getDate()-i); var e=h[kk(x)]; if(!e||!e.cat) continue;
+      Object.keys(e.cat).forEach(function(c){ if(stkCat(c)===id){ a+=e.cat[c].a||0; dn+=e.cat[c].d||0; } }); }
+    if(a<3) return null; var rt=dn/a; return {rate:rt, pct:Math.max(-6,Math.min(6,(rt-.7)*25))};
+  }
+  function dayMove(h,x,D){   // 這天的漲跌（%）和原因
+    var real=realOf(x,D), nw=newsOf(D), ea=earnOf(h,x[0],D), r=seedRng('stk|'+x[0]+'|'+kk(D));
+    var pct=(real==null?0:real*x[4]) + nw.reduce(function(a,n){ return a+(n.imp[x[0]]||0)*n.k; },0) + (ea?ea.pct:0) + gauss(r)*x[5]*100;
+    pct=Math.max(-STK.limit*100,Math.min(STK.limit*100,pct));
+    return {pct:pct, real:real, news:nw.filter(function(n){ return n.imp[x[0]]; }), earn:ea};
+  }
+  function closeOf(h,x,D){   // D 這天的收盤價（V2_START 以前用舊算法）
+    if(D<V2_START) return stkPriceOld(h,x[0],D);
+    var k=x[0]+'|'+kk(D); if(stkMemo[k]!=null) return stkMemo[k];
+    var y=new Date(D); y.setDate(y.getDate()-1);
+    var v=Math.round(closeOf(h,x,y)*(1+dayMove(h,x,D).pct/100)*10)/10;
+    return (stkMemo[k]=Math.max(1,v));
+  }
+  function pathOf(h,x,D){   // 20:00–23:00 每 5 分鐘的價格：從昨天收盤走到今天收盤，中間照亂數起伏（開盤前就固定）
+    var k='p|'+x[0]+'|'+kk(D); if(stkMemo[k]) return stkMemo[k];
+    var y=new Date(D); y.setDate(y.getDate()-1);
+    var o=closeOf(h,x,y), c=closeOf(h,x,D), n=(STK.close-STK.open)/STK.step, r=seedRng('path|'+x[0]+'|'+kk(D)), w=[0];
+    for(var i=1;i<=n;i++) w.push(w[i-1]+gauss(r));
+    var amp=o*x[5]*0.8/Math.sqrt(n), lo=o*(1-STK.limit), hi=o*(1+STK.limit), out=[];
+    for(var j=0;j<=n;j++){ var v=o+(c-o)*j/n+(w[j]-w[n]*j/n)*amp; out.push(Math.round(Math.max(lo,Math.min(hi,v))*10)/10); }
+    out[n]=c; return (stkMemo[k]=out);
+  }
+  function mktState(now){ now=now||new Date(); var m=now.getHours()*60+now.getMinutes(); return m<STK.open?'pre':(m>=STK.close?'closed':'open'); }
+  function stkNow(h,x,now){   // 現在的價格：開盤前＝昨天收盤；20:00–23:00 照路線；收盤後＝今天收盤
+    now=now||new Date(); var D=new Date(now); D.setHours(0,0,0,0); var st=mktState(now), y=new Date(D); y.setDate(y.getDate()-1);
+    if(D<V2_START) return stkPriceOld(h,x[0],D);
+    if(st==='pre') return closeOf(h,x,y);
+    if(st==='closed') return closeOf(h,x,D);
+    var m=now.getHours()*60+now.getMinutes(); return pathOf(h,x,D)[Math.floor((m-STK.open)/STK.step)];
+  }
+  function stkHist(h,x){ var out=[]; for(var i=13;i>=0;i--){ var d=d0(); d.setDate(d.getDate()-i); out.push(closeOf(h,x,d)); } return out; }
+  function stkCost(b){ var c=0; Object.keys(b.stk||{}).forEach(function(k){ c+=(b.stk[k].cost||0); }); return c; }
   function spark(a,col){
     var mn=Math.min.apply(null,a.concat([40])), mx=Math.max.apply(null,a.concat([160])), W2=84, H2=24;
     var pts=a.map(function(v,i){ return (i*W2/(a.length-1)).toFixed(1)+','+(H2-(v-mn)/(mx-mn||1)*H2).toFixed(1); }).join(' ');
     return '<svg class="bn-spark" viewBox="0 0 '+W2+' '+H2+'" width="'+W2+'" height="'+H2+'" aria-hidden="true"><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   }
-  function stkCost(b){ var c=0; Object.keys(b.stk||{}).forEach(function(k){ c+=(b.stk[k].cost||0); }); return c; }
   var bnApp=document.getElementById('bn-app'), bnMsg='';
   function bnTab(k,t,on){ return '<button type="button" data-btab="'+k+'" aria-pressed="'+on+'">'+t+'</button>'; }
   function amtBox(id,ph,quick){
@@ -7527,6 +7616,7 @@ html.pv .wrap{max-width:none;padding:0}
       +(quick||[]).map(function(q){ return '<button type="button" class="btn ghost" data-fill="'+id+'" data-v="'+q[1]+'">'+q[0]+'</button>'; }).join('')+'</div>';
   }
   function paintBank(){
+    stkMemo={};   // 科目股的收盤價每次重畫重算（讀書紀錄、台股資料可能更新了）
     if(!bnApp || window.__tab!==5) return;
     var s=petState(), lv=s.pet?(s.pet.lvSeen||1):1, h=allHist();
     var ev=bankSettle(h,lv), b=bankState(), cr=creditOf(b,h,lv), v=viewState(), tab=v.btab||'home', pts=wallet(), tk=kk(d0()), B=boostOf(tk);
@@ -7537,7 +7627,7 @@ html.pv .wrap{max-width:none;padding:0}
     var o='<div class="fp-tabs bn-tabs" role="tablist" aria-label="銀行分頁">'+bnTab('home','總覽',tab==='home')+bnTab('sav','活存',tab==='sav')+bnTab('fix','定存',tab==='fix')
       +bnTab('bond','考試定存',tab==='bond')+bnTab('stk','📈 科目股',tab==='stk')+bnTab('loan','預支'+(b.loan?' <b class="fp-dot">!</b>':''),tab==='loan')+bnTab('ex','兌換所',tab==='ex')+bnTab('log','帳本',tab==='log')+bnTab('rule','規則',tab==='rule')+'</div><div class="bn-body">';
     var tb=talLv('bank'), savRate=BANK.sav+cr.sav+.2*tb, stkVal=0;
-    STOCKS.forEach(function(x){ var hh=b.stk[x[0]]; if(hh&&hh.sh) stkVal+=hh.sh*stkPrice(h,x[0],d0()); });
+    STOCKS.forEach(function(x){ var hh=b.stk[x[0]]; if(hh&&hh.sh) stkVal+=hh.sh*stkNow(h,x); }); stkVal=Math.round(stkVal);
     o+='<div class="bn-tiles">'
       +'<div class="bn-tile"><small>錢包</small><b>'+pts+'</b><em>可以花的點數</em></div>'
       +'<div class="bn-tile"><small>活存</small><b>'+b.sav+'</b><em>'+(b.loan?'有借款，暫停計息':'有照顧 +'+savRate.toFixed(1)+'%／天'+(b.auto?'・自動存 '+b.auto+'%':''))+'</em></div>'
@@ -7600,16 +7690,32 @@ html.pv .wrap{max-width:none;padding:0}
             +'<span class="st">'+(x.st==='open'?'進行中':(x.st==='win'?'🎉 拿回 '+x.pay:'拿回 '+x.pay))+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有押過。</p>')+'</div>';
     }
     if(tab==='stk'){
-      var yd=d0(), cost=stkCost(b); yd.setDate(yd.getDate()-1);
-      o+='<div class="bn-panel"><h4>📈 科目股 <span>股價＝前 7 天這科任務的完成率（40～160），每天半夜換價</span></h4>'
-        +'<p class="fp-gone">押自己：買進落後的科目，把它的任務讀完，股價就漲；偷懶那科會跌。買賣各收 '+STK.fee+'% 手續費，持股成本合計最多 '+STK.cap+' 點（現在 '+cost+'）。'+(b.loan?'<b>有借款時不能買。</b>':'')+'已實現損益 '+((b.st.stkWin||0)>0?'+':'')+(b.st.stkWin||0)+' 點。</p>'
+      // 科目股 v2（11-10）：每晚 20:00–23:00 開盤；股價＝真實台股＋每日新聞＋隨機＋週日財報
+      loadMarket();
+      var cost=stkCost(b), now=new Date(), st=mktState(now), td=d0(), nw=newsOf(td), nm=now.getHours()*60+now.getMinutes();
+      var stTxt=st==='open'?'<b class="up">交易中</b>　23:00 收盤（還有 '+(STK.close-nm)+' 分）':(st==='pre'?'還沒開盤：今晚 20:00 開盤，現在顯示的是昨天的收盤價':'今天收盤了：明晚 20:00 再開盤');
+      if(td<V2_START) stTxt='新的股市 '+(V2_START.getMonth()+1)+'/'+V2_START.getDate()+' 晚上 20:00 第一次開盤；在那之前照舊的算法（前 7 天完成率）。';
+      o+='<div class="bn-panel"><h4>📈 科目股 <span>每晚 20:00 開盤、23:00 收盤；每天漲跌最多 ±10%</span></h4>'
+        +'<p class="stk-st">'+stTxt+'</p>'
+        +(td>=V2_START?'<div class="stk-news"><b>今日新聞</b>'+(nw.length?nw.map(function(n){ return '<span>📰 '+esc(n.t)+'</span>'; }).join(''):'<span>今天沒有大新聞</span>')
+          +(td.getDay()===0?'<span>📊 今天是週日：各科發「財報」，照這週一到週六的完成率，比 70% 好就漲、差就跌</span>':'')+'</div>':'')
+        +'<details class="sec-rules"><summary>股價怎麼算</summary><p class="fp-gone" style="margin-top:6px">每天的漲跌＝<b>真實台股</b>（對應的那支股票前一個交易日的漲跌）＋<b>每日新聞</b>（網站自己編的，不是真的新聞）＋<b>隨機波動</b>＋<b>週日財報</b>（這週那科的任務完成率）。'
+          +'每天最多漲跌 10%。漲跌路線在 20:00 開盤前就算好了，買賣不會影響價格；只有 20:00–23:00 能買賣，用當下的價格成交。買賣各收 '+STK.fee+'% 手續費，持股成本合計最多 '+STK.cap+' 點（現在 '+cost+'）。</p></details>'
+        +(b.loan?'<p class="fp-gone"><b>有借款時不能買。</b></p>':'')+'<p class="fp-gone" style="margin-top:4px">已實現損益 '+((b.st.stkWin||0)>0?'+':'')+(b.st.stkWin||0)+' 點。</p>'
         +'<div class="bn-stks">'+STOCKS.map(function(x){
-          var pr=stkPrice(h,x[0],d0()), py=stkPrice(h,x[0],yd), hh=b.stk[x[0]]||{sh:0,cost:0}, ch=pr-py, val=hh.sh*pr, pl=val-hh.cost;
-          return '<div class="bn-stk"><div class="bn-stk-h"><b>'+x[1]+'</b><span class="mono">'+pr+'</span><small class="'+(ch>0?'up':(ch<0?'dn':''))+'">'+(ch>0?'▲'+ch:(ch<0?'▼'+(-ch):'—'))+'</small></div>'
-            +spark(stkHist(h,x[0]),x[2])
+          var y=new Date(td); y.setDate(y.getDate()-1);
+          var pr=stkNow(h,x,now), py=closeOf(h,x,y), hh=b.stk[x[0]]||{sh:0,cost:0}, ch=Math.round((pr-py)*10)/10, pc=py?Math.round(ch/py*1000)/10:0, val=Math.round(hh.sh*pr), pl=val-hh.cost;
+          var mv=td>=V2_START?dayMove(h,x,td):null, why=[];
+          if(mv&&mv.real!=null) why.push((MK&&MK.tickers&&MK.tickers[x[3]]||x[3])+' 前一交易日 '+(mv.real>0?'+':'')+mv.real+'%');
+          if(mv&&mv.earn) why.push('財報：完成率 '+Math.round(mv.earn.rate*100)+'%');
+          var line=td>=V2_START&&st==='open'?pathOf(h,x,td).slice(0,Math.floor((nm-STK.open)/STK.step)+1):stkHist(h,x);
+          var canTrade=st==='open'&&td>=V2_START;
+          return '<div class="bn-stk"><div class="bn-stk-h"><b>'+x[1]+'</b><span class="mono">'+pr+'</span><small class="'+(ch>0?'up':(ch<0?'dn':''))+'">'+(ch>0?'▲'+ch+'（+'+pc+'%）':(ch<0?'▼'+(-ch)+'（'+pc+'%）':'—'))+'</small></div>'
+            +(line.length>1?spark(line,x[2]):'')
+            +'<small>對應 '+esc(MK&&MK.tickers&&MK.tickers[x[3]]||x[3])+' '+x[3]+(why.length?'・'+esc(why.join('・')):'')+'</small>'
             +'<small>'+(hh.sh?'持有 '+hh.sh+' 股・市值 '+val+'・'+(pl>=0?'賺 ':'賠 ')+Math.abs(pl):'還沒持有')+'</small>'
-            +'<div class="bn-stk-b"><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="1"'+(b.loan?' disabled':'')+'>買 1</button><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="3"'+(b.loan?' disabled':'')+'>買 3</button>'
-            +'<button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="1"'+(hh.sh?'':' disabled')+'>賣 1</button><button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="all"'+(hh.sh?'':' disabled')+'>全賣</button></div></div>';
+            +'<div class="bn-stk-b"><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="1"'+(b.loan||!canTrade?' disabled':'')+'>買 1</button><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="3"'+(b.loan||!canTrade?' disabled':'')+'>買 3</button>'
+            +'<button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="1"'+(hh.sh&&canTrade?'':' disabled')+'>賣 1</button><button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="all"'+(hh.sh&&canTrade?'':' disabled')+'>全賣</button></div></div>';
         }).join('')+'</div></div>';
     }
     if(tab==='loan'){
@@ -7644,7 +7750,7 @@ html.pv .wrap{max-width:none;padding:0}
       +'<li><b>信用分數</b>（0–100）：近 14 天照顧天數 ×3、連續照顧天數（最多 14）、準時還清 ×6（最多 18）、定存順利到期 ×4（最多 16）、考試定存達標 ×5（最多 10）；定存違約 −8、逾期中 −40、寵物生病 −10。30 分 B、50 分 A、70 分 AA、85 分 AAA。</li>'
       +'<li><b>兌換</b>：1 🌟 = '+BANK.star2pts+' 點；'+BANK.pts2clover+' 點 = 1 🍀（每天 '+BANK.cloverDay+' 個）；'+BANK.pts2ticket+' 點 = 1 🎟️（每週 1 張）。</li>'
       +'<li><b>自動存款</b>：可選 10／20／30%，讀書賺到的點數（任務、番茄鐘、全清）先拿這個比例存進活存；有借款時改成自動還款。</li>'
-      +'<li><b>科目股</b>：國文、數學、英文、自然、社會、科班、補習作業各一支。股價＝前 7 天（不含今天）這科任務的完成率換算成 40～160 點，7 天都沒有這科任務就是 100。買賣各收 '+STK.fee+'%，持股成本合計最多 '+STK.cap+' 點；有借款時不能買。</li>'
+      +'<li><b>科目股</b>（11/11 起）：國文、數學、英文、自然、社會、科班、補習作業各一支，各對應一支真的台股。每晚 20:00–23:00 開盤；每天漲跌＝真實台股前一個交易日的漲跌＋每日新聞＋隨機波動＋週日財報（這週那科完成率比 70% 好就漲），最多 ±10%。買賣各收 '+STK.fee+'%，持股成本合計最多 '+STK.cap+' 點；有借款時不能買。</li>'
       +'<li><b>寵物天賦「理財」</b>：每階活存利率 +0.2%、每天利息上限 +5。</li>'
       +'<li>每天的利息、保管費在<b>隔天第一次打開網站</b>時補算；沒打開網站的日子算沒照顧。</li></ul></div>';
     o+='<p class="fp-msg" id="bn-msg" aria-live="polite">'+bnMsg+'</p></div>';
@@ -7697,17 +7803,18 @@ html.pv .wrap{max-width:none;padding:0}
     if(op==='goal'){ var its=window.__shopItems?window.__shopItems():[], gi=b0.dataset.v; if(gi===''){ b.goal=null; return done('選一個新的目標。'); } var g0=its[+gi]; if(!g0) return; b.goal={n:g0.n, c:g0.c}; return done('目標：'+g0.n+'（'+g0.c+' 點）。'); }
     if(op==='sbuy'||op==='ssell'){
       var sid=b0.dataset.id, sx=STOCKS.filter(function(z){ return z[0]===sid; })[0]; if(!sx) return;
-      var pr=stkPrice(h,sid,d0()), hh=b.stk[sid]||{sh:0,cost:0};
+      if(mktState()!=='open' || d0()<V2_START) return done('現在沒開盤：每晚 20:00–23:00 才能買賣。');   // 11-10 科目股 v2
+      var pr=stkNow(h,sx), hh=b.stk[sid]||{sh:0,cost:0};
       if(op==='sbuy'){
         if(b.loan) return done('有借款時不能買股票。');
-        var nb=+b0.dataset.n||1, c0=nb*pr, fee=Math.ceil(c0*STK.fee/100);
+        var nb=+b0.dataset.n||1, c0=Math.round(nb*pr), fee=Math.ceil(c0*STK.fee/100);
         if(stkCost(b)+c0>STK.cap) return done('持股成本最多 '+STK.cap+' 點，現在 '+stkCost(b)+'。');
         if(c0+fee>pts) return done('錢包只有 '+pts+' 點（要 '+(c0+fee)+'）。');
         walletAdd(-(c0+fee),'買 '+sx[1]+'股 '+nb+' 股'); hh.sh+=nb; hh.cost+=c0; b.stk[sid]=hh; blog(b,0,'買 '+sx[1]+'股 '+nb+' 股 @'+pr+'（手續費 '+fee+'）');
         return done('買了 '+sx[1]+'股 '+nb+' 股，每股 '+pr+'。把'+sx[1]+'的任務讀完，股價就會漲。');
       }
       var ns=b0.dataset.n==='all'?hh.sh:Math.min(hh.sh,+b0.dataset.n||1); if(ns<=0) return;
-      var gross=ns*pr, fee2=Math.ceil(gross*STK.fee/100), avg=hh.sh?hh.cost/hh.sh:0, basis=Math.round(avg*ns), back2=gross-fee2;
+      var gross=Math.round(ns*pr), fee2=Math.ceil(gross*STK.fee/100), avg=hh.sh?hh.cost/hh.sh:0, basis=Math.round(avg*ns), back2=gross-fee2;
       hh.sh-=ns; hh.cost=hh.sh?Math.max(0,hh.cost-basis):0; b.stk[sid]=hh; b.st.stkWin=(b.st.stkWin||0)+back2-basis;
       blog(b,0,'賣 '+sx[1]+'股 '+ns+' 股 @'+pr+'（'+(back2-basis>=0?'賺 ':'賠 ')+Math.abs(back2-basis)+'）'); walletAdd(back2,'賣 '+sx[1]+'股 '+ns+' 股');
       return done('賣了 '+ns+' 股，拿回 '+back2+' 點（'+(back2-basis>=0?'賺 ':'賠 ')+Math.abs(back2-basis)+'）。');
