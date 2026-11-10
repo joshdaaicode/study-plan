@@ -139,7 +139,9 @@
         return '<button type="button" class="dc-bar'+(v?'':' zero')+(x.easy?' easy':'')+(j===state.sel?' sel':'')+'" data-j="'+j+'" aria-label="'+esc(lab)+'" title="'+esc(lab)+'"><i style="height:'+h.toFixed(1)+'%"></i></button>'; }).join('')+'</div>';
       html+='<div class="dc-x">'+D.map(function(x,j){ var lab=(state.off===0&&j===DAYS-1)?'今':String(x.d.getDate()); return '<span'+(x.d.getDay()===1?' class="wk"':'')+'>'+lab+'</span>'; }).join('')+'</div>';
       html+='<p class="dc-cap">'+(isM?'讀書分鐘：有番茄鐘看番茄鐘，沒有才看完成任務的表定時間':'讀書任務完成的比例（上學、補習不算）；斜線是降級／休息日')+'・粗體是週一・點長條看那天</p>';
-      html+='<div class="dc-det" id="'+(el.id||'dc')+'-det" aria-live="polite">'+detail(D[state.sel])+'</div>';
+      // opts.compact（11-10，孩子的網站用）：那天的細節先收起來，點長條才展開；家長頁沒帶這個，照舊直接顯示
+      html+='<div class="dc-det" id="'+(el.id||'dc')+'-det" aria-live="polite"'+(opts.compact&&!state.picked?' hidden':'')+'>'+detail(D[state.sel])+'</div>'
+        +(opts.compact&&!state.picked?'<p class="dc-cap" style="margin-top:6px">點長條看那天做了什麼。</p>':'');
       var W=D.slice(DAYS-7), wm=W.reduce(function(a,x){ return a+x.m; },0), wa=W.reduce(function(a,x){ return a+x.a; },0), wd=W.reduce(function(a,x){ return a+x.dn; },0),
           wp=W.reduce(function(a,x){ return a+x.pomo.length; },0), wgood=W.filter(function(x){ return x.m>=60; }).length, wnone=W.filter(function(x){ return !x.has; }).length;
       html+='<div class="dc-sum"><span>'+(state.off?'這段的後 7 天':'最近 7 天')+'讀書　<b>'+(wm/60).toFixed(1)+'</b> 小時</span><span>任務完成率　<b>'+(wa?Math.round(wd/wa*100):0)+'%</b></span>'
@@ -147,9 +149,9 @@
         +(wnone?'<span style="grid-column:1/-1;color:var(--warn,#A65A0C)">有 '+wnone+' 天沒有紀錄（那天沒打開網站）</span>':'')+'</div>';
       el.innerHTML=html;
       el.querySelectorAll('.dc-bar').forEach(function(b){ b.addEventListener('click',function(){
-        state.sel=+b.getAttribute('data-j');
+        state.sel=+b.getAttribute('data-j'); state.picked=true;
         el.querySelectorAll('.dc-bar').forEach(function(z){ z.classList.toggle('sel',z===b); });
-        el.querySelector('.dc-det').innerHTML=detail(D[state.sel]);
+        var dt=el.querySelector('.dc-det'); dt.innerHTML=detail(D[state.sel]); dt.hidden=false;
       }); });
       el.querySelectorAll('[data-m]').forEach(function(b){ b.addEventListener('click',function(){ state.mode=b.getAttribute('data-m'); lsSet('dc.mode',state.mode); render(); }); });
       el.querySelectorAll('[data-nav]').forEach(function(b){ b.addEventListener('click',function(){ state.off=Math.max(0,state.off+7*(+b.getAttribute('data-nav'))); state.sel=DAYS-1; render(); }); });

@@ -638,7 +638,7 @@ section{padding-top:40px}
 @media (min-width:1180px){ .wrap{max-width:1120px} }
 .td-grid{display:flex;flex-direction:column}
 .td-main,.td-side{display:contents}
-#td-note2{order:1} #td-list{order:2} .td-bar{order:3} .td-side .nowcard{order:4} #td-budget{order:5} #td-editor{order:6} .td-side .fp-mini{order:7} .td-side .bar-btns{order:8} .td-side .td-ask{order:9}   /* 手機（11-09 A2 改）：記事→任務→按鈕→現在＋番茄鐘→今日進度→寵物→提醒→問老師；第一個畫面就要看到第一項任務 */
+.td-side .nowcard{order:0} #td-first{order:1} #td-due{order:2} #td-note{order:3} #td-note2{order:3} #td-list{order:4} .td-bar{order:5} #td-budget{order:6} #td-editor{order:7} .td-side .fp-mini{order:8} .td-side .bar-btns{order:9} .td-side .td-ask{order:10}   /* 手機（11-10 使用者：「這個應該要在今天的最上面，我才能一次看到現在要做什麼還有設定番茄鐘」）：現在＋番茄鐘→昨晚的第一件事→快到期→記事→任務→按鈕→今日進度→寵物→提醒→問老師 */
 .td-main .td-bar{order:6} #td-editor{order:7} .td-ask{order:8;margin-top:16px}
 @media (min-width:1100px){
   .td-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
@@ -681,6 +681,13 @@ section{padding-top:40px}
 .kp-subj span{font-size:12px;padding:3px 10px;border-radius:999px;background:var(--slate-tint);color:var(--ink-soft)}
 .kp-year{margin-top:12px}
 .kp-year h4{margin:0 0 6px;font-size:13px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.06em}
+.kp-year>summary{cursor:pointer;display:flex;align-items:baseline;gap:10px;padding:6px 0;list-style:none;border-bottom:1px solid var(--rule2)}
+.kp-year>summary::-webkit-details-marker{display:none}
+.kp-year>summary h4{margin:0}
+.kp-year>summary span{font-size:13px;color:var(--ink-soft)}
+.kp-year>summary::after{content:'▸';margin-left:auto;color:var(--ink-faint)}
+.kp-year[open]>summary::after{content:'▾'}
+
 .kp-row{display:grid;grid-template-columns:22px minmax(0,1fr) 74px;gap:10px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--rule2);font-size:13.5px}
 .kp-row:last-child{border-bottom:0}
 .kp-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--sci)}
@@ -814,6 +821,26 @@ section{padding-top:40px}
 /* ---------- 分科進度、教材進度 ---------- */
 .sp-sum{font-size:13.5px;margin:0 0 10px;color:var(--ink-soft)}
 .nw{white-space:nowrap}
+.sec-fold>.sec-head{cursor:pointer;user-select:none}
+.sec-fold>.sec-head h2::after{content:' ▾';font-size:.6em;color:var(--ink-faint);vertical-align:middle}
+.sec-fold.closed>.sec-head h2::after{content:' ▸'}
+.sec-fold.closed>:not(.sec-head){display:none!important}
+.sec-fold.closed{padding-bottom:0;margin-bottom:0}
+.sec-fold.closed>.sec-head{margin-bottom:0;padding-bottom:10px;border-bottom:1px solid var(--rule2)}
+.qt-card{padding:12px 14px}
+.qt-card summary{cursor:pointer;font-size:13.5px;list-style:none}
+.qt-card summary::-webkit-details-marker{display:none}
+.qt-card summary::after{content:' ▸';color:var(--ink-faint)}
+.qt-card details[open] summary::after{content:' ▾'}
+.qt-card summary em{font-style:normal;color:var(--cap);font-weight:700}
+.fold-card>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;color:var(--sci);padding:2px 0}
+.fold-card>summary::-webkit-details-marker{display:none}
+.fold-card>summary::after{content:'▸';color:var(--ink-faint);font-size:12px}
+.fold-card[open]>summary::after{content:'▾'}
+.fold-card>summary h3{margin:0;color:var(--ink)}
+details.fold-card:not(.card){margin:0 0 14px}
+.chk-more{margin-top:8px}
+.chk-more>summary{cursor:pointer;font-size:13px;color:var(--sci);padding:4px 0}
 .td-due{margin:0 0 12px;padding:10px 14px;border-radius:var(--r-card,12px);border:1px solid var(--rule);background:var(--card);font-size:13.5px}
 .td-due ul{margin:6px 0 8px;padding-left:18px}
 .td-due li{margin:2px 0}
@@ -846,6 +873,7 @@ code.dim{font-size:11.5px;color:var(--ink-faint);background:none;padding:0}
 .sp-tbl .behind{color:var(--warn);font-weight:700}
 /* 教材進度詳細（11-07）：每本書展開看每一段的排程和完成時間 */
 #bk-auto .sp-tbl td:first-child,#bk-auto .sp-tbl td:last-child{white-space:normal;min-width:9em}
+.bk-nx{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}   /* 11-10：「下一次」最多兩行（完整的在每本書的明細裡） */
 .bk-d{border-top:1px solid var(--rule);padding:8px 0}
 .bk-d>summary{cursor:pointer;font-size:14px;line-height:1.5}
 .bk-d>summary span{display:block;font-size:12.5px;color:var(--ink-faint)}
@@ -911,7 +939,7 @@ code.dim{font-size:11.5px;color:var(--ink-faint);background:none;padding:0}
 .fp-mini p{margin:2px 0 0;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
 .fp-mini:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 /* .td-side .fp-mini{order:3} ← 11-09 拿掉：跟上面 order:7 打架（後寫的贏），讓寵物卡排在任務前面；A2 要第一個畫面看到任務 */
-.td-side .qt-card{order:9}   /* 11-09：今天的任務小卡排在待辦清單後面（沒寫 order 會跑到最前面） */
+.td-side .qt-card{order:11}   /* 11-09：今天的任務小卡排在待辦清單後面（沒寫 order 會跑到最前面） */
 @media (min-width:900px){ .td-side .qt-card{margin-top:14px} }
 
 
@@ -1023,16 +1051,11 @@ html.pv .wrap{max-width:none;padding:0}
 [data-dark] .p-x,[data-dark] .p-s,[data-dark] .dowbox button.on,[data-dark] .mood-row button.on,[data-dark] .fp-dot{color:#0B1620}
 /* 11-09 修 B11：手機版分頁按鈕的 padding（約 337 行）被上面沒有條件的 .tab-btn{padding:9px 17px} 蓋掉，這裡再寫一次讓手機版生效 */
 @media (max-width:640px){ .tab-btn{padding:7px 12px} }
-/* 11-09 A1：手機上主分頁固定在螢幕底部（5 個、不用左右滑），子分頁留在上面黏著 */
+/* 11-10 使用者：「我還是習慣要把選單放在上面」→ 主分頁回到上面（黏在頂端），還是 5 個、平均分、不用左右滑 */
 .tabs-wrap::after{display:none}
 @media (max-width:760px){
-  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));gap:4px;
-    justify-content:space-around;overflow:visible;border-bottom:0;border-top:1px solid var(--rule);box-shadow:0 -4px 14px rgba(16,32,44,.08)}
-  .tab-btn{flex:1 1 0;min-height:48px;padding:6px 2px;font-size:13.5px;border-radius:12px;text-align:center}
-  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
-  .rem-banner{bottom:calc(76px + env(safe-area-inset-bottom,0px))}
-  .fx-banner{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
-  html.pv .tabs{display:none}
+  .tabs{gap:4px;padding:8px 0 8px;overflow:visible}
+  .tab-btn{flex:1 1 0;min-height:44px;padding:6px 2px;font-size:14px;text-align:center}
 }
 .tk-del{min-width:32px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;font-size:17px}
 @media (prefers-reduced-motion:reduce){.fp-new,.fp-sw,.fp-grass,.fp-glow,.fp-tw,.fp-shim,.fp-rain,.fp-snow,.fp-bulb,.fp-anger,.fp-mini-pet .rg-b,.fp-adopt button svg .rg-b{animation:none}}
@@ -1246,12 +1269,13 @@ html.pv .wrap{max-width:none;padding:0}
 
 <section>
   <div class="sec-head"><h2>今天</h2><span class="eyebrow" id="td-when">—</span></div>
-  <p class="td-first" id="td-first" hidden></p><!-- 11-09 A3：昨晚日誌寫的「明天的第一件事」 -->
-  <div class="td-due" id="td-due" hidden></div><!-- 11-09 A7：「待決定」裡 7 天內到期、還沒勾的 -->
-  <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來；放假日會從娛樂時間扣（平日娛樂本來就只有 30 分，是下限，不會再扣）。</p>
 
   <div class="td-grid">
     <div class="td-main">
+  <!-- 11-10：搬進版面裡，手機上才能排在「現在＋番茄鐘」後面 -->
+  <p class="td-first" id="td-first" hidden></p><!-- 11-09 A3：昨晚日誌寫的「明天的第一件事」 -->
+  <div class="td-due" id="td-due" hidden></div><!-- 11-09 A7：「待決定」裡 7 天內到期、還沒勾的 -->
+  <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來；放假日會從娛樂時間扣（平日娛樂本來就只有 30 分，是下限，不會再扣）。</p>
   <div class="td-budget" id="td-note2" hidden style="border-left:3px solid var(--warn)"></div>
   <div class="td-budget" id="td-budget"></div>
   <div class="todo" id="td-list"></div>
@@ -2077,15 +2101,17 @@ html.pv .wrap{max-width:none;padding:0}
 
 <section>
   <div class="sec-head"><h2>進度</h2><span class="eyebrow">要交的檢查、每天、每科、每本書</span></div>
-  <p class="sec-note">138 項研究、近 2 萬名參與者的統合分析顯示，監控目標進度確實能提升達成率（d = 0.40），而且<b>把進度實際記錄下來</b>時效果更強。這頁就是那個記錄。</p>
+  <details class="sec-rules"><summary>為什麼要記錄進度</summary><p class="sec-note">138 項研究、近 2 萬名參與者的統合分析顯示，監控目標進度確實能提升達成率（d = 0.40），而且<b>把進度實際記錄下來</b>時效果更強。這頁就是那個記錄。</p></details>
   <!-- 11-09：「給 Claude 檢查」從森林頁搬來（使用者：不該放在森林的東西移出來，不然看一下就被扣心情） -->
   <div class="card" id="chk-card" style="padding:14px 16px;margin-bottom:14px"></div>
   <div class="card" id="dc-card" style="padding:14px 16px;margin-bottom:14px"><h3 style="margin:0 0 6px">每天的讀書長條圖</h3><div id="dc-mine"><p class="sub">載入中…</p></div></div>
   <div class="td-budget" id="bt-sum"></div>
   <div class="card" id="bt-chart" style="padding:14px 16px;margin-bottom:14px"></div>
+  <details class="fold-card"><summary>看每天的數字（最近 21 天）</summary><!-- 11-10：收起來，跟上面的長條圖重複 -->
   <div class="tbl-scroll"><table id="bt-table">
     <thead><tr><th>日期</th><th>完成</th><th>比例</th><th>心情</th><th>體力</th></tr></thead><tbody></tbody>
   </table></div>
+  </details>
   <div class="card" id="sp-card" style="margin-top:14px">
     <h3 style="margin-bottom:6px">分科進度</h3>
     <p class="sub">照計畫到昨天每一科應該完成幾段，和你實際勾掉的比；欠帳補完也算。最後一欄是近 14 天的完成率，看哪一科最常被跳過。</p>
@@ -2097,20 +2123,18 @@ html.pv .wrap{max-width:none;padding:0}
     <p class="sub">不用自己填：照「今天」勾掉的任務自動算出每本書做到第幾頁，和計畫排到哪裡比。</p>
     <div id="bk-auto"></div>
   </div>
-  <div class="card" style="margin-top:14px">
-    <h3 style="margin-bottom:6px">每週回顧</h3>
+  <details class="card fold-card" style="margin-top:14px"><summary><h3>每週回顧</h3></summary><!-- 11-10：收起來，週日晚上才用 -->
     <p class="sub">週日晚上十五分鐘，照著走完就好。靠自覺的回顧通常撐不過三週，有流程才撐得久。</p>
     <div id="rv-flow"></div>
     <div class="bar-btns"><button class="btn solid" id="rv-start" type="button">開始本週回顧</button><button class="btn ghost" id="rv-hist" type="button">看以前的</button></div>
     <div id="rv-list" hidden style="margin-top:12px"></div>
-  </div>
+  </details>
 
-  <div class="card" style="margin-top:14px">
-    <h3 style="margin-bottom:6px">給爸媽的週報</h3>
+  <details class="card fold-card" style="margin-top:14px"><summary><h3>給爸媽的週報</h3></summary><!-- 11-10：收起來 -->
     <p class="sub">三行摘要，省掉「你到底有沒有在讀書」這種對話。按了會複製到剪貼簿。<br><b>家長網頁</b>：爸媽打開就能隨時看你今天讀了沒、哪些作業還沒給 Claude 檢查（只能看、不能改，不顯示成績）。資料來自雲端同步，要先在「設定 → 雲端同步」開好自動同步。</p>
     <div class="bar-btns" style="margin-top:0"><button class="btn" id="pr-go" type="button">產生並複製</button><button class="btn ghost" id="pr-link" type="button">複製家長網頁連結</button></div>
     <pre id="pr-out" style="margin:12px 0 0;white-space:pre-wrap;font-family:inherit;font-size:13.5px;color:var(--ink-soft)"></pre>
-  </div>
+  </details>
 
   <p class="w-note">連續達標以「當天完成 60% 以上」計算，每 7 天有 1 天寬限——斷掉一天不會歸零。<br>研究也指出，斷掉的連續紀錄反而會降低後續參與度，所以這裡不做「連續中斷」的懲罰。</p>
 </section>
@@ -2131,7 +2155,7 @@ html.pv .wrap{max-width:none;padding:0}
 
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js?v=20261109a"></script>
+<script src="daychart.js?v=20261110a"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -2379,6 +2403,22 @@ html.pv .wrap{max-width:none;padding:0}
   // 「整年計畫」要先看「待決定」（12）和「其他還沒定案的」（5）：把這兩區搬到計畫的最前面（secs 是開頁時抓的清單，編號不受影響）
   try { secs[2].parentNode.insertBefore(secs[12], secs[2]); secs[2].parentNode.insertBefore(secs[5], secs[2]); } catch(e){}
   function idOf(x){ return Array.isArray(x) ? x[0] : x; }
+  // 11-10 縮短（使用者：「有些頁面拖太長了」）：「整年計畫」除了「待決定」，每一區預設收起來，點標題展開（以前十區全攤開，約 14 個畫面）
+  // 展開哪幾區只記在這台（plan-secfold，不同步）
+  (function(){
+    var FK = 'plan-secfold', fold = {};
+    try { fold = JSON.parse(localStorage.getItem(FK) || '{}') || {}; } catch(e){}
+    [5,2,3,6,7,8,9,10,11].forEach(function(i){
+      var sec = secs[i], head = sec && sec.querySelector('.sec-head'); if (!head) return;
+      sec.classList.add('sec-fold'); if (!fold[i]) sec.classList.add('closed');
+      head.setAttribute('role','button'); head.tabIndex = 0; head.setAttribute('aria-expanded', fold[i] ? 'true' : 'false');
+      function tog(e){ if (e && e.target && e.target.closest && e.target.closest('a,button,input,select,textarea')) return;
+        var open = !sec.classList.toggle('closed'); fold[i] = open ? 1 : 0; head.setAttribute('aria-expanded', open ? 'true' : 'false');
+        try { localStorage.setItem(FK, JSON.stringify(fold)); } catch(err){} }
+      head.addEventListener('click', tog);
+      head.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); tog(); } });
+    });
+  })();
 
   // 一個分頁有好幾個區塊（紀錄、獎勵、計畫）：上面列子分頁，一次只顯示一個區塊，手機上才不會拖很長
   var toc = document.getElementById('page-toc'), mini = document.getElementById('hero-mini');
@@ -3183,7 +3223,8 @@ html.pv .wrap{max-width:none;padding:0}
     var took=Math.max(0,base-left);   // 實際扣掉的分鐘（娛樂本來就是最低 30 分的日子扣不到）
     if(took>0) m+='　<span class="warn">（欠帳 '+owed+' 分，扣掉 '+took+' 分）</span>';
     else if(owed>0 && !easy) m+='　<span class="warn">（欠帳 '+owed+' 分）</span>';
-    if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了。</span>這通常代表計畫排太滿，不是你不夠努力——按「清掉欠帳」重來，然後砍掉這週優先度最低的一項。沒寫的複習講義，隔週六的「熬夜補進度」會自動帶回來補。';
+    if(owed>ALERT) m+='<br><span class="warn">欠帳超過 '+ALERT+' 分了</span>：通常是計畫排太滿，不是你不夠努力。'   // 11-10 縮短，細節收進「?」
+      +'<details class="td-rule"><summary aria-label="欠帳太多怎麼辦">?</summary>按「清掉欠帳」重來，然後砍掉這週優先度最低的一項。沒寫的複習講義，隔週六的「熬夜補進度」會自動帶回來補。</details>';
     else if(took>0) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">每天最多扣 '+CAP+' 分，娛樂不低於 '+FLOOR+' 分，睡眠一律不動。</span>';
     else if(owed>0 && !easy) m+='<br><span style="font-size:12.5px;color:var(--ink-faint)">今天娛樂已經是最低的 '+FLOOR+' 分，不再扣；欠帳用週日 14:40 的空檔補。</span>';
     elBud.innerHTML=m;
@@ -4964,7 +5005,7 @@ html.pv .wrap{max-width:none;padding:0}
   function paintDC(){
     var el=document.getElementById('dc-mine'); if(!el || !window.DayChart) return;
     if(dcm){ dcm.refresh(); return; }
-    dcm=window.DayChart.mount(el,{get:function(){ var o={};
+    dcm=window.DayChart.mount(el,{compact:true, get:function(){ var o={};
       ['plan.state.v3','plan.hist.v1','plan.pomo.v1','plan.checks.v1','plan.shop.v1','plan.vrev.v1','plan.easy.v1','plan.parent.v1'].forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; });
       return o; }});
   }
@@ -5444,9 +5485,11 @@ html.pv .wrap{max-width:none;padding:0}
       +books.map(function(r){
         var nx=r.next? '<span class="nw">'+md(r.next.k)+'（'+WD[pk(r.next.k).getDay()]+'）'+(r.next.t?' '+esc(r.next.t):'')+'</span> '+esc(bookShort(r.next.n,r.b)) : '全部排完了';   // 11-09 A6：加上幾點
         return '<tr><td><b>'+esc(BOOK_SUBJ[r.key]||'')+'</b>　'+esc(r.title)+'</td><td class="n '+(r.late.length?'behind':(r.dueDone?'ok':''))+'">'+r.dueDone+'／'+r.due+'</td>'
-          +'<td class="n'+(r.late.length?' behind':'')+'">'+(r.late.length?r.late.length+' 段':'—')+'</td><td>'+nx+'</td></tr>'; }).join('')
+          +'<td class="n'+(r.late.length?' behind':'')+'">'+(r.late.length?r.late.length+' 段':'—')+'</td><td><span class="bk-nx">'+nx+'</span></td></tr>'; }).join('')
       +'</tbody></table></div>'
       +'<p class="w-note">「到今天」＝排到今天的段數裡完成幾段（今天排的還沒做不算落後）。點下面的書名看每一段排在哪天、你哪天幾點完成。</p>';
+    // 11-10 縮短：每本書每一段的明細收進一個「點開看」（以前 13 本的明細全部列在表下面，這張卡約 3 個畫面長）
+    html+='<details class="chk-more bk-all"'+(bkOpen._all?' open':'')+'><summary>每本書每一段排在哪天、幾點完成</summary>';
     html+=books.map(function(r){
       var rows=r.segs.map(function(s){
         var st, cls;
@@ -5466,9 +5509,11 @@ html.pv .wrap{max-width:none;padding:0}
         +(fut.length?'<details class="bk-more"><summary>之後的排程（'+fut.length+' 段，到 '+md(fut[fut.length-1].k)+'）</summary><div class="tbl-scroll"><table class="bk-t">'+head+'<tbody>'+fut.map(function(x){ return x.html; }).join('')+'</tbody></table></div></details>':'')
         +'</details>';
     }).join('');
+    html+='</details>';
     html+='<p class="w-note">完成時間：11/7 起勾任務會記下幾點幾分；以前的從點數紀錄找（只留最近 200 筆），找不到就只顯示日期。提早＝熬夜往前寫掉的；晚幾天＝當欠帳補的。</p>';
     box.innerHTML=html;
     Array.prototype.forEach.call(box.querySelectorAll('details.bk-d'),function(d){ d.addEventListener('toggle',function(){ bkOpen[d.getAttribute('data-bk')]=d.open; }); });
+    var all=box.querySelector('details.bk-all'); if(all) all.addEventListener('toggle',function(){ bkOpen._all=all.open; });
   }
 
   /* ---------- 日程搜尋 ---------- */
@@ -6912,9 +6957,14 @@ html.pv .wrap{max-width:none;padding:0}
       var qcl=s.quests[tk]||{}, wcl1=s.weekly[wk]||{};
       var ql=function(t,r,cl){ var ok=r[0]>=r[1]; return '<div class="fp-q'+(cl?' done':'')+'"><div><b>'+esc(t)+'</b><div class="bar"><i style="width:'+Math.min(100,Math.round(r[0]/r[1]*100))+'%"></i></div><small>'+Math.min(r[0],r[1])+' / '+r[1]+'</small></div><span class="st">'+(cl?'已領 ✓':(ok?'<b>可以領</b>':''))+'</span></div>'; };
       qt.hidden=false;
-      qt.innerHTML='<div class="fp-panel"><h4>今天的任務 <span>完成一個 🍀×1；三個都領完再 🌟×1</span></h4>'+quests.map(function(q){ return ql(q.t,q.f(x),qcl[q.id]); }).join('')+'</div>'
+      // 11-10 縮短：平常只顯示一行（完成幾個、有幾個可以領），點開才看每一項的進度
+      var qDone=quests.filter(function(q){ var r=q.f(x); return r[0]>=r[1]; }).length, wDone=weekly.filter(function(c){ var r=c.f(wdat); return r[0]>=r[1]; }).length;
+      var wasOpen=!!(qt.querySelector('details')||{}).open;
+      qt.innerHTML='<details'+(wasOpen?' open':'')+'><summary><b>今天的任務 '+qDone+'/'+quests.length+'</b>　本週挑戰 '+wDone+'/'+weekly.length+(questReady?'　<em>可以領 '+questReady+' 個</em>':'')+'</summary>'
+        +'<div class="fp-panel" style="margin-top:8px"><h4>今天的任務 <span>完成一個 🍀×1；三個都領完再 🌟×1</span></h4>'+quests.map(function(q){ return ql(q.t,q.f(x),qcl[q.id]); }).join('')+'</div>'
         +'<div class="fp-panel"><h4>本週挑戰 <span>每個 🌟×2；週一換新</span></h4>'+weekly.map(function(c){ return ql(c.t,c.f(wdat),wcl1[c.id]); }).join('')+'</div>'
-        +(questReady?'<button type="button" class="btn solid" data-go="quest">到森林領 '+questReady+' 個</button>':'<p class="fp-gone" style="margin:0">領取在「獎勵 → 我的森林 → 📋 任務」，在那頁不會被算進待太久。</p>');
+        +'<p class="fp-gone" style="margin:0">領取在「獎勵 → 我的森林 → 📋 任務」，在那頁不會被算進待太久。</p></details>'
+        +(questReady?'<button type="button" class="btn solid" data-go="quest" style="margin-top:8px">到森林領 '+questReady+' 個</button>':'');
     }
     if(!app || window.__tab!==5 || (window.__sub!==15 && !window.__pv)){ afterPaint=[]; flash=flash.slice(-6); tagToday(); return; }   // 只有在「我的森林」子頁才畫森林（11-09 C7）   // 沒在看「獎勵」就不畫森林（切過去時會重畫），手機比較順
     var scene=v.scene||'forest', tabk=v.tab||'main';
@@ -7081,21 +7131,25 @@ html.pv .wrap{max-width:none;padding:0}
   function row(t,sub,items){ return '<div class="fp-row"><h4>'+t+'<span>'+sub+'</span></h4><div class="fp-items">'+items+'</div></div>'; }
   // 給 Claude 檢查的清單（11-09 從森林頁搬到「紀錄 → 進度」；只顯示，沒有按鈕）
   function checkPanelHTML(C){
-      var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
-      return '<div class="fp-panel"><h4>給 Claude 檢查 <span>訂正、考古題限時作答、模考卷、歷屆會考、錯題重做</span></h4>'
-        +'<p class="fp-gone">做法：在「今天」勾掉這類任務 → 把寫好的題本、訂正拍照傳給 Claude，說「檢查：任務名稱」→ Claude 檢查過關會給你一個連結，點開就過關。'
-        +'沒過關的話 Claude 會告訴你哪裡要重做。過關：A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。<br>'
-        +'<b>補檢查</b>：勾完 '+CHECK_DAYS+' 天內交都沒事；超過就每天扣點，逾期第 1 天扣 '+LATE_PEN+'、第 2 天扣 '+(LATE_PEN*2)+'、第 3 天扣 '+(LATE_PEN*3)+'…；'
-        +'逾期超過 '+LATE_DIE+' 天樹苗枯死，但還是要交，沒過關會一直扣。過關就停止扣點（已扣的不退）。</p>'
-        +(items.length?items.slice(0,30).map(function(it){
-          var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
-          if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.wd?'　樹苗已枯':'');
-          else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
-          else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
-          else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
-          return '<div class="fp-chk '+cls+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'+txt+'</span></div>'; }).join(''):'<p class="fp-gone">還沒有要檢查的任務。</p>')
-        +'</div>';
-      }
+    // 11-10 縮短（使用者：「有些頁面拖太長了」）：還沒過關的直接列出來；做法說明、已過關的收起來（以前全部攤開，這張卡約 2 個畫面長）
+    var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
+    function row(it){
+      var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
+      if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.wd?'　樹苗已枯':'');
+      else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
+      else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
+      else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
+      return '<div class="fp-chk '+cls+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'+txt+'</span></div>';
+    }
+    var todo=items.filter(function(it){ return it.st!=='pass' && !it.old; }), done=items.filter(function(it){ return it.st==='pass'; });
+    return '<div class="fp-panel"><h4>給 Claude 檢查 <span>'+(todo.length?'還要交 '+todo.length+' 份':'都交了 ✓')+'</span></h4>'
+      +(todo.length?todo.map(row).join(''):'<p class="fp-gone" style="margin-top:0">沒有要交的。</p>')
+      +(done.length?'<details class="chk-more"><summary>已過關 '+done.length+' 份</summary>'+done.slice(0,30).map(row).join('')+'</details>':'')
+      +'<details class="chk-more"><summary>怎麼交、逾期怎麼算</summary><p class="fp-gone" style="margin-top:6px">在「今天」勾掉訂正、考古題限時作答、模考卷、歷屆會考、錯題重做這類任務 → 把題本、訂正拍照傳給 Claude，說「檢查：任務名稱」→ 過關會給你一個連結，點開就過關。'
+      +'A 給 🌟×2＋飼料 3 份，B 給 🌟×1＋飼料 2 份。<br>勾完 '+CHECK_DAYS+' 天內交都沒事；超過就每天扣點（逾期第 n 天扣 '+LATE_PEN+'n）；'
+      +'逾期超過 '+LATE_DIE+' 天樹苗枯死，但還是要交。過關就停止扣點（已扣的不退）。</p></details>'
+      +'</div>';
+  }
   window.__goChecks=function(){ if(window.__showTab) window.__showTab(4,21); setTimeout(function(){ var el=document.getElementById('chk-card'); if(el) try{ el.scrollIntoView({block:'start'}); }catch(e){} },60); };
   function paintChecks(){ var el=document.getElementById('chk-card'); if(el) el.innerHTML=checkPanelHTML(checks()); }
   function qrow(kind,id,t,cur,goal,claimed){
@@ -8170,18 +8224,22 @@ html.pv .wrap{max-width:none;padding:0}
   function paint(){
     paintTop();
     var html='';
+    // 11-10 縮短：每個年份收成一行「112 年　已寫 8／24」，點開才列出那一年的每一份（以前 71 份全部攤開）
     [112,113,114].forEach(function(y){
-      html+='<div class="kp-year"><h4>'+y+' 年</h4>';
+      var ps=PL.papers.filter(function(p){ return p[3]===y; }), dn=ps.filter(function(p){ return (data[id(p)]||{}).d; }).length;
+      html+='<details class="kp-year" data-y="'+y+'"'+(kpOpen[y]?' open':'')+'><summary><h4>'+y+' 年</h4><span>已寫 <b class="kp-yn">'+dn+'</b>／'+ps.length+'</span></summary>';
       PL.papers.filter(function(p){ return p[3]===y; }).forEach(function(p){
         var k=id(p), r=data[k]||{};
         html+='<div class="kp-row'+(r.d?' on':'')+'"><input type="checkbox" data-k="'+k+'"'+(r.d?' checked':'')+' aria-label="'+k+' 已寫">'
           +'<span class="kp-name"><span class="kp-tag c-'+(CAT[p[2]]||'kb')+'">'+p[2]+'</span>'+p[1]+'<small>歷屆試題Q p.'+p[4]+'–'+p[5]+'</small></span>'
           +'<input type="number" min="0" max="100" placeholder="%" data-s="'+k+'" value="'+(r.s!==undefined?r.s:'')+'" aria-label="'+k+' 分數"></div>';
       });
-      html+='</div>';
+      html+='</details>';
     });
     box.innerHTML=html;
+    Array.prototype.forEach.call(box.querySelectorAll('details.kp-year'),function(d){ d.addEventListener('toggle',function(){ kpOpen[d.dataset.y]=d.open; }); });
   }
+  var kpOpen={};   // 這次打開的年份（重畫時保持）
   // 打勾、填分數（11-09 修 B3）：以前每次都重建整個 71 列清單——
   // 打勾時，事件還沒冒泡到上層，勾選框就被換掉了，「照計畫應寫幾份」那行不會跟著更新；
   // 填完一格點下一格時，下一格也被換掉，手機鍵盤會收起來。改成只改那一列和上面的總數。
@@ -8191,7 +8249,8 @@ html.pv .wrap{max-width:none;padding:0}
     if(c.type==='checkbox') r.d=c.checked?1:0;
     else { r.s=c.value===''?'':Math.max(0,Math.min(100,+c.value)); if(c.value!==''){ r.d=1; c.value=r.s; } }
     data[k]=r; sv(data);
-    if(row){ row.classList.toggle('on',!!r.d); var cb=row.querySelector('input[type=checkbox]'); if(cb) cb.checked=!!r.d; }
+    if(row){ row.classList.toggle('on',!!r.d); var cb=row.querySelector('input[type=checkbox]'); if(cb) cb.checked=!!r.d;
+      var yd=row.closest('details.kp-year'), yn=yd&&yd.querySelector('.kp-yn'); if(yn) yn.textContent=yd.querySelectorAll('.kp-row.on').length; }
     paintTop();
   });
   // 「今天」勾掉「科班考古｜台南一中 112 數學 限時作答…」就自動打勾（分前後半的，後半勾掉才算）
