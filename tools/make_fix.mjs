@@ -6,6 +6,8 @@
 //     --subj：chi 國文、math 數學、eng 英文、sci 自然、soc 社會、kbm 科班資優數學、kbs 科班自然學科
 //     --end：那顆番茄鐘結束的時間（HH:MM）；--orig：雲端備份裡那顆計時的 endAt（毫秒），網站會順便停掉還在跑的同一顆，避免算兩次
 //   補／扣點數：node tools/make_fix.mjs pts --n 20 --why "家長加點沒收到"（一次最多 ±500）
+//   補登以前的小考：node tools/make_fix.mjs quiz --file <rows.json> --why "補習班 LINE 的歷史成績"（2026-11-10）
+//     rows.json＝[[日期 2026-8-8, 科目, 分數, 滿分, 'gq' 或 'q', 備註, 班平均], …]，最多 60 筆；成績只在連結裡、不要放進 repo
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,10 +41,19 @@ if (kind === 'pomo') {
   const n = parseInt(args.n, 10); if (!n || Math.abs(n) > 500) die('--n 要是 ±1～500');
   if (!payload.why) die('點數要寫 --why 理由');
   payload.n = n;
-} else die('第一個參數要是 pomo 或 pts');
+} else if (kind === 'quiz') {
+  if (!args.file) die('要給 --file <rows.json>');
+  const rows = JSON.parse(fs.readFileSync(args.file, 'utf8'));
+  if (!Array.isArray(rows) || !rows.length || rows.length > 60) die('rows 要是 1～60 筆的陣列');
+  for (const r of rows) {
+    if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(r[0]) || !r[1] || !(r[2] >= 0) || !(r[3] > 0) || r[2] > r[3]) die('格式不對：' + JSON.stringify(r));
+    r[0] = r[0].split('-').map(Number).join('-');
+  }
+  payload.q = rows;
+} else die('第一個參數要是 pomo、pts 或 quiz');
 
 const body = b64u(Buffer.from(JSON.stringify(payload), 'utf8'));
 const key = crypto.createPrivateKey(fs.readFileSync(KEY_FILE));
 const sig = crypto.sign('sha256', Buffer.from(body, 'utf8'), { key, dsaEncoding: 'ieee-p1363' });
-console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
+console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
 console.log(SITE + '#fix=' + body + '.' + b64u(sig));

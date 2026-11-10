@@ -3766,6 +3766,21 @@ html.pv .wrap{max-width:none;padding:0}
   if(!sc||typeof sc!=='object') sc={term:{},mock:{},custom:[]};
   sc.term=sc.term||{}; sc.mock=sc.mock||{}; sc.custom=sc.custom||[];
   var quiz=ls(QZK); if(!Array.isArray(quiz)) quiz=[];
+  // 11-10 Claude 補登小考（#fix= 的 kind 'quiz'；成績只在簽過名的連結裡，不進 repo）。
+  // 每筆 [日期, 科目, 分數, 滿分, 類型 gq/q, 備註, 班平均]；同一天、同科、同分的當作已經有，不重複；以前的成績不加點數。
+  window.__quizImport=function(rows){
+    var add=0, dup=0, bad=0;
+    (Array.isArray(rows)?rows:[]).forEach(function(r){
+      var d=String(r[0]||''), sub=String(r[1]||'').trim(), s=+r[2], f=+r[3]||100;
+      if(!/^\d{4}-\d{1,2}-\d{1,2}$/.test(d) || !sub || isNaN(s) || s<0 || s>f){ bad++; return; }
+      if(quiz.some(function(x){ return x.d===d && x.sub===sub && +x.s===s; })){ dup++; return; }
+      var q={id:Date.now()*10+add, d:d, sub:sub, s:s, f:f, k:r[4]==='q'?'q':'gq', note:String(r[5]||''), pts:0};
+      if(r[6]!=null && !isNaN(+r[6])) q.avg=+r[6];
+      quiz.push(q); add++;
+    });
+    if(add){ quiz.sort(function(a,b){ return dnum(a.d)-dnum(b.d) || a.id-b.id; }); save(QZK,quiz); try{ paintRecent(); renderTrend(); }catch(e){} }
+    return {add:add, dup:dup, bad:bad};
+  };
 
   // 舊版成績表（國數英自社＋作文混在一起）只搬能對上的欄位，其他數字留著提醒重填；舊資料本身不刪
   (function migrate(){
@@ -8140,6 +8155,10 @@ html.pv .wrap{max-width:none;padding:0}
         var n=Math.round(+pl.n||0); if(!n || Math.abs(n)>500){ passBanner('❌ 補登的點數不對。'); return; }
         if(window.__award) window.__award(n,'Claude 補登'+why,true);
         msg='✅ Claude 補登點數 '+(n>0?'+':'−')+Math.abs(n)+why+'。';
+      } else if(pl.kind==='quiz'){   // 11-10 補登以前的小考成績
+        if(!window.__quizImport){ passBanner('成績紀錄還沒載入好，重新整理後再點一次連結。'); return; }
+        var rq=window.__quizImport(pl.q);
+        msg='✅ Claude 補登小考成績：新增 '+rq.add+' 筆'+(rq.dup?'，'+rq.dup+' 筆本來就有（沒重複加）':'')+(rq.bad?'，'+rq.bad+' 筆格式不對沒加':'')+why+'。在「紀錄 → 成績 → 小考」看；以前的成績不加點數。';
       } else { passBanner('❌ 看不懂這個補登連結的內容。'); return; }
       C=checks(); C.used[pl.i]=Date.now(); saveChecks(C);
       passBanner(msg,true);
