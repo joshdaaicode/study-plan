@@ -1126,6 +1126,7 @@ html.pv .wrap{max-width:none;padding:0}
 .bn-spark{display:block;margin:4px 0}
 .bn-stk-b{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
 .bn-stk-b .btn{padding:4px 9px;font-size:12px}
+.bn-stk-b{align-items:center}.bn-stk-b .stk-n{width:68px;padding:4px 6px;font:inherit;font-size:13px;border:1px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink)}.bn-stk-b .stk-u{font-size:12px;color:var(--ink-faint);margin-right:2px}.bn-stk .stk-msg{margin:6px 0 0;font-size:12.5px}
 .fp-diary li{margin:4px 0}
 
 /* ---------- 成就 ---------- */
@@ -7533,7 +7534,7 @@ html.pv .wrap{max-width:none;padding:0}
   //            代號    名稱      顏色       台股    倍數  每天波動
   var STOCKS=[['chi','國文','#7DBF5A','1216',.8,.012],['math','數學','#2F7D4F','2454',.6,.02],['eng','英文','#D9583B','2618',.8,.02],['sci','自然','#E8B931','6505',.7,.016],
     ['soc','社會','#4E9A45','2412',.8,.012],['kb','科班','#F4A7C0','2330',.7,.022],['hw','補習作業','#2B5E45','0050',.8,.012]];
-  var STK={fee:3, cap:500, lo:40, span:120, limit:.10, open:20*60, close:23*60, step:5};
+  var STK={fee:3, cap:30000, lo:40, span:120, limit:.10, open:20*60, close:23*60, step:5};   // cap：持股成本合計上限（11-11 他要「能持有超過兩萬」：500 → 30000）
   var V2_START=new Date(2026,10,11);   // 第一天用新算法；前一天的收盤價＝舊算法（完成率換算），持股不會一換版就暴漲暴跌
   function stkCat(c){ return /^(kb|kbfix|kbr|fu)$/.test(c)?'kb':c; }
   function stkPriceOld(h,id,day){   // 舊算法（11-02）：前 7 天這科完成率換算成 40～160；只用來算上線前的價格
@@ -7624,7 +7625,8 @@ html.pv .wrap{max-width:none;padding:0}
     var pts=a.map(function(v,i){ return (i*W2/(a.length-1)).toFixed(1)+','+(H2-(v-mn)/(mx-mn||1)*H2).toFixed(1); }).join(' ');
     return '<svg class="bn-spark" viewBox="0 0 '+W2+' '+H2+'" width="'+W2+'" height="'+H2+'" aria-hidden="true"><polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   }
-  var bnApp=document.getElementById('bn-app'), bnMsg='';
+  var bnApp=document.getElementById('bn-app'), bnMsg='', bnStk='', stkN={};   // bnStk：訊息是哪一支股票的；stkN：每支股票填的股數（重畫時保留）
+  if(bnApp) bnApp.addEventListener('input',function(e){ var t=e.target; if(t.classList&&t.classList.contains('stk-n')) stkN[t.dataset.sid]=Math.max(1,parseInt(t.value,10)||1); });
   function bnTab(k,t,on){ return '<button type="button" data-btab="'+k+'" aria-pressed="'+on+'">'+t+'</button>'; }
   function amtBox(id,ph,quick){
     return '<div class="bn-amt"><input type="number" id="'+id+'" min="1" step="1" inputmode="numeric" placeholder="'+ph+'" aria-label="'+ph+'">'
@@ -7727,18 +7729,22 @@ html.pv .wrap{max-width:none;padding:0}
           var canTrade=st==='open'&&td>=V2_START;
           // 11-11 他回報「有一些不能買，錢都夠」：其實是持股成本上限，原因以前只寫在銀行頁最下面，手機上看不到 → 按鈕直接停用、原因寫在這支股票上
           var buyNo=function(n){ var c0=Math.round(n*pr), fee=Math.ceil(c0*STK.fee/100); if(!canTrade||b.loan) return 'x'; if(cost+c0>STK.cap) return 'cap'; if(c0+fee>ptsNow) return 'pts'; return ''; };
-          var no1=buyNo(1), no3=buyNo(3), noTxt='';
+          var no1=buyNo(1), noTxt='', mx=0;
           if(no1==='cap') noTxt='買 1 股要 '+Math.round(pr)+' 點，會超過持股上限（還能買 '+Math.max(0,STK.cap-cost)+' 點以內）';
           else if(no1==='pts') noTxt='點數不夠買 1 股（要 '+(Math.round(pr)+Math.ceil(Math.round(pr)*STK.fee/100))+' 點）';
-          else if(no3==='cap') noTxt='買 3 股會超過持股上限，只能買 1 股';
-          else if(no3==='pts') noTxt='點數只夠買 1 股';
+          if(!no1){ mx=Math.max(1,Math.min(Math.floor((STK.cap-cost)/pr),Math.floor(ptsNow/(pr*(1+STK.fee/100))))); while(mx>1&&buyNo(mx)) mx--; if(!buyNo(mx+1)) mx++; }   // 現在最多能買幾股（上限和點數都算）
+          var nIn=stkN[x[0]]||1;
           return '<div class="bn-stk"><div class="bn-stk-h"><b>'+x[1]+'</b><span class="mono">'+pr+'</span><small class="'+(ch>0?'up':(ch<0?'dn':''))+'">'+(ch>0?'▲'+ch+'（+'+pc+'%）':(ch<0?'▼'+(-ch)+'（'+pc+'%）':'—'))+'</small></div>'
             +(line.length>1?spark(line,x[2]):'')
             +'<small>對應 '+esc(MK&&MK.tickers&&MK.tickers[x[3]]||x[3])+' '+x[3]+(why.length?'・'+esc(why.join('・')):'')+'</small>'
             +'<small>'+(hh.sh?'持有 '+hh.sh+' 股・市值 '+val+'・'+(pl>=0?'賺 ':'賠 ')+Math.abs(pl):'還沒持有')+'</small>'
             +(noTxt?'<small style="color:var(--warn)">⚠️ '+noTxt+'</small>':'')
-            +'<div class="bn-stk-b"><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="1"'+(no1?' disabled':'')+'>買 1</button><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="3"'+(no3?' disabled':'')+'>買 3</button>'
-            +'<button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="1"'+(hh.sh&&canTrade?'':' disabled')+'>賣 1</button><button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="all"'+(hh.sh&&canTrade?'':' disabled')+'>全賣</button></div></div>';
+            // 11-11 上限改 30000 後一次要能買很多股：填股數再按買／賣；「最多」把能買的股數填進去
+            +'<div class="bn-stk-b"><input type="number" class="stk-n" id="stk-n-'+x[0]+'" data-sid="'+x[0]+'" min="1" step="1" inputmode="numeric" value="'+nIn+'" aria-label="'+x[1]+'股要買賣幾股"'+(canTrade?'':' disabled')+'><span class="stk-u">股</span>'
+            +(mx>1?'<button type="button" class="btn ghost" data-fill="stk-n-'+x[0]+'" data-v="'+mx+'">最多 '+mx+'</button>':'')
+            +'<button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'"'+(no1?' disabled':'')+'>買</button>'
+            +'<button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'"'+(hh.sh&&canTrade?'':' disabled')+'>賣</button><button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="all"'+(hh.sh&&canTrade?'':' disabled')+'>全賣</button></div>'
+            +(bnStk===x[0]&&bnMsg?'<p class="fp-msg stk-msg" aria-live="polite">'+bnMsg+'</p>':'')+'</div>';
         }).join('')+'</div></div>';
     }
     if(tab==='loan'){
@@ -7776,7 +7782,7 @@ html.pv .wrap{max-width:none;padding:0}
       +'<li><b>科目股</b>（11/11 起）：國文、數學、英文、自然、社會、科班、補習作業各一支，各對應一支真的台股。每晚 20:00–23:00 開盤；每天漲跌＝真實台股前一個交易日的漲跌＋每日新聞＋隨機波動＋週日財報（這週那科完成率比 70% 好就漲），最多 ±10%。買賣各收 '+STK.fee+'%，持股成本合計最多 '+STK.cap+' 點；有借款時不能買。</li>'
       +'<li><b>寵物天賦「理財」</b>：每階活存利率 +0.2%、每天利息上限 +5。</li>'
       +'<li>每天的利息、保管費在<b>隔天第一次打開網站</b>時補算；沒打開網站的日子算沒照顧。</li></ul></div>';
-    o+='<p class="fp-msg" id="bn-msg" aria-live="polite">'+bnMsg+'</p></div>';
+    o+='<p class="fp-msg" id="bn-msg" aria-live="polite">'+(tab==='stk'&&bnStk?'':bnMsg)+'</p></div>';   // 股票的訊息寫在那支股票底下（手機才看得到）
     bnApp.innerHTML=o;   // 訊息留到下一次操作才清
   }
   function logRow(l){
@@ -7786,7 +7792,7 @@ html.pv .wrap{max-width:none;padding:0}
   function amtOf(id){ var el=document.getElementById(id), n=el?parseInt(el.value,10):NaN; return isNaN(n)?0:n; }
   if(bnApp) bnApp.addEventListener('click',function(e){
     var b0=e.target.closest('button'); if(!b0||b0.disabled) return;
-    if(!b0.dataset.fill) bnMsg='';
+    if(!b0.dataset.fill){ bnMsg=''; bnStk=''; }
     var v=viewState();
     if(b0.dataset.btab){ v.btab=b0.dataset.btab; saveView(v); paintBank(); return; }
     if(b0.dataset.term){ v.bterm=+b0.dataset.term; saveView(v); paintBank(); return; }
@@ -7828,15 +7834,20 @@ html.pv .wrap{max-width:none;padding:0}
       var sid=b0.dataset.id, sx=STOCKS.filter(function(z){ return z[0]===sid; })[0]; if(!sx) return;
       if(mktState()!=='open' || d0()<V2_START) return done('現在沒開盤：每晚 20:00–23:00 才能買賣。');   // 11-10 科目股 v2
       var pr=stkNow(h,sx), hh=b.stk[sid]||{sh:0,cost:0};
+      bnStk=sid;   // 11-11：訊息寫在這支股票底下
+      var nIn=b0.dataset.n?0:amtOf('stk-n-'+sid); if(nIn>0) stkN[sid]=nIn;   // 填的股數（「全賣」不看）
       if(op==='sbuy'){
         if(b.loan) return done('有借款時不能買股票。');
-        var nb=+b0.dataset.n||1, c0=Math.round(nb*pr), fee=Math.ceil(c0*STK.fee/100);
-        if(stkCost(b)+c0>STK.cap) return done('持股成本最多 '+STK.cap+' 點，現在 '+stkCost(b)+'。');
+        var nb=nIn; if(nb<=0) return done('先填要買幾股。');
+        var c0=Math.round(nb*pr), fee=Math.ceil(c0*STK.fee/100);
+        if(stkCost(b)+c0>STK.cap) return done('買 '+nb+' 股要 '+c0+' 點，持股成本最多 '+STK.cap+' 點（現在 '+stkCost(b)+'，還能買 '+Math.max(0,STK.cap-stkCost(b))+' 點以內）。');
         if(c0+fee>pts) return done('錢包只有 '+pts+' 點（要 '+(c0+fee)+'）。');
+        if(c0+fee>=1000 && !confirm('買 '+sx[1]+'股 '+nb+' 股，每股 '+pr+'，共 '+(c0+fee)+' 點（含手續費 '+fee+'）？')) return done('沒有買。');
         walletAdd(-(c0+fee),'買 '+sx[1]+'股 '+nb+' 股'); hh.sh+=nb; hh.cost+=c0; b.stk[sid]=hh; blog(b,0,'買 '+sx[1]+'股 '+nb+' 股 @'+pr+'（手續費 '+fee+'）');
         return done('買了 '+sx[1]+'股 '+nb+' 股，每股 '+pr+'。把'+sx[1]+'的任務讀完，股價就會漲。');
       }
-      var ns=b0.dataset.n==='all'?hh.sh:Math.min(hh.sh,+b0.dataset.n||1); if(ns<=0) return;
+      if(!hh.sh) return done('還沒持有'+sx[1]+'股。');
+      var ns=b0.dataset.n==='all'?hh.sh:Math.min(hh.sh,nIn); if(ns<=0) return done('先填要賣幾股。');
       var gross=Math.round(ns*pr), fee2=Math.ceil(gross*STK.fee/100), avg=hh.sh?hh.cost/hh.sh:0, basis=Math.round(avg*ns), back2=gross-fee2;
       hh.sh-=ns; hh.cost=hh.sh?Math.max(0,hh.cost-basis):0; b.stk[sid]=hh; b.st.stkWin=(b.st.stkWin||0)+back2-basis;
       blog(b,0,'賣 '+sx[1]+'股 '+ns+' 股 @'+pr+'（'+(back2-basis>=0?'賺 ':'賠 ')+Math.abs(back2-basis)+'）'); walletAdd(back2,'賣 '+sx[1]+'股 '+ns+' 股');
