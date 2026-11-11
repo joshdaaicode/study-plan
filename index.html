@@ -7707,7 +7707,7 @@ html.pv .wrap{max-width:none;padding:0}
     if(tab==='stk'){
       // 科目股 v2（11-10）：每晚 20:00–23:00 開盤；股價＝真實台股＋每日新聞＋隨機＋週日財報
       loadMarket();
-      var cost=stkCost(b), now=new Date(), st=mktState(now), td=d0(), nw=newsOf(td), nm=now.getHours()*60+now.getMinutes();
+      var cost=stkCost(b), now=new Date(), st=mktState(now), td=d0(), nw=newsOf(td), nm=now.getHours()*60+now.getMinutes(), ptsNow=window.__pts?window.__pts():0;
       var stTxt=st==='open'?'<b class="up">交易中</b>　23:00 收盤（還有 '+(STK.close-nm)+' 分）':(st==='pre'?'還沒開盤：今晚 20:00 開盤，現在顯示的是昨天的收盤價':'今天收盤了：明晚 20:00 再開盤');
       if(td<V2_START) stTxt='新的股市 '+(V2_START.getMonth()+1)+'/'+V2_START.getDate()+' 晚上 20:00 第一次開盤；在那之前照舊的算法（前 7 天完成率）。';
       o+='<div class="bn-panel"><h4>📈 科目股 <span>每晚 20:00 開盤、23:00 收盤；每天漲跌最多 ±10%</span></h4>'
@@ -7716,7 +7716,7 @@ html.pv .wrap{max-width:none;padding:0}
           +(td.getDay()===0?'<span>📊 今天是週日：各科發「財報」，照這週一到週六的完成率，比 70% 好就漲、差就跌</span>':'')+'</div>':'')
         +'<details class="sec-rules"><summary>股價怎麼算</summary><p class="fp-gone" style="margin-top:6px">每天的漲跌＝<b>真實台股</b>（對應的那支股票前一個交易日的漲跌）＋<b>每日新聞</b>（網站自己編的，不是真的新聞）＋<b>隨機波動</b>＋<b>週日財報</b>（這週那科的任務完成率）。'
           +'每天最多漲跌 10%。漲跌路線在 20:00 開盤前就算好了，買賣不會影響價格；只有 20:00–23:00 能買賣，用當下的價格成交。買賣各收 '+STK.fee+'% 手續費，持股成本合計最多 '+STK.cap+' 點（現在 '+cost+'）。</p></details>'
-        +(b.loan?'<p class="fp-gone"><b>有借款時不能買。</b></p>':'')+'<p class="fp-gone" style="margin-top:4px">已實現損益 '+((b.st.stkWin||0)>0?'+':'')+(b.st.stkWin||0)+' 點。</p>'
+        +(b.loan?'<p class="fp-gone"><b>有借款時不能買。</b></p>':'')+'<p class="fp-gone" style="margin-top:4px">持股成本 <b>'+cost+' / '+STK.cap+'</b> 點（所有股票加起來，賣掉就空出來）・已實現損益 '+((b.st.stkWin||0)>0?'+':'')+(b.st.stkWin||0)+' 點。</p>'
         +'<div class="bn-stks">'+STOCKS.map(function(x){
           var y=new Date(td); y.setDate(y.getDate()-1);
           var pr=stkNow(h,x,now), py=closeOf(h,x,y), hh=b.stk[x[0]]||{sh:0,cost:0}, ch=Math.round((pr-py)*10)/10, pc=py?Math.round(ch/py*1000)/10:0, val=Math.round(hh.sh*pr), pl=val-hh.cost;
@@ -7725,11 +7725,19 @@ html.pv .wrap{max-width:none;padding:0}
           if(mv&&mv.earn) why.push('財報：完成率 '+Math.round(mv.earn.rate*100)+'%');
           var line=td>=V2_START&&st==='open'?pathOf(h,x,td).slice(0,Math.floor((nm-STK.open)/STK.step)+1):stkHist(h,x);
           var canTrade=st==='open'&&td>=V2_START;
+          // 11-11 他回報「有一些不能買，錢都夠」：其實是持股成本上限，原因以前只寫在銀行頁最下面，手機上看不到 → 按鈕直接停用、原因寫在這支股票上
+          var buyNo=function(n){ var c0=Math.round(n*pr), fee=Math.ceil(c0*STK.fee/100); if(!canTrade||b.loan) return 'x'; if(cost+c0>STK.cap) return 'cap'; if(c0+fee>ptsNow) return 'pts'; return ''; };
+          var no1=buyNo(1), no3=buyNo(3), noTxt='';
+          if(no1==='cap') noTxt='買 1 股要 '+Math.round(pr)+' 點，會超過持股上限（還能買 '+Math.max(0,STK.cap-cost)+' 點以內）';
+          else if(no1==='pts') noTxt='點數不夠買 1 股（要 '+(Math.round(pr)+Math.ceil(Math.round(pr)*STK.fee/100))+' 點）';
+          else if(no3==='cap') noTxt='買 3 股會超過持股上限，只能買 1 股';
+          else if(no3==='pts') noTxt='點數只夠買 1 股';
           return '<div class="bn-stk"><div class="bn-stk-h"><b>'+x[1]+'</b><span class="mono">'+pr+'</span><small class="'+(ch>0?'up':(ch<0?'dn':''))+'">'+(ch>0?'▲'+ch+'（+'+pc+'%）':(ch<0?'▼'+(-ch)+'（'+pc+'%）':'—'))+'</small></div>'
             +(line.length>1?spark(line,x[2]):'')
             +'<small>對應 '+esc(MK&&MK.tickers&&MK.tickers[x[3]]||x[3])+' '+x[3]+(why.length?'・'+esc(why.join('・')):'')+'</small>'
             +'<small>'+(hh.sh?'持有 '+hh.sh+' 股・市值 '+val+'・'+(pl>=0?'賺 ':'賠 ')+Math.abs(pl):'還沒持有')+'</small>'
-            +'<div class="bn-stk-b"><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="1"'+(b.loan||!canTrade?' disabled':'')+'>買 1</button><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="3"'+(b.loan||!canTrade?' disabled':'')+'>買 3</button>'
+            +(noTxt?'<small style="color:var(--warn)">⚠️ '+noTxt+'</small>':'')
+            +'<div class="bn-stk-b"><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="1"'+(no1?' disabled':'')+'>買 1</button><button type="button" class="btn ghost" data-bk="sbuy" data-id="'+x[0]+'" data-n="3"'+(no3?' disabled':'')+'>買 3</button>'
             +'<button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="1"'+(hh.sh&&canTrade?'':' disabled')+'>賣 1</button><button type="button" class="btn ghost" data-bk="ssell" data-id="'+x[0]+'" data-n="all"'+(hh.sh&&canTrade?'':' disabled')+'>全賣</button></div></div>';
         }).join('')+'</div></div>';
     }
@@ -8632,7 +8640,7 @@ html.pv .wrap{max-width:none;padding:0}
     if(window.__tab!==5 || window.__sub!==22) return;
     if(window.__casino){ window.__casino.show(); return; }
     if(asked) return; asked=true;
-    var s=document.createElement('script'); s.src='casino.js?v=20261109a';
+    var s=document.createElement('script'); s.src='casino.js?v=20261111b';
     s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }

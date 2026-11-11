@@ -50,7 +50,13 @@
     +'.vc-list{margin:0 0 12px}.vc-list>div{display:grid;grid-template-columns:22px minmax(0,auto) minmax(0,1fr) auto;gap:8px;align-items:baseline;font-size:13px;padding:5px 0;border-bottom:1px solid var(--rule2)}'
     +'.vc-list small{color:var(--ink-faint);font-size:11.5px}.vc-list .ok>span:first-child{color:var(--cap)}.vc-list .bad>span:first-child{color:var(--warn)}'
     +'.vc-list.wb>div{grid-template-columns:44px minmax(0,auto) minmax(0,1fr) auto}.vc-list.wb>div>span:first-child{color:var(--cap);font-size:11px}'
-    +'.vc-bars>div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 10px;align-items:center;margin:6px 0;font-size:13px}.vc-bars small{grid-column:2;font-size:11.5px;color:var(--ink-faint)}.vc-bars .bar{margin:0;max-width:none}';
+    +'.vc-bars>div{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 10px;align-items:center;margin:6px 0;font-size:13px}.vc-bars small{grid-column:2;font-size:11.5px;color:var(--ink-faint)}.vc-bars .bar{margin:0;max-width:none}'
+    // 11-11 紀錄分頁：一天一個標題，每局可以點開看考了哪些字
+    +'.vc-lgday{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;margin:14px 0 4px;font-size:13.5px}.vc-lgday small{font-size:11.5px;color:var(--ink-faint)}'
+    +'.vc-lg{border-bottom:1px solid var(--rule2)}.vc-lg>summary{display:grid;grid-template-columns:44px 62px minmax(0,1fr) 12px;gap:8px;align-items:baseline;padding:7px 0;font-size:12.5px;color:var(--ink-soft);cursor:pointer;list-style:none}'
+    +'.vc-lg>summary::-webkit-details-marker{display:none}.vc-lg>summary::after{content:"▸";color:var(--ink-faint)}.vc-lg[open]>summary::after{content:"▾"}'
+    +'.vc-lg .mono{font-family:var(--mono);font-size:11.5px;color:var(--ink-faint)}.vc-lg .up{color:var(--cap)}.vc-lg .dn{color:var(--warn)}'
+    +'.vc-lg-b{padding:0 0 10px 8px;font-size:12.5px;color:var(--ink-soft)}.vc-lg-b>p{margin:0 0 6px}.vc-lg-b .vc-list{margin:0}.vc-list .yo{display:block;color:var(--warn)}';
   if(!document.getElementById('vc-css')){ var stl=document.createElement('style'); stl.id='vc-css'; stl.textContent=CSS; document.head.appendChild(stl); }
   var VK='plan.vocab.v1', RK='plan.vrev.v1';
   function ls(k,d){ try{ var v=JSON.parse(localStorage.getItem(k)); return v===null||v===undefined?d:v; }catch(e){ return d; } }
@@ -163,6 +169,15 @@
   }
   var MUTE=null;
   function save(s){ sv(VK,s); }
+  // 11-11 每局的紀錄（他要「每局考了哪些字」＋獨立一頁）：最多留 300 局；最近 2000 個字留明細，再舊的只留輸贏，資料才不會一直變大（會同步到雲端）
+  var LOG_MAX=300, LOG_WORDS=2000, LOGN=30;
+  function pushLog(s,e){
+    s.log.unshift(e); s.log=s.log.slice(0,LOG_MAX);
+    var n=0; s.log.forEach(function(l){ if(!l.w) return; n+=l.w.length; if(n>LOG_WORDS){ delete l.w; l.wx=1; } });
+  }
+  // 一題：[字的 key, 對 1／錯 0, 倍率, 答錯時答了什麼（0＝沒在時間內答）]
+  function wOf(key,ok,m,val){ return ok?[key,1,m]:[key,0,m,val==null?0:String(val).slice(0,40)]; }
+  function plain(t){ return String(t||'').replace(/<[^>]+>/g,'').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&'); }
   function mastered(s,key){ var w=s.ws[key]; return !!(w && w[2]>=MASTER); }
   function acc100(s){ if(s.rec.length<20) return .7; var n=0; s.rec.forEach(function(x){ n+=x; }); return n/s.rec.length; }
 
@@ -356,7 +371,7 @@
     var c=s.cur; s.cur=null;
     var single=c.mode==='single', net=single?(c.net||0):-c.bet;   // 一題一注：每題已經各自結算，這裡只補記淨輸贏
     s.k.net[c.cur]=(s.k.net[c.cur]||0)+net; s.k.games++;
-    s.log.unshift({t:Date.now(),m:c.mode,d:c.diff,c:c.cur,b:c.bet,p:single?net:0,r:c.right||0,n:c.n||0,ab:1,single:single?1:0}); s.log=s.log.slice(0,60);
+    pushLog(s,{t:Date.now(),m:c.mode,d:c.diff,c:c.cur,b:c.bet,p:single?net:0,r:c.right||0,n:c.n||0,ab:1,single:single?1:0,rg:c.rg,sl:c.sl,w:c.w});
     save(s);
     if(c.cur==='pts' && net && window.__award) window.__award(0,'單字賭場：'+modeOf(c.mode).n+' 沒打完就離開'+(single?'（答 '+(c.n||0)+' 題）':'，押的 '+c.bet+' 點沒收'),true,{logN:net});
     msg=single?'上次一題一注沒按收手就離開了，已經照每題結算（淨 '+(net>0?'+':'')+net+'）。':'上次那局沒打完就離開了，押的 '+c.bet+' '+CUR[c.cur].u+'沒收。';
@@ -372,10 +387,10 @@
     if(view==='game' && G) return renderGame();
     if(view==='result' && R) return renderResult();
     if(view==='review') return renderReview();
-    var tabs='<div class="fp-tabs vc-tabs" role="tablist" aria-label="賭場分頁">'+[['home','🎰 下注'],['review','📕 錯字本'+(dueList(s).length?' <b class="fp-dot">'+dueList(s).length+'</b>':'')],['shop','🛍️ 籌碼與獎品'],['stats','📊 統計']]
+    var tabs='<div class="fp-tabs vc-tabs" role="tablist" aria-label="賭場分頁">'+[['home','🎰 下注'],['review','📕 錯字本'+(dueList(s).length?' <b class="fp-dot">'+dueList(s).length+'</b>':'')],['shop','🛍️ 籌碼與獎品'],['stats','📊 統計'],['log','📜 紀錄']]
       .map(function(t){ return '<button type="button" data-view="'+t[0]+'" aria-pressed="'+(view===t[0]||(view==='review0'&&t[0]==='review'))+'">'+t[1]+'</button>'; }).join('')+'</div>';
     var o=tabs+'<div class="vc-body">'+tiles(s,view==='home');
-    if(view==='shop') o+=shopHtml(s); else if(view==='stats') o+=statsHtml(s); else if(view==='review0') o+=reviewHome(s); else o+=setupHtml(s,set);
+    if(view==='shop') o+=shopHtml(s); else if(view==='stats') o+=statsHtml(s); else if(view==='log') o+=logHtml(s); else if(view==='review0') o+=reviewHome(s); else o+=setupHtml(s,set);
     o+='<p class="fp-msg" id="vc-msg" aria-live="polite">'+msg+'</p></div>';
     app.innerHTML=o;
   }
@@ -434,11 +449,11 @@
     set.bet=bet; save(s);
     // 題目：偏向還不熟的字（熟字少出一點）
     var order=shuffle(pool).sort(function(a,b){ return (mastered(s,a.key)?1:0)-(mastered(s,b.key)?1:0)+(Math.random()-.5)*.6; });
-    G={mode:set.mode, diff:set.diff, cur:cur, bet:bet, queue:order.map(function(it){ return it.key; }), qi:0, q:null, right:0, wrong:0, n:0, mults:[], hist:[], prize:bet, rung:0, net:0};
+    G={mode:set.mode, diff:set.diff, cur:cur, bet:bet, rg:set.rg.slice(), queue:order.map(function(it){ return it.key; }), qi:0, q:null, right:0, wrong:0, n:0, mults:[], hist:[], prize:bet, rung:0, net:0};
     if(G.mode!=='single'){ addCur(cur,-bet,'單字賭場下注'); }
     if(G.mode==='duel'){ var tal=API.talent?API.talent('vocab'):0; G.petAcc=Math.max(.25,Math.min(.97,acc100(s)+(Math.random()*.16-.08)-(tal>=3?.05:0))); G.petScore=0; G.petName=pet.name; }
     if(G.mode==='sprint'){ G.endAt=Date.now()+60000; }
-    s=st(); s.cur={mode:G.mode, diff:G.diff, cur:cur, bet:bet, right:0, n:0, pid:PID, at:Date.now()}; save(s);
+    s=st(); s.cur={mode:G.mode, diff:G.diff, cur:cur, bet:bet, rg:G.rg, right:0, n:0, w:[], pid:PID, at:Date.now()}; save(s);
     msg=''; view='game';
     if(G.mode==='slot'){ G.spinning=true; renderGame(); spin(); return; }
     nextQ();
@@ -448,7 +463,7 @@
     for(var i=0;i<SLOT.length;i++){ acc+=SLOT[i][1]; if(r<acc){ res=SLOT[i][0]; break; } }
     var reel=app.querySelector('.vc-reel'), lever=app.querySelector('.vc-slotsvg .vc-lever'), n=0, faces=SLOT.map(function(x){ return '×'+x[0]; });
     if(lever) lever.classList.add('pull');
-    var iv=setInterval(function(){ n++; if(reel) reel.textContent=faces[n%faces.length]; if(n>=16){ clearInterval(iv); G.spinning=false; G.slot=res; snd(res>=2?'win':(res===0?'bad':'tick'));
+    var iv=setInterval(function(){ n++; if(reel) reel.textContent=faces[n%faces.length]; if(n>=16){ clearInterval(iv); G.spinning=false; G.slot=res; var sc=st(); if(sc.cur){ sc.cur.sl=res; save(sc); } snd(res>=2?'win':(res===0?'bad':'tick'));
       if(res===0){ finish(); } else nextQ(); } },90);
   }
   function nextQ(){
@@ -477,7 +492,7 @@
     if(q.kind==='type' && val!==null && !String(val).trim()) return;   // 空白送出不算答錯
     q.done=1;
     var ok=val===null?false:judge(q,val), s=st(), it=BYKEY[q.key];
-    record(s,q.key,ok,true); if(s.cur){ s.cur.right=G.right+(ok?1:0); s.cur.n=G.n+1; s.cur.at=Date.now(); }
+    record(s,q.key,ok,true); if(s.cur){ s.cur.right=G.right+(ok?1:0); s.cur.n=G.n+1; s.cur.at=Date.now(); (s.cur.w=s.cur.w||[]).push(wOf(q.key,ok,q.m,val)); }
     G.n++; if(ok) G.right++; else G.wrong++; G.mults.push(q.m); G.hist.push({key:q.key, ok:ok, m:q.m, val:val});
     q.ok=ok; q.val=val; snd(ok?'ok':'bad');
     if(G.mode==='duel'){ var pOk=Math.random()<G.petAcc; if(pOk) G.petScore++; q.pet=pOk; }
@@ -516,7 +531,8 @@
       save(s);
       addCur(g.cur,pay,'單字賭場：'+modeOf(g.mode).n+'（'+note.replace(/<[^>]+>/g,'')+'）押 '+g.bet+' 拿回 '+pay,pay-g.bet);
     }
-    s=st(); s.log.unshift({t:Date.now(),m:g.mode,d:g.diff,c:g.cur,b:g.bet,p:pay==null?g.net:pay,r:g.right,n:g.n,single:pay==null?1:0}); s.log=s.log.slice(0,60); save(s);
+    s=st(); pushLog(s,{t:Date.now(),m:g.mode,d:g.diff,c:g.cur,b:g.bet,p:pay==null?g.net:pay,r:g.right,n:g.n,single:pay==null?1:0,
+      rg:g.rg, sl:g.mode==='slot'?(g.slot||0):undefined, nt:plain(note), why:why||undefined, w:g.hist.map(function(x){ return wOf(x.key,x.ok,x.m,x.val); })}); save(s);
     var gain=pay==null?g.net:pay-g.bet;
     if(gain>0){ snd('win'); if(gain>=Math.max(30,g.bet) && window.__fx && window.__fx.banner) window.__fx.banner('🎰 單字賭場贏了 '+gain+' '+CUR[g.cur].u+'！'); }
     if(g.mode==='duel' && API.petTouch) API.petTouch(g.right>g.petScore?'你贏了！我要再多練練 💪':(g.right===g.petScore?'平手！下次再比':'嘿嘿，這次我贏了 😝'));
@@ -700,11 +716,48 @@
       +'<li>淨輸贏：點數 '+sg(s.k.net.pts)+'、籌碼 '+sg(s.k.net.chip)+'、🌟 '+sg(s.k.net.star)+'</li>'
       +'<li>爬梯爬滿 10 階 '+s.k.lad10+' 次；跟寵物對賭 '+s.k.petW+' 勝 '+s.k.petL+' 敗</li>'
       +'<li>錯字本：複習 '+s.k.rvAns+' 題、答對 '+s.k.rvOk+'、移出 '+s.k.clr+' 個；今天複習 '+reviewMinToday()+' 分鐘</li></ul></div>';
-    o+='<div class="vc-row"><h4>最近的局</h4>'+(s.log.length?s.log.slice(0,20).map(function(l){ var d=new Date(l.t), gain=l.single?l.p:l.p-l.b;
-        return '<div class="bn-log"><span class="mono">'+(d.getMonth()+1)+'/'+d.getDate()+' '+hm(d.getHours()*60+d.getMinutes())+'</span><span class="mono '+(gain>0?'up':(gain<0?'dn':''))+'">'+sg(gain)+'</span><span>'+modeOf(l.m).e+' '+modeOf(l.m).n+'・'+diffOf(l.d).n+'・'+CUR[l.c].n+(l.ab?'（沒打完）':'')+'・對 '+l.r+'/'+l.n+'</span></div>'; }).join(''):'<p class="vc-sub">還沒玩過。</p>')+'</div>';
+    o+='<div class="vc-row"><h4>最近的局 <span>每局考了哪些字在「📜 紀錄」</span></h4>'+(s.log.length?s.log.slice(0,5).map(function(l){ var d=new Date(l.t), gain=gainOf(l);
+        return '<div class="bn-log"><span class="mono">'+(d.getMonth()+1)+'/'+d.getDate()+' '+hm(d.getHours()*60+d.getMinutes())+'</span><span class="mono '+(gain>0?'up':(gain<0?'dn':''))+'">'+sg(gain)+'</span><span>'+modeOf(l.m).e+' '+modeOf(l.m).n+'・'+diffOf(l.d).n+'・'+CUR[l.c].n+(l.ab?'（沒打完）':'')+'・對 '+l.r+'/'+l.n+'</span></div>'; }).join('')
+        +'<div class="bar-btns"><button class="btn ghost" type="button" data-view="log">看完整紀錄（'+s.log.length+' 局）</button></div>':'<p class="vc-sub">還沒玩過。</p>')+'</div>';
     return o;
   }
   function sg(n){ return (n>0?'+':'')+(n||0); }
+  function gainOf(l){ return l.single?l.p:l.p-l.b; }
+
+  /* ---------- 紀錄（11-11）：一天一段，每局點開看考了哪些字 ---------- */
+  function logHtml(s){
+    var L=s.log;
+    if(!L.length) return '<p class="vc-sub">還沒玩過。玩完一局就會記在這裡。</p>';
+    var days={};
+    L.forEach(function(l){ var k=kk(new Date(l.t)), D=days[k]||(days[k]={g:0,r:0,n:0,net:{}}); D.g++; D.r+=l.r||0; D.n+=l.n||0; D.net[l.c]=(D.net[l.c]||0)+gainOf(l); });
+    var o='<p class="vc-sub">留最近 '+LOG_MAX+' 局（現在 '+L.length+' 局）。點一局看考了哪些字、答錯時你答了什麼。</p>', last='';
+    L.slice(0,LOGN).forEach(function(l){
+      var d=new Date(l.t), k=kk(d), D=days[k];
+      if(k!==last){ last=k; o+='<div class="vc-lgday"><b>'+(d.getMonth()+1)+'/'+d.getDate()+'（'+'日一二三四五六'.charAt(d.getDay())+'）</b><small>'+D.g+' 局・答對 '+D.r+'/'+D.n+'・'
+        +Object.keys(D.net).map(function(c){ return (CUR[c]||CUR.pts).n+' '+sg(D.net[c]); }).join('・')+'</small></div>'; }
+      o+=logRow(l);
+    });
+    if(L.length>LOGN) o+='<div class="bar-btns"><button class="btn ghost" type="button" data-act="logmore">再看 30 局（還有 '+(L.length-LOGN)+' 局）</button></div>';
+    return o;
+  }
+  function logRow(l){
+    var d=new Date(l.t), g=gainOf(l), M=modeOf(l.m), cu=CUR[l.c]||CUR.pts, info=[];
+    var o='<details class="vc-lg"><summary><span class="mono">'+hm(d.getHours()*60+d.getMinutes())+'</span><span class="mono '+(g>0?'up':(g<0?'dn':''))+'">'+sg(g)+'</span>'
+      +'<span>'+M.e+' '+M.n+'・'+diffOf(l.d).n+'・'+cu.n+(l.ab?'（沒打完）':'')+'・對 '+(l.r||0)+'/'+(l.n||0)+'</span></summary><div class="vc-lg-b">';
+    info.push(l.single?'每題押 '+l.b+' '+cu.u+'，淨 '+sg(l.p):'押 '+l.b+' '+cu.u+'，拿回 '+l.p);
+    if(l.sl!=null && !l.nt) info.push('拉霸 ×'+l.sl);   // 打完的局 nt 已經寫了拉霸倍率；沒打完的才補
+    if(l.nt) info.push(esc(l.nt));
+    if(l.why) info.push(esc(l.why));
+    if(l.rg && l.rg.length) info.push('範圍：'+l.rg.map(function(r){ var x=RANGES.filter(function(z){ return z.id===r; })[0]; return esc(x?x.n:r); }).join('、'));
+    o+='<p>'+info.join('；')+'</p>';
+    if(l.w && l.w.length) o+='<div class="vc-list">'+l.w.map(function(w){
+        var it=BYKEY[w[0]], word=it?it.w:String(w[0]).replace(/^[wp]:/,''), zh=it?it.zh:'';
+        return '<div class="'+(w[1]?'ok':'bad')+'"><span>'+(w[1]?'✓':'✗')+'</span><b>'+esc(word)+'</b><span>'+esc(zh)
+          +(w[1]?'':'<small class="yo">'+(w[3]===0?'沒在時間內答':'你答：'+esc(w[3]))+'</small>')+'</span><small>×'+w[2]+'</small></div>'; }).join('')+'</div>';
+    else if(l.w) o+='<p class="vc-sub">'+(l.m==='slot'&&l.sl===0?'拉霸轉到 ×0，這局不用答題。':'這局沒答題就結束了。')+'</p>';
+    else o+='<p class="vc-sub">'+(l.wx?'這局比較舊，考了哪些字已經清掉（只留最近 '+LOG_WORDS+' 個字）。':'這局是 11/11 改版前玩的，那時候還沒記考了哪些字。')+'</p>';
+    return o+'</div></details>';
+  }
 
   /* ---------- 事件 ---------- */
   app.addEventListener('click',function(e){
@@ -715,7 +768,7 @@
       if(!G && RV && RV.q && !RV.q.done && !RV.q.hint){ RV.q.hint=1; speak(it.w); renderReview(); var hi=document.getElementById('vc-ans'); if(hi) hi.focus(); return; }   // 錯字本：聽發音等於看提示
       speak(it.w); return;
     }
-    if(b.dataset.view){ if(G) return; view=b.dataset.view==='review'?'review0':b.dataset.view; R=null; msg=''; return render(); }
+    if(b.dataset.view){ if(G) return; view=b.dataset.view==='review'?'review0':b.dataset.view; if(view==='log') LOGN=30; R=null; msg=''; return render(); }
     if(b.dataset.rg){ var i=set.rg.indexOf(b.dataset.rg); if(i>=0){ if(set.rg.length>1) set.rg.splice(i,1); } else set.rg.push(b.dataset.rg); save(s); return render(); }
     if(b.dataset.let){ if(b.dataset.let==='*') set.let=''; else set.let=set.let.indexOf(b.dataset.let)>=0?set.let.replace(b.dataset.let,''):(set.let+b.dataset.let).split('').sort().join(''); save(s); return render(); }
     if(b.dataset.pos){ var j=set.pos.indexOf(b.dataset.pos); if(j>=0) set.pos.splice(j,1); else set.pos.push(b.dataset.pos); save(s); return render(); }
@@ -731,6 +784,7 @@
     if(act==='start') return startGame();
     if(act==='again'){ R=null; view='home'; return startGame(); }
     if(act==='mute'){ s.set.mute=!s.set.mute; save(s); return render(); }
+    if(act==='logmore'){ LOGN+=30; return render(); }
     if(act==='submit'){ var a=document.getElementById('vc-ans'); return answer(a?a.value:''); }
     if(act==='giveup') return answer(null);
     if(act==='next') return nextQ();
