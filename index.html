@@ -4848,6 +4848,15 @@ html.pv .wrap{max-width:none;padding:0}
     window.addEventListener('load',function(){
       if(!window.__pv) navigator.serviceWorker.register('sw.js').catch(function(){});
     });
+    // 11-12：網路太慢時先開的是手機裡存的舊版，新版下載好了 sw.js 會通知 → 底下跳一條，點了重新整理
+    navigator.serviceWorker.addEventListener('message',function(e){
+      if(window.__pv || !e.data || e.data.t!=='newver' || document.getElementById('newver-bar')) return;
+      var b=document.createElement('button'); b.type='button'; b.id='newver-bar';
+      b.textContent='網站有新版本（剛才網路慢，先開了手機裡存的舊版）・點這裡重新整理';
+      b.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:9999;padding:12px 14px;border:0;border-radius:12px;background:#1F2D3A;color:#fff;font:inherit;font-size:14px;line-height:1.4;box-shadow:0 4px 16px rgba(0,0,0,.3);cursor:pointer';
+      b.addEventListener('click',function(){ location.reload(); });
+      document.body.appendChild(b);
+    });
   }
   var ss=document.getElementById('sw-status');
   if(ss) ss.addEventListener('click',function(){
@@ -7523,7 +7532,7 @@ html.pv .wrap{max-width:none;padding:0}
     b.sav-=x; blog(b,-x,'取消勾選：扣回自動存的 '+x); saveBank(b); return x;
   };
   // 科目股（2026-11-02 加）：每科一支股票，股價＝前 7 天（不含今天）這科任務的完成率，40～160 點；7 天都沒有這科任務就是 100。
-  // 押自己會把落後的科目補起來：買進落後的科目、把它讀完，股價就漲。買賣各收 3% 手續費，成本合計最多 500 點。
+  // 押自己會把落後的科目補起來：買進落後的科目、把它讀完，股價就漲。買賣各收 3% 手續費，成本合計有上限（STK.cap；11-11 起 30000）。
   // ===== 科目股 v2（2026-11-10 使用者：「改得更像真的股票，不要全部都是我控制的，多點隨機性，也可以參考當天時事」）=====
   // 他選的：真的台股＋網站自編每日新聞；每晚 20:00 開盤、23:00 收盤，漲跌順序開盤前就準備好；每週日財報；整段都能下單；台股用我配的。
   // 每天收盤價 ＝ 昨天收盤 ×（1＋漲跌），漲跌（最多 ±10%，跟台股漲跌停一樣）＝
