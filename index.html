@@ -5800,7 +5800,7 @@ html.pv .wrap{max-width:none;padding:0}
         var full=e.a>0 && e.d===e.a; if(full) allClear++;
         doneList(e).forEach(function(t){
           var chk=t.n && needsCheck(t.n), it=chk? C.items[k+'|'+t.n] : null;
-          trees.push({id:uid('t|'+k+'|'+(t.n||t.c)), sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?((it.wd||it.old)?'dead':it.st):'pending'):'ok', n:t.n});   // 逾期枯死的，之後過關也不復活
+          trees.push({id:uid('t|'+k+'|'+(t.n||t.c)), sp:TREE[t.c]||'bush', k:k, chk:chk, st:chk?(it?((it.wd||it.old)?'dead':it.st):'pending'):'ok', n:t.n});   // 逾期枯死的維持枯掉；11-12 起 Claude 發連結之後才枯的，過關時 chkRewind 會拿掉 wd 救回來
           if(since && pk(k)>=since && (!chk || (it&&it.st==='pass'))) tasks++;
         });
         if(since && pk(k)>=since && full) clear++;
@@ -5876,11 +5876,24 @@ html.pv .wrap{max-width:none;padding:0}
   /* ---- 每天的結算：檢查到期、森林枯萎、寵物飢餓與生病 ---- */
   // 逾期沒交檢查（2026-11-07 使用者定）：勾完 3 天內交都沒事；之後每天扣點，逾期第 1 天扣 5、第 2 天扣 10…（第 n 天扣 5n）。
   //   逾期超過 5 天（第 6 天）樹苗枯死，但還是要交，沒過關就繼續扣；過關就停止扣點（已扣的不退），枯死前過關樹苗照常長大。
-  //   it.ls＝逾期第 1 天、it.pd＝扣到逾期第幾天、it.pt＝累計扣了幾點、it.wd＝枯死那天（之後過關也不會復活）。
+  //   it.ls＝逾期第 1 天、it.pd＝扣到逾期第幾天、it.pt＝累計扣了幾點、it.wd＝枯死那天（11-12 起：Claude 發連結之後才枯的，過關時救回來，見 chkRewind）。
   //   以前（舊規則）就枯掉的也照新規則（11-07 使用者：「之前枯死的…要照現在的規則」）：從原本期限的隔天算逾期第 1 天，
   //   該扣的一次補扣；逾期還沒超過 5 天的救回來，超過的維持枯掉、繼續扣到過關。
   function addDays(k,n){ var d=pk(k); d.setDate(d.getDate()+n); return kk(d); }
   function lateDay(it,today){ return (it.st==='pass'||it.old||!it.ls)?0:Math.max(0,daysBetween(pk(it.ls),today)+1); }
+  // 11-12 他定（「要照 11/9 算，因為我本來就有做完」）：過關算 Claude 檢查完、發連結的那一刻（連結裡的 t），
+  // 不是他點連結的時間。發連結之後才多扣的逾期點數退回；發連結之後才枯的樹苗救回來。回傳要退的點數（呼叫的人負責加回去）。
+  function chkRewind(it,t){
+    if(!t || !it.ls || it.old) return 0;
+    var at=new Date(t); at.setHours(0,0,0,0);
+    var nAt=Math.max(0,daysBetween(pk(it.ls),at)+1), pd=it.pd||0, back=0;
+    for(var d=nAt+1;d<=pd;d++) back+=LATE_PEN*d;
+    if(back>0){ it.pd=nAt; it.pt=Math.max(0,(it.pt||0)-back); it.back=(it.back||0)+back; }
+    if(it.wd && pk(it.wd)>at){ delete it.wd; it.revived=1; }
+    it.chkAt=t;
+    return back;
+  }
+  function chkDay(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate(); }
   function checksAdvance(C,h){
     var today=d0(), tk=kk(today), changed=false, pen=[];
     Object.keys(h).forEach(function(k){ (h[k].dn||[]).forEach(function(n){ if(needsCheck(n) && !C.items[k+'|'+n]){ C.items[k+'|'+n]={k:k,n:n,st:'pending'}; changed=true; } }); });
@@ -7164,7 +7177,7 @@ html.pv .wrap{max-width:none;padding:0}
     var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
     function row(it){
       var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
-      if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.wd?'　樹苗已枯':'');
+      if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.back?'（照檢查那天算，退回 '+it.back+' 點）':'')+(it.wd?'　樹苗已枯':(it.revived?'　樹苗救回來了':''));
       else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
       else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
       else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
@@ -8142,12 +8155,15 @@ html.pv .wrap{max-width:none;padding:0}
       C.used[pl.i]=Date.now();
       var key=pl.k+'|'+pl.n, prev=C.items[key];
       if(prev && prev.st==='pass'){ saveChecks(C); passBanner('這份已經過關了。'); return; }
-      var wasLate=prev && prev.st!=='pass' && !prev.old && prev.ls;   // 逾期中過關：停止扣點（已扣的、枯死的樹不變）
-      C.items[key]=Object.assign({}, prev||{}, {k:pl.k, n:pl.n, st:'pass', g:pl.g, m:pl.m||'', passAt:Date.now()});
+      var wasLate=prev && prev.st!=='pass' && !prev.old && prev.ls;   // 逾期中過關：停止扣點
+      var it=C.items[key]=Object.assign({}, prev||{}, {k:pl.k, n:pl.n, st:'pass', g:pl.g, m:pl.m||'', passAt:Date.now()});
+      var back=wasLate? chkRewind(it,pl.t) : 0;   // 11-12：照發連結那天算，之後多扣的退回、之後才枯的救回來
       saveChecks(C);
+      if(back>0 && window.__award) window.__award(back,'過關算 Claude 檢查那天（'+chkDay(pl.t)+'）：退回之後多扣的逾期點數：'+pl.n,true);
       var s=petState(); s.gold+=(pl.g==='A'?2:1); s.bonusFood+=(pl.g==='A'?3:2); savePet(s);
       passBanner('✅ Claude 檢查過關（'+esc(pl.g)+'）：'+esc(pl.n)+(pl.m?'——'+esc(pl.m):'')+'。🌟 +'+(pl.g==='A'?2:1)+'、飼料 +'+(pl.g==='A'?3:2)+'。'
-        +(wasLate?'逾期扣點停止了（逾期共扣 '+(prev.pt||0)+' 點）'+(prev.wd?'，樹苗已經枯了不會復活':'')+'。':''), true);
+        +(wasLate?'逾期扣點停止了'+(back>0?'；過關算 Claude 檢查那天（'+chkDay(pl.t)+'），之後多扣的 '+back+' 點退回':'')
+          +'（逾期共扣 '+(it.pt||0)+' 點）'+(it.revived?'，樹苗救回來了 🌱':(it.wd?'，樹苗在檢查之前就枯了，不會復活':''))+'。':''), true);
       if(window.__fx) window.__fx.unlock(null,'Claude 檢查過關');
       afterPaint.push(function(){ petDo('flip',{dur:1}); petDo('say',{txt:'過關了！好厲害！'}); });
       tagToday(); paintPet();
@@ -8155,6 +8171,21 @@ html.pv .wrap{max-width:none;padding:0}
   }
   handlePass();
   window.addEventListener('hashchange',handlePass);
+  // 11-12：台南一中 114 物理那兩條連結 11/9 21:18 就發了，他 11/12 才點（點的時候網站還是舊規則）。
+  // 已經點過的照連結裡的時間補算一次（還沒點的，點的時候 handlePass 就會照新規則算）；退點前先看帳本有沒有退過，兩台裝置不會重複退
+  (function(){
+    var FIX={'2026-11-3|科班考古｜台南一中 114 物理 限時作答（考古題 A 本 p.1–5）':1794230316853,
+             '2026-11-6|科班考古｜台南一中 114 物理 訂正（考古題 A 本 p.1–5）':1794230318457};
+    var C=checks(), ch=false;
+    Object.keys(FIX).forEach(function(key){
+      var it=C.items[key]; if(!it || it.st!=='pass' || it.chkAt) return;
+      var back=chkRewind(it,FIX[key]); ch=true;
+      var why='過關算 Claude 檢查那天（11/9）：退回之後多扣的逾期點數：'+it.n;
+      var done=(window.__shopLog?window.__shopLog():[]).some(function(l){ return l.w===why; });
+      if(back>0 && !done && window.__award) window.__award(back,why,true);
+    });
+    if(ch){ saveChecks(C); tagToday(); paintPet(); }
+  })();
 
   /* ---- Claude 補登連結：#fix=內容.簽章（2026-11-07 使用者要的「接口」）----
      番茄鐘做完卻被手機清掉、點數算錯時，Claude 在筆電用 tools/make_fix.mjs 簽一個連結，點開就補上。
