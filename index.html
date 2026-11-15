@@ -8673,13 +8673,15 @@ html.pv .wrap{max-width:none;padding:0}
     if(e.key==='ArrowLeft') go(addD(cur,-1),-1);
     if(e.key==='ArrowRight') go(addD(cur,1),1);
   });
-  document.addEventListener('plan:tab',function(e){ if(e.detail===1){ wantScroll=true; draw(); } });
+  // 11-15：「月曆」「整年計畫」也在日程分頁裡，那時「每天」是藏起來的：不用畫，更不要捲到「現在」
+  // （捲動要先把整頁排好版，以前切到月曆、整年計畫都白白多排一次）。切回「每天」時會再觸發一次，那時才畫
+  document.addEventListener('plan:tab',function(e){ if(e.detail===1 && window.__sub===1){ wantScroll=true; draw(); } });
   var gd=document.getElementById('note-goday');
   if(gd) gd.addEventListener('click',function(){ if(gd.dataset.k) window.__gotoDay(gd.dataset.k); });
   // 網址帶 #d=2027-1-27 會直接打開那一天
   var hm=(location.hash||'').match(/d=(\d{4}-\d{1,2}-\d{1,2})/);
   if(hm && PL.days[hm[1]]){ cur=parse(hm[1]); if(window.__showTab) window.__showTab(1,1); }
-  draw();
+  if(window.__tab===1 && window.__sub===1) draw();   // 11-15：開網站時停在「每天」才畫（分頁在這段之前就切好了，那時還沒接上切頁事件）；沒在看就等切過去再畫
   var stamp=new Date().toDateString();
   setInterval(function(){
     var n=new Date().toDateString();
