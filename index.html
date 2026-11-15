@@ -8336,12 +8336,12 @@ html.pv .wrap{max-width:none;padding:0}
     if(g===4 && sb===21) paintChecks();   // 檢查清單在最上面，馬上畫
     if(g===4 && sb===14) paintKbPace();   // 11-09：只畫正在看的子頁
     if(boot && g===0) tagToday();   // 任務旁邊「要給 Claude 檢查」的小字：開網站時跟清單一起出來，不要晚一格才跳出來
-    var job=petJob={g:g, sb:sb};
+    var job=petJob={g:g, sb:sb, c:!!(g===5 || boot || (petJob && petJob.c))};   // c：要不要順便檢查自訂獎勵（被後來的切頁取代時也要帶過去）
     window.__U.later(function(){
       if(petJob!==job) return;   // 又切到別頁了，等最後那一次
       petJob=null; deCache=null; paintPet();
       var on=function(){ return window.__tab===job.g && window.__sub===job.sb; };
-      if(g===5 || boot) paintCustom();   // 11-09 C2：開頁也要檢查自訂獎勵的解鎖提示（要用寵物算好的統計）
+      if(job.c) paintCustom();   // 11-09 C2：開頁也要檢查自訂獎勵的解鎖提示（要用寵物算好的統計）
       if(g!==4 || sb!==21) return;
       if(on()) paintChecks();   // 寵物那邊會更新逾期狀態，檢查清單照新的再畫一次
       window.__U.next(function(){ if(!on()) return; paintSubjects();   // 11-09：教材進度搬到這裡（A4）
