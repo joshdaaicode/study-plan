@@ -4215,7 +4215,9 @@ html.pv .wrap{max-width:none;padding:0}
     var b=e.target.closest('button'); if(!b||b.dataset.k===tab) return;
     tab=b.dataset.k; save(SCT,tab); draft=null; paintSeg(); renderEntry(); renderTrend();
   });
-  paintSeg(); renderEntry(); renderTrend();
+  // 11-15：開網站時沒在看「紀錄 → 成績」就先不畫走勢圖（筆電約 25 毫秒，手機約 0.1 秒）：
+  // 切到成績時下面的 refit 一定會照實際寬度重畫一次，開網站時畫的那份每次都被丟掉
+  paintSeg(); renderEntry(); if(window.__tab===4 && window.__sub===14) renderTrend();
   var lastW=0, rT=null;
   function refit(){ var w=measure(); if(w!==lastW){ lastW=w; renderTrend(); } }
   window.addEventListener('resize',function(){ clearTimeout(rT); rT=setTimeout(refit,150); });
@@ -8493,7 +8495,13 @@ html.pv .wrap{max-width:none;padding:0}
     if(!m || /前半/.test(name)) return;
     var k=m[1]+' '+m[2]+' '+m[3]; data=ls(); var r=data[k]||{}; r.d=1; data[k]=r; sv(data); paint();
   };
-  paint();
+  // 11-15：這張清單在「紀錄 → 成績」：開網站時沒在看就先不畫（71 份，筆電約 10 毫秒、手機約 0.04 秒），第一次切過去才畫
+  if(window.__tab===4 && window.__sub===14) paint();
+  else document.addEventListener('plan:tab',function first(){
+    if(!(window.__tab===4 && window.__sub===14)) return;
+    document.removeEventListener('plan:tab',first);
+    if(!box.firstChild) paint();   // 打勾「今天」的考古題時（__kbMark）可能已經畫過了
+  });
 })();
 </script>
 <script>
