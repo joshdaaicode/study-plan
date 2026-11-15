@@ -2275,7 +2275,18 @@ html.pv .wrap{max-width:none;padding:0}
     d0:function(){ var d=new Date(); d.setHours(0,0,0,0); return d; },
     kk:function(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); },
     ls:function(k,d){ var dd=d===undefined?null:d; try{ var v=JSON.parse(localStorage.getItem(k)); return v===null||v===undefined?dd:v; }catch(e){ return dd; } },
-    sv:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ if(window.__quota) window.__quota(e); } }
+    sv:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ if(window.__quota) window.__quota(e); } },
+    // 11-15：不急的工作（看不到的地方、畫面下面）等這一格畫面畫出來再做，切分頁、開網站時先讓人看到新的一頁。
+    // requestAnimationFrame 在畫下一格之前跑，裡面再排 setTimeout，就會排在那一格畫完之後；背景分頁不畫畫面，直接排 setTimeout。
+    // 畫面暫時沒在更新（requestAnimationFrame 不會跑）時，最晚 1 秒後也一定會做
+    later:function(fn){
+      var done=false, go=function(){ if(!done){ done=true; fn(); } };
+      if(document.hidden || !window.requestAnimationFrame){ setTimeout(go,0); return; }
+      requestAnimationFrame(function(){ setTimeout(go,0); });
+      setTimeout(go,1000);
+    },
+    // 11-15：一長串工作中間讓一下，讓點擊、畫面可以先處理（有 scheduler.yield 用它，排在最前面；沒有的瀏覽器用 setTimeout）
+    next:function(fn){ if(window.scheduler && typeof window.scheduler.yield==='function') window.scheduler.yield().then(fn); else setTimeout(fn,0); }
   };
   window.__pick=pick;   // 雲端同步也用這份（以前另外寫了一份一樣的）
 })();
@@ -8291,12 +8302,33 @@ html.pv .wrap{max-width:none;padding:0}
   function paintAll(){ deCache=null; paintSubjects(); paintKbPace(); paintBooks(); paintPet(); paintBank(); paintAch(); paintCustom(); }
   // 效能（2026-11-02）：切分頁、切回來時只畫正在看的那一頁（以前每次都全部重算，切一次分頁多 30–100 毫秒，手機更久）。
   // 寵物每次都算：「今天」的小卡、「獎勵」的紅點都靠它。紀錄＝4（科班考古題配速、分科進度）、獎勵＝5、設定＝7（教材進度）
-  function paintFor(g){
-    deCache=null; paintPet();
-    if(g===4){ var s4=window.__sub; if(s4===21){ paintChecks(); paintSubjects(); paintBooks(); } if(s4===14) paintKbPace(); }   // 11-09：只畫正在看的子頁；教材進度搬到這裡（A4）
-    if(g===5){ var sb=window.__sub; if(sb===17) paintBank(); if(sb===16) paintAch(); paintCustom(); }   // 11-09 C7：只畫正在看的子頁
+  // 11-15：寵物算出來的東西（「今天」下面的寵物小卡、任務小卡，「獎勵」的紅點）在手機上都不在第一個畫面，
+  // 所以除了「我的森林」「成就」「銀行」（這三頁要用寵物剛算好的結果：森林畫面、成就進度、銀行每日結算），
+  // 切分頁、開網站時都先讓新的一頁畫出來，再算寵物（以前每切一次都先花 30–40 毫秒算寵物才換頁，手機上更久）。
+  // 連續切好幾頁只算最後一次。「紀錄 → 進度」下面的分科進度、教材進度（約 0.1–0.2 秒）也一樣排在後面，一段一段做。
+  var petJob=null;
+  function paintFor(g,boot){
+    deCache=null;
+    var sb=window.__sub;
+    if(g===5 && (sb===15 || sb===16 || sb===17 || window.__pv)){   // 11-09 C7：只畫正在看的子頁
+      petJob=null; paintPet(); if(sb===17) paintBank(); if(sb===16) paintAch(); paintCustom(); return;
+    }
+    if(g===4 && sb===21) paintChecks();   // 檢查清單在最上面，馬上畫
+    if(g===4 && sb===14) paintKbPace();   // 11-09：只畫正在看的子頁
+    if(boot && g===0) tagToday();   // 任務旁邊「要給 Claude 檢查」的小字：開網站時跟清單一起出來，不要晚一格才跳出來
+    var job=petJob={g:g, sb:sb};
+    window.__U.later(function(){
+      if(petJob!==job) return;   // 又切到別頁了，等最後那一次
+      petJob=null; deCache=null; paintPet();
+      var on=function(){ return window.__tab===job.g && window.__sub===job.sb; };
+      if(g===5 || boot) paintCustom();   // 11-09 C2：開頁也要檢查自訂獎勵的解鎖提示（要用寵物算好的統計）
+      if(g!==4 || sb!==21) return;
+      if(on()) paintChecks();   // 寵物那邊會更新逾期狀態，檢查清單照新的再畫一次
+      window.__U.next(function(){ if(!on()) return; paintSubjects();   // 11-09：教材進度搬到這裡（A4）
+        window.__U.next(function(){ if(on()) paintBooks(); }); });
+    });
   }
-  paintFor(window.__tab); if(window.__tab!==5) paintCustom();   // 11-09 C2：開頁只畫正在看的分頁（自訂獎勵的解鎖提示照舊檢查）
+  paintFor(window.__tab,true);   // 11-09 C2：開頁只畫正在看的分頁
   document.addEventListener('plan:tab',function(e){ paintFor(e.detail); });
   document.addEventListener('change',function(e){
     if(e.target.closest && (e.target.closest('#td-list')||e.target.closest('#kp-list'))) setTimeout(function(){ paintFor(window.__tab); },60);
