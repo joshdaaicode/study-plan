@@ -5382,11 +5382,17 @@ html.pv .wrap{max-width:none;padding:0}
   // 手動改過的日程：一次重畫會被讀上千次，快取 2 秒（paintAll 開頭也會清掉）
   var deCache=null, deT=0;
   function dayEdits(){ var n=Date.now(); if(!deCache||n-deT>2000){ deCache=ls('plan.dayedit.v1',{})||{}; deT=n; } return deCache; }
+  // 11-15：算好的每天段落記起來，同一份「手動改過的日程」只算一次（教材進度一次重畫要對 15 本書各掃一遍全部日子，
+  // 以前同一天的段落要重算約 3,000 次）。手動改過的日程重新讀過（換了一份）就整個重算。拿到的陣列只能讀，不要改。
+  var sbMemo={}, sbDe=null;
   function studyBlocks(k){
     var de=dayEdits();
-    if(de[k]) return de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n, t:(String(x.t||'').match(/\d{1,2}:\d{2}/)||[''])[0]}; });
-    var day=PL.days[k]; if(!day) return [];
-    return day.b.filter(function(b){ return b[5]===0; }).map(function(b){ return {c:b[2], n:b[3], t:b[0], d:b[4]}; });
+    if(de!==sbDe){ sbDe=de; sbMemo={}; }
+    if(Object.prototype.hasOwnProperty.call(sbMemo,k)) return sbMemo[k];
+    var r;
+    if(de[k]) r=de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n, t:(String(x.t||'').match(/\d{1,2}:\d{2}/)||[''])[0]}; });
+    else { var day=PL.days[k]; r=day?day.b.filter(function(b){ return b[5]===0; }).map(function(b){ return {c:b[2], n:b[3], t:b[0], d:b[4]}; }):[]; }
+    return (sbMemo[k]=r);
   }
   var CATN={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kb:'科班考古題',kbfix:'科班訂正',kbr:'科班複習',
     hw:'補習作業',mock:'模考／訂正',term:'段考',fu:'複試',other:'其他'};
@@ -5499,9 +5505,17 @@ html.pv .wrap{max-width:none;padding:0}
     return idx;
   }
   var bkOpen={};   // 這次開著的那本（重畫時保持展開）
+  var bkSig=null;   // 11-15：上次畫教材進度時用到的資料
   function paintBooks(){
     var box=document.getElementById('bk-auto'); if(!box) return;
-    var today=d0(), tk=kk(today), idx=doneIndex();
+    var today=d0(), tk=kk(today);
+    // 11-15：教材進度只跟這幾樣有關：今天日期、每天的完成紀錄（含今天勾了哪些、錯字本複習）、點數紀錄（找完成時間）、手動改過的日程。
+    // 都沒變就不重畫：一次要算 15 本書約 450 段（筆電約 50–70 毫秒，手機約 0.2–0.3 秒），以前每次切到「紀錄 → 進度」都重算
+    var sig=[tk, localStorage.getItem('plan.hist.v1'), localStorage.getItem('plan.vrev.v1'), JSON.stringify(window.__todayStat?window.__todayStat():null),
+      JSON.stringify(window.__shopLog?window.__shopLog():null), localStorage.getItem('plan.dayedit.v1')].join('\n');
+    if(sig===bkSig && box.firstChild) return;
+    bkSig=sig;
+    var idx=doneIndex();
     var books=BOOK_KEYS.filter(function(key){ return PL.books[key]; }).map(function(key){
       var b=PL.books[key], segs=[];
       DAYS.forEach(function(k){
