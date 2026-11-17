@@ -188,7 +188,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   </footer>
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js?v=20261117s"></script>
+<script src="daychart.js?v=20261117t"></script>
 <script>
 (function(){
   var GK='parent.gist.v1', CK='parent.chan.v1', FILE='study-plan-backup.json', PFILE='study-plan-parent.json', OWNER='joshdaaicode';
@@ -239,7 +239,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   function upcomingExams(today){
     var EX=((window.PLAN&&window.PLAN.exams)||[]).filter(function(e){ return !/第二天/.test(e[3]); }).map(function(e){ return {n:e[3].replace(/ 第一天$/,''), d:new Date(e[0],e[1]-1,e[2])}; })
       .filter(function(e){ return e.d>=today; }).slice(0,4);
-    if(window.PLAN&&window.PLAN.sci){ var sc=window.PLAN.sci, sd=new Date(sc[0],sc[1]-1,sc[2]); if(sd>=today && !EX.some(function(e){ return /科學班/.test(e.n); })) EX.push({n:'雄中科學班初試（暫定）', d:sd}); }
+    if(window.PLAN&&window.PLAN.sci){ var sc=window.PLAN.sci, sd=new Date(sc[0],sc[1]-1,sc[2]); if(sd>=today && !EX.some(function(e){ return /科學班/.test(e.n); })) EX.push({n:'雄中科學班初試（科學能力檢定）', d:sd}); }
     if(window.PLAN&&window.PLAN.cap){ var cp=window.PLAN.cap, cd=new Date(cp[0],cp[1]-1,cp[2]); if(cd>=today && !EX.some(function(e){ return /會考/.test(e.n); })) EX.push({n:'國中教育會考', d:cd}); }
     EX.sort(function(a,b){ return a.d-b.d; });
     return EX;

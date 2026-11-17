@@ -136,7 +136,7 @@
     {id:'bg_neon',k:'bg',n:'霓虹夜背景',e:'🌃',c:250},
     {id:'bg_royal',k:'bg',n:'皇家紫背景',e:'💜',c:350},
     {id:'bg_gold',k:'bg',n:'黃金廳背景',e:'🏆',c:600},
-    // 11-17 新獎品：越後面越貴，給長期目標。名牌（plate）只顯示在賭場招牌下面；VIP 卡要照順序升級；都只是好看，不改任何規則
+    // 11-17 新獎品：越後面越貴，給長期目標。名牌（plate）只顯示在賭場招牌下面；VIP 卡要照順序升級，照等級有賭場裡的好處（見 VIPP；下注上限、鎖、點數規則不變）
     {id:'bg_ocean',k:'bg',n:'深海藍背景',e:'🌊',c:900},
     {id:'bg_sakura',k:'bg',n:'櫻花粉背景',e:'🌸',c:1500},
     {id:'bg_galaxy',k:'bg',n:'銀河背景',e:'🌌',c:2500},
@@ -161,7 +161,7 @@
     {id:'a_bg5',e:'🎯',n:'賓果全開',say:'賓果一局連成 5 條線',v:function(s){ return s.k.bgMax; },t:5,c:150},
     {id:'a_bg20',e:'🎲',n:'賓果常客',say:'賓果玩 20 局',v:function(s){ return s.k.bgG; },t:20,c:200},
     {id:'a_r10',e:'🎴',n:'十全十美',say:'「一局 10 題」10 題全對',v:function(s){ return s.k.r10; },t:1,c:100},
-    {id:'a_sl10',e:'🎰',n:'頭獎',say:'拉霸轉到 ×10',v:function(s){ return s.k.sl10; },t:1,c:150},
+    {id:'a_sl10',e:'🎰',n:'頭獎',say:'拉霸轉到 ×10，而且那題答對',v:function(s){ return s.k.sl10; },t:1,c:150},   // 11-17 審查：要答對才算，不靠運氣
     {id:'a_lad',e:'🪜',n:'登頂',say:'加倍爬梯爬滿 10 階',v:function(s){ return s.k.lad10; },t:1,c:200},
     {id:'a_pet',e:'🐾',n:'寵物剋星',say:'跟寵物對賭贏 10 次',v:function(s){ return s.k.petW; },t:10,c:200},
     {id:'a_run',e:'🔥',n:'連對 50',say:'最長連對 50 題',v:function(s){ return s.k.best; },t:50,c:200},
@@ -257,7 +257,7 @@
   // 以前玩的局：「十題全對」「拉霸 ×10」從紀錄補算一次（之後每局結算時直接加）
   (function backfill(){
     var s=st(); if(s.k.bf) return;
-    s.log.forEach(function(l){ if(l.ab) return; if(l.m==='round' && (l.r||0)>=10) s.k.r10++; if(l.m==='slot' && l.sl>=10) s.k.sl10++; });
+    s.log.forEach(function(l){ if(l.ab) return; if(l.m==='round' && (l.r||0)>=10) s.k.r10++; if(l.m==='slot' && l.sl>=10 && (l.r||0)>=1) s.k.sl10++; });
     s.k.bf=1; save(s);
   })();
 
@@ -676,7 +676,7 @@
       if(g.mode==='duel'){ if(g.right>g.petScore) s.k.petW++; else if(g.right<g.petScore) s.k.petL++; }
       // 11-17 賭場成就的計數（只加計數，不改這幾種玩法的規則）
       if(g.mode==='round'&&g.right>=10) s.k.r10++;
-      if(g.mode==='slot'&&g.slot>=10) s.k.sl10++;
+      if(g.mode==='slot'&&g.slot>=10&&g.right) s.k.sl10++;
       if(g.mode==='bj'){ if(g.res==='win'||g.res==='bj') s.k.bjW++; if(g.res==='bj') s.k.bjBJ++; }
       if(g.mode==='bingo'){ s.k.bgG++; s.k.bgMax=Math.max(s.k.bgMax,g.lines); }
       save(s);

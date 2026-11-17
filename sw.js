@@ -1,5 +1,5 @@
-const CACHE='study-plan-v13';   // 11-17：daychart.js 換成 20261117s（各科讀書時間圖），預存清單跟著換；v12 是 11-12 丟掉舊版用的
-const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261117s'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
+const CACHE='study-plan-v14';   // 11-17 晚：daychart.js 換成 20261117t（各科讀書時間圖算進錯字本複習）；v13 是 20261117s，v12 是 11-12 丟掉舊版用的
+const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261117t'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'}))).catch(()=>{})));

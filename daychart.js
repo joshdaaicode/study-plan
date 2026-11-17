@@ -219,7 +219,7 @@
   var PG={chi:'chi',math:'math',eng:'eng',sci:'sci',soc:'soc',kbm:'kb',kbs:'kb'};   // 番茄鐘科目 → 組
   var SCG={chi:'chi',math:'math',eng:'eng',sci:'sci',soc:'soc',mock:'mt',term:'mt',kb:'kb',kbfix:'kb',kbr:'kb',fu:'kb',hw:'kb'};   // 任務類別 → 組（沒列的都算其他）
   var SUBP={kbm:'資優數學',kbs:'自然學科'};
-  var SUBS={kb:'考古題',kbfix:'考古題訂正',kbr:'科班複習',fu:'複試',hw:'補習作業',mock:'模考',term:'段考',late:'熬夜補進度'};
+  var SUBS={kb:'考古題',kbfix:'考古題訂正',kbr:'科班複習',fu:'複試',hw:'補習作業',mock:'模考',term:'段考',late:'熬夜補進度',vrev:'錯字本複習'};
   var CORE=['chi','math','eng','sci','soc','kb'];   // 「沒讀到」只看這幾科
   // 驗證時（亮或暗任一種）色盲模擬 ΔE<6 或一般視覺 ΔE<15 的兩色：圓餅圖裡不要讓它們相鄰
   var WEAK={'math|kb':1,'chi|soc':1,'chi|eng':1,'chi|mt':1,'sci|eng':1,'sci|mt':1,'soc|mt':1,'sci|oth':1,'eng|oth':1,'soc|oth':1};
@@ -321,8 +321,8 @@
   // 每天、每組加起來（資料沒變就用上次算好的）
   var aggC={};
   function aggregate(o){
-    var hs=o['plan.hist.v1'], ps=o['plan.pomo.v1'], ss=o['plan.state.v3'];
-    if(aggC.r && aggC.hs===hs && aggC.ps===ps && aggC.ss===ss) return aggC.r;
+    var hs=o['plan.hist.v1'], ps=o['plan.pomo.v1'], ss=o['plan.state.v3'], rs=o['plan.vrev.v1'];
+    if(aggC.r && aggC.hs===hs && aggC.ps===ps && aggC.ss===ss && aggC.rs===rs) return aggC.r;
     var P={}, S={};
     var plog=(J(o,'plan.pomo.v1',{})||{}).log;
     (Array.isArray(plog)?plog:[]).forEach(function(e){
@@ -345,8 +345,12 @@
         x.m+=m; x.a+=a; x.d+=d; s.m+=m; s.a+=a; s.d+=d;
       });
     });
+    // 11-17 審查：單字賭場的錯字本複習，網站其他地方都算英文讀書分鐘（2026-11-01 他選的），表定這邊也算進英文（只加分鐘，不算完成率）
+    var rv=J(o,'plan.vrev.v1',{})||{};
+    Object.keys(rv).forEach(function(k){ if(k==='pomo') return; var mm=Math.round((+rv[k]||0)/60); if(!mm) return;
+      var D=S[k]=S[k]||{}, x=D.eng=D.eng||{m:0,n:0,a:0,d:0,sub:{}}, s=x.sub.vrev=x.sub.vrev||{m:0,n:0,a:0,d:0}; x.m+=mm; s.m+=mm; });
     function firstDay(M){ var f=null; Object.keys(M).forEach(function(k){ var d=pk(k); if(!isNaN(d.getTime()) && (!f||d<f)) f=d; }); return f; }
-    aggC={hs:hs, ps:ps, ss:ss, r:{p:{M:P, first:firstDay(P)}, s:{M:S, first:firstDay(S)}}};
+    aggC={hs:hs, ps:ps, ss:ss, rs:rs, r:{p:{M:P, first:firstDay(P)}, s:{M:S, first:firstDay(S)}}};
     return aggC.r;
   }
   function sumRange(M,from,to){
