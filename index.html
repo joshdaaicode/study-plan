@@ -1044,6 +1044,14 @@ html.pv .wrap{max-width:none;padding:0}
 .fp-boost{font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;padding:7px 11px;border-radius:var(--r-in);background:var(--card2);border:1px dashed var(--rule)}
 .fp-hint{font-size:12.5px;color:var(--ink-faint);margin:-4px 0 8px}
 .fp-stat small{display:block;margin-top:3px;font-size:11px;color:var(--ink-faint)}
+/* 11-17：寵物手勢（連點兩下擊掌、按住抱抱、左右來回滑搔癢）、小遊戲（追光點的光點可以拖） */
+#fp-pet-g{touch-action:pan-y}   /* 在牠身上左右滑＝搔癢；上下滑還是捲動頁面 */
+.fp-scene svg{-webkit-touch-callout:none}   /* 手機長按（抱抱）不要跳出選單 */
+.fp-drag{cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.fp-drag.dragging{cursor:grabbing}
+.fp-drag:focus{outline:none}
+.fp-drag:focus-visible .ring{stroke:#E0A030;stroke-width:3}   /* SVG 的 outline 畫不出來，改畫一圈 */
+.fp-spot{cursor:pointer}
 .tab-dot{display:inline-block;min-width:16px;height:16px;line-height:16px;padding:0 4px;margin-left:4px;border-radius:999px;background:#E5484D;color:#fff;font-size:10.5px;font-weight:700;text-align:center;vertical-align:1px}
 .tab-dot.soft{background:#A65A0C}
 .rem-banner.ok{background:var(--cap)}
@@ -1881,6 +1889,7 @@ html.pv .wrap{max-width:none;padding:0}
     <b>1 天沒照顧牠不理你、2 天生病、5 天離家出走；沒照顧的日子樹會枯，3 天沒救回就死；番茄鐘中途放棄留下枯樹樁；讀書時段跑來看、一天待超過 15 分鐘，牠也不理你。</b>
     牠越大吃越多：Lv5 起每天要讀 90 分或完成 60%，Lv12 起 120 分或 70%。降級模式和休息日算有照顧，沒打開網站的日子算沒照顧。
     <br>點寵物會表演把戲，親密度越高學越多（有照顧的日子 +1、那天有餵或陪玩再 +1、沒照顧 −3）。天氣跟著你：沒照顧的隔天森林會下雨，昨天全清今天有彩虹。
+    <br><b>互動和小遊戲</b>：連點兩下擊掌、按住抱抱、在牠身上左右來回滑搔癢；點家具牠會過去用。小遊戲有丟球接球、躲貓貓（在家）、追光點（用品店的雷射光點筆）。這些只有動畫和最高紀錄，不改飽足、心情、點數；讀書時段、睡覺、生氣時一樣不能玩，玩的時間也算在「一天 15 分鐘」裡。
     <br><b>番茄鐘掉寶</b>：每完成一顆番茄鐘抽一次，可能掉飼料、小點心、🍀、籌碼，運氣好掉 🌟。<b>天賦</b>：Lv2 起每升一級 1 點，點在理財、旅行、單字三條路線（各 3 階），牠離家天賦就沒了。森林頁下面有<b>牠的日記</b>，記下最近 5 天你讀了什麼。</p></details>
   <div class="card fp-card" id="fp-app"></div>
 </section>
@@ -5752,7 +5761,11 @@ html.pv .wrap{max-width:none;padding:0}
     if(last) s.lootT=Math.max(s.lootT,last);
     return out;
   }
-  var TRICKS=[{b:0,id:'jump',n:'跳跳'},{b:3,id:'spin',n:'轉圈圈'},{b:7,id:'dance',n:'跳舞'},{b:14,id:'flip',n:'後空翻'},{b:30,id:'wave',n:'揮手打招呼'},{b:60,id:'star',n:'變出星星'}];
+  // 11-17：多 7 種（翻滾、握手、鞠躬、裝死、月球漫步、比愛心、變出彩虹）；d＝表演幾秒、s＝表演時說的話（沒寫就說「看我…！」）
+  var TRICKS=[{b:0,id:'jump',n:'跳跳'},{b:3,id:'spin',n:'轉圈圈',d:1},{b:5,id:'roll',n:'翻滾',d:1.1},{b:7,id:'dance',n:'跳舞',d:2.4},{b:10,id:'shake',n:'握手',d:1.6,s:'握握手，好朋友！'},
+    {b:14,id:'flip',n:'後空翻',d:1},{b:20,id:'bow',n:'鞠躬',d:1.4,s:'謝謝大家！'},{b:30,id:'wave',n:'揮手打招呼',d:1.8},{b:40,id:'dead',n:'裝死',d:3.2,s:'啊…我不行了…'},
+    {b:50,id:'moon',n:'月球漫步',d:2.6},{b:60,id:'star',n:'變出星星',d:1.7},{b:80,id:'heart',n:'比愛心',d:1.6,s:'愛你喔！'},{b:100,id:'rainbow',n:'變出彩虹',d:2.2}];
+  var OLD_TRICKS=['jump','spin','dance','flip','wave','star'];   // 11-17 以前就有的（第一次載入時只宣布新加的）
   // 家具：成就領越多階，家裡越漂亮
   var FURN=[{at:5,id:'rug',n:'地毯',e:'🟫'},{at:12,id:'plant',n:'盆栽',e:'🪴'},{at:22,id:'frame',n:'掛畫',e:'🖼️'},{at:35,id:'sofa',n:'沙發',e:'🛋️'},
     {at:50,id:'shelf',n:'書櫃',e:'📚'},{at:70,id:'lamp',n:'落地燈',e:'💡'},{at:95,id:'trophy',n:'獎盃',e:'🏆'},{at:125,id:'lights',n:'串燈',e:'✨'}];
@@ -6234,7 +6247,8 @@ html.pv .wrap{max-width:none;padding:0}
     if(pd) s+='<ellipse cx="-0.9" cy="-1" rx="3.4" ry="4.3" transform="rotate(-24 -0.9 -1)" fill="'+P.d+'"/><ellipse cx="5.6" cy="-1" rx="3.1" ry="4" transform="rotate(22 5.6 -1)" fill="'+P.d+'"/>';
     s+=eyesSVG(E,face,pd);
     var nc=(sp==='cat'||sp==='rabbit'||sp==='hamster')?'#E88B8B':EYE;
-    s+='<ellipse cx="'+M[0]+'" cy="'+(M[1]-2.3)+'" rx="1.6" ry="1.15" fill="'+nc+'"/>'+mouthSVG(M,face,sp);
+    s+='<ellipse cx="'+M[0]+'" cy="'+(M[1]-2.3)+'" rx="1.6" ry="1.15" fill="'+nc+'"/>'+mouthSVG(M,face,sp)
+      +'<g class="rg-y" style="display:none"><ellipse cx="'+M[0]+'" cy="'+(M[1]+1.5)+'" rx="2.3" ry="2.8" fill="#7A2E2A"/><ellipse cx="'+M[0]+'" cy="'+(M[1]+3.2)+'" rx="1.5" ry="1" fill="#F49A9A"/></g>';   // 11-17：張大嘴（打哈欠、笑）
     if(face!=='sulk') s+='<ellipse cx="-3.6" cy="3.8" rx="2.3" ry="1.4" fill="#F28C8C" opacity="'+(face==='happy'?.55:.32)+'"/>';
     if(sp==='cat') s+='<path d="M11.5 2.4 l5 -1.2 M11.5 4 l5 .8" stroke="'+P.d+'" stroke-width=".6" opacity=".8"/>';
     if(sp==='dog') s+='<ellipse cx="-6.5" cy="-2" rx="4.4" ry="8.4" transform="rotate(16 -6.5 -2)" fill="'+P.e+'"/>';
@@ -6247,38 +6261,40 @@ html.pv .wrap{max-width:none;padding:0}
     var nearC=sp==='panda'?P.d:P.b, farC=P.d;
     function leg(x,cls,c){ return '<g transform="translate('+x+' '+hipY+')"><g class="'+cls+'"><rect x="-2.5" y="-1.5" width="5" height="'+(legL+1.5)+'" rx="2.5" fill="'+c+'"/></g></g>'; }
     var s='';
-    if(!sleep) s+=leg(-4.5,'lgB',farC)+leg(10.5,'lgA',farC);
+    if(!sleep) s+=leg(-4.5,'lgB lg1',farC)+leg(10.5,'lgA lg2',farC);   // lg1–lg4：遠後、遠前、近後、近前（11-17 坐下、握手用）
     s+=tailSVG(sp,P,o.pose,ham?[-13,-13]:[-14,-19]);
     s+='<ellipse cx="'+B[0]+'" cy="'+B[1]+'" rx="'+B[2]+'" ry="'+B[3]+'" fill="'+P.b+'"/>'
       +'<ellipse cx="'+(B[0]+3)+'" cy="'+(B[1]+B[3]*0.42)+'" rx="'+(B[2]*0.62)+'" ry="'+(B[3]*0.5)+'" fill="'+P.l+'"/>'
       +'<ellipse cx="'+(B[0]-4)+'" cy="'+(B[1]-B[3]*0.5)+'" rx="'+(B[2]*0.5)+'" ry="'+(B[3]*0.28)+'" fill="#fff" opacity=".2"/>';
     if(sp==='cat') s+='<path d="M-10 -25.5 q2.4 4 .4 8.4 M-4.6 -26.8 q2.4 4 .4 8.6" stroke="'+P.d+'" stroke-width="2.1" fill="none" stroke-linecap="round" opacity=".75"/>';
     if(sp==='panda') s+='<path d="M3.5 -26 q-4.5 9 .5 17" stroke="'+P.d+'" stroke-width="7.5" fill="none" stroke-linecap="round"/>';
-    if(!sleep) s+=leg(-9,'lgA',nearC)+leg(6.5,'lgB lgF',nearC);
+    if(!sleep) s+=leg(-9,'lgA lg3',nearC)+leg(6.5,'lgB lgF lg4',nearC);
     if(o.acc==='scarf') s+=scarfSVG(Hx-6,Hy+9);
     return s+'<g transform="translate('+Hx+' '+Hy+')"><g class="rg-h">'+quadHead(sp,P,face,o,r)+'</g></g>';
   }
   function birdRig(sp,P,o,face){
     var sleep=o.pose==='sleep', s='', E;
     if(sp==='penguin'){
-      if(!sleep) s+='<g transform="translate(-4 -2.2)"><g class="lgA"><ellipse cx="1.4" cy="1.2" rx="4.2" ry="1.9" fill="'+P.e+'"/></g></g><g transform="translate(4.5 -2.2)"><g class="lgB"><ellipse cx="1.4" cy="1.2" rx="4.2" ry="1.9" fill="'+P.e+'"/></g></g>';
+      if(!sleep) s+='<g transform="translate(-4 -2.2)"><g class="lgA lg3"><ellipse cx="1.4" cy="1.2" rx="4.2" ry="1.9" fill="'+P.e+'"/></g></g><g transform="translate(4.5 -2.2)"><g class="lgB lg4"><ellipse cx="1.4" cy="1.2" rx="4.2" ry="1.9" fill="'+P.e+'"/></g></g>';
       s+='<ellipse cx="0" cy="-18" rx="12.5" ry="16.5" fill="'+P.b+'"/><ellipse cx="3.2" cy="-14.5" rx="8.4" ry="12.2" fill="'+P.l+'"/><ellipse cx="-4.5" cy="-27" rx="4.5" ry="3" fill="#fff" opacity=".14"/>'
         +'<g transform="translate(-8 -20)"><g class="rg-w"><ellipse cx="-1" cy="6.5" rx="3.3" ry="8.4" transform="rotate(16 -1 6.5)" fill="'+P.d+'"/></g></g>';
       if(o.acc==='scarf') s+=scarfSVG(1,-20);
       E=[-1.4,4.6,-1.2];
       s+='<g transform="translate(4 -26)"><g class="rg-h"><ellipse cx="1.8" cy="-.6" rx="6.6" ry="5" fill="#fff"/>'+eyesSVG(E,face,false)
-        +'<path d="M7.4 1 L13 2.8 L7.4 4.6 Z" fill="'+P.e+'"/>'+(face==='happy'?'<path d="M7.6 3.2 L11.4 3.4" stroke="#B5473F" stroke-width=".9"/>':'');
+        +'<path d="M7.4 1 L13 2.8 L7.4 4.6 Z" fill="'+P.e+'"/>'+(face==='happy'?'<path d="M7.6 3.2 L11.4 3.4" stroke="#B5473F" stroke-width=".9"/>':'')
+        +'<g class="rg-y" style="display:none"><path d="M7.5 2.9 L12 3.4 L7.5 4.6 Z" fill="#7A2E2A"/><path d="M7.4 4.3 L12.2 6.8 L7.4 6.3 Z" fill="'+P.e+'"/></g>';
       if(face!=='sulk') s+='<ellipse cx="-2.6" cy="3" rx="2" ry="1.2" fill="#F28C8C" opacity=".4"/>';
       if(face==='sick') s+='<path d="M-6 -6 q-1.8 3 0 4 q1.8 -1 0 -4 Z" fill="#8FD0F2"/>';
       return s+accSVG(o.acc,-8,E)+'</g></g>';
     }
-    if(!sleep) s+='<g transform="translate(-3 -6.5)"><g class="lgA"><path d="M0 0 V6.5 M-2.2 6.5 H2.4" stroke="'+P.e+'" stroke-width="1.7" stroke-linecap="round"/></g></g><g transform="translate(3.5 -6.5)"><g class="lgB"><path d="M0 0 V6.5 M-2.2 6.5 H2.4" stroke="'+P.e+'" stroke-width="1.7" stroke-linecap="round"/></g></g>';
+    if(!sleep) s+='<g transform="translate(-3 -6.5)"><g class="lgA lg3"><path d="M0 0 V6.5 M-2.2 6.5 H2.4" stroke="'+P.e+'" stroke-width="1.7" stroke-linecap="round"/></g></g><g transform="translate(3.5 -6.5)"><g class="lgB lg4"><path d="M0 0 V6.5 M-2.2 6.5 H2.4" stroke="'+P.e+'" stroke-width="1.7" stroke-linecap="round"/></g></g>';
     s+='<ellipse cx="0" cy="-16" rx="13" ry="11.8" fill="'+P.b+'"/><ellipse cx="-4" cy="-22" rx="5" ry="3.2" fill="#fff" opacity=".24"/>'
       +'<g transform="translate(-4 -15)"><g class="rg-w"><ellipse cx="-1.5" cy="2" rx="6" ry="4.3" transform="rotate(-18 -1.5 2)" fill="'+P.d+'"/></g></g>';
     if(o.acc==='scarf') s+=scarfSVG(3,-11);
     E=[-1.2,4.4,-2];
     s+='<g transform="translate(5 -19)"><g class="rg-h"><path d="M-3 -8 q-1.5 -5 1.5 -6.5 M-1.5 -8.4 q1.5 -5 4.6 -4.6" stroke="'+P.d+'" stroke-width="1.6" fill="none" stroke-linecap="round"/>'
-      +eyesSVG(E,face,false)+'<path d="M7.2 -.6 L12 1 L7.2 2.6 Z" fill="'+P.e+'"/>';
+      +eyesSVG(E,face,false)+'<path d="M7.2 -.6 L12 1 L7.2 2.6 Z" fill="'+P.e+'"/>'
+      +'<g class="rg-y" style="display:none"><path d="M7.3 1.4 L11.6 1.8 L7.3 3 Z" fill="#7A2E2A"/><path d="M7.2 2.6 L11.6 5 L7.2 4.6 Z" fill="'+P.e+'"/></g>';
     if(face!=='sulk') s+='<ellipse cx="-2.8" cy="2.4" rx="2" ry="1.2" fill="#F28C8C" opacity=".45"/>';
     if(face==='sick') s+='<path d="M-6 -6 q-1.8 3 0 4 q1.8 -1 0 -4 Z" fill="#8FD0F2"/>';
     return s+accSVG(o.acc,-7.5,E)+'</g></g>';
@@ -6516,16 +6532,16 @@ html.pv .wrap{max-width:none;padding:0}
   function pfurnSVG(s,p){
     var F=s.pfurn||{}, o='';
     if(F.portrait){ var em=p?petEmoji(p):'🐾';
-      o+='<g transform="translate(192 84)"><rect width="40" height="34" rx="2" fill="#B5894F"/><rect x="3.5" y="3.5" width="33" height="27" fill="#FDF3E1"/><text x="20" y="25" font-size="18" text-anchor="middle">'+em+'</text></g>'; }
-    if(F.cattree) o+='<g transform="translate(262 254)"><rect x="-3.5" y="-96" width="7" height="96" fill="#B08960"/><path d="M-3.5 -80 h7 M-3.5 -60 h7 M-3.5 -40 h7 M-3.5 -20 h7" stroke="#9A7650" stroke-width="1.4"/>'
+      o+='<g transform="translate(192 84)" data-furn="portrait" class="fp-click"><rect width="40" height="34" rx="2" fill="#B5894F"/><rect x="3.5" y="3.5" width="33" height="27" fill="#FDF3E1"/><text x="20" y="25" font-size="18" text-anchor="middle">'+em+'</text></g>'; }
+    if(F.cattree) o+='<g transform="translate(262 254)" data-furn="cattree" class="fp-click"><rect x="-3.5" y="-96" width="7" height="96" fill="#B08960"/><path d="M-3.5 -80 h7 M-3.5 -60 h7 M-3.5 -40 h7 M-3.5 -20 h7" stroke="#9A7650" stroke-width="1.4"/>'
       +'<rect x="-24" y="-5" width="48" height="9" rx="4" fill="#E7D3B5"/><rect x="-20" y="-52" width="40" height="8" rx="4" fill="#E7D3B5"/><rect x="-16" y="-100" width="32" height="8" rx="4" fill="#E7D3B5"/>'
       +'<circle cx="12" cy="-43" r="3.2" fill="#E5536B"/><path d="M12 -48 v4" stroke="#9A7650" stroke-width="1"/></g>';
-    if(F.tank) o+='<g transform="translate(302 214)"><rect x="-4" y="30" width="72" height="12" rx="2" fill="#8C6A4A"/><rect x="0" y="0" width="64" height="32" rx="3" fill="#BFE6F7" stroke="#7FB8D6" stroke-width="2"/>'
+    if(F.tank) o+='<g transform="translate(302 214)" data-furn="tank" class="fp-click"><rect x="-4" y="30" width="72" height="12" rx="2" fill="#8C6A4A"/><rect x="0" y="0" width="64" height="32" rx="3" fill="#BFE6F7" stroke="#7FB8D6" stroke-width="2"/>'
       +'<rect x="2" y="20" width="60" height="10" fill="#E8D7A8" opacity=".8"/><path d="M10 30 q3 -10 0 -16 M14 30 q-3 -8 2 -14" stroke="#4FA36B" stroke-width="2" fill="none"/>'
       +'<text x="38" y="20" font-size="13" text-anchor="middle">🐠</text><circle cx="52" cy="9" r="1.6" fill="#fff" opacity=".8"/><circle cx="55" cy="4" r="1.1" fill="#fff" opacity=".8"/></g>';
-    if(F.cushion) o+='<g transform="translate(176 274)"><ellipse cx="0" cy="4" rx="32" ry="8" fill="#000" opacity=".1"/><ellipse cx="0" cy="0" rx="30" ry="10" fill="#C46A6A"/><ellipse cx="0" cy="-2" rx="23" ry="6.5" fill="#F3C5C5"/></g>';
-    if(F.fountain) o+='<g transform="translate(112 292)"><ellipse cx="0" cy="2" rx="14" ry="3.5" fill="#000" opacity=".1"/><rect x="-12" y="-10" width="24" height="12" rx="5" fill="#7FC4E8"/><rect x="-4" y="-18" width="8" height="9" rx="3" fill="#5AA9E6"/><path d="M0 -18 q4 -5 7 1" stroke="#BFE6F7" stroke-width="1.6" fill="none"/></g>';
-    if(F.tent) o+='<g transform="translate(560 292)"><ellipse cx="0" cy="0" rx="36" ry="5" fill="#000" opacity=".1"/><path d="M-32 0 L0 -40 L32 0 Z" fill="#F2A65A"/><path d="M-10 0 L0 -40 L10 0 Z" fill="#7A4A2A"/><path d="M0 -40 v-6" stroke="#7A4A2A" stroke-width="2"/><path d="M0 -46 l9 3 l-9 3 Z" fill="#E5536B"/></g>';
+    if(F.cushion) o+='<g transform="translate(176 274)" data-furn="cushion" class="fp-click"><ellipse cx="0" cy="4" rx="32" ry="8" fill="#000" opacity=".1"/><ellipse cx="0" cy="0" rx="30" ry="10" fill="#C46A6A"/><ellipse cx="0" cy="-2" rx="23" ry="6.5" fill="#F3C5C5"/></g>';
+    if(F.fountain) o+='<g transform="translate(112 292)" data-furn="fountain" class="fp-click"><ellipse cx="0" cy="2" rx="14" ry="3.5" fill="#000" opacity=".1"/><rect x="-12" y="-10" width="24" height="12" rx="5" fill="#7FC4E8"/><rect x="-4" y="-18" width="8" height="9" rx="3" fill="#5AA9E6"/><path d="M0 -18 q4 -5 7 1" stroke="#BFE6F7" stroke-width="1.6" fill="none"/></g>';
+    if(F.tent) o+='<g transform="translate(560 292)" data-furn="tent" class="fp-click"><ellipse cx="0" cy="0" rx="36" ry="5" fill="#000" opacity=".1"/><path d="M-32 0 L0 -40 L32 0 Z" fill="#F2A65A"/><path d="M-10 0 L0 -40 L10 0 Z" fill="#7A4A2A"/><path d="M0 -40 v-6" stroke="#7A4A2A" stroke-width="2"/><path d="M0 -46 l9 3 l-9 3 Z" fill="#E5536B"/></g>';
     return o;
   }
   function homeSVG(s,p,info,att,fedToday,ph,wx,furn,sav){
@@ -6631,6 +6647,7 @@ html.pv .wrap{max-width:none;padding:0}
   }
   function startMotion(key){
     cancelAnimationFrame(raf); raf=0; actors=[]; parts=[]; clouds=[]; petA=null; sceneKey=key||'';
+    if(game){ game=null; drag=null; setTimeout(gRow,0); }   // 11-17：畫面重畫了，小遊戲的球、光點都不在了，這局結束
     sceneSvg=app&&app.querySelector('.fp-scene svg'); if(!sceneSvg) return;
     fxLayer=sceneSvg.querySelector('.fp-fx'); clockEl=sceneSvg.querySelector('.fp-clock');
     leafCols=fxLayer&&fxLayer.getAttribute('data-leaf')?fxLayer.getAttribute('data-leaf').split(','):[];
@@ -6648,6 +6665,7 @@ html.pv .wrap{max-width:none;padding:0}
         a.la=g.querySelectorAll('.lgA'); a.lb=g.querySelectorAll('.lgB'); a.lf=g.querySelector('.lgF'); a.tail=g.querySelector('.rg-t'); a.head=g.querySelector('.rg-h');
         a.eyes=g.querySelector('.rg-e'); a.joy=g.querySelector('.rg-j'); a.wing=g.querySelector('.rg-w'); a.shadow=g.querySelector('.fp-shadow');
         a.eyeY=a.eyes?+a.eyes.getAttribute('data-y'):0; a.blink=1+Math.random()*3; a.zz=.5; a.mood=+g.getAttribute('data-mood')||60; a.sp=g.getAttribute('data-sp'); a.hh=+g.getAttribute('data-h')||44;
+        a.L=['.lg1','.lg2','.lg3','.lg4'].map(function(c){ return g.querySelector(c); }); a.yawn=g.querySelector('.rg-y'); a.bird=!!(PAL[a.sp]||{}).biped; a.idle=4+Math.random()*5; a.opv=1; a.bob=0;   // 11-17
         petA=a;
       }
       pickTarget(a); actors.push(a); drawActor(a,0,0);
@@ -6656,6 +6674,7 @@ html.pv .wrap{max-width:none;padding:0}
     amb={leaf:.5, fish:4+Math.random()*6, talk:6+Math.random()*8, ff:0};
     if(nightFx && !noMotion()) for(var i=0;i<9;i++) spawn('firefly',40+Math.random()*(W-80),HZ+10+Math.random()*(H-HZ-30));
     if(clockEl) clockTick(true);
+    if(petA && !greeted && petA.pose==='stand' && petCtx){ greeted=true; greet(petA,petCtx); }   // 11-17：打開網站第一次看到牠，照今天的狀況打招呼
     ensureLoop();
   }
   window.__fpDbg=function(){ return {raf:raf, inView:inView, actors:actors.length, svg:!!sceneSvg, conn:!!(sceneSvg&&sceneSvg.isConnected), q:petA?petA.q.length:-1, act:petA&&petA.act?petA.act.type:''}; };
@@ -6665,19 +6684,21 @@ html.pv .wrap{max-width:none;padding:0}
   }
   function ensureLoop(){
     if(raf || !sceneSvg || !sceneSvg.isConnected || document.hidden || !inView || noMotion()) return;
-    if(window.__tab!==5) return;   // 不在「獎勵」分頁（不用 offsetParent：那會逼整頁重新排版）
+    if(offForest()) return;   // 不在「獎勵」分頁（不用 offsetParent：那會逼整頁重新排版）
     lastT=performance.now(); raf=requestAnimationFrame(step);
   }
+  function offForest(){ return window.__tab!==5 || (window.__sub!==15 && !window.__pv); }   // 11-17：也要在「我的森林」子頁（以前只看主分頁，靠捲出畫面才停）
   if(window.IntersectionObserver && document.getElementById('fp-app')){
     new IntersectionObserver(function(es){ inView=es[0].isIntersecting; document.getElementById('fp-app').classList.toggle('fp-off',!inView); if(inView) ensureLoop(); },{rootMargin:'60px'}).observe(document.getElementById('fp-app'));   // 11-09 C10：捲出畫面就暫停 CSS 動畫
   }
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) ensureLoop(); });
   function step(t){
     raf=0;
-    if(!sceneSvg || !sceneSvg.isConnected || document.hidden || !inView || noMotion() || window.__tab!==5) return;
+    if(!sceneSvg || !sceneSvg.isConnected || document.hidden || !inView || noMotion() || offForest()) return;
     var dt=Math.min(.05,Math.max(0,(t-lastT)/1000)); lastT=t; var ts=t/1000;
     for(var i=0;i<actors.length;i++){ var a=actors[i]; if(a.kind==='pet') petStep(a,dt,ts); else critterStep(a,dt,ts); }
     for(var c=0;c<clouds.length;c++){ var cl=clouds[c]; cl.x+=cl.sp*dt; if(cl.x>W+80) cl.x=-80; cl.el.setAttribute('transform','translate('+cl.x.toFixed(1)+' '+cl.y+')'); }
+    if(game) gameStep(dt,ts);   // 11-17 小遊戲
     ambientStep(dt,ts);
     partsStep(dt,ts);
     if(clockEl) clockTick(false);
@@ -6723,12 +6744,13 @@ html.pv .wrap{max-width:none;padding:0}
   /* 寵物的動作佇列：petDo('eat') 之類 */
   function petDo(type,o){ if(!petA||noMotion()) return; var it=Object.assign({type:type,t:0},o||{}); petA.q.push(it); }
   function petStep(a,dt,ts){
-    var S=a.S, bob=0, sx=1, sy=1, rot=0, legAmp=0, headR=0, tailX=0, joy=false, walking=false, wave=null, run=1;
+    var S=a.S, bob=0, sx=1, sy=1, rot=0, legAmp=0, headR=0, tailX=0, joy=false, walking=false, wave=null, run=1, R=null;
     var br=Math.sin(ts*(a.pose==='sleep'?1.5:2.4)+a.t0);
     sy=1+br*(a.pose==='sleep'?.04:.018); sx=1-br*.01;
+    if(!a.act && !a.q.length && !game) idleTick(a,dt);   // 11-17：沒事做的時候自己找事做（伸懶腰、打哈欠、追蝴蝶、去用家具…）
     if(!a.act && a.q.length){ a.act=a.q.shift(); a.act.t=0; if(a.act.init) a.act.init(a); }
     if(a.act){
-      var A=a.act; A.t+=dt; var r=actStep(a,A,dt,ts)||{};
+      var A=a.act; A.t+=dt; var r=actStep(a,A,dt,ts)||{}; R=r;
       bob=r.bob||0; sx*=r.sx||1; sy*=r.sy||1; rot=r.rot||0; headR=r.head||0; joy=!!r.joy; walking=!!r.walk; wave=r.wave==null?null:r.wave; if(r.tail!=null) tailX=r.tail; if(r.run) run=r.run;
       if(r.done){ a.act=null; a.wait=.6+Math.random()*1.4; }
     } else if(a.pose==='stand'){
@@ -6740,19 +6762,26 @@ html.pv .wrap{max-width:none;padding:0}
     var legA=Math.sin(a.ph)*legAmp, i;
     if(a.la) for(i=0;i<a.la.length;i++) a.la[i].setAttribute('transform','rotate('+legA.toFixed(1)+')');
     if(a.lb) for(i=0;i<a.lb.length;i++){ var deg=(wave!=null && a.lb[i]===a.lf)?wave:-legA; a.lb[i].setAttribute('transform','rotate('+deg.toFixed(1)+')'); }
+    if(R && R.legs && a.L) for(i=0;i<4;i++) if(R.legs[i]!=null && a.L[i]) a.L[i].setAttribute('transform','rotate('+R.legs[i].toFixed(1)+')');   // 11-17：坐下、握手、四腳朝天
     if(a.tail){ var amp=a.pose==='sleep'?3:(a.pose==='sulk'?2:(a.mood>=70?17:(a.mood>=35?10:5))), spd=a.sp==='dog'?11:(a.sp==='cat'?2.4:5);
       if(joy) amp*=1.6; a.tail.setAttribute('transform','rotate('+(tailX+Math.sin(ts*spd+a.t0)*amp*(walking?1.2:1)).toFixed(1)+')'); }
-    if(a.wing){ var wr=joy?Math.sin(ts*22)*38:(walking?Math.sin(a.ph*2)*16:Math.sin(ts*2+a.t0)*4); a.wing.setAttribute('transform','rotate('+(-wr).toFixed(1)+')'); }
+    if(a.wing){ var wr=(R&&R.wingR!=null)?-R.wingR:(joy?Math.sin(ts*22)*38:(walking?Math.sin(a.ph*2)*16:Math.sin(ts*2+a.t0)*4)); a.wing.setAttribute('transform','rotate('+(-wr).toFixed(1)+')'); }
     if(a.head) a.head.setAttribute('transform','rotate('+headR.toFixed(1)+')');
+    var shut=!!(R&&R.shut);
     if(a.eyes){
       a.blink-=dt; var ey=1;
       if(a.blink<0){ ey=Math.max(.1,Math.abs(a.blink+.07)/.07); if(a.blink<-.14){ a.blink=1.8+Math.random()*4.2; ey=1; } }
+      if(shut) ey=.12;
       a.eyes.setAttribute('transform','translate(0 '+a.eyeY+') scale(1 '+ey.toFixed(2)+') translate(0 '+(-a.eyeY)+')');
-      a.eyes.style.display=joy?'none':''; if(a.joy) a.joy.style.display=joy?'':'none';
+      var js=joy&&!shut; if(js!==a.jOn){ a.jOn=js; a.eyes.style.display=js?'none':''; if(a.joy) a.joy.style.display=js?'':'none'; }   // 只有變了才改（以前每一格都寫一次）
     }
+    var mo=!!(R&&R.mouth); if(a.yawn && mo!==a.mOn){ a.mOn=mo; a.yawn.style.display=mo?'':'none'; }
+    var op=(R&&R.op!=null)?Math.max(0,Math.min(1,R.op)):1;
+    if(Math.abs(op-a.opv)>.01 || (op!==a.opv && (op===0||op===1))){ a.opv=op; a.g.setAttribute('opacity',op.toFixed(2)); a.g.style.pointerEvents=op<.3?'none':''; }
     if(a.pose==='sleep'){ a.zz-=dt; if(a.zz<0){ a.zz=1.5; spawn('zz',a.x+8*S*a.dir,a.y-a.hh*.7); } }
     a.fs+=(a.dir-a.fs)*Math.min(1,dt*12);
     var fs=Math.abs(a.fs)<.08?(a.fs<0?-.08:.08):a.fs;
+    a.bob=bob;
     a.g.setAttribute('transform','translate('+a.x.toFixed(1)+' '+a.y.toFixed(1)+')');
     a.f.setAttribute('transform','translate(0 '+bob.toFixed(2)+') rotate('+rot.toFixed(1)+' 0 '+(-18*S).toFixed(1)+') scale('+(fs*S*sx).toFixed(3)+' '+(S*sy).toFixed(3)+')');
     if(a.shadow){ var k=Math.max(.45,1+bob/60); a.shadow.setAttribute('rx',(15*S*k).toFixed(1)); a.shadow.setAttribute('opacity',(.15*k).toFixed(2)); }
@@ -6764,7 +6793,7 @@ html.pv .wrap{max-width:none;padding:0}
       case 'goto':
         if(A.tgt){ var tg=A.tgt(); if(tg){ A.x=tg[0]; A.y=tg[1]; } }
         var dx=A.x-a.x, dy=(A.y==null?a.y:A.y)-a.y, d=Math.sqrt(dx*dx+dy*dy), sp=a.spd*(A.run||1.7);
-        if(d<3 || A.t>8){ if(A.face) a.dir=A.face; return {done:1}; }
+        if(d<3 || A.t>(A.max||8)){ if(A.face) a.dir=A.face; return {done:1}; }
         var st=Math.min(d,sp*dt); a.x+=dx/d*st; a.y+=dy/d*st; if(Math.abs(dx)>1) a.dir=dx<0?-1:1;
         return {walk:1, run:A.run||1.7};
       case 'wait': return k>=1?{done:1}:{head:Math.sin(A.t*3)*6};
@@ -6815,12 +6844,13 @@ html.pv .wrap{max-width:none;padding:0}
         if(k>=1) return {done:1};
         return {bob:-Math.sin(k*Math.PI)*12, joy:1, head:-10};
     }
-    return {done:1};
+    return actMore(a,A,dt,ts,k);   // 11-17 新動作在下面
   }
   // 表演一個學會的把戲（點寵物時）
   function doTrick(p){
+    if(((petCtx&&petCtx.gear)||{}).wand && Math.random()<.18){ petDo('magic',{dur:2}); return {id:'magic',n:'變魔術',s:'看我的魔法！'}; }   // 11-17：有魔法棒
     var list=tricksOf(p), t=pickR(list.slice(-3).concat(list));
-    if(t.id==='jump') petDo('jump'); else petDo(t.id,{dur:t.id==='dance'?2.4:(t.id==='wave'?1.8:(t.id==='star'?1.7:1))});
+    if(t.id==='jump') petDo('jump'); else petDo(t.id,{dur:t.d||1});
     return t;
   }
   /* 對話泡泡 */
@@ -6855,7 +6885,7 @@ html.pv .wrap{max-width:none;padding:0}
       case 'star': p.el=svgEl('text',{'font-size':11,'text-anchor':'middle'},'⭐'); p.vx=(Math.random()-.5)*150; p.vy=-70-Math.random()*70; p.g=170; p.vr=(Math.random()-.5)*400; p.life=p.max=1.3; break;
       case 'zz': p.el=svgEl('text',{'font-size':11,'font-weight':700,fill:'#6C7BB0','text-anchor':'middle'},'z'); p.vx=9; p.vy=-15; p.life=p.max=2.2; p.grow=1; break;
       case 'crumb': p.el=svgEl('circle',{r:1.5,fill:'#B9864F'}); p.vx=(Math.random()-.5)*50; p.vy=-40-Math.random()*20; p.g=200; p.life=p.max=.55; break;
-      case 'float': p.el=svgEl('text',{'font-size':o.size||18,'text-anchor':'middle'},o.txt||'✨'); p.vy=-26; p.life=p.max=1.3; break;
+      case 'float': p.el=svgEl('text',o.fill?{'font-size':o.size||12,'text-anchor':'middle',fill:o.fill,'font-weight':700,stroke:'#fff','stroke-width':3,'paint-order':'stroke','stroke-linejoin':'round'}:{'font-size':o.size||18,'text-anchor':'middle'},o.txt||'✨'); p.vy=-26; p.life=p.max=1.3; break;   // 11-17：fill＝文字（加白邊才看得清楚）
       case 'hand': p.el=svgEl('text',{'font-size':18,'text-anchor':'middle'},'🤚'); p.follow=o.follow; p.life=p.max=1.3; break;
       case 'leaf':
         p.el=svgEl('path',{d:'M0 -3.2 C3 -2 3 2 0 3.2 C-3 2 -3 -2 0 -3.2 Z',fill:o.c||'#7DB862'}); p.vy=16+Math.random()*12; p.vx=(Math.random()-.5)*14;
@@ -6867,20 +6897,20 @@ html.pv .wrap{max-width:none;padding:0}
         p.el=svgEl('text',{'font-size':16,'text-anchor':'middle'},'🐟'); p.vx=(Math.random()<.5?-1:1)*(50+Math.random()*30); p.vy=-120-Math.random()*30; p.g=260; p.life=p.max=.95; p.splashY=y; break;
       case 'ripple': p.el=svgEl('ellipse',{rx:2,ry:1,fill:'none',stroke:'#fff','stroke-width':1.4}); p.life=p.max=.9; break;
       case 'toy': p.el=svgEl('text',{'font-size':18,'text-anchor':'middle'},o.txt||'⚾'); p.vy=o.vy||0; p.vx=o.vx||0; p.g=480; p.floor=o.floor; p.life=p.max=o.life||9; p.rest=0; break;
-      default: return null;
+      default: if(!spawnMore(p,type,o)) return null;   // 11-17 新的粒子（音符、煙、彩虹、蝴蝶、鼻涕泡泡…）
     }
     fxLayer.appendChild(p.el); parts.push(p); drawPart(p); return p;
   }
   function drawPart(p){
-    var a=p.life/p.max, op=p.type==='firefly'?1:Math.min(1,a*2.2), s=p.s;
+    var a=p.life/p.max, op=p.type==='firefly'?1:(p.opf?p.opf(p,a):Math.min(1,a*2.2)), s=p.s;
     if(p.type==='zz') s=.8+(1-a)*1.2;
-    p.el.setAttribute('transform','translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') rotate('+p.rot.toFixed(0)+') scale('+s.toFixed(2)+')');
-    if(p.type!=='firefly' && p.type!=='toy') p.el.setAttribute('opacity',op.toFixed(2));
+    p.el.setAttribute('transform','translate('+p.x.toFixed(1)+' '+p.y.toFixed(1)+') rotate('+p.rot.toFixed(0)+') scale('+((p.sx||1)*s).toFixed(2)+' '+s.toFixed(2)+')');
+    if(p.type!=='firefly' && p.type!=='toy' && !p.noOp) p.el.setAttribute('opacity',op.toFixed(2));
   }
   function partsStep(dt,ts){
     for(var i=parts.length-1;i>=0;i--){
       var p=parts[i]; p.life-=dt;
-      if(p.life<=0){ if(p.type==='fish') spawn('ripple',p.x,p.splashY); if(p.el.parentNode) p.el.parentNode.removeChild(p.el); parts.splice(i,1); continue; }
+      if(p.life<=0){ if(p.type==='fish') spawn('ripple',p.x,p.splashY); if(p.die) p.die(p); if(p.el.parentNode) p.el.parentNode.removeChild(p.el); parts.splice(i,1); continue; }
       if(p.type==='firefly'){
         p.vx+=(Math.random()-.5)*60*dt; p.vy+=(Math.random()-.5)*60*dt; p.vx*=.98; p.vy*=.98;
         p.x+=p.vx*dt; p.y+=p.vy*dt; if(p.x<20||p.x>W-20) p.vx*=-1; if(p.y<HZ-20||p.y>H-10) p.vy*=-1;
@@ -6897,6 +6927,7 @@ html.pv .wrap{max-width:none;padding:0}
         if(p.y>p.floor){ p.y=p.floor; if(Math.abs(p.vy)>60) p.vy=-p.vy*.45; else { p.vy=0; p.rest=1; } p.vx*=.8; }
         if(p.rest){ p.vx*=.9; }
         if(p.x<70||p.x>W-70){ p.vx=-p.vx; p.x=Math.max(70,Math.min(W-70,p.x)); }
+      } else if(p.upd){ p.upd(p,dt,ts);   // 11-17
       } else {
         p.vy+=p.g*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.rot+=p.vr*dt;
         if(p.type==='fish') p.rot=Math.atan2(p.vy,p.vx)*57.3+(p.vx<0?180:0);
@@ -6910,7 +6941,7 @@ html.pv .wrap{max-width:none;padding:0}
     if(water){ amb.fish-=dt; if(amb.fish<0){ amb.fish=7+Math.random()*9;
       var fx=water==='lake'?330+Math.random()*180:60+Math.random()*520, fy=water==='lake'?204+Math.random()*8:(222+Math.sin(fx/100)*14);
       spawn('ripple',fx,fy); spawn('fish',fx,fy); } }
-    if(petA && petA.pose!=='sleep' && !petA.act && !petA.q.length && talkLines.length){
+    if(petA && petA.pose!=='sleep' && !petA.act && !petA.q.length && talkLines.length && !game){
       amb.talk-=dt; if(amb.talk<0){ amb.talk=16+Math.random()*18; say(pickR(talkLines),3.4); }
     }
   }
@@ -6922,6 +6953,595 @@ html.pv .wrap{max-width:none;padding:0}
     var tgt=function(){ return [toy.x-14*(toy.x>petA.x?1:-1),fl]; };
     petDo('wait',{dur:.5}); petDo('goto',{tgt:tgt,run:2.2}); petDo('kick',{toy:toy,dur:.5}); petDo('goto',{tgt:tgt,run:2.4}); petDo('kick',{toy:toy,dur:.5});
     petDo('goto',{tgt:tgt,run:2}); petDo('jump',{dur:.6}); petDo('wiggle',{dur:1});
+  }
+
+  /* ================= 11-17：更多動作和互動（使用者：「動物也再新增更多動作或互動」） =================
+     這些都只有動畫（加上小遊戲的最高紀錄 plan.pet.v1 的 games），不改飽足、心情、親密度、點數——照顧還是要靠讀書。
+     讀書時段、睡覺、旅行、生氣時：互動按鈕和小遊戲跟「玩耍」一樣不能按，對牠做手勢牠會轉過去不理你；
+     在森林裡玩一樣算「待在獎勵頁」的時間（一天超過 15 分鐘牠就不理你）。
+     動畫都在原本那個 requestAnimationFrame 迴圈裡跑：看不到森林（別的分頁、捲出畫面、切到背景）就停；減少動態效果時不跑。 */
+  var game=null, drag=null, gst=null, eatClick=false, lastTap=0, greeted=false, petCtx=null, tickles=[];
+  function actMore(a,A,dt,ts,k){
+    var S=a.S, q=!a.bird, d=a.dir, sn=Math.sin, PI=Math.PI, u, f, i;
+    switch(A.type){
+      /* ---- 新把戲 ---- */
+      case 'roll':   // 翻滾：往前滾一圈
+        if(A.x0==null){ A.x0=a.x; A.x1=Math.max(a.area[0],Math.min(a.area[2],a.x+d*46)); }
+        a.x=A.x0+(A.x1-A.x0)*ease(k);
+        if(k>=1) return {done:1};
+        return {rot:360*ease(k)*d, bob:-sn(k*PI)*6, sy:.9, sx:1.05, legs:[-70,-70,-70,-70], joy:k>.75};
+      case 'shake':   // 握手：坐下、伸出前腳上下晃
+        if(!A.h0){ A.h0=1; spawn('float',a.x+d*24*S,a.y-a.hh*.45,{txt:'🤝',size:14}); }
+        if(k>=1) return {done:1};
+        return q?{rot:-12*d, bob:3*S, legs:[-55,12,-55,-82+sn(A.t*13)*14], head:-6, joy:1}:{legs:[null,null,0,-60+sn(A.t*13)*12], wingR:-30, joy:1};
+      case 'bow':   // 鞠躬
+        if(k>=1){ spawn('spark',a.x,a.y-a.hh); return {done:1}; }
+        u=k<.25?ease(k/.25):(k<.75?1:1-ease((k-.75)/.25));
+        return {rot:16*d*u, head:26*u, legs:q?[0,-18*u,0,-18*u]:null, wingR:q?null:-50*u, sy:1-.04*u, joy:k>.75};
+      case 'dead':   // 裝死：晃兩下倒下、四腳朝天，再跳起來「騙你的！」
+        if(k>=1) return {done:1};
+        if(k<.15) return {rot:sn(A.t*30)*8, head:12};
+        if(!A.s1){ A.s1=1; spawn('float',a.x,a.y-a.hh-6,{txt:'💫',size:16}); }
+        if(k<.3){ f=ease((k-.15)/.15); return {rot:168*d*f, bob:-10*S*f, shut:1}; }
+        if(k<.8) return {rot:168*d+sn(A.t*2)*2, bob:-10*S, shut:1, mouth:1, tail:0, legs:[sn(A.t*9)*6,sn(A.t*9+1)*6,sn(A.t*9+2)*6,sn(A.t*9+3)*6]};
+        if(!A.s2){ A.s2=1; say('騙你的！嘿嘿',2.2); }
+        f=(k-.8)/.2; return {rot:168*d*(1-ease(f)), bob:-10*S*(1-f)-sn(f*PI)*18, joy:1};
+      case 'moon':   // 月球漫步：臉朝前、腳在走、人往後滑
+        if(k>=1){ spawn('spark',a.x,a.y-a.hh); return {done:1}; }
+        a.x=Math.max(a.area[0],Math.min(a.area[2],a.x-d*30*dt));
+        return {walk:1, run:.8, head:-6, sy:1.02};
+      case 'heart':   // 比愛心：站起來、前腳舉高，冒出大愛心
+        if(!A.h0 && k>.35){ A.h0=1; spawn('bigheart',a.x,a.y-a.hh-8); for(i=0;i<5;i++) spawn('heart',a.x+(i-2)*8,a.y-a.hh); }
+        if(k>=1) return {done:1};
+        u=k<.2?ease(k/.2):(k>.85?1-ease((k-.85)/.15):1);
+        return q?{rot:-28*d*u, legs:[-20*u,-140*u,-20*u,-150*u], head:-10*u, joy:1}:{wingR:-110*u, head:-8*u, joy:1, sy:1+.05*u};
+      case 'rainbow':   // 變出彩虹（慢慢出現、慢慢消失，不會閃）
+        if(!A.r0 && k>.3){ A.r0=1; spawn('rainbow',a.x,a.y-a.hh-8); for(i=0;i<6;i++) spawn('star',a.x,a.y-a.hh*.8); }
+        if(k>=1) return {done:1};
+        return {bob:-sn(Math.min(1,k*2)*PI)*16, rot:k<.5?360*ease(k*2)*d:0, joy:1};
+      case 'magic':   // 魔法棒：揮一揮、冒煙不見、變出東西再出現
+        if(k>=1) return {done:1};
+        if(k<.3){ if(!A.w0){ A.w0=1; spawn('float',a.x+d*22*S,a.y-a.hh*.75,{txt:'🪄',size:15}); } if(sn(A.t*20)>.92) spawn('spark',a.x+d*18*S,a.y-a.hh);
+          return q?{legs:[0,0,0,-100+sn(A.t*16)*25], joy:1}:{wingR:-70+sn(A.t*16)*25, joy:1}; }
+        if(!A.p0){ A.p0=1; for(i=0;i<7;i++) spawn('puff',a.x+(Math.random()-.5)*28,a.y-a.hh*.5+(Math.random()-.5)*20); }
+        if(k<.55) return {op:Math.max(0,1-(k-.3)/.08)};
+        if(!A.g0){ A.g0=1; spawn('float',a.x,a.y-a.hh-14,{txt:pickR(['🌸','🎈','🍬','🐟','🎁','🌈','🍩']),size:24}); spawn('spark',a.x-12,a.y-a.hh); spawn('spark',a.x+12,a.y-a.hh); }
+        return {op:Math.min(1,(k-.55)/.08), joy:1, bob:-sn((k-.55)/.45*PI)*14};
+      /* ---- 閒置小動作 ---- */
+      case 'stretch':   // 伸懶腰：前腳往前伸、屁股翹高
+        if(k>=1) return {done:1};
+        u=k<.3?ease(k/.3):(k<.7?1:1-ease((k-.7)/.3));
+        return q?{rot:14*d*u, legs:[10*u,-60*u,10*u,-60*u], head:-14*u, sy:1-.03*u, sx:1+.06*u, tail:-18*u, shut:u>.6}:{wingR:-80*u, head:-16*u, sy:1+.07*u, shut:u>.6};
+      case 'yawn':   // 打哈欠
+        if(k>=1) return {done:1};
+        u=k<.2?k/.2:(k<.8?1:1-(k-.8)/.2); f=k>.15&&k<.8;
+        return {head:-16*u, mouth:f, shut:f, sy:1+.03*u, rot:q?-4*d*u:0};
+      case 'scratch':   // 用後腳抓癢（鳥用翅膀）
+        if(k>=1) return {done:1};
+        return q?{rot:-10*d, bob:2*S, legs:[-50,10,-95+sn(A.t*38)*20,10], head:16, shut:1, tail:0}:{wingR:-40+sn(A.t*34)*18, head:18, shut:1};
+      case 'sniff':   // 聞聞地上，有時候找到小東西
+        if(!A.f0 && k>.6){ A.f0=1; if(Math.random()<.35) spawn('float',a.x+d*22*S,a.y-8,{txt:pickR(['🌼','🐞','🍂','🐜','🌰']),size:13}); else spawn('float',a.x+d*20*S,a.y-a.hh*.6,{txt:'嗅嗅',size:10,fill:'#6b4a32'}); }
+        if(k>=1) return {done:1};
+        return {head:24+sn(A.t*18)*3, bob:sn(A.t*18)*.4, rot:q?6*d:0, tail:6};
+      case 'sit':   // 坐下東看西看（up：抬頭看你）
+        if(k>=1) return {done:1};
+        f=A.up?-18:sn(A.t*1.1)*12;
+        return q?{rot:-12*d, bob:3*S, legs:[-55,12,-55,12], head:f}:{sy:.92, head:f};
+      case 'tailchase':   // 追自己的尾巴，轉到頭暈
+        if(A.c==null) A.c=.28; A.c-=dt; if(A.c<0){ A.c=.28; a.dir=-a.dir; }
+        a.x=Math.max(a.area[0],Math.min(a.area[2],a.x+Math.cos(A.t*7)*40*dt));
+        if(k>=1){ spawn('float',a.x,a.y-a.hh-6,{txt:'💫',size:16}); if(Math.random()<.5) say('頭好暈…',1.8); return {done:1}; }
+        return {walk:1, run:1.8, head:14, rot:sn(A.t*10)*5};
+      case 'groom':   // 洗臉（前腳在臉上抹；鳥整理羽毛）
+        if(k>=1) return {done:1};
+        return {rot:q?-10*d:0, bob:q?2*S:0, legs:q?[-50,10,-50,-118+sn(A.t*12)*14]:null, wingR:q?null:-60+sn(A.t*12)*14, head:12+sn(A.t*12)*6, shut:1};
+      case 'flap':   // 鳥：拍拍翅膀小跳
+        if(k>=1) return {done:1};
+        return {wingR:sn(A.t*30)*50, bob:-Math.abs(sn(A.t*9))*6, joy:1};
+      case 'hop':   // 今天有讀書：開心地蹦兩下
+        if(!A.n0){ A.n0=1; spawn('note',a.x+d*10,a.y-a.hh); }
+        if(k>=1) return {done:1};
+        f=(k*2)%1; return {bob:-sn(f*PI)*12, sy:f<.12?.9:1.04, joy:1};
+      case 'sigh':   // 心情不好：坐著嘆氣
+        if(!A.s0){ A.s0=1; spawn('float',a.x+d*14*S,a.y-a.hh-4,{txt:'💧',size:13}); if(Math.random()<.4) say(pickR(['唉…','好無聊…','陪我玩嘛…']),2); }
+        if(k>=1) return {done:1};
+        return q?{rot:-8*d, bob:3*S, legs:[-55,8,-55,8], head:22, sy:.97}:{head:20, sy:.93};
+      case 'growl':   // 肚子餓：咕嚕叫
+        if(!A.s0){ A.s0=1; spawn('float',a.x,a.y-a.hh-4,{txt:'咕嚕～',size:12,fill:'#8a5a33'}); }
+        if(k>=1) return {done:1};
+        return {head:30, rot:sn(A.t*40)*1.5, sy:.97};
+      case 'cough':   // 生病：咳嗽
+        if(!A.s0){ A.s0=1; spawn('float',a.x+d*16*S,a.y-a.hh*.7,{txt:'咳咳',size:11,fill:'#5a6b7a'}); }
+        if(k>=1) return {done:1};
+        return {rot:k<.5?sn(A.t*30)*3:0, head:14+(k<.5?sn(A.t*30)*6:0), sy:.96, shut:k<.5};
+      case 'shakeoff':   // 下雨：甩掉身上的水
+        if(A.c==null) A.c=0; A.c-=dt; if(A.c<0){ A.c=.08; spawn('drop',a.x+(Math.random()-.5)*30*S,a.y-a.hh*.6); }
+        if(k>=1) return {done:1};
+        return {rot:sn(A.t*42)*7, sx:1+sn(A.t*42)*.04, head:sn(A.t*42)*10, shut:1};
+      case 'snowcatch':   // 下雪：跳起來接雪花
+        if(!A.s0 && k>.45){ A.s0=1; spawn('float',a.x,a.y-a.hh-6,{txt:'❄️',size:14}); if(Math.random()<.5) say(pickR(['好冰！','下雪了！','雪花好漂亮']),2); }
+        if(k>=1) return {done:1};
+        return {bob:-sn(k*PI)*20, head:-18, mouth:k>.3&&k<.6, joy:k>.6};
+      case 'nap':   // 白天在床墊上睡一下
+        if(A.c==null) A.c=.4; A.c-=dt; if(A.c<0){ A.c=1.4; spawn('zz',a.x+8*S*d,a.y-a.hh*.6); }
+        if(k>=1) return {done:1};
+        return q?{sy:.82, sx:1.05, bob:3*S, legs:[-85,-85,-85,-85], head:14, shut:1, tail:-30}:{sy:.88, head:14, shut:1};
+      case 'drink':   // 在飲水機喝水
+        if(A.c==null) A.c=.2; A.c-=dt; if(A.c<0){ A.c=.35; spawn('drop',a.x+d*20*S,a.y-8*S); }
+        if(k>=1){ spawn('float',a.x,a.y-a.hh-6,{txt:'咕嘟咕嘟',size:11,fill:'#2f6f9a'}); return {done:1}; }
+        return {head:28+sn(A.t*14)*4, rot:q?6*d:0};
+      case 'watch':   // 坐著抬頭看（魚缸、畫像、窗外、夕陽）
+        if(!A.s0){ A.s0=1; if(A.emo) spawn('float',a.x+d*12,a.y-a.hh-8,{txt:A.emo,size:14}); if(A.line && Math.random()<.6) say(A.line,2.4); }
+        if(k>=1) return {done:1};
+        return q?{rot:-12*d, bob:3*S, legs:[-55,12,-55,12], head:-22+sn(A.t*1.6)*8}:{head:-20+sn(A.t*1.6)*8, sy:.95};
+      case 'hidden': return k>=1?{done:1, op:0}:{op:0};
+      case 'fade': return k>=1?{done:1, op:A.to}:{op:A.from+(A.to-A.from)*k};
+      case 'hopto':   // 跳到某個位置（爬跳台）
+        if(A.x0==null){ A.x0=a.x; A.y0=a.y; if(Math.abs(A.x-a.x)>1) a.dir=A.x<a.x?-1:1; }
+        if(k<.2) return {sy:.84, sx:1.1};
+        f=Math.min(1,(k-.2)/.8); a.x=A.x0+(A.x-A.x0)*f; a.y=A.y0+(A.y-A.y0)*f;
+        if(k>=1) return {done:1};
+        return {bob:-sn(f*PI)*(A.h||24), sy:1.06, sx:.95, legs:[30,-30,30,-30], joy:1};
+      case 'piano':   // 彈小鋼琴
+        if(A.c==null) A.c=.1; A.c-=dt; if(A.c<0){ A.c=.32; spawn('note',a.x+(Math.random()-.5)*24,a.y-a.hh); }
+        if(k>=1) return {done:1};
+        f=sn(A.t*18)*20;
+        return q?{rot:-14*d, bob:3*S, legs:[-55,-60+f,-55,-60-f], head:sn(A.t*4)*8, joy:1}:{wingR:-50+f, head:sn(A.t*4)*8, joy:1};
+      case 'dunk':   // 灌籃
+        if(k<.2) return {sy:.82, sx:1.1};
+        if(!A.b0 && k>.55){ A.b0=1; spawn('toy',A.hx,A.hy,{txt:'🏀',floor:a.y-2,vx:(Math.random()-.5)*40,life:2.6}); spawn('spark',A.hx,A.hy-6); say(pickR(['灌籃！','進了！','兩分！']),2); }
+        if(k>=1) return {done:1};
+        f=(k-.2)/.8; u=sn(f*PI); return {bob:-u*(A.h||80), sy:1.08, sx:.94, joy:1, legs:[30*u,-120*u,30*u,-130*u], wingR:q?null:-100*u};
+      /* ---- 手勢反應 ---- */
+      case 'hug':   // 抱抱：按住就一直抱著（最多 6 秒），放開再撒嬌一下
+        if(!A.hold && A.t>=(A.dur||1.6)) A.rel=1;
+        if(A.hold && A.t>6) A.rel=1;
+        if(A.rel){ if(A.re==null){ A.re=A.t; spawn('heart',a.x,a.y-a.hh); } f=(A.t-A.re)/.7; if(f>=1) return {done:1}; return {head:sn(A.t*13)*10, joy:1}; }
+        if(A.c==null) A.c=0; A.c-=dt; if(A.c<0){ A.c=.45; spawn('heart',a.x+(Math.random()-.5)*18,a.y-a.hh); }
+        u=Math.abs(sn(A.t*5)); return {sy:1-u*.06, sx:1+u*.05, joy:1, head:-4, tail:0, rot:sn(A.t*2.5)*3};
+      case 'tickle':   // 搔癢：笑到打滾
+        if(A.c==null) A.c=0; A.c-=dt; if(A.c<0){ A.c=.22; spawn('float',a.x+(Math.random()-.5)*34,a.y-a.hh*.7-Math.random()*10,{txt:pickR(['哈','嘻','呵']),size:12,fill:'#C2562A'}); }
+        if(k>=1) return {done:1};
+        return {rot:sn(A.t*28)*8, bob:-Math.abs(sn(A.t*14))*4, joy:1, mouth:1, tail:sn(A.t*20)*25,
+          legs:q?[sn(A.t*20)*30,sn(A.t*20+1)*30,sn(A.t*20+2)*30,sn(A.t*20+3)*30]:null, wingR:q?null:sn(A.t*30)*45};
+      case 'five':   // 擊掌
+        if(!A.h0 && k>.45){ A.h0=1; spawn('spark',a.x+d*18*S,a.y-a.hh-4); spawn('float',a.x+d*24*S,a.y-a.hh-12,{txt:'啪！',size:13,fill:'#C2562A'}); }
+        if(k>=1) return {done:1};
+        u=k<.4?ease(k/.4):(k>.8?1-ease((k-.8)/.2):1); f=k>.45&&k<.55?10:0;
+        return q?{rot:-16*d*u, legs:[-20*u,12,-20*u,(-150+f)*u], head:-10*u, joy:k>.45}:{wingR:(-120+f)*u, head:-8*u, joy:k>.45, sy:1+.04*u};
+      case 'peek':   // 生氣時偷看你一眼，又轉回去
+        if(!A.f0 && k>.15){ A.f0=1; a.dir=-a.dir; }
+        if(!A.f1 && k>.65){ A.f1=1; a.dir=-a.dir; spawn('float',a.x,a.y-a.hh-10,{txt:'💢',size:14}); }
+        return k>=1?{done:1}:{head:k>.15&&k<.65?2:14};
+      case 'turnover':   // 睡覺翻身
+        if(!A.f0 && k>.5){ A.f0=1; a.dir=-a.dir; }
+        return k>=1?{done:1}:{sy:1-sn(k*PI)*.08, bob:-sn(k*PI)*2};
+      case 'sneeze':   // 睡覺時被搔癢：哈啾
+        if(!A.f0 && k>.4){ A.f0=1; spawn('float',a.x+d*18*S,a.y-a.hh*.6,{txt:'哈啾！',size:12,fill:'#5a6b7a'}); }
+        return k>=1?{done:1}:{bob:k>.4&&k<.6?-4:0, sy:k<.4?1+k*.1:1};
+      /* ---- 小遊戲 ---- */
+      case 'pickup':   // 低頭咬起球
+        if(!A.f0 && k>.5){ A.f0=1; if(A.fn) A.fn(a); }
+        return k>=1?{done:1}:{head:30*sn(k*PI), rot:q?8*d*sn(k*PI):0};
+      case 'chase': return chaseAct(a,A,dt);
+    }
+    return {done:1};
+  }
+  // 新的粒子：音符、煙、水滴、大愛心、彩虹、蝴蝶、鼻涕泡泡（p.upd 自己更新位置、p.opf 自己算透明度、p.die 消失時）
+  function spawnMore(p,type,o){
+    switch(type){
+      case 'note': p.el=svgEl('text',{'font-size':14,'text-anchor':'middle',fill:pickR(['#E5536B','#5AA9E6','#7C5CC4','#2E9464']),'font-weight':700,stroke:'#fff','stroke-width':2.5,'paint-order':'stroke'},pickR(['♪','♫','♪']));
+        p.vy=-30; p.vx=(Math.random()-.5)*20; p.life=p.max=1.6; p.sw=Math.random()*6;
+        p.upd=function(q,dt,ts){ q.x+=(q.vx+Math.sin(ts*4+q.sw)*14)*dt; q.y+=q.vy*dt; }; return true;
+      case 'puff': p.el=svgEl('circle',{r:6,fill:'#fff',stroke:'#E3E3E3','stroke-width':.6}); p.vx=(Math.random()-.5)*30; p.vy=-12-Math.random()*16; p.life=p.max=.8;
+        p.upd=function(q,dt){ q.x+=q.vx*dt; q.y+=q.vy*dt; q.s=.8+(1-q.life/q.max)*1.4; }; return true;
+      case 'drop': p.el=svgEl('circle',{r:1.6,fill:'#8FD0F2'}); p.vx=(Math.random()-.5)*44; p.vy=-50-Math.random()*20; p.g=220; p.life=p.max=.6; return true;
+      case 'bigheart': p.el=svgEl('text',{'font-size':26,'text-anchor':'middle'},'💖'); p.vy=-16; p.life=p.max=1.5;
+        p.upd=function(q,dt){ q.y+=q.vy*dt; q.s=.5+(1-q.life/q.max)*1.1; }; return true;
+      case 'rainbow':
+        p.el=svgEl('g',{}); ['#FF6B6B','#FFA94D','#FFD93D','#6BCB77','#4D96FF','#9B72CF'].forEach(function(c,i){ var r=40-i*4; p.el.appendChild(svgEl('path',{d:'M'+(-r)+' 0 A'+r+' '+(r*.8)+' 0 0 1 '+r+' 0',stroke:c,'stroke-width':4,fill:'none','stroke-linecap':'round'})); });
+        p.life=p.max=2.6; p.opf=function(q){ return Math.min(1,(q.max-q.life)/.5,q.life/.8)*.85; }; p.upd=function(q,dt){ q.y-=4*dt; }; return true;
+      case 'bfly':   // 追蝴蝶用：牠靠近就飛開
+        p.el=svgEl('text',{'font-size':15,'text-anchor':'middle'},'🦋'); p.life=p.max=9; p.gy=o.gy||p.y+36; p.t=0;
+        p.upd=function(q,dt){ q.t+=dt; var pa=petA;
+          if(q.away){ q.y-=55*dt; q.x+=q.vx*dt; }
+          else { if(pa){ var dx=q.x-pa.x; if(Math.abs(dx)<56) q.vx+=(dx>0?1:-1)*140*dt; } q.vx*=Math.pow(.2,dt); q.vx+=Math.sin(q.t*1.7)*30*dt; q.x=Math.max(30,Math.min(W-30,q.x+q.vx*dt)); q.y=q.gy-36+Math.sin(q.t*5)*7; }
+          q.sx=.55+Math.abs(Math.sin(q.t*14))*.45; }; return true;
+      case 'snot':   // 睡覺的鼻涕泡泡：跟著呼吸變大變小，最後「啵」
+        p.el=svgEl('g',{}); p.el.appendChild(svgEl('circle',{r:1,fill:'#CDEBFA',opacity:.75,stroke:'#8FC9E8','stroke-width':.12})); p.el.appendChild(svgEl('circle',{cx:-.35,cy:-.35,r:.22,fill:'#fff'}));
+        p.follow=o.follow; p.life=p.max=4+Math.random()*2; p.noOp=1;
+        p.upd=function(q,dt,ts){ var f=q.follow; if(!f||f!==petA){ q.life=0; return; } var ham=f.sp==='hamster';
+          q.x=f.x+f.dir*(f.bird?15:(ham?19:22))*f.S; q.y=f.y-(f.bird?21:(ham?12:17))*f.S;
+          q.s=(1.8+3.2*(.5+.5*Math.sin(ts*1.5+f.t0)))*Math.min(1,(q.max-q.life)/1.2)*f.S+.01; };
+        p.die=function(q){ if(q.follow===petA) spawn('float',q.x,q.y,{txt:'啵',size:10,fill:'#5a8fb0'}); }; return true;
+    }
+    return false;
+  }
+  /* ---- 沒事做的時候：照時間、天氣、心情、今天有沒有讀書、家裡有什麼家具，自己找事做 ---- */
+  function idleTick(a,dt){
+    a.idle-=dt; if(a.idle>0) return;
+    var c=petCtx||{}; a.idle=(c.mood>=70?8:11)+Math.random()*9;
+    if(a.pose==='sleep'){ var r=Math.random();
+      if(r<.45) spawn('snot',a.x,a.y,{follow:a});
+      else if(r<.75) say('（夢話）'+pickR(['小魚乾…','再五分鐘…','主人加油…','好飽…嘿嘿','不要考試…']),2.6);
+      else petDo('turnover',{dur:.8});
+      return; }
+    if(a.pose==='sulk'){ if(Math.random()<.6) petDo('peek',{dur:1.8}); return; }
+    if(a.pose!=='stand') return;
+    var L=idleList(a,c), tot=0, i; for(i=0;i<L.length;i++) tot+=L[i][0];
+    var r2=Math.random()*tot; for(i=0;i<L.length;i++){ r2-=L[i][0]; if(r2<0){ L[i][1](); return; } }
+  }
+  function idleList(a,c){
+    var L=[], q=!a.bird, m=nowMin(), early=m<9*60, late=m>=21*60+30, wet=c.wx==='rain'||c.wx==='gloom', home=c.scene==='home', F=c.furn||{};
+    function add(w,fn){ L.push([w,fn]); }
+    add(3,function(){ petDo('sniff',{dur:1.6}); });
+    add(2,function(){ petDo('sit',{dur:2.6+Math.random()*2}); });
+    add(early||late?5:1.2,function(){ petDo('yawn',{dur:1.6}); if(Math.random()<.4) say(early?'呵～早安':'呵～好睏',2); });
+    add(early?4:1.4,function(){ petDo('stretch',{dur:1.8}); });
+    add(1.4,function(){ petDo(q?'scratch':'flap',{dur:1.4}); });
+    add(1.4,function(){ petDo('groom',{dur:1.8}); });
+    if(/^(cat|dog|fox)$/.test(a.sp)) add(c.mood>=50?1.2:.3,function(){ petDo('tailchase',{dur:2.4}); });
+    if(c.care) add(2.4,function(){ petDo('hop',{dur:1}); if(Math.random()<.3) say(pickR(['今天有讀書，好開心♪','♪～','你今天好棒！']),2.2); });
+    else if(c.left) add(1.2,function(){ petDo('sit',{dur:2.6,up:1}); say('今天還差 '+c.left+' 分鐘喔',2.6); });
+    if(c.mood>=70) add(1.4,function(){ petDo('roll',{dur:1.1}); });
+    if(c.mood<30) add(4,function(){ petDo('sigh',{dur:2}); });
+    if(c.hunger<30) add(4,function(){ if(home){ petDo('goto',{x:56+30*a.S,y:282,face:-1,run:1.4,max:5}); petDo('sniff',{dur:1.2}); petDo('say',{txt:'碗是空的…'}); } else petDo('growl',{dur:1.4}); });
+    if(c.sick) add(5,function(){ petDo('cough',{dur:1.1}); });
+    if(!home){
+      if((c.ph==='day'||c.ph==='dawn') && !wet && c.wx!=='snow') add(c.bfly?4:2,function(){ chaseBfly(a); });
+      if(wet) add(3,function(){ petDo('shakeoff',{dur:1.2}); if(Math.random()<.4) say('下雨了…',2); });
+      if(c.wx==='snow') add(3,function(){ petDo('snowcatch',{dur:1}); });
+      if(c.ph==='dusk') add(2,function(){ petDo('watch',{dur:3,line:'夕陽好漂亮'}); });
+      var cr=actors.filter(function(z){ return z.kind==='walk'; })[0];
+      if(cr) add(1.5,function(){ visitCritter(a,cr); });
+    } else {
+      ['fountain','cushion','cattree','tank','tent','portrait','piano','hoop'].forEach(function(id){ if(F[id]) add(id==='portrait'?1.2:2.6,function(){ furnGo(id); }); });
+      add(1,function(){ playToy(pickR(['🧸','⚽'])); });
+      add(1,function(){ petDo('goto',{x:118,y:262,run:1.3,max:5}); petDo('watch',{dur:2.6,line:winLine(c)}); });
+    }
+    return L;
+  }
+  function winLine(c){ return c.ph==='night'?'星星好多':(c.wx==='rain'||c.wx==='gloom'?'外面在下雨…':(c.wx==='snow'?'外面下雪了！':(c.wx==='cloudy'?'雲好多喔':'天氣好好，想出去玩'))); }
+  function chaseBfly(a){
+    var gx=Math.max(a.area[0]+20,Math.min(a.area[2]-20,a.x+a.dir*80)), b=spawn('bfly',gx,a.y-36,{gy:a.y});
+    if(!b) return;
+    petDo('goto',{tgt:function(){ return [b.x-a.dir*10, Math.max(a.area[1],Math.min(a.area[3],b.gy))]; },run:2.1,max:3.2});
+    petDo('jump',{h:26,dur:.6});
+    petDo('fx',{fn:function(){ b.away=1; b.vx=(Math.random()-.5)*60; b.life=Math.min(b.life,1.6); if(Math.random()<.5) say(pickR(['差一點！','蝴蝶飛走了～','下次一定抓到！']),2); }});
+  }
+  function visitCritter(a,cr){
+    petDo('goto',{tgt:function(){ return [cr.x-(cr.x>a.x?1:-1)*28, Math.max(a.area[1],Math.min(a.area[3],cr.y))]; },run:1.8,max:4});
+    petDo('jump',{dur:.7});
+    petDo('fx',{fn:function(){ if(!cr.act) cr.act={t:0,dur:.5}; say('你好呀，'+(cr.name.split(' ')[1]||'朋友')+'！',2.2); }});
+  }
+  // 家具：閒的時候自己去用，點家具也會去（家裡的座標，跟 pfurnSVG 畫的位置對齊）
+  var FURN_LINE={fountain:'咕嘟咕嘟',cushion:'好軟喔～',cattree:'好高喔！',tank:'魚魚游來游去～',tent:'嘿！找不到我吧',portrait:'這是我耶！',piano:'♪ 好聽嗎？',hoop:'灌籃！'};
+  function furnGo(id){
+    switch(id){
+      case 'fountain': petDo('goto',{x:142,y:288,face:-1,run:1.6,max:5}); petDo('drink',{dur:2.2}); return true;
+      case 'cushion': petDo('goto',{x:176,y:276,run:1.4,max:5}); petDo('nap',{dur:5+Math.random()*3}); petDo('stretch',{dur:1.6}); return true;
+      case 'cattree': petDo('goto',{x:238,y:268,face:1,run:1.6,max:5}); petDo('hopto',{x:262,y:250,h:16,dur:.5}); petDo('hopto',{x:262,y:202,h:28,dur:.6}); petDo('wait',{dur:.5});
+        petDo('hopto',{x:262,y:154,h:28,dur:.6}); petDo('watch',{dur:2.4,line:'好高喔！'}); petDo('hopto',{x:300,y:272,h:22,dur:.7}); return true;
+      case 'tank': petDo('goto',{x:334,y:282,run:1.5,max:5}); petDo('watch',{dur:3,emo:'🐠',line:'魚魚游來游去～'}); return true;
+      case 'tent': petDo('goto',{x:556,y:290,run:1.6,max:6}); petDo('fade',{from:1,to:0,dur:.35}); petDo('hidden',{dur:2.6}); petDo('fade',{from:0,to:1,dur:.3});
+        petDo('jump'); petDo('say',{txt:'嘿！找不到我吧'}); petDo('goto',{x:400,y:280,run:1.4,max:5}); return true;
+      case 'portrait': petDo('goto',{x:212,y:262,run:1.4,max:5}); petDo('watch',{dur:2.6,emo:'✨',line:'這是我耶！'}); return true;
+      case 'piano': petDo('goto',{x:410,y:272,run:1.5,max:5}); petDo('piano',{dur:3.2}); petDo('say',{txt:pickR(['♪ 好聽嗎？','我是音樂家！','啦啦啦～'])}); return true;
+      case 'hoop': petDo('goto',{x:500,y:270,face:1,run:1.6,max:6}); petDo('dunk',{dur:1.3,h:84,hx:500,hy:162}); petDo('wiggle',{dur:.8}); return true;
+    }
+    return false;
+  }
+  function furnTap(id){
+    if(!petA || game || !FURN_LINE[id]) return;
+    var s=petState(), p=s.pet; if(!p) return;
+    var att=attitude(s,allHist(),viewState(),p.lvSeen||1);
+    if(att.away) return;
+    if(att.sulk){ petDo('turn',{dur:1}); say(pickR(talkLines.length?talkLines:['哼！']),2.4); msg(SULK[att.sulk]); return; }
+    if(att.sleep){ say('呼…呼…（睡得很熟）',2.2); return; }
+    if(noMotion()){ say(FURN_LINE[id],2.2); return; }
+    petA.q=[]; petA.act=null; furnGo(id);
+  }
+  // 打開網站第一次看到牠：照今天的狀況打招呼
+  function greet(a,c){
+    if(c.sick){ petDo('cough',{dur:1.1}); petDo('say',{txt:'咳咳…你來了'}); }
+    else if(c.hunger<30){ petDo('growl',{dur:1.4}); petDo('say',{txt:'你來了！肚子好餓…'}); }
+    else if(c.care){ petDo('jump'); petDo('wiggle',{dur:1}); petDo('say',{txt:pickR(['你來了！今天好認真','今天有讀書，我好開心！'])}); }
+    else if(nowMin()<9*60){ petDo('stretch',{dur:1.6}); petDo('say',{txt:'早安！今天也要加油'}); }
+    else { petDo('wave',{dur:1.6}); petDo('say',{txt:c.left?'你來了！今天還差 '+c.left+' 分鐘':'你來了！'}); }
+  }
+  /* ---- 互動：抱抱、搔癢、擊掌、表演把戲、變魔術（按鈕或手勢都走這裡；反應看心情、飽足、親密度、有沒有生病） ---- */
+  function petReact(kind,hold){
+    if(!petA) return;
+    var c=petCtx||{}, L='', bond=c.bond||0;
+    if(kind==='trick'){ var s=petState(); if(!s.pet) return; petA.q=[]; petA.act=null; var tr=doTrick(s.pet); say(tr.s||(tr.id==='jump'?pickR(talkLines.length?talkLines:['嘿！']):'看我'+tr.n+'！'),2.6); return; }
+    petA.q=[]; petA.act=null;
+    if(kind==='hug'){ petDo('hug',{hold:!!hold,dur:1.8});
+      L=c.sick?'咳…抱著好溫暖':(c.hunger<30?'抱抱很好，可是肚子好餓…':(bond<5?'有、有點害羞…':pickR(bond>=30?['最喜歡你了！','好溫暖～','再抱一下！']:['好溫暖～','嘿嘿','抱緊緊']))); }
+    else if(kind==='tickle'){
+      var now=Date.now(); tickles=tickles.filter(function(t){ return now-t<12000; }); tickles.push(now);
+      if(c.sick){ petDo('cough',{dur:1.1}); L='咳咳…現在不要啦'; }
+      else if(c.mood<30){ petDo('turn',{dur:.8}); L='哼…沒心情'; }
+      else if(tickles.length>=4){ tickles=[]; petDo('tickle',{dur:.9}); var gx=petA.x<W/2?Math.min(petA.area[2],petA.x+150):Math.max(petA.area[0],petA.x-150); petDo('goto',{x:gx,y:petA.y,run:2.8,max:2.5}); L='不要了啦～哈哈'; }
+      else { petDo('tickle',{dur:1.8}); L=pickR(['哈哈哈好癢！','嘻嘻嘻不要啦','哈哈哈哈！']); } }
+    else if(kind==='five'){ petDo('five',{dur:1.1}); L=c.sick?'（有氣無力）耶…':(bond<10?'碰！…這樣對嗎？':pickR(['耶！','擊掌成功！','再一次！'])); }
+    else if(kind==='magic'){ petDo('magic',{dur:2}); L='看我的魔法！'; }
+    if(L) say(L,2.4);
+  }
+  function petTap(){ var t=Date.now(); if(t-lastTap<380){ lastTap=0; petReact('five'); return true; } lastTap=t; return false; }
+  function gestureStart(kind){
+    var s=petState(), p=s.pet; if(!p||!petA) return;
+    var att=attitude(s,allHist(),viewState(),p.lvSeen||1);
+    if(att.away) return;
+    if(att.sulk){ petA.q=[]; petA.act=null; petDo('turn',{dur:1}); say(pickR(talkLines.length?talkLines:['哼！']),2.6); msg(SULK[att.sulk]); return; }
+    if(att.sleep){ if(kind==='tickle'){ petDo('sneeze',{dur:1}); say('哈啾！…呼…呼…',2.4); } else { petDo('turnover',{dur:.8}); say('（翻身）嗯…再睡一下…',2.4); } return; }
+    petReact(kind,kind==='hug');
+  }
+  // 手勢：按住寵物 0.55 秒＝抱抱（放開才結束）；在牠身上左右來回滑 3 次＝搔癢；拖光點（追光點遊戲）
+  function dragStart(e,el){ if(!sceneSvg) return; drag={id:e.pointerId, r:sceneSvg.getBoundingClientRect(), el:el}; try{ el.setPointerCapture(e.pointerId); }catch(err){} el.classList.add('dragging'); e.preventDefault(); dragMove(e); }
+  function dragMove(e){ if(!drag||!game||!game.dot) return; var r=drag.r; dotTo((e.clientX-r.left)*W/r.width,(e.clientY-r.top)*H/r.height,true); }
+  function dragEnd(){ if(drag&&drag.el) drag.el.classList.remove('dragging'); drag=null; }
+  var fpEl=document.getElementById('fp-app');   // 這段在「主畫面」的 var app 之前執行，自己抓
+  if(fpEl){
+    fpEl.addEventListener('pointerdown',function(e){
+      eatClick=false;
+      if(e.pointerType==='mouse' && e.button!==0) return;
+      var dr=e.target.closest && e.target.closest('.fp-drag');
+      if(dr && game && game.kind==='chase'){ dragStart(e,dr); return; }
+      var pg=e.target.closest && e.target.closest('#fp-pet-g'); if(!pg || !petA || game) return;
+      if(gst) clearTimeout(gst.lp);
+      gst={id:e.pointerId, x0:e.clientX, y0:e.clientY, lx:e.clientX, d:0, n:0, done:''};
+      gst.lp=setTimeout(function(){ if(!gst||gst.done) return; gst.done='hug'; eatClick=true; gestureStart('hug'); },550);
+      try{ pg.setPointerCapture(e.pointerId); }catch(err){}
+    });
+    fpEl.addEventListener('pointermove',function(e){
+      if(drag){ if(e.pointerId===drag.id) dragMove(e); return; }
+      if(!gst || e.pointerId!==gst.id || gst.done) return;
+      if(Math.abs(e.clientX-gst.x0)+Math.abs(e.clientY-gst.y0)>10) clearTimeout(gst.lp);
+      var dx=e.clientX-gst.lx; if(Math.abs(dx)<8) return;
+      var dd=dx>0?1:-1; if(gst.d && dd!==gst.d) gst.n++; gst.d=dd; gst.lx=e.clientX;
+      if(gst.n>=3){ gst.done='tickle'; eatClick=true; clearTimeout(gst.lp); gestureStart('tickle'); }
+    });
+    var gEnd=function(e){
+      if(drag && e.pointerId===drag.id){ dragEnd(); return; }
+      if(!gst || e.pointerId!==gst.id) return;
+      clearTimeout(gst.lp); if(gst.done==='hug' && petA && petA.act && petA.act.type==='hug') petA.act.rel=1; gst=null;
+    };
+    fpEl.addEventListener('pointerup',gEnd); fpEl.addEventListener('pointercancel',gEnd); fpEl.addEventListener('lostpointercapture',gEnd);
+    fpEl.addEventListener('contextmenu',function(e){ if(e.target.closest && e.target.closest('#fp-pet-g,.fp-drag')) e.preventDefault(); });   // 手機長按不要跳出選單
+    fpEl.addEventListener('keydown',function(e){   // 追光點：選到光點後用方向鍵移動
+      if(!game || game.kind!=='chase' || !e.target.closest || !e.target.closest('.fp-drag')) return;
+      var mv={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key]; if(!mv) return;
+      e.preventDefault(); var D=game.dot; dotTo((D.tx!=null?D.tx:D.x)+mv[0]*24,(D.ty!=null?D.ty:D.y)+mv[1]*16,false);
+    });
+  }
+  /* ---- 小遊戲：丟球接球、躲貓貓（在家）、追光點（要雷射光點筆）。只有動畫和最高紀錄（plan.pet.v1 的 games） ---- */
+  var SPOTS=[{id:'curtain',n:'窗簾後面',r:[16,30,52,112],o:[70,262]},{id:'box',n:'玩具箱裡',r:[78,222,68,52],o:[150,276]},{id:'bed',n:'床底下',r:[452,176,170,62],o:[520,262]},
+    {id:'sofa',need:'sofa',n:'沙發後面',r:[16,152,176,62],o:[200,262]},{id:'plant',need:'plant',n:'盆栽後面',r:[180,146,46,62],o:[222,262]},
+    {id:'cattree',need:'cattree',n:'跳台上',r:[236,150,52,96],o:[262,268]},{id:'tank',need:'tank',n:'魚缸後面',r:[296,210,76,48],o:[334,282]},
+    {id:'piano',need:'piano',n:'鋼琴後面',r:[378,198,66,54],o:[410,276]},{id:'tent',need:'tent',n:'帳篷裡',r:[524,248,74,46],o:[520,284]}];
+  function gArea(){ return game&&game.home?[100,250,600,292]:[50,HZ+44,W-60,H-10]; }
+  function gDry(x,y){ if(!water) return [x,y]; for(var i=0;i<16;i++){ var yy=y+(i%2?1:-1)*Math.ceil(i/2)*9; if(!inWater(water,x,yy,6)) return [x,yy]; } return [x,y]; }
+  function gStatus(){ var G=game; if(!G) return '';
+    if(G.kind==='fetch') return '第 '+Math.min(G.n+1,G.max)+'/'+G.max+' 球・接到 '+G.air+'・撿回 '+G.got;
+    if(G.kind==='chase') return '還有 '+Math.max(0,Math.ceil(G.dur-G.t))+' 秒・抓到 '+G.hits+' 次';
+    return G.st==='count'?'牠在找地方躲…':(G.st==='hide'?'點你覺得牠躲的地方（還可以猜 '+(3-G.tries)+' 次）':'');
+  }
+  function gSet(){ var el=document.getElementById('fp-gst'); if(el) el.textContent=gStatus(); }
+  function gRow(){ var el=app&&app.querySelector('#fp-games'); if(el && petCtx) el.innerHTML=gamesInner(); }
+  function playRows(p,s,scene,block){
+    var gear=s.gear||{};
+    var gb=function(id,e,n,sub){ return '<button type="button" data-gest="'+id+'"'+(block?' disabled':'')+'><span class="e">'+e+'</span>'+n+(sub?'<small>'+sub+'</small>':'')+'</button>'; };
+    return '<div class="fp-row"><h4>互動<span>只是陪牠玩，不改飽足和心情。直接對牠也可以：連點兩下擊掌、按住抱抱、左右來回滑搔癢'+(scene==='home'?'；點家具牠會過去用':'')+'</span></h4><div class="fp-items">'
+      +gb('hug','🤗','抱抱')+gb('tickle','🤭','搔癢')+gb('five','✋','擊掌')+gb('trick','🎪','表演把戲','學會 '+tricksOf(p).length+'/'+TRICKS.length+' 種')+(gear.wand?gb('magic','🪄','變魔術'):'')+'</div></div>'
+      +'<div class="fp-row" id="fp-games">'+gamesInner()+'</div>';
+  }
+  function gamesInner(){
+    var c=petCtx||{}, G=c.games||{}, gear=c.gear||{}, why=c.block?'':(c.sick?'生病不能玩':(noMotion()?'動畫關掉了，不能玩':'')), off=!!(c.block||why);
+    var gm=function(id,e,n,sub,dis){ return '<button type="button" data-game="'+id+'"'+(off||dis?' disabled':'')+'><span class="e">'+e+'</span>'+n+'<small>'+sub+'</small></button>'; };
+    var h='<h4>小遊戲<span id="fp-gst">'+(game?gStatus():(why||'不用次數；在森林裡玩一樣算時間（一天 15 分鐘）'))+'</span></h4><div class="fp-items">';
+    if(game) return h+'<button type="button" data-game="stop"><span class="e">⏹</span>結束遊戲<small>'+({fetch:'丟球接球',seek:'躲貓貓',chase:'追光點'}[game.kind])+'</small></button></div>';
+    return h+gm('fetch','⚾','丟球接球',G.fetch?'最多接到 '+G.fetch+' 次':'點地上丟球')
+      +gm('seek','🙈','躲貓貓',c.scene!=='home'?'到「🏠 家」玩':(G.seek?'找到過 '+G.seek+' 次':'猜牠躲在哪'),c.scene!=='home')
+      +gm('chase','🔦','追光點',gear.laser?(G.chase?'最多抓到 '+G.chase+' 次':'拖著光點讓牠追'):'用品店 600 點',!gear.laser)+'</div>';
+  }
+  function gameStart(kind,p,s){
+    if(!petA || !fxLayer) return '牠不在這塊地，到牠在的地方或「🏠 家」再玩。';
+    if(noMotion()) return '小遊戲要有動畫：「設定」裡勾了「關閉所有動畫」，或手機開了「減少動態效果」。';
+    if(p.sick) return '生病了不能玩：看獸醫或連續 2 天有照顧就會好。';
+    var c=petCtx||{};
+    if(kind==='seek' && c.scene!=='home') return '躲貓貓要在「🏠 家」玩。';
+    if(kind==='chase' && !(s.gear||{}).laser) return '追光點要先到「🐾 用品店」買雷射光點筆（600 點）。';
+    if(game) gameEnd(true,true);
+    petA.q=[]; petA.act=null;
+    var G=game={kind:kind, home:c.scene==='home', t:0, els:[]}, ar=gArea();
+    if(kind==='fetch'){
+      G.n=0; G.max=8; G.air=0; G.got=0; G.hx=W/2; G.hy=ar[3]-4; G.rest=0;
+      var B=G.ball=ballMake(); B.st='rest'; B.x=G.hx-8; B.gy=G.hy+2; B.y=B.gy; ballDraw(B); G.els.push(B.el);
+      petDo('goto',{x:G.hx+24,y:G.hy,run:1.8,max:4,face:-1}); say('點地上，把球丟出去！',3);
+      msg('⚾ 丟球接球：點地上，球就丟到那裡；丟近一點牠比較接得到，牠心情好跑得比較快。一局 '+G.max+' 球。');
+    } else if(kind==='seek'){
+      G.st='count'; G.spots=SPOTS.filter(function(z){ return !z.need || (c.furn||{})[z.need]; }); G.hide=pickR(G.spots); G.tries=0; G.wrong={}; G.tx={};
+      petA.act={type:'hidden',t:0,dur:1e9};
+      var bl=svgEl('g',{'class':'fp-blind'}); bl.appendChild(svgEl('rect',{width:W,height:H,fill:'#0B1020',opacity:.72}));
+      G.cnt=svgEl('text',{x:W/2,y:H/2+8,'font-size':26,'text-anchor':'middle',fill:'#fff','font-weight':700},'閉上眼睛… 1'); bl.appendChild(G.cnt); fxLayer.appendChild(bl); G.els.push(bl); G.blind=bl;
+      msg('🙈 躲貓貓：牠去躲起來了，等一下點你覺得牠躲的地方（可以猜 3 次）。');
+    } else if(kind==='chase'){
+      G.dur=30; G.hits=0; G.sec=-1;
+      var D=G.dot={x:Math.max(ar[0],Math.min(ar[2],petA.x+(petA.x<W/2?140:-140))), y:(ar[1]+ar[3])/2, v:0, tx:null, ty:null};
+      D.px=D.x; D.py=D.y; D.el=dotMake(); G.els.push(D.el); dotDraw(D);
+      petA.act={type:'chase',t:0,dur:1e9,ph:'',cool:.8};
+      say('光點！我要抓住它！',2.4);
+      msg('🔦 追光點：拖著紅色光點跑，或點地上讓光點跳過去（也可以按 Tab 選到光點，用方向鍵移動）。牠抓到之後要把光點移開，牠才會再撲；30 秒看牠抓到幾次。');
+    }
+    gRow(); return '';
+  }
+  function gameEnd(stopped,silent){
+    var G=game; if(!G) return; game=null; dragEnd();
+    G.els.forEach(function(el){ if(el && el.parentNode) el.parentNode.removeChild(el); });
+    if(petA){
+      if(petA.act && /^(chase|hidden|fade|pickup)$/.test(petA.act.type)) petA.act=null;
+      if(G.kind==='seek' && G.st!=='done' && G.hide){ petA.q=[]; petA.x=G.hide.o[0]; petA.y=G.hide.o[1]; petDo('jump'); }
+    }
+    var line='', sv0=null, gm;
+    if(G.kind==='fetch' && G.n>0){ line='接到 '+G.air+' 次、撿回 '+G.got+' 次'; sv0=petState(); gm=sv0.games||{}; if(G.air>(gm.fetch||0)){ gm.fetch=G.air; line+='，新紀錄！'; } else sv0=null; }
+    if(G.kind==='chase' && !stopped){ line='30 秒抓到 '+G.hits+' 次'; sv0=petState(); gm=sv0.games||{}; if(G.hits>(gm.chase||0)){ gm.chase=G.hits; line+='，新紀錄！'; } else sv0=null; }
+    if(sv0 && sv0.pet){ sv0.games=gm; savePet(sv0); if(petCtx) petCtx.games=gm; }
+    if(line && !silent){ say(line,3); msg('遊戲結束：'+line+(/！$/.test(line)?'':'。')); }
+    gRow();
+  }
+  function gameStep(dt,ts){
+    var G=game; if(!G || !petA) return;
+    G.t+=dt;
+    if(G.endIn!=null){ G.endIn-=dt; if(G.endIn<=0){ gameEnd(false); return; } }
+    if(G.kind==='fetch') fetchStep(G,dt);
+    else if(G.kind==='seek') seekStep(G,dt);
+    else if(G.kind==='chase') chaseStep(G,dt);
+  }
+  function gameTap(e){
+    if(!game || !sceneSvg || !e.target.closest('.fp-scene')) return false;
+    var r=sceneSvg.getBoundingClientRect(), x=(e.clientX-r.left)*W/r.width, y=(e.clientY-r.top)*H/r.height, G=game;
+    if(G.kind==='fetch') fetchThrow(x,y);
+    else if(G.kind==='chase'){ if(!e.target.closest('.fp-drag')) dotTo(x,y,false); }
+    else if(G.kind==='seek'){ var sp=e.target.closest('[data-spot]'); if(sp) seekGuess(sp.getAttribute('data-spot')); }
+    return true;
+  }
+  // 丟球接球
+  function mouthPt(a){ var ham=a.sp==='hamster', mx=a.bird?14:(ham?18:21), my=a.bird?(a.sp==='penguin'?23:18):(ham?18:23); return [a.x+a.dir*mx*a.S, a.y-my*a.S+(a.bob||0)]; }
+  function ballMake(){
+    var k=zk(), g=svgEl('g',{'class':'fp-ball'}), sh=svgEl('ellipse',{cx:0,cy:1,rx:(6*k).toFixed(1),ry:(1.8*k).toFixed(1),fill:'#000',opacity:.18}), b=svgEl('g',{}), r=5.4*k;
+    b.appendChild(svgEl('circle',{r:r.toFixed(1),fill:'#D9EB4B',stroke:'#9FB22A','stroke-width':.9}));
+    b.appendChild(svgEl('path',{d:'M'+(-r*.75).toFixed(1)+' '+(-r*.62).toFixed(1)+' q'+(r*.75).toFixed(1)+' '+(r*.62).toFixed(1)+' 0 '+(r*1.25).toFixed(1)+' M'+(r*.75).toFixed(1)+' '+(-r*.62).toFixed(1)+' q'+(-r*.75).toFixed(1)+' '+(r*.62).toFixed(1)+' 0 '+(r*1.25).toFixed(1),stroke:'#fff','stroke-width':1,fill:'none'}));
+    g.appendChild(sh); g.appendChild(b); fxLayer.appendChild(g);
+    return {el:g, b:b, sh:sh, r0:r, x:0, y:0, gy:0, r:0, z:0, vz:0, vx:0};
+  }
+  function ballDraw(B){
+    B.el.setAttribute('transform','translate('+B.x.toFixed(1)+' '+B.gy.toFixed(1)+')');
+    B.b.setAttribute('transform','translate(0 '+(B.y-B.gy-B.r0).toFixed(1)+') rotate('+(B.r%360).toFixed(0)+')');
+    B.sh.setAttribute('opacity',(.18*Math.max(.25,1-(B.gy-B.y)/110)).toFixed(2));
+  }
+  function fetchThrow(x,y){
+    var G=game, B=G.ball, a=petA, c=petCtx||{};
+    if(G.endIn!=null) return;
+    if(B.st!=='rest'){ if(!G.toldWait){ G.toldWait=1; say('等我把球撿回來！',1.6); } return; }
+    var ar=gArea(); x=Math.max(ar[0],Math.min(ar[2],x)); y=Math.max(ar[1],Math.min(ar[3],y)); var dp=gDry(x,y); x=dp[0]; y=dp[1];
+    var dist=Math.hypot(x-B.x,y-B.gy); if(dist<30){ say('丟遠一點嘛',1.4); return; }
+    B.st='fly'; B.x0=B.x; B.y0=B.gy; B.x1=x; B.y1=y; B.ft=0; B.T=.6+dist/320; B.h=36+dist*.22; G.jumped=0; G.toldWait=0;
+    var tired=c.hunger<20||c.mood<20, run=tired?1.5:3.6, arr=Math.max(0,Math.hypot(a.x-x,a.y-y)-20)/(a.spd*run);
+    G.catchable=!tired && arr<B.T-.15 && Math.random()<Math.min(.9,.55+(c.bond||0)*.006+(c.mood>=70?.1:0));
+    var side=x>a.x?1:-1;
+    a.q=[]; a.act=null; petDo('goto',{x:x-side*16*a.S,y:y,run:run,max:6});
+    if(tired) say('好累…跑不動…',1.8);
+  }
+  function fetchBack(G){ petDo('goto',{x:G.hx+24,y:G.hy,run:2,max:6,face:-1}); }
+  function fetchStep(G,dt){
+    var B=G.ball, a=petA, ar=gArea(), m, f;
+    if(B.st==='rest'){ G.rest+=dt; if(G.rest>45 && G.endIn==null){ say('不玩了嗎？',2); G.endIn=1.5; } } else G.rest=0;
+    if(B.st==='fly'){
+      B.ft+=dt; f=Math.min(1,B.ft/B.T); B.x=B.x0+(B.x1-B.x0)*f; B.gy=B.y0+(B.y1-B.y0)*f; B.y=B.gy-Math.sin(f*Math.PI)*B.h; B.r+=dt*600;
+      if(G.catchable && !G.jumped && B.T-B.ft<.34 && Math.hypot(a.x-B.x1,a.y-B.y1)<40){ G.jumped=1; a.q=[]; a.dir=B.x1>=a.x?1:-1; a.act={type:'jump',t:0,dur:.55,h:30}; }
+      if(f>=1){
+        if(G.jumped && Math.abs(a.x-B.x1)<46 && Math.abs(a.y-B.y1)<30){ B.st='held'; G.air++; m=mouthPt(a); spawn('spark',m[0],m[1]-6); say(pickR(['接到了！','好球！','看我的！']),1.8); fetchBack(G); }
+        else { B.st='loose'; B.z=0; B.vz=110; B.vx=(B.x1-B.x0)/B.T*.35; G.jumped=0; }
+        gSet();
+      }
+    } else if(B.st==='loose'){
+      B.vz-=520*dt; B.z+=B.vz*dt; if(B.z<0){ B.z=0; B.vz=Math.abs(B.vz)>50?-B.vz*.42:0; }
+      B.x+=B.vx*dt; B.vx*=Math.pow(.3,dt); if(B.x<ar[0]||B.x>ar[2]){ B.vx=-B.vx; B.x=Math.max(ar[0],Math.min(ar[2],B.x)); }
+      B.y=B.gy-B.z; B.r+=B.vx*dt*8;
+      if(!a.act && !a.q.length){
+        if(Math.abs(B.x-(a.x+a.dir*16*a.S))<14 && Math.abs(B.gy-a.y)<14 && B.z<4){ a.act={type:'pickup',t:0,dur:.45,fn:function(){ if(game===G && B.st==='loose'){ B.st='held'; G.got++; gSet(); } }}; }
+        else petDo('goto',{tgt:function(){ var s2=B.x>a.x?1:-1; return [B.x-s2*16*a.S,B.gy]; },run:2.6,max:4});
+      }
+    } else if(B.st==='held'){
+      m=mouthPt(a); B.x=m[0]; B.y=m[1]; B.gy=a.y;
+      if(!a.act && !a.q.length){
+        if(Math.hypot(a.x-(G.hx+24),a.y-G.hy)<8){
+          B.st='rest'; B.gy=a.y+2; B.y=B.gy; B.x=a.x+a.dir*18*a.S; G.n++; gSet(); petDo('wiggle',{dur:.8});
+          if(G.n>=G.max) G.endIn=1; else if(Math.random()<.5) say(pickR(['再丟一次！','還要玩！','好好玩！']),1.8);
+        } else fetchBack(G);
+      }
+    }
+    ballDraw(B);
+  }
+  // 躲貓貓
+  function seekStep(G,dt){
+    var a=petA;
+    if(G.st==='count'){
+      var n=Math.min(3,1+Math.floor(G.t/.8)); if(n!==G.cn){ G.cn=n; G.cnt.textContent='閉上眼睛… '+n; }
+      if(G.t>=2.6){
+        G.st='hide'; if(G.blind.parentNode) G.blind.parentNode.removeChild(G.blind);
+        a.x=G.hide.o[0]; a.y=G.hide.o[1]; a.dir=a.x<W/2?1:-1;
+        var mk=G.marks=svgEl('g',{}), kz=zk();   // 手機上記號放大
+        G.spots.forEach(function(sp){
+          var gg=svgEl('g',{'class':'fp-spot','data-spot':sp.id}), cx=sp.r[0]+sp.r[2]/2, cy=sp.r[1]+sp.r[3]/2, t;
+          gg.appendChild(svgEl('rect',{x:sp.r[0],y:sp.r[1],width:sp.r[2],height:sp.r[3],rx:6,fill:'transparent'}));
+          var g2=svgEl('g',{transform:'translate('+cx+' '+cy+') scale('+kz+')'}); g2.appendChild(svgEl('circle',{r:11,fill:'#fff',opacity:.9,stroke:'#C9B79C'}));
+          t=svgEl('text',{y:5,'font-size':14,'font-weight':700,'text-anchor':'middle',fill:'#6b4a32'},'?'); g2.appendChild(t); gg.appendChild(g2); G.tx[sp.id]=t; mk.appendChild(gg);
+        });
+        fxLayer.appendChild(mk); G.els.push(mk);
+        say('躲好了，來找我！',2.6,{x:W/2,y:150,hh:10}); gSet(); G.ht=0;
+      }
+    } else if(G.st==='hide'){
+      G.ht+=dt; if(G.hint && G.ht>2.6){ G.ht=0; spawn('float',G.hide.r[0]+G.hide.r[2]*(.3+Math.random()*.4),G.hide.r[1]+G.hide.r[3]*.4,{txt:'👀',size:13}); }   // 猜錯一次之後，牠躲的地方偶爾露出眼睛
+      if(G.t>70) seekReveal(false);
+    }
+  }
+  function seekGuess(id){
+    var G=game; if(!G || G.st!=='hide' || G.wrong[id]) return;
+    var sp=G.spots.filter(function(z){ return z.id===id; })[0]; if(!sp) return;
+    if(id===G.hide.id){ seekReveal(true); return; }
+    G.wrong[id]=1; G.tries++; G.hint=1; G.ht=2;
+    if(G.tx[id]){ G.tx[id].textContent='✗'; G.tx[id].parentNode.setAttribute('opacity','.55'); }
+    say(pickR(['不在這裡～','嘻嘻，猜錯了','再找找看！']),1.8,{x:sp.r[0]+sp.r[2]/2,y:sp.r[1]+sp.r[3]/2+14,hh:10});
+    if(G.tries>=3) seekReveal(false); else gSet();
+  }
+  function seekReveal(won){
+    var G=game, a=petA; if(!G || !a) return;
+    G.st='done'; G.won=won; if(G.marks && G.marks.parentNode) G.marks.parentNode.removeChild(G.marks);
+    a.q=[]; a.act=null; a.x=G.hide.o[0]; a.y=G.hide.o[1];
+    spawn('puff',a.x,a.y-a.hh*.5);
+    if(won){
+      petDo('jump'); petDo('wiggle',{dur:1}); say(G.tries===0?'一下就被你找到了！':'被你找到了！',2.4); for(var i=0;i<3;i++) spawn('heart',a.x+(i-1)*8,a.y-a.hh);
+      var sv0=petState(); if(sv0.pet){ sv0.games=sv0.games||{}; sv0.games.seek=(sv0.games.seek||0)+1; savePet(sv0); if(petCtx) petCtx.games=sv0.games; }
+      msg('🙈 找到了！牠躲在'+G.hide.n+'。');
+    } else { petDo('jump'); petDo('dance',{dur:1.8}); say('我在'+G.hide.n+'啦～',2.6); msg('🙈 沒找到：牠躲在'+G.hide.n+'。'); }
+    G.endIn=2.6; gSet();
+  }
+  // 追光點
+  function dotMake(){
+    var g=svgEl('g',{'class':'fp-drag',tabindex:'0',role:'button','aria-label':'紅色光點：拖著走，或用方向鍵移動'}), in2=svgEl('g',{transform:'scale('+zk()+')'});   // 手機上放大；透明的圓是手指好按的範圍
+    in2.appendChild(svgEl('circle',{r:30,fill:'transparent'})); in2.appendChild(svgEl('circle',{'class':'ring',r:14,fill:'none',stroke:'none'}));
+    in2.appendChild(svgEl('circle',{r:10,fill:'#FF3B3B',opacity:.22})); in2.appendChild(svgEl('circle',{r:4.6,fill:'#FF2A2A'})); in2.appendChild(svgEl('circle',{cx:-1.2,cy:-1.2,r:1.5,fill:'#fff',opacity:.9}));
+    g.appendChild(in2); fxLayer.appendChild(g); return g;
+  }
+  function dotDraw(D){ D.el.setAttribute('transform','translate('+D.x.toFixed(1)+' '+D.y.toFixed(1)+')'); }
+  function dotTo(x,y,now){ var G=game; if(!G || !G.dot) return; var ar=gArea(), D=G.dot; x=Math.max(ar[0],Math.min(ar[2],x)); y=Math.max(ar[1],Math.min(ar[3],y)); if(now){ D.x=x; D.y=y; D.tx=null; } else { D.tx=x; D.ty=y; } }
+  function chaseStep(G,dt){
+    var D=G.dot;
+    if(D.tx!=null){ var kx=Math.min(1,dt*9); D.x+=(D.tx-D.x)*kx; D.y+=(D.ty-D.y)*kx; if(Math.abs(D.tx-D.x)+Math.abs(D.ty-D.y)<1) D.tx=null; }
+    var inst=dt>0?Math.hypot(D.x-D.px,D.y-D.py)/dt:0; D.v=D.v*.8+inst*.2; D.px=D.x; D.py=D.y;
+    dotDraw(D);
+    var sec=Math.ceil(G.dur-G.t); if(sec!==G.sec){ G.sec=sec; gSet(); }
+    if(G.t>=G.dur && G.endIn==null){ G.endIn=.8; if(petA.act && petA.act.type==='chase') petA.act=null; petDo('jump'); return; }
+    if(G.endIn==null && !petA.act && !petA.q.length) petA.act={type:'chase',t:0,dur:1e9,ph:'',cool:.5};
+  }
+  function chaseAct(a,A,dt){
+    var G=game; if(!G || G.kind!=='chase' || !G.dot || G.endIn!=null) return {done:1};
+    var D=G.dot, dx=D.x-a.x, dy=D.y-a.y, d=Math.sqrt(dx*dx+dy*dy), f;
+    if(A.cool>0) A.cool-=dt;
+    if(A.ph==='crouch'){ A.pt+=dt; if(A.pt>.3){ A.ph='leap'; A.pt=0; A.x0=a.x; A.y0=a.y; A.x1=D.x-(dx>=0?1:-1)*8*a.S; A.y1=D.y; } return {sy:.84, sx:1.1, rot:Math.sin(A.t*30)*2, head:10, legs:[-30,-20,-30,-20]}; }
+    if(A.ph==='leap'){
+      A.pt+=dt; f=Math.min(1,A.pt/.4); a.x=A.x0+(A.x1-A.x0)*f; a.y=A.y0+(A.y1-A.y0)*f;
+      if(f>=1){ A.ph=''; A.cool=.9;
+        if(Math.hypot(D.x-a.x,D.y-a.y)<24*a.S+10){ G.hits++; G.last=[D.x,D.y]; gSet(); spawn('spark',D.x,D.y-6); if(Math.random()<.5) say(pickR(['抓到了！','嘿！','我的！']),1.4); }   // 光點不會自己跑走：要你再移開，牠才會再撲
+        else spawn('float',a.x,a.y-a.hh-6,{txt:'？',size:12,fill:'#6b4a32'}); }
+      return {bob:-Math.sin(f*Math.PI)*22, joy:1, sy:1.06, legs:[40,-50,40,-50]};
+    }
+    if(d>30*a.S+14){ var st=Math.min(d-20,a.spd*2.6*dt); a.x+=dx/d*st; a.y+=dy/d*st; if(Math.abs(dx)>1) a.dir=dx<0?-1:1; return {walk:1, run:2.6}; }
+    var same=G.last && Math.hypot(D.x-G.last[0],D.y-G.last[1])<30;   // 剛抓到、你還沒移開：用前腳撥一撥
+    if(A.cool<=0 && D.v<80 && !same){ A.ph='crouch'; A.pt=0; if(Math.abs(dx)>1) a.dir=dx<0?-1:1; return {sy:.9}; }
+    if(same) return {head:12+Math.sin(A.t*6)*6, legs:a.bird?null:[0,0,0,-40+Math.sin(A.t*9)*25], wingR:a.bird?-30+Math.sin(A.t*9)*20:null, sy:.96};
+    return {head:Math.sin(A.t*8)*10, sy:.95, tail:Math.sin(A.t*14)*20};
   }
 
   /* ---- 主畫面 ---- */
@@ -6985,6 +7605,13 @@ html.pv .wrap{max-width:none;padding:0}
     vis.forEach(function(a){ if(!s.dex[a.id]){ s.dex[a.id]=tk; ev.push('dex|'+a.e+' '+a.n); } });
     var info=null;
     if(p){ var xp=xpSince(h,pk(p.born),p.pomo0||0,C); info={xp:xp, lv:levelOf(xp)}; if(info.lv.lv!==p.lvSeen){ if(p.lvSeen && info.lv.lv>p.lvSeen) ev.push('lv|'+info.lv.lv); p.lvSeen=info.lv.lv; } }
+    // 11-17：親密度到了學會新把戲要說一聲（p.tricks＝已經宣布過的；第一次載入只宣布 11-17 新加的）
+    if(p && att.ok && app && window.__tab===5 && (window.__sub===15 || window.__pv)){ var kn=tricksOf(p).map(function(t){ return t.id; });   // 看得到牠、牠沒在生氣才宣布
+      if(!Array.isArray(p.tricks)) p.tricks=kn.filter(function(id){ return OLD_TRICKS.indexOf(id)>=0; });
+      var newT=TRICKS.filter(function(t){ return kn.indexOf(t.id)>=0 && p.tricks.indexOf(t.id)<0; });
+      if(newT.length){ p.tricks=p.tricks.concat(newT.map(function(t){ return t.id; })); var t0=newT[newT.length-1];
+        flash.push('🎓 '+esc(p.name)+' 學會新把戲：'+newT.map(function(t){ return t.n; }).join('、')+'！點牠就會表演。');
+        afterPaint.push(function(){ petDo(t0.id==='jump'?'jump':t0.id,{dur:t0.d||1}); petDo('say',{txt:'我學會'+t0.n+'了！'}); }); } }
     savePet(s);
     var lootChips=loot.filter(function(L){ return L.k==='chips'; }).length;
     if(lootChips){ var vq=ls('plan.vocab.v1',{})||{}; vq.chips=(vq.chips||0)+15*lootChips; sv('plan.vocab.v1',vq); }
@@ -7073,12 +7700,16 @@ html.pv .wrap{max-width:none;padding:0}
       var nxL=land(curLand+1); top+='<span class="fp-lock">🔒 '+nxL.n+'（'+land(curLand).n+'種滿 '+land(curLand).cap+' 棵開放）</span></div>';
     }
     var WXI=ph==='night'&&(wx==='sunny'||wx==='rainbow')?['🌙','晴朗的夜晚']:(ph==='night'&&wx==='cloudy'?['☁️','多雲的夜晚']:WXN[wx]);
-    var hud='<div class="fp-hud" aria-hidden="true"><span>'+WXI[0]+' '+WXI[1]+'</span><span>⚡ '+B.n+'</span>'+(scene==='home'&&p&&!att.away?'<span>點寵物會表演把戲</span>':'')+'</div>';
+    var hud='<div class="fp-hud" aria-hidden="true"><span>'+WXI[0]+' '+WXI[1]+'</span><span>⚡ '+B.n+'</span>'+(scene==='home'&&p&&!att.away?'<span>點牠表演把戲・按住抱抱</span>':'')+'</div>';
     var sk=scene==='home'?'home':'forest'+li;
     var svg=scene==='home'?homeSVG(s,p,info||{lv:{lv:1}},att,fedToday,ph,wx,furn,bk.sav):forestSVG(s,T,trees,cc,li,p,info||{lv:{lv:1}},att,vis,wx,ph,v.seenTrees);
     var sceneHtml=hud+svg;
     if(v.seenTrees!==T.trees.length){ v.seenTrees=T.trees.length; saveView(v); }
     var block=!!(att.sulk||att.sleep||att.away);
+    // 11-17：給閒置小動作、手勢、小遊戲看的狀況（每次重畫更新；只讀，不存）
+    var hasF={}; furn.forEach(function(f){ hasF[f.id]=1; }); Object.keys(s.pfurn||{}).forEach(function(k){ if(s.pfurn[k]) hasF[k]=1; });
+    petCtx=p?{scene:scene, ph:ph, wx:wx, care:careToday, mood:p.mood||0, hunger:p.hunger||0, sick:!!p.sick, bond:p.bond||0, furn:hasF, gear:s.gear||{}, games:s.games||{},
+      bfly:vis.some(function(a){ return a.id==='butterfly'; }), left:Math.max(0,need.m-(te.m||0)), block:block, nT:tricksOf(p).length}:null;
     var body='';
     if(tabk==='main'){
       if(p){
@@ -7105,6 +7736,7 @@ html.pv .wrap{max-width:none;padding:0}
         if(bk.loan && bk.loan.late) msg+='<br>🏦 欠銀行的點數逾期了，牠很擔心你（心情最多 60）。';
         if(p.bag && !p.trip) msg+='<br>🎒 行李打包好了（'+esc(p.bag.food)+(p.bag.charm?'、護身符':'')+(p.bag.tool?'、'+esc(p.bag.tool):'')+(p.bag.ticket?'、旅行券':'')+'），牠會自己挑時間出發。';
         body+='<p class="'+cls+'">'+msg+'</p>';
+        if(!att.away) body+=playRows(p,s,scene,block);   // 11-17：互動、小遊戲
         if(!att.away && scene==='forest') body+='<p class="fp-hint">想餵牠、陪牠玩、打包旅行，切到上面的「🏠 家」。</p>';
         if(!att.away && scene==='home'){
           body+=row('餵食','飼料 '+foodN+' 份（一般任務 1 份；要檢查的任務過關後才給，另外加碼 2–3 份）',FOODS.map(function(f){
@@ -7284,14 +7916,18 @@ html.pv .wrap{max-width:none;padding:0}
     var b=e.target.closest('button');
     if(b && b.dataset.gochk){ window.__goChecks(); return; }
     if(!b){
+      if(game && gameTap(e)) return;   // 11-17：小遊戲進行中，點畫面＝丟球／移光點／猜躲在哪
       if(e.target.closest('#fp-piggy')){ goBank(); return; }
+      var fu=e.target.closest('[data-furn]'); if(fu){ furnTap(fu.getAttribute('data-furn')); return; }   // 11-17：點家具，牠會去用
       var ag=e.target.closest('[data-actor]');
       if(ag && ag.id==='fp-pet-g'){
+        if(eatClick){ eatClick=false; return; }   // 剛剛是按住抱抱、來回滑搔癢，不算點一下
         var s0=petState(), h0=allHist(), att0=attitude(s0,h0,viewState(),s0.pet?(s0.pet.lvSeen||1):1);
         if(!petA){ return; }
         if(att0.sulk){ petDo('turn',{dur:1}); say(pickR(talkLines.length?talkLines:['哼！']),2.6); msg(SULK[att0.sulk]); }
         else if(att0.sleep){ say('呼…呼…（睡得很熟）',2.4); spawn('zz',petA.x+8,petA.y-petA.hh*.7); }
-        else if(!petA.act && !petA.q.length){ var tr=doTrick(s0.pet); say(tr.id==='jump'?pickR(talkLines):'看我'+tr.n+'！',2.6); }
+        else if(petTap()){ return; }   // 11-17：連點兩下＝擊掌
+        else if(!petA.act && !petA.q.length){ var tr=doTrick(s0.pet); say(tr.s||(tr.id==='jump'?pickR(talkLines):'看我'+tr.n+'！'),2.6); }
         return;
       }
       if(ag){ var a=actors.filter(function(z){ return z.g===ag; })[0]; if(a && !a.act){ a.act={t:0,dur:.5}; say(a.name,2.2,a); } return; }
@@ -7372,6 +8008,12 @@ html.pv .wrap{max-width:none;padding:0}
     if(!p) return;
     var lv=p.lvSeen||1, C=checks(), T=collect(h,C,s,pk(p.born)), att=attitude(s,h,v,lv);
     if(att.sulk||att.sleep||att.away){ paintPet(); return; }
+    // 11-17：互動按鈕（只有動畫，不改資料）、小遊戲（讀書時段、睡覺、旅行、生氣時上面就擋掉了，跟玩耍一樣）
+    if(b.dataset.gest){ if(!petA){ msg('牠不在這塊地，到牠在的地方或「🏠 家」再跟牠玩。'); return; } petReact(b.dataset.gest); return; }
+    if(b.dataset.game){
+      if(b.dataset.game==='stop'){ gameEnd(true); return; }
+      var gw=gameStart(b.dataset.game,p,s); if(gw) msg(gw); return;
+    }
     var foodN=T.tasks+s.bonusFood-(p.fed||0);
     if(b.dataset.bag){
       if(b.dataset.bag==='food') bagPick.food=(bagPick.food===b.dataset.v?'':b.dataset.v);
@@ -8290,6 +8932,8 @@ html.pv .wrap{max-width:none;padding:0}
       else if(kind==='talk'){ petDo('turn',{dur:.6}); say(line||'嗯嗯！',3.2); }
       else if(kind==='msg'){ petDo('jump'); say('我會轉告他：'+line,3.2); }
       else if(kind==='pts'){ petDo('flip',{dur:1}); say('謝謝！我會跟他說',2.8); }
+      // 11-17：新的互動（家長頁現在沒用到，之後要加按鈕可以直接叫）
+      else if(kind==='hug'||kind==='tickle'||kind==='five'||kind==='trick'){ petReact(kind); if(line) say(line,2.8); }
     }};
 
   /* ---- 家長的互動（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（家長頻道），
