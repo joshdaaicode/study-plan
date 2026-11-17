@@ -2275,7 +2275,18 @@ html.pv .wrap{max-width:none;padding:0}
     d0:function(){ var d=new Date(); d.setHours(0,0,0,0); return d; },
     kk:function(d){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); },
     ls:function(k,d){ var dd=d===undefined?null:d; try{ var v=JSON.parse(localStorage.getItem(k)); return v===null||v===undefined?dd:v; }catch(e){ return dd; } },
-    sv:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ if(window.__quota) window.__quota(e); } }
+    sv:function(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){ if(window.__quota) window.__quota(e); } },
+    // 11-15：不急的工作（看不到的地方、畫面下面）等這一格畫面畫出來再做，切分頁、開網站時先讓人看到新的一頁。
+    // requestAnimationFrame 在畫下一格之前跑，裡面再排 setTimeout，就會排在那一格畫完之後；背景分頁不畫畫面，直接排 setTimeout。
+    // 畫面暫時沒在更新（requestAnimationFrame 不會跑）時，最晚 1 秒後也一定會做
+    later:function(fn){
+      var done=false, go=function(){ if(!done){ done=true; fn(); } };
+      if(document.hidden || !window.requestAnimationFrame){ setTimeout(go,0); return; }
+      requestAnimationFrame(function(){ setTimeout(go,0); });
+      setTimeout(go,1000);
+    },
+    // 11-15：一長串工作中間讓一下，讓點擊、畫面可以先處理（有 scheduler.yield 用它，排在最前面；沒有的瀏覽器用 setTimeout）
+    next:function(fn){ if(window.scheduler && typeof window.scheduler.yield==='function') window.scheduler.yield().then(fn); else setTimeout(fn,0); }
   };
   window.__pick=pick;   // 雲端同步也用這份（以前另外寫了一份一樣的）
 })();
@@ -4204,7 +4215,9 @@ html.pv .wrap{max-width:none;padding:0}
     var b=e.target.closest('button'); if(!b||b.dataset.k===tab) return;
     tab=b.dataset.k; save(SCT,tab); draft=null; paintSeg(); renderEntry(); renderTrend();
   });
-  paintSeg(); renderEntry(); renderTrend();
+  // 11-15：開網站時沒在看「紀錄 → 成績」就先不畫走勢圖（筆電約 25 毫秒，手機約 0.1 秒）：
+  // 切到成績時下面的 refit 一定會照實際寬度重畫一次，開網站時畫的那份每次都被丟掉
+  paintSeg(); renderEntry(); if(window.__tab===4 && window.__sub===14) renderTrend();
   var lastW=0, rT=null;
   function refit(){ var w=measure(); if(w!==lastW){ lastW=w; renderTrend(); } }
   window.addEventListener('resize',function(){ clearTimeout(rT); rT=setTimeout(refit,150); });
@@ -5389,11 +5402,17 @@ html.pv .wrap{max-width:none;padding:0}
   // 手動改過的日程：一次重畫會被讀上千次，快取 2 秒（paintAll 開頭也會清掉）
   var deCache=null, deT=0;
   function dayEdits(){ var n=Date.now(); if(!deCache||n-deT>2000){ deCache=ls('plan.dayedit.v1',{})||{}; deT=n; } return deCache; }
+  // 11-15：算好的每天段落記起來，同一份「手動改過的日程」只算一次（教材進度一次重畫要對 15 本書各掃一遍全部日子，
+  // 以前同一天的段落要重算約 3,000 次）。手動改過的日程重新讀過（換了一份）就整個重算。拿到的陣列只能讀，不要改。
+  var sbMemo={}, sbDe=null;
   function studyBlocks(k){
     var de=dayEdits();
-    if(de[k]) return de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n, t:(String(x.t||'').match(/\d{1,2}:\d{2}/)||[''])[0]}; });
-    var day=PL.days[k]; if(!day) return [];
-    return day.b.filter(function(b){ return b[5]===0; }).map(function(b){ return {c:b[2], n:b[3], t:b[0], d:b[4]}; });
+    if(de!==sbDe){ sbDe=de; sbMemo={}; }
+    if(Object.prototype.hasOwnProperty.call(sbMemo,k)) return sbMemo[k];
+    var r;
+    if(de[k]) r=de[k].filter(function(x){ return !x.f&&!x.e&&!x.l; }).map(function(x){ return {c:x.c||'other', n:x.n, t:(String(x.t||'').match(/\d{1,2}:\d{2}/)||[''])[0]}; });
+    else { var day=PL.days[k]; r=day?day.b.filter(function(b){ return b[5]===0; }).map(function(b){ return {c:b[2], n:b[3], t:b[0], d:b[4]}; }):[]; }
+    return (sbMemo[k]=r);
   }
   var CATN={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kb:'科班考古題',kbfix:'科班訂正',kbr:'科班複習',
     hw:'補習作業',mock:'模考／訂正',term:'段考',fu:'複試',other:'其他'};
@@ -5506,9 +5525,17 @@ html.pv .wrap{max-width:none;padding:0}
     return idx;
   }
   var bkOpen={};   // 這次開著的那本（重畫時保持展開）
+  var bkSig=null;   // 11-15：上次畫教材進度時用到的資料
   function paintBooks(){
     var box=document.getElementById('bk-auto'); if(!box) return;
-    var today=d0(), tk=kk(today), idx=doneIndex();
+    var today=d0(), tk=kk(today);
+    // 11-15：教材進度只跟這幾樣有關：今天日期、每天的完成紀錄（含今天勾了哪些、錯字本複習）、點數紀錄（找完成時間）、手動改過的日程。
+    // 都沒變就不重畫：一次要算 15 本書約 450 段（筆電約 50–70 毫秒，手機約 0.2–0.3 秒），以前每次切到「紀錄 → 進度」都重算
+    var sig=[tk, localStorage.getItem('plan.hist.v1'), localStorage.getItem('plan.vrev.v1'), JSON.stringify(window.__todayStat?window.__todayStat():null),
+      JSON.stringify(window.__shopLog?window.__shopLog():null), localStorage.getItem('plan.dayedit.v1')].join('\n');
+    if(sig===bkSig && box.firstChild) return;
+    bkSig=sig;
+    var idx=doneIndex();
     var books=BOOK_KEYS.filter(function(key){ return PL.books[key]; }).map(function(key){
       var b=PL.books[key], segs=[];
       DAYS.forEach(function(k){
@@ -6434,7 +6461,11 @@ html.pv .wrap{max-width:none;padding:0}
     return o+'<g class="fp-fx" data-leaf="'+Object.keys(leaf).map(function(k){ return LEAFC[k]; }).join(',')+'" data-water="'+(L.deco==='stream'||L.deco==='lake'?L.deco:'')+'" data-night="'+(night?1:0)+'"></g></svg>';
   }
   // 手機上整個場景縮很小，動物和寵物放大一點才看得清楚
-  function zk(){ var w=window.innerWidth||800; return w<520?1.35:(w<760?1.15:1); }
+  // 11-15：螢幕寬度記起來，轉向、改視窗大小才重讀。手機上讀 window.innerWidth 會逼整頁先重新排版一次，
+  // 森林畫面還沒換上去就先排了一次舊的（切到「我的森林」多花約 0.05–0.5 秒）
+  var vwNow=0; window.addEventListener('resize',function(){ vwNow=0; });
+  function vw0(){ return vwNow||(vwNow=window.innerWidth||800); }
+  function zk(){ var w=vw0(); return w<520?1.35:(w<760?1.15:1); }
   function critterSVG(a,x,y,area){
     var fs=Math.round((a.fly?20:24)*zk());
     return '<g data-actor="'+(a.fly?'fly':'walk')+'" data-id="'+a.id+'" data-mv="'+(a.mv||'')+'" data-spd="'+(a.spd||(a.fly?70:26))+'" data-area="'+area.join(',')+'" data-x="'+x.toFixed(1)+'" data-y="'+y.toFixed(1)+'" data-name="'+a.e+' '+a.n+'"'
@@ -6798,7 +6829,7 @@ html.pv .wrap{max-width:none;padding:0}
   function say(txt,dur,who){
     if(!fxLayer) return; who=who||petA; if(!who) return;
     if(bubble && bubble.el.parentNode) bubble.el.parentNode.removeChild(bubble.el);
-    var vw=window.innerWidth||800, k=vw<520?1.7:(vw<760?1.3:1);   // 手機上泡泡和字放大
+    var vw=vw0(), k=vw<520?1.7:(vw<760?1.3:1);   // 手機上泡泡和字放大（11-15：寬度用記起來的）
     var w=Math.min(300/k,textW(txt)+22), g=svgEl('g',{'class':'fp-bubble'}), inner=svgEl('g',{transform:'scale('+k+')'});
     inner.appendChild(svgEl('rect',{x:-w/2,y:-30,width:w,height:24,rx:12,fill:'#fff',stroke:'#C9B79C','stroke-width':1}));
     var tail=svgEl('path',{d:'M-5 -6.5 L0 1 L5 -6.5 Z',fill:'#fff',stroke:'#C9B79C','stroke-width':1});
@@ -8309,12 +8340,33 @@ html.pv .wrap{max-width:none;padding:0}
   function paintAll(){ deCache=null; paintSubjects(); paintKbPace(); paintBooks(); paintPet(); paintBank(); paintAch(); paintCustom(); }
   // 效能（2026-11-02）：切分頁、切回來時只畫正在看的那一頁（以前每次都全部重算，切一次分頁多 30–100 毫秒，手機更久）。
   // 寵物每次都算：「今天」的小卡、「獎勵」的紅點都靠它。紀錄＝4（科班考古題配速、分科進度）、獎勵＝5、設定＝7（教材進度）
-  function paintFor(g){
-    deCache=null; paintPet();
-    if(g===4){ var s4=window.__sub; if(s4===21){ paintChecks(); paintSubjects(); paintBooks(); } if(s4===14) paintKbPace(); }   // 11-09：只畫正在看的子頁；教材進度搬到這裡（A4）
-    if(g===5){ var sb=window.__sub; if(sb===17) paintBank(); if(sb===16) paintAch(); paintCustom(); }   // 11-09 C7：只畫正在看的子頁
+  // 11-15：寵物算出來的東西（「今天」下面的寵物小卡、任務小卡，「獎勵」的紅點）在手機上都不在第一個畫面，
+  // 所以除了「我的森林」「成就」「銀行」（這三頁要用寵物剛算好的結果：森林畫面、成就進度、銀行每日結算），
+  // 切分頁、開網站時都先讓新的一頁畫出來，再算寵物（以前每切一次都先花 30–40 毫秒算寵物才換頁，手機上更久）。
+  // 連續切好幾頁只算最後一次。「紀錄 → 進度」下面的分科進度、教材進度（約 0.1–0.2 秒）也一樣排在後面，一段一段做。
+  var petJob=null;
+  function paintFor(g,boot){
+    deCache=null;
+    var sb=window.__sub;
+    if(g===5 && (sb===15 || sb===16 || sb===17 || window.__pv)){   // 11-09 C7：只畫正在看的子頁
+      petJob=null; paintPet(); if(sb===17) paintBank(); if(sb===16) paintAch(); paintCustom(); return;
+    }
+    if(g===4 && sb===21) paintChecks();   // 檢查清單在最上面，馬上畫
+    if(g===4 && sb===14) paintKbPace();   // 11-09：只畫正在看的子頁
+    if(boot && g===0) tagToday();   // 任務旁邊「要給 Claude 檢查」的小字：開網站時跟清單一起出來，不要晚一格才跳出來
+    var job=petJob={g:g, sb:sb, c:!!(g===5 || boot || (petJob && petJob.c))};   // c：要不要順便檢查自訂獎勵（被後來的切頁取代時也要帶過去）
+    window.__U.later(function(){
+      if(petJob!==job) return;   // 又切到別頁了，等最後那一次
+      petJob=null; deCache=null; paintPet();
+      var on=function(){ return window.__tab===job.g && window.__sub===job.sb; };
+      if(job.c) paintCustom();   // 11-09 C2：開頁也要檢查自訂獎勵的解鎖提示（要用寵物算好的統計）
+      if(g!==4 || sb!==21) return;
+      if(on()) paintChecks();   // 寵物那邊會更新逾期狀態，檢查清單照新的再畫一次
+      window.__U.next(function(){ if(!on()) return; paintSubjects();   // 11-09：教材進度搬到這裡（A4）
+        window.__U.next(function(){ if(on()) paintBooks(); }); });
+    });
   }
-  paintFor(window.__tab); if(window.__tab!==5) paintCustom();   // 11-09 C2：開頁只畫正在看的分頁（自訂獎勵的解鎖提示照舊檢查）
+  paintFor(window.__tab,true);   // 11-09 C2：開頁只畫正在看的分頁
   document.addEventListener('plan:tab',function(e){ paintFor(e.detail); });
   document.addEventListener('change',function(e){
     if(e.target.closest && (e.target.closest('#td-list')||e.target.closest('#kp-list'))) setTimeout(function(){ paintFor(window.__tab); },60);
@@ -8461,7 +8513,13 @@ html.pv .wrap{max-width:none;padding:0}
     if(!m || /前半/.test(name)) return;
     var k=m[1]+' '+m[2]+' '+m[3]; data=ls(); var r=data[k]||{}; r.d=1; data[k]=r; sv(data); paint();
   };
-  paint();
+  // 11-15：這張清單在「紀錄 → 成績」：開網站時沒在看就先不畫（71 份，筆電約 10 毫秒、手機約 0.04 秒），第一次切過去才畫
+  if(window.__tab===4 && window.__sub===14) paint();
+  else document.addEventListener('plan:tab',function first(){
+    if(!(window.__tab===4 && window.__sub===14)) return;
+    document.removeEventListener('plan:tab',first);
+    if(!box.firstChild) paint();   // 打勾「今天」的考古題時（__kbMark）可能已經畫過了
+  });
 })();
 </script>
 <script>
@@ -8659,13 +8717,15 @@ html.pv .wrap{max-width:none;padding:0}
     if(e.key==='ArrowLeft') go(addD(cur,-1),-1);
     if(e.key==='ArrowRight') go(addD(cur,1),1);
   });
-  document.addEventListener('plan:tab',function(e){ if(e.detail===1){ wantScroll=true; draw(); } });
+  // 11-15：「月曆」「整年計畫」也在日程分頁裡，那時「每天」是藏起來的：不用畫，更不要捲到「現在」
+  // （捲動要先把整頁排好版，以前切到月曆、整年計畫都白白多排一次）。切回「每天」時會再觸發一次，那時才畫
+  document.addEventListener('plan:tab',function(e){ if(e.detail===1 && window.__sub===1){ wantScroll=true; draw(); } });
   var gd=document.getElementById('note-goday');
   if(gd) gd.addEventListener('click',function(){ if(gd.dataset.k) window.__gotoDay(gd.dataset.k); });
   // 網址帶 #d=2027-1-27 會直接打開那一天
   var hm=(location.hash||'').match(/d=(\d{4}-\d{1,2}-\d{1,2})/);
   if(hm && PL.days[hm[1]]){ cur=parse(hm[1]); if(window.__showTab) window.__showTab(1,1); }
-  draw();
+  if(window.__tab===1 && window.__sub===1) draw();   // 11-15：開網站時停在「每天」才畫（分頁在這段之前就切好了，那時還沒接上切頁事件）；沒在看就等切過去再畫
   var stamp=new Date().toDateString();
   setInterval(function(){
     var n=new Date().toDateString();
