@@ -5652,6 +5652,7 @@ html.pv .wrap{max-width:none;padding:0}
     {id:'shades',n:'墨鏡',e:'🕶️',c:3,acc:1},{id:'grad',n:'學士帽',e:'🎓',c:5,acc:1},{id:'crown',n:'皇冠',e:'👑',c:8,acc:1},
     {id:'ticket',n:'旅行券',e:'🎟️',c:2,say:'下次旅行一定去遠的地方'},{id:'bento',n:'特製便當',e:'🍙',c:3,say:'打包時用，旅行 24–48 小時、明信片機會加倍'},
     {id:'seed',n:'神木種子',e:'🌰',c:4,say:'種下去直接是大樹，30 天照顧就成神木'},
+    {id:'wand',n:'魔法棒',e:'🪄',c:4,gear:1,say:'多一個「變魔術」互動，點牠有時候也會變'},   // 11-17：gear＝買一次一直有（存在 plan.pet.v1 的 gear）
     // 單字賭場用籌碼換的飾品（chip：不在金幸運草商店賣，每週挑戰也抽不到）
     {id:'visor',n:'發牌員遮陽帽',e:'🧢',c:0,acc:1,chip:1},{id:'pokerhat',n:'撲克牌紳士帽',e:'🃏',c:0,acc:1,chip:1},
     // 寵物用品店用點數買的飾品（pshop：不在金幸運草商店賣，每週挑戰也抽不到）
@@ -5671,6 +5672,10 @@ html.pv .wrap{max-width:none;padding:0}
     {id:'tent',n:'寵物帳篷',e:'⛺',c:2200,k:'furn',say:'放在家裡'},
     {id:'cattree',n:'跳台',e:'🪜',c:2500,k:'furn',say:'放在家裡'},
     {id:'tank',n:'魚缸',e:'🐠',c:3000,k:'furn',say:'放在家裡'},
+    // 11-17：新家具會讓牠多新的動作（彈琴、灌籃）；玩具（gear）買一次一直有，解鎖小遊戲
+    {id:'hoop',n:'迷你籃框',e:'🏀',c:2000,k:'furn',say:'掛在家裡，牠會灌籃'},
+    {id:'piano',n:'寵物小鋼琴',e:'🎹',c:2400,k:'furn',say:'放在家裡，牠會彈琴'},
+    {id:'laser',n:'雷射光點筆',e:'🔦',c:600,k:'gear',say:'解鎖小遊戲「追光點」'},
     {id:'flower',n:'花圈',e:'💐',c:1200,k:'acc',say:'戴在頭上'},
     {id:'party',n:'派對帽',e:'🥳',c:1500,k:'acc',say:'戴在頭上'},
     {id:'halo',n:'天使光環',e:'😇',c:3000,k:'acc',say:'頭上發光'}];
@@ -5679,6 +5684,7 @@ html.pv .wrap{max-width:none;padding:0}
     var p=s.pet;
     if(att && att.sulk==='study') return '讀書時段不能逛';
     if(a.k==='furn') return (s.pfurn||{})[a.id]?'已經有了':'';
+    if(a.k==='gear') return (s.gear||{})[a.id]?'已經有了':'';
     if(a.k==='acc') return s.acc[a.id]?'已經有了':'';
     if(!p) return '先領養寵物';
     if(att && att.away) return '牠去旅行了';
@@ -6533,6 +6539,14 @@ html.pv .wrap{max-width:none;padding:0}
     var F=s.pfurn||{}, o='';
     if(F.portrait){ var em=p?petEmoji(p):'🐾';
       o+='<g transform="translate(192 84)" data-furn="portrait" class="fp-click"><rect width="40" height="34" rx="2" fill="#B5894F"/><rect x="3.5" y="3.5" width="33" height="27" fill="#FDF3E1"/><text x="20" y="25" font-size="18" text-anchor="middle">'+em+'</text></g>'; }
+    if(F.hoop) o+='<g transform="translate(500 144)" data-furn="hoop" class="fp-click"><rect x="-21" y="-12" width="42" height="25" rx="2" fill="#fff" stroke="#C9C2B8" stroke-width="1.2"/>'   // 11-17：迷你籃框（掛在床上面）
+      +'<rect x="-8" y="-3" width="16" height="11" fill="none" stroke="#E8743B" stroke-width="1.6"/><rect x="-3" y="12" width="6" height="3" fill="#9A9A9A"/>'
+      +'<path d="M-11 19 L-7 30 M-4 19 L-3 30 M4 19 L3 30 M11 19 L7 30 M-9.5 24.5 h19 M-7 29.5 h14" stroke="#fff" stroke-width="1" opacity=".95"/><path d="M-12 17 h24" stroke="#E8743B" stroke-width="2.6" stroke-linecap="round"/></g>';
+    if(F.piano){ var keys='';   // 11-17：小鋼琴（靠牆）
+      for(var ki=0;ki<10;ki++){ keys+='<path d="M'+(4+ki*5.6)+' 18 v9" stroke="#CFC7BA" stroke-width=".6"/>'; if(ki%7!==2 && ki%7!==6 && ki<9) keys+='<rect x="'+(7.6+ki*5.6)+'" y="18" width="2.6" height="5.4" fill="#1d1d1d"/>'; }
+      o+='<g transform="translate(378 202)" data-furn="piano" class="fp-click"><rect x="4" y="44" width="4" height="6" fill="#2B1E18"/><rect x="56" y="44" width="4" height="6" fill="#2B1E18"/><rect width="64" height="45" rx="3" fill="#3B2A22"/>'
+        +'<rect x="3" y="3" width="58" height="12" rx="2" fill="#4E382D"/><rect x="4" y="18" width="56" height="9" fill="#FFFDF7"/>'+keys+'<rect x="2" y="27" width="60" height="3" fill="#2B1E18"/>'
+        +'<g transform="rotate(-4 32 -1)"><rect x="22" y="-9" width="20" height="13" fill="#fff" stroke="#DDD" stroke-width=".6"/><text x="32" y="1" font-size="8" text-anchor="middle" fill="#555">♪♫</text></g><ellipse cx="20" cy="8" rx="9" ry="2" fill="#fff" opacity=".12"/></g>'; }
     if(F.cattree) o+='<g transform="translate(262 254)" data-furn="cattree" class="fp-click"><rect x="-3.5" y="-96" width="7" height="96" fill="#B08960"/><path d="M-3.5 -80 h7 M-3.5 -60 h7 M-3.5 -40 h7 M-3.5 -20 h7" stroke="#9A7650" stroke-width="1.4"/>'
       +'<rect x="-24" y="-5" width="48" height="9" rx="4" fill="#E7D3B5"/><rect x="-20" y="-52" width="40" height="8" rx="4" fill="#E7D3B5"/><rect x="-16" y="-100" width="32" height="8" rx="4" fill="#E7D3B5"/>'
       +'<circle cx="12" cy="-43" r="3.2" fill="#E5536B"/><path d="M12 -48 v4" stroke="#9A7650" stroke-width="1"/></g>';
@@ -7805,20 +7819,21 @@ html.pv .wrap{max-width:none;padding:0}
     }
     if(tabk==='shop'){
       body+='<div class="fp-panel"><h4>🌟 金幸運草商店 <span>你有 🌟 '+s.gold+'。金幸運草只有 Claude 檢查過關、每日任務全清、每週挑戰、成就拿得到</span></h4><div class="fp-items">'
-        +SHOP.filter(function(a){ return !a.chip && !a.pshop; }).map(function(a){ var own=a.acc&&s.acc[a.id];
+        +SHOP.filter(function(a){ return !a.chip && !a.pshop; }).map(function(a){ var own=(a.acc&&s.acc[a.id])||(a.gear&&(s.gear||{})[a.id]);
           return '<button type="button" data-buy="'+a.id+'"'+(own||s.gold<a.c?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n+'<small>'+(own?'已擁有':('🌟 '+a.c+(a.say?'・'+a.say:'')))+'</small></button>'; }).join('')+'</div>'
         +'<p class="fp-gone">持有：🍀 護身符 '+charms+'・🎟️ 旅行券 '+s.tickets+'・🍙 特製便當 '+s.bentos+'・🌰 已種神木種子 '+s.seeds.length+'。🌟 也可以到銀行換成點數。</p></div>'
         +'<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p>';
     }
     if(tabk==='pshop'){
       var pts=window.__pts?window.__pts():0, PF=s.pfurn||{};
-      var pitem=function(a){ var why=pshopWhy(a,s,att), own=(a.k==='furn'&&PF[a.id])||(a.k==='acc'&&s.acc[a.id]);
+      var pitem=function(a){ var why=pshopWhy(a,s,att), own=(a.k==='furn'&&PF[a.id])||(a.k==='acc'&&s.acc[a.id])||(a.k==='gear'&&(s.gear||{})[a.id]);
         return '<button type="button" data-pbuy="'+a.id+'"'+(why||pts<a.c?' disabled':'')+'><span class="e">'+a.e+'</span>'+a.n
           +'<small>'+(own?'已擁有':(a.c+' 點・'+(why&&!/點數/.test(why)?why:a.say)))+'</small></button>'; };
       body+='<div class="fp-panel"><h4>🐾 寵物用品店 <span>用點數買（你有 '+pts+' 點）；比許願商店貴，買了不能退</span></h4>'
         +(att.sulk==='study'?'<p class="fp-care bad">現在是讀書時段，讀完這段再來逛。</p>':'')
         +'<div class="fp-row"><h4>吃的・玩的・保養<span>買了馬上用在'+(p?esc(p.name):'寵物')+'身上</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='food'||a.k==='mood'||a.k==='heal'; }).map(pitem).join('')+'</div></div>'
         +'<div class="fp-row"><h4>家具<span>放在「🏠 家」裡，每種一個</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='furn'; }).map(pitem).join('')+'</div></div>'
+        +'<div class="fp-row"><h4>玩具<span>買一次一直都有，解鎖新的小遊戲</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='gear'; }).map(pitem).join('')+'</div></div>'   // 11-17
         +'<div class="fp-row"><h4>穿戴<span>買了馬上換上，之後在「🏠 家」可以換別的</span></h4><div class="fp-items">'+PSHOP.filter(function(a){ return a.k==='acc'; }).map(pitem).join('')+'</div></div>'
         +'<p class="fp-gone">吃的只補飽足和心情，不算「有照顧」——照顧還是要靠讀書。生病看獸醫可以馬上好。</p>'
         +'<p class="fp-msg" id="fp-msg" aria-live="polite">'+flash.join('<br>')+'</p></div>';
@@ -7958,10 +7973,11 @@ html.pv .wrap{max-width:none;padding:0}
     if(b.dataset.buy){
       var it=SHOP.filter(function(a){ return a.id===b.dataset.buy && !a.chip && !a.pshop; })[0]; if(!it||s.gold<it.c) return;
       if(it.acc){ if(s.acc[it.id]) return; s.acc[it.id]=1; }
+      else if(it.gear){ if((s.gear||{})[it.id]) return; s.gear=s.gear||{}; s.gear[it.id]=1; }   // 11-17 魔法棒
       else if(it.id==='ticket') s.tickets++;
       else if(it.id==='bento') s.bentos++;
       else if(it.id==='seed') s.seeds.push({k:tk});
-      s.gold-=it.c; savePet(s); flash.push('買了 '+it.e+' '+it.n+(it.id==='seed'?'，已經種在森林裡了':(it.acc?'，到「家」可以幫牠穿上':''))+'。'); paintPet(); return;
+      s.gold-=it.c; savePet(s); flash.push('買了 '+it.e+' '+it.n+(it.id==='seed'?'，已經種在森林裡了':(it.acc?'，到「家」可以幫牠穿上':(it.gear?'，在「互動」就能用':'')))+'。'); paintPet(); return;
     }
     if(b.dataset.pbuy){   // 寵物用品店（用點數）
       var pa=PSHOP.filter(function(a){ return a.id===b.dataset.pbuy; })[0]; if(!pa) return;
@@ -7974,11 +7990,14 @@ html.pv .wrap{max-width:none;padding:0}
       s=petState(); p=s.pet;   // 扣點可能觸發重畫，重新讀一次
       var line='';
       if(pa.k==='furn'){
-        s.pfurn=s.pfurn||{}; s.pfurn[pa.id]=1; line='買了 '+pa.e+' '+pa.n+'，已經放在「🏠 家」裡了。';
+        s.pfurn=s.pfurn||{}; s.pfurn[pa.id]=1; line='買了 '+pa.e+' '+pa.n+'，已經放在「🏠 家」裡了，點它牠會過去用。';
         afterPaint.push(function(){ petDo('jump'); petDo('say',{txt:'哇，新家具！'}); });
       } else if(pa.k==='acc'){
         s.acc[pa.id]=1; if(p) p.wear=pa.id; line='買了 '+pa.e+' '+pa.n+(p?'，'+esc(p.name)+'已經戴上了':'')+'。';
         afterPaint.push(function(){ petDo('spin',{dur:.9}); if(petA) spawn('spark',petA.x,petA.y-petA.hh); });
+      } else if(pa.k==='gear'){   // 11-17：玩具，買一次一直有
+        s.gear=s.gear||{}; s.gear[pa.id]=1; line='買了 '+pa.e+' '+pa.n+'，在「小遊戲」就能玩。';
+        afterPaint.push(function(){ petDo('jump'); petDo('say',{txt:'新玩具！快來玩！'}); });
       } else if(p){
         if(pa.k==='heal') p.sick=false;
         var cap=p.sick?40:100;
