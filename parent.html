@@ -188,7 +188,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   </footer>
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js?v=20261110a"></script>
+<script src="daychart.js?v=20261117s"></script>
 <script>
 (function(){
   var GK='parent.gist.v1', CK='parent.chan.v1', FILE='study-plan-backup.json', PFILE='study-plan-parent.json', OWNER='joshdaaicode';
@@ -490,6 +490,8 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
 
     // 長條圖
     html+='<section class="card"><h2>每天的讀書長條圖</h2><div id="dc"></div></section>';
+    // 11-17：各科讀書時間（孩子要的：番茄鐘／表定兩種、長條圖／圓餅圖、統計數字）；跟孩子網站「紀錄 → 進度」同一份 daychart.js
+    html+='<section class="card"><h2 style="margin-bottom:8px">各科讀書時間</h2><div id="ss"></div></section>';
 
     // 考試
     var EX=upcomingExams(today);   // 11-10：抽成函式，「未來 7 天」也要用
@@ -507,6 +509,8 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     var po=document.getElementById('pv-open'); if(po) po.addEventListener('click',togglePet);
     var dcEl=document.getElementById('dc');
     if(window.DayChart && dcEl) dcHandle=window.DayChart.mount(dcEl,{get:function(){ return lastO||{}; }});
+    var ssEl=document.getElementById('ss');
+    if(window.DayChart && window.DayChart.subj && ssEl) window.DayChart.subj(ssEl,{media:true, get:function(){ return lastO||{}; }});   // media：深色跟著手機設定
     paintActs(); paintSetup(); paintLive();
   }
 
