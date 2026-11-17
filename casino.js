@@ -62,6 +62,8 @@
     +'.vc-card.bg_lava{--vc-g1:#3D0C02;--vc-g2:#A12A0C;--vc-acc:#FFC857}.vc-card.bg_diamond{--vc-g1:#16213A;--vc-g2:#2F6F7E;--vc-acc:#E8FFFE}.vc-card.bg_rainbow{--vc-acc:#FFF6C9}'
     +'.vc-card.bg_galaxy .vc-top{background:radial-gradient(circle at 12% 22%,rgba(255,255,255,.75) 0 1px,transparent 2px),radial-gradient(circle at 68% 14%,rgba(255,255,255,.6) 0 1px,transparent 2px),radial-gradient(circle at 86% 64%,rgba(255,255,255,.7) 0 1.4px,transparent 2.4px),radial-gradient(circle at 34% 78%,rgba(255,255,255,.5) 0 1px,transparent 2px),linear-gradient(135deg,var(--vc-g1),var(--vc-g2))}'
     +'.vc-card.bg_rainbow .vc-top{background:linear-gradient(135deg,#4B1F73,#1C4F8F 28%,#0E6B58 52%,#7A5410 76%,#8E2A20)}'
+    +'.vc-vipt{overflow-x:auto;margin:6px 0 4px}.vc-vipt table{min-width:0;width:100%;border-collapse:collapse;font-size:12.5px}.vc-vipt caption{text-align:left;font-size:12px;color:var(--ink-faint);padding:0 0 4px}'
+    +'.vc-vipt th,.vc-vipt td{padding:5px 3px;border-bottom:1px solid var(--rule);text-align:center;white-space:nowrap}.vc-vipt th[scope=row]{text-align:left}.vc-vipt tr.me{background:var(--cap-tint)}.vc-vipt tr.me th{font-weight:700}.vc-vipt:focus-visible{outline:2px solid var(--cap);outline-offset:2px}'
     +'.vc-plate{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 8px;padding:2px 10px 0;font-size:12px}.vc-plate span{padding:2px 10px;border-radius:999px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.35)}'
     +'.vc-bj{display:grid;gap:8px;margin:0 0 10px}.vc-hand{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--rule);border-radius:14px}'
     +'.vc-hand>small{font-size:12px;color:var(--ink-soft);line-height:1.3}.vc-hand>b{font-family:"IBM Plex Mono",monospace;font-size:20px}.vc-hand.bust>b{color:var(--warn)}'
@@ -359,7 +361,7 @@
     var q={key:it.key, diff:diff, m:qMult(it,diff,s), t0:Date.now(), mast:mastered(s,it.key)};
     if(diff==='easy'){ q.kind='choice'; q.ans=it.zh; q.opts=shuffle([it.zh].concat(zhOptions(it,3))); }
     else if(diff==='norm'){ q.kind='choice'; q.ans=it.w; q.opts=shuffle([it.w].concat(enOptions(it,3))); }
-    else { q.kind='type'; q.ans=(it.ph&&diff==='hard')?it.f:it.w; q.accept=[q.ans].concat(it.ph?[]:it.alt); if(diff==='hell'){ q.limit=15; q.listen=1; } }
+    else { q.kind='type'; q.ans=(it.ph&&diff==='hard')?it.f:it.w; q.accept=[q.ans].concat(it.ph?[]:it.alt); if(diff==='hell'){ q.limit=15+vipPerk(st()).sec; q.listen=1; } }
     return q;
   }
   // 拼字題：看中文拼字時，中文意思一模一樣的別的字也算對（秋天：autumn、fall）
@@ -533,7 +535,7 @@
     G={mode:set.mode, diff:set.diff, cur:cur, bet:bet, rg:set.rg.slice(), queue:order.map(function(it){ return it.key; }), qi:0, q:null, right:0, wrong:0, n:0, mults:[], hist:[], prize:bet, rung:0, net:0};
     if(G.mode!=='single'){ addCur(cur,-bet,'單字賭場下注'); }
     if(G.mode==='duel'){ var tal=API.talent?API.talent('vocab'):0; G.petAcc=Math.max(.25,Math.min(.97,acc100(s)+(Math.random()*.16-.08)-(tal>=3?.05:0))); G.petScore=0; G.petName=pet.name; }
-    if(G.mode==='sprint'){ G.endAt=Date.now()+60000; }
+    if(G.mode==='sprint'){ G.endAt=Date.now()+(60+vipPerk(s).sec)*1000; }   // 11-17：VIP 多幾秒
     if(G.mode==='bj'){ G.ph=[]; G.dh=[bjCard(),bjCard()]; G.pend=null; G.burn=0; G.stood=0; G.dealer=pet&&!pet.trip?pet.name:''; }
     if(G.mode==='bingo'){ var bd=order.slice(0,8); G.board=bd.slice(0,4).map(function(it){ return it.key; }).concat([null],bd.slice(4).map(function(it){ return it.key; }));
       G.bm=G.board.map(function(k){ return k?qMult(BYKEY[k],G.diff,s):0; }); G.marks=[0,0,0,0,1,0,0,0,0]; G.cell=-1; }
@@ -802,6 +804,7 @@
       else { w.ok=0; w.lv=0; w.due=addDays(1); }
     }
     if(ok && tal){ s.chips+=tal; RV.chips+=tal; }
+    var vrv=vipPerk(s).rv; if(ok && !q.hint && vrv){ s.chips+=vrv; RV.chips+=vrv; }   // 11-17 VIP
     save(s); q.ok=ok; q.val=val; snd(ok?'ok':'bad');
     if(pomos) msg='🍅 錯字本複習滿 25 分鐘，種了一棵英文番茄樹！';
     RV.i++; renderReview();
@@ -834,13 +837,15 @@
       +(debt.length?'<p class="fp-care bad">'+debt.join('；')+'：先還清才能換籌碼。</p>':'')
       +'<div class="bn-amt"><input type="number" id="vc-chipn" min="1" step="1" inputmode="numeric" placeholder="數量" aria-label="數量"><button class="btn ghost" type="button" data-chipq="50">50</button><button class="btn ghost" type="button" data-chipq="100">100</button></div>'
       +'<div class="bar-btns"><button class="btn solid" type="button" data-act="buychips"'+(debt.length?' disabled':'')+'>用點數買籌碼</button><button class="btn" type="button" data-act="sellchips">籌碼換回點數</button><span class="sub" style="margin:0">點數 '+pts+'・籌碼 '+s.chips+'</span></div></div>';
+    o+=vipHtml(s);   // 11-17 VIP 等級好處
     // 11-17：獎品變多了，照種類分開；收藏進度在「🏅 賭場成就」
     var nOwn=prizeOwnedN(s);
     o+='<div class="vc-row"><h4>獎品 <span>用籌碼換，只有賭場拿得到；收藏 '+nOwn+' / '+PRIZES.length+'（全部收齊有賭場成就）</span></h4>'+PKIND.map(function(kd){
         var L=PRIZES.filter(function(p){ return p.k===kd[0]; }); if(!L.length) return '';
         return '<p class="vc-ph"><b>'+kd[1]+'</b>'+(kd[2]?'・'+kd[2]:'')+'</p><div class="bn-ex">'+L.map(function(p){
           var own=ownPrize(s,p), lock=p.need&&!s.own[p.need], nd=lock?PRIZES.filter(function(x){ return x.id===p.need; })[0]:null;
-          return '<button type="button" data-prize="'+p.id+'"'+(own||lock||s.chips<p.c?' disabled':'')+'><span class="e">'+p.e+'</span><b>'+esc(p.n)+'</b><small>'+(own?'已擁有':p.c+' 籌碼'+(lock?'・先買 '+esc(nd?nd.n:''):'')+(p.say&&!lock?'・'+esc(p.say):''))+'</small></button>'; }).join('')+'</div>'; }).join('');
+          var pr=priceOf(s,p);
+          return '<button type="button" data-prize="'+p.id+'"'+(own||lock||s.chips<pr?' disabled':'')+'><span class="e">'+p.e+'</span><b>'+esc(p.n)+'</b><small>'+(own?'已擁有':(pr<p.c?'<s>'+p.c+'</s> ':'')+pr+' 籌碼'+(lock?'・先買 '+esc(nd?nd.n:''):'')+(p.say&&!lock?'・'+esc(p.say):''))+'</small></button>'; }).join('')+'</div>'; }).join('');
     var bgs=BGS.filter(function(b){ return !b.id||s.own[b.id]; }), pls=plateOpts(s);
     o+='<div class="vc-chips" style="margin-top:12px">背景：'+bgs.map(function(b){ return chipBtn('data-bg',b.id||'none',(s.set.bg||'')===b.id,esc(b.n)); }).join('')+'</div>'
       +(pls.length?'<div class="vc-chips" style="margin-top:8px">招牌下的名牌：'+chipBtn('data-plate','none',!s.set.plate,'不掛')+pls.map(function(x){ return chipBtn('data-plate',x.id,s.set.plate===x.id,x.e+' '+esc(x.ti)); }).join('')+'</div>':'')
@@ -854,6 +859,31 @@
     return L;
   }
   function vipTop(s){ var v=null; PRIZES.forEach(function(p){ if(p.k==='vip' && s.own[p.id]) v=p; }); return v; }
+  // 11-17 他：「VIP 卡是不是應該要有一些優惠或 buff，照等級提升」→ 只給賭場裡的好處；下注上限、鎖、倍率、點數規則都不變。
+  //   disc：獎品打折（VIP 卡本身不打折）；day：每天讀滿 VIP_STUDY 分鐘可以領的籌碼；rv：錯字本複習每答對一題（沒用提示）送的籌碼；sec：限時衝刺、地獄題多幾秒
+  var VIPP=[null,{n:'銅卡',e:'🥉',disc:.05,day:10,rv:1,sec:1},{n:'銀卡',e:'🥈',disc:.10,day:25,rv:1,sec:2},{n:'金卡',e:'🥇',disc:.15,day:50,rv:2,sec:3},{n:'黑卡',e:'🖤',disc:.20,day:100,rv:3,sec:5}];
+  var VIP_STUDY=30;
+  function vipLv(s){ var v=vipTop(s); return v?(+v.id.slice(3)||0):0; }
+  function vipPerk(s){ return VIPP[vipLv(s)]||{disc:0,day:0,rv:0,sec:0}; }
+  function priceOf(s,p){ return p.k==='vip'?p.c:Math.round(p.c*(1-vipPerk(s).disc)); }
+  function vipHtml(s){
+    var lv=vipLv(s), P=vipPerk(s), got=s.vipd===kk(d0()), mins=todayMin();
+    var o='<div class="vc-row"><h4>VIP 會員 <span>'+(lv?'你是 '+P.e+' '+P.n+' 會員':'買 VIP 卡就有（在下面「VIP 卡」）')+'；等級越高好處越多</span></h4>'
+      +'<div class="vc-vipt" tabindex="0" role="region" aria-labelledby="vc-vipcap"><table><caption id="vc-vipcap">各等級的好處</caption>'
+      +'<thead><tr><th scope="col">等級</th><th scope="col">獎品折扣</th><th scope="col">每日籌碼</th><th scope="col">錯字本每題</th><th scope="col">限時多</th></tr></thead><tbody>'
+      +VIPP.slice(1).map(function(v,i){ var me=i+1===lv; return '<tr'+(me?' class="me" aria-current="true"':'')+'><th scope="row">'+v.e+' '+v.n+(me?'（你）':'')+'</th><td>'+Math.round(v.disc*100)+'%</td><td>+'+v.day+'</td><td>+'+v.rv+'</td><td>'+v.sec+' 秒</td></tr>'; }).join('')
+      +'</tbody></table></div>'
+      +'<p class="vc-sub">每日籌碼要今天讀滿 '+VIP_STUDY+' 分鐘才能領，一天一次；錯字本用提示答對不送。限時多的秒數用在「限時衝刺」和地獄難度每題的時間。</p>';
+    if(lv) o+='<div class="bar-btns"><button class="btn solid" type="button" data-act="vipday"'+(got||mins<VIP_STUDY?' disabled':'')+'>'+P.e+' 領今天的 VIP 籌碼（+'+P.day+'）</button><span class="sub" style="margin:0">'
+      +(got?'今天領過了':(mins<VIP_STUDY?'今天讀了 '+mins+' 分鐘，還差 '+(VIP_STUDY-mins)+' 分鐘':'可以領了'))+'</span></div>';
+    return o+'</div>';
+  }
+  function vipDay(){
+    var s=st(), P=vipPerk(s), today=kk(d0());
+    if(!P.day || s.vipd===today || todayMin()<VIP_STUDY) return render();
+    s.vipd=today; s.chips+=P.day; s.k.vipd=(s.k.vipd||0)+P.day; save(s);
+    msg=P.e+' VIP 每日籌碼 +'+P.day+'。'; snd('win'); render();
+  }
   function plateHtml(s){
     var pl=plateOpts(s).filter(function(x){ return x.id===s.set.plate; })[0], v=vipTop(s);
     if(!pl && !v) return '';
@@ -895,9 +925,9 @@
     render();
   }
   function buyPrize(id){
-    var p=PRIZES.filter(function(x){ return x.id===id; })[0], s=st(); if(!p||s.chips<p.c) return;
-    if(p.k==='acc'){ if(API.hasAcc&&API.hasAcc(id)) return; if(!confirm('用 '+p.c+' 籌碼換「'+p.n+'」？')) return; s.chips-=p.c; save(s); API.giveAcc(id); msg='換到 '+p.e+' '+p.n+'！到「我的森林 → 家 → 穿戴」幫牠戴上。'; }
-    else { if(s.own[id]) return; if(p.need && !s.own[p.need]) return; if(!confirm('用 '+p.c+' 籌碼換「'+p.n+'」？')) return; s.chips-=p.c; s.own[id]=1; if(p.k==='bg') s.set.bg=id; if(p.k==='plate') s.set.plate=id; save(s);
+    var p=PRIZES.filter(function(x){ return x.id===id; })[0], s=st(); if(!p) return; var pr=priceOf(s,p); if(s.chips<pr) return;   // 11-17：VIP 折扣
+    if(p.k==='acc'){ if(API.hasAcc&&API.hasAcc(id)) return; if(!confirm('用 '+pr+' 籌碼換「'+p.n+'」？')) return; s.chips-=pr; save(s); API.giveAcc(id); msg='換到 '+p.e+' '+p.n+'！到「我的森林 → 家 → 穿戴」幫牠戴上。'; }
+    else { if(s.own[id]) return; if(p.need && !s.own[p.need]) return; if(!confirm('用 '+pr+' 籌碼換「'+p.n+'」？')) return; s.chips-=pr; s.own[id]=1; if(p.k==='bg') s.set.bg=id; if(p.k==='plate') s.set.plate=id; save(s);
       msg='換到 '+p.e+' '+p.n+'！'+(p.k==='title'?'到「成就 → 稱號」選。':(p.k==='plate'?'已經掛在賭場招牌下面。':(p.k==='vip'?'會員卡掛在賭場招牌下面。':''))); }
     if(window.__fx && window.__fx.unlock) window.__fx.unlock(null,p.n);
     render(); if(window.__petRefresh) setTimeout(window.__petRefresh,50);
@@ -987,6 +1017,7 @@
     if(b.dataset.opt!==undefined && G && G.q){ if(Date.now()-G.q.t0<250) return; return answer(G.q.opts[+b.dataset.opt]); }
     var act=b.dataset.act;
     if(act==='start') return startGame();
+    if(act==='vipday') return vipDay();
     if(act==='again'){ R=null; view='home'; return startGame(); }
     if(act==='mute'){ s.set.mute=!s.set.mute; save(s); return render(); }
     if(act==='logmore'){ LOGN+=30; return render(); }

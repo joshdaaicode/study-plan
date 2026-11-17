@@ -1827,6 +1827,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     <label data-due="2026-11-30"><input type="checkbox"><span>問補習班：寒假、連假、初試後到複試的課表（目前假設：連假停、上到 3/21）<span class="when">11 月內</span><small class="td-why"><b>目前假設</b>週末 17–22 照上；遇到連假停；上到 3/21（複試前）　<b>確定後</b>補習班有加課或停課就跟我說，或在今天分頁編輯當天</small></span></label>
     <label data-due="2026-12-31"><input type="checkbox"><span>問學校寒輔的實際日期（目前暫定 1/21–1/29 上午）<span class="when">12 月</span><small class="td-why"><b>目前假設</b>暫定 1/21–1/29 平日上午 07:45–12:00　<b>確定後</b>學校通知後改 <code class="dim">HANFU</code></small></span></label>
     <label><input type="checkbox"><span>雄中考古題本拿到後，日程裡「雄中考古題」那幾格就照年份寫<span class="when">拿到當天</span><small class="td-why"><b>目前假設</b>12 月起每週留 1–2 格「雄中考古題」，還沒發就改做考古題錯題重做　<b>確定後</b>拿到後那些格子就照年份往下寫，不用重排</small></span></label>
+    <label data-due="2027-03-20"><input type="checkbox"><span>初試放榜後決定會考那 22 項怎麼排<span class="when">初試放榜後</span><small class="td-why"><b>目前假設</b>11-17 初試改 3/13、複試推估 3/27 後，會考少約兩週，英文第二本單元 6–15、數學第二本單元 6–16、歷屆會考 112 排不進去；他說「等看有沒有進複試再說」　<b>確定後</b>沒進複試：複試格子全部改會考（重跑產生器看還剩幾項）；有進：再決定要不要從初試前拿回時間或捨掉</small></span></label>
     <label data-due="2027-01-25"><input type="checkbox"><span>一月底起每週查雄中科學班簡章，複試日期確定後更新計畫<span class="when">1 月底起</span><small class="td-why"><b>目前假設</b>教育部 11-17 公告：報名 2/18–3/3、初試（科學能力檢定）3/13（六）、報到 4/8；複試各校自訂，照去年推估 3/27（六）　<b>確定後</b>簡章公布當天改 <code class="dim">EXAM</code> 的複試日期，後面整段會自動重排</small></span></label>
     <label data-due="2027-03-31"><input type="checkbox"><span>從心測中心官網下載並印好歷屆會考 112–115 年試題（英文只要閱讀）<span class="when">3 月底前</span></span></label>
   </div>
@@ -9637,7 +9638,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(window.__tab!==5 || window.__sub!==22) return;
     if(window.__casino){ window.__casino.show(); return; }
     if(asked) return; asked=true;
-    var s=document.createElement('script'); s.src='casino.js?v=20261117c';
+    var s=document.createElement('script'); s.src='casino.js?v=20261117e';
     s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }
