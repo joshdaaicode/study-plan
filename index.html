@@ -1301,7 +1301,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     <div class="count a">
       <span class="tag">科學班初試</span>
       <div class="n" id="c-sci">—<small>天</small></div>
-      <p class="d">雄中科學班 · 暫定 2027/3/6（簡章公布後更新）</p>
+      <p class="d">雄中科學班 · 2027/3/13 科學能力檢定（教育部公告）</p>
     </div>
     <div class="count b">
       <span class="tag">國中教育會考</span>
@@ -1514,9 +1514,9 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     <div class="tl-row">
       <div class="tl-mon">3月</div>
       <div class="tl-rail sci stop"><span class="cap-stop"></span>
-        <span class="chip big est"><span class="dt">≈3/6</span>初試</span>
-        <span class="chip"><span class="dt">3/7–12</span>一半時間準備複試</span>
-        <span class="chip big est"><span class="dt">≈3/13</span>複試 — 科學班軌結束</span>
+        <span class="chip big"><span class="dt">3/13</span>初試（科學能力檢定）</span>
+        <span class="chip"><span class="dt">3/14–26</span>一半時間準備複試</span>
+        <span class="chip big est"><span class="dt">≈3/27</span>複試（推估，簡章為準）— 科學班軌結束</span>
       </div>
       <div class="tl-rail cap">
         <span class="chip est"><span class="dt">3/22–23</span>下學期一段（預定，不準備）</span>
@@ -1578,7 +1578,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     </div>
 
     <div class="phase p-sci">
-      <div class="when"><b>PHASE 4</b>2/15 – 3/6<br>瘋狂訂正</div>
+      <div class="when"><b>PHASE 4</b>2/15 – 3/13<br>瘋狂訂正</div>
       <div>
         <h3>第二輪、限時模擬、觀念總整理</h3>
         <p>每校每科的錯題不看解答重做；114 年的卷子整份限時重寫，看能不能拿到九成；五科各寫一頁 A4 觀念總整理，那五頁就是初試前一晚要看的東西。四模不另外準備。</p>
@@ -1587,7 +1587,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     </div>
 
     <div class="phase p-mix">
-      <div class="when"><b>PHASE 5</b>3/7 – 3/13<br>複試週</div>
+      <div class="when"><b>PHASE 5</b>3/14 – 3/27<br>複試準備</div>
       <div>
         <h3>一半複試、一半會考</h3>
         <p>自我介紹、實驗總整理、數據處理、經驗說明、模擬提問。<b>沒進複試就把這些格子全部改成會考</b>——今天分頁可以直接編輯當天。</p>
@@ -1649,7 +1649,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   <div class="sec-head"><h2>其他還沒定案的</h2><span class="eyebrow">確定了就改，日程會跟著動</span></div>
   <p class="sec-note">要去問、要等通知的都放在上面的「待決定」。這裡是不用特別去問、遇到再改的。確定之後跟 Claude 說，或改 <code class="dim">tools/gen_plan.py</code> 重新產生。</p>
   <div class="var-list">
-    <div class="var-card"><b>資優數學寒假是否上課</b><p><span>目前</span>週三照上，國定假日停，最後一堂 3/3</p><p><span>確定後</span>有變動就改 <code class="dim">GIFTED_LAST</code> 或當天編輯</p></div>
+    <div class="var-card"><b>資優數學寒假是否上課</b><p><span>目前</span>週三照上，國定假日停，最後一堂 3/10（初試 3/13 前）</p><p><span>確定後</span>有變動就改 <code class="dim">GIFTED_LAST</code> 或當天編輯</p></div>
     <div class="var-card"><b>下學期段考日期</b><p><span>目前</span>預定 3/22–23、5/3 與 5/7（未定案，不準備，只標在月曆）</p><p><span>確定後</span>學校公布後改 <code class="dim">DAY_NOTES</code></p></div>
     <div class="var-card"><b>自然學科競賽複賽</b><p><span>目前</span>1/7，前一晚排了一格公式卡</p><p><span>確定後</span>沒晉級那格就改寫補習作業</p></div>
     <div class="var-card"><b>颱風假／生病</b><p><span>目前</span>每週日 14:40–16:00 空檔就是緩衝</p><p><span>確定後</span>掉的進度先用空檔補；連兩週補不完就砍當週最不重要的一項，不要熬夜</p></div>
@@ -1658,7 +1658,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 
 <section>
   <div class="sec-head"><h2>時段模板</h2><span class="eyebrow">每一天都由這五種組成</span></div>
-  <p class="sec-note">固定不能動的：週三 18:00–21:30 資優數學（到 3/3）、週六 17:00–22:00 雄科班補習（資優數學）、週日 17:00–22:00 雄科班補習（自然學科）（到 3/7，連假停）。平日 06:30 起床、假日 07:30 起床，每天 23:00 睡。</p>
+  <p class="sec-note">固定不能動的：週三 18:00–21:30 資優數學（到 3/10）、週六 17:00–22:00 雄科班補習（資優數學）、週日 17:00–22:00 雄科班補習（自然學科）（到 3/21，連假停）。平日 06:30 起床、假日 07:30 起床，每天 23:00 睡。</p>
 
   <div class="wk" data-kind="school">
     <div class="wk-title"><h3>上學日</h3><span class="wk-when">週一、二、四、五（週三見下一張）</span></div>
@@ -1678,7 +1678,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   </div>
 
   <div class="wk" data-kind="gifted">
-    <div class="wk-title"><h3>週三（資優數學）</h3><span class="wk-when">到 3/3</span></div>
+    <div class="wk-title"><h3>週三（資優數學）</h3><span class="wk-when">到 3/10</span></div>
     <div class="tbl-scroll"><table>
       <thead><tr><th>時段</th><th>內容</th></tr></thead>
       <tbody>
@@ -1692,7 +1692,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   </div>
 
   <div class="wk" data-kind="weekend">
-    <div class="wk-title"><h3>週末（晚上補習）</h3><span class="wk-when">到 3/7，連假除外</span></div>
+    <div class="wk-title"><h3>週末（晚上補習）</h3><span class="wk-when">到 3/21，連假除外</span></div>
     <div class="tbl-scroll"><table>
       <thead><tr><th>時段</th><th>週六</th><th>週日</th></tr></thead>
       <tbody>
@@ -1707,7 +1707,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         <tr><td class="t">22:15–22:35</td><td colspan="2">今天補習重點回想（不看筆記寫 3 個重點）</td></tr>
       </tbody>
     </table></div>
-    <p class="w-note">科班全衝期（12/25–3/6）週末除了週日上午作業和週日空檔，其他全給科班。</p>
+    <p class="w-note">科班全衝期（12/25–3/13）週末除了週日上午作業和週日空檔，其他全給科班。</p>
   </div>
 
   <div class="wk" data-kind="full">
@@ -1774,9 +1774,9 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       <tr><td class="t">11/9–11/24</td><td>減半（二段準備）</td><td>補習作業照寫</td></tr>
       <tr><td class="t">11/25–12/24</td><td>恢復每週 3–4 份</td><td>12/3 自然學科競賽初選；12 月起每週一格雄中考古題</td></tr>
       <tr><td class="t">12/25–2/13</td><td>全衝：寫完剩下的 112、113、114 年</td><td>每週穿插 4 格補習講義複習、2 格雄中考古題、1 格自學擴充、1 格錯題重做</td></tr>
-      <tr><td class="t">2/15–3/5</td><td>第二輪：每校錯題重做、114 年整份限時重寫</td><td>五科各寫一頁 A4 觀念總整理</td></tr>
-      <tr><td class="t">≈3/6</td><td colspan="2">初試。前一天只看觀念總整理和錯題紙</td></tr>
-      <tr><td class="t">3/7–3/12</td><td colspan="2">複試準備：自我介紹、實驗總整理、數據處理、經驗說明、模擬提問</td></tr>
+      <tr><td class="t">2/15–3/12</td><td>第二輪：每校錯題重做、114 年整份限時重寫</td><td>五科各寫一頁 A4 觀念總整理</td></tr>
+      <tr><td class="t">3/13</td><td colspan="2">初試（科學能力檢定，教育部公告）。前一天只看觀念總整理和錯題紙</td></tr>
+      <tr><td class="t">3/14–3/26</td><td colspan="2">複試準備：自我介紹、實驗總整理、數據處理、經驗說明、模擬提問</td></tr>
     </tbody>
   </table></div>
   <p class="w-note">南一中、嘉中、彰中那本目前手上沒有解答檔的話，訂正時先自己重算，真的卡住的記到「今天 → 要問老師」，週末帶去補習班問。</p>
@@ -1790,8 +1790,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     <tbody>
       <tr><td class="t">10/26–10/29</td><td>1–3 冊（自然 1–4 冊）重點快速翻過</td><td>二模 10/28–29</td></tr>
       <tr><td class="t">10/30–12/22</td><td>第一本講義 1–3 冊第一輪，三模前約走到第 2 冊＋第 3 冊開頭（11/9–24 暫停換二段）；12/19–21 模考卷第 2 回</td><td>三模 12/23–24</td></tr>
-      <tr><td class="t">12/25–3/6</td><td>暫停（科班全衝）</td><td>四模 2/18–19 不另外準備</td></tr>
-      <tr><td class="t">3/7–4/14</td><td>四模訂正；補完 1–3 冊（3/20）；開始 4–6 冊；模考卷第 3 回；4/3–4 寫第 4 回</td><td>五模 4/15–16</td></tr>
+      <tr><td class="t">12/25–3/13</td><td>暫停（科班全衝）</td><td>四模 2/18–19 不另外準備</td></tr>
+      <tr><td class="t">3/14–4/14</td><td>四模訂正；補完 1–3 冊（約 4/2）；開始 4–6 冊；模考卷第 3 回；4/3–4 寫第 4 回</td><td>五模 4/15–16</td></tr>
       <tr><td class="t">4/17–4/30</td><td>4–6 冊走完、模考卷第 5 回；數學、英文第二本講義；歷屆會考 112；平日 50 分鐘做第二輪</td><td>—</td></tr>
       <tr><td class="t">5/1–5/14</td><td>歷屆會考 113–115；錯題本總複習；最後一輪；弱科加強</td><td>會考 5/15–16</td></tr>
     </tbody>
@@ -1824,10 +1824,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   <p class="sec-note">11/9 把「現在就要處理的事」和「還沒定案的變數」合在一起：重複的只留一份，做完的拿掉。7 天內到期、還沒勾的會出現在「今天」。</p>
   <div class="todo" id="todo-list">
     <label data-due="2026-11-15"><input type="checkbox"><span>準備兩本錯題本：科班一本、會考一本（或都用「錯題」分頁）<span class="when">本週</span></span></label>
-    <label data-due="2026-11-30"><input type="checkbox"><span>問補習班：寒假、連假、初試後到複試的課表（目前假設：連假停、上到 3/7）<span class="when">11 月內</span><small class="td-why"><b>目前假設</b>週末 17–22 照上；遇到連假停；上到 3/7（複試前）　<b>確定後</b>補習班有加課或停課就跟我說，或在今天分頁編輯當天</small></span></label>
+    <label data-due="2026-11-30"><input type="checkbox"><span>問補習班：寒假、連假、初試後到複試的課表（目前假設：連假停、上到 3/21）<span class="when">11 月內</span><small class="td-why"><b>目前假設</b>週末 17–22 照上；遇到連假停；上到 3/21（複試前）　<b>確定後</b>補習班有加課或停課就跟我說，或在今天分頁編輯當天</small></span></label>
     <label data-due="2026-12-31"><input type="checkbox"><span>問學校寒輔的實際日期（目前暫定 1/21–1/29 上午）<span class="when">12 月</span><small class="td-why"><b>目前假設</b>暫定 1/21–1/29 平日上午 07:45–12:00　<b>確定後</b>學校通知後改 <code class="dim">HANFU</code></small></span></label>
     <label><input type="checkbox"><span>雄中考古題本拿到後，日程裡「雄中考古題」那幾格就照年份寫<span class="when">拿到當天</span><small class="td-why"><b>目前假設</b>12 月起每週留 1–2 格「雄中考古題」，還沒發就改做考古題錯題重做　<b>確定後</b>拿到後那些格子就照年份往下寫，不用重排</small></span></label>
-    <label data-due="2027-01-25"><input type="checkbox"><span>一月底起每週查雄中科學班簡章，初試、複試日期確定後更新計畫<span class="when">1 月底起</span><small class="td-why"><b>目前假設</b>初試 3/6（六）、複試 3/13（六），都是推估　<b>確定後</b>一月底簡章公布當天改 <code class="dim">EXAM</code>，後面整段會自動重排</small></span></label>
+    <label data-due="2027-01-25"><input type="checkbox"><span>一月底起每週查雄中科學班簡章，複試日期確定後更新計畫<span class="when">1 月底起</span><small class="td-why"><b>目前假設</b>教育部 11-17 公告：報名 2/18–3/3、初試（科學能力檢定）3/13（六）、報到 4/8；複試各校自訂，照去年推估 3/27（六）　<b>確定後</b>簡章公布當天改 <code class="dim">EXAM</code> 的複試日期，後面整段會自動重排</small></span></label>
     <label data-due="2027-03-31"><input type="checkbox"><span>從心測中心官網下載並印好歷屆會考 112–115 年試題（英文只要閱讀）<span class="when">3 月底前</span></span></label>
   </div>
   <p class="w-note">勾起來會記住（也會跟著備份、雲端同步）。</p>
@@ -2716,9 +2716,9 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     '2026-11':'11/9–11/22 二段準備兩週（會考講義暫停、考古題減半、補習作業照寫）｜11/23–24 二段｜11/25 回到雙軌',
     '2026-12':'12/3 自然學科競賽校內初選｜12/16–22 三模週（12/19–21 模考卷第 2 回）｜12/23–24 三模｜12/25 連假起全衝科班',
     '2027-1':'1/1–1/3 元旦連假全給科班（補習停課）｜1/18–19 三段不另外準備｜1/21 寒假、寒輔暫定 1/21–1/29 上午｜月底起每週查雄中簡章',
-    '2027-2':'2/5 除夕、2/6 初一休息｜2/11 開學｜2/13 兩本考古題寫完＋訂正｜2/15 起第二輪＋限時模擬｜2/18–19 四模（不另外準備）｜2/27–3/1 連假全給科班',
-    '2027-3':'≈3/6 初試｜3/7–12 一半時間準備複試｜≈3/13 複試｜之後全面轉會考：先補完 1–3 冊（3/20），再走 4–6 冊',
-    '2027-4':'4/3–4/4 連假：模考卷第 4 回｜4/15–16 五模（最後一次模考）｜4/17 走完 4–6 冊、寫第 5 回｜第二本講義＋歷屆 112',
+    '2027-2':'2/5 除夕、2/6 初一休息｜2/11 開學｜2/13 兩本考古題寫完＋訂正｜2/15 起第二輪＋限時模擬｜2/18–3/3 科學班報名｜2/18–19 四模（不另外準備）｜2/27–3/1 連假全給科班',
+    '2027-3':'3/4–6 會考報名｜3/13 初試（科學能力檢定）｜3/14–26 一半時間準備複試｜≈3/27 複試（推估）｜之後全面轉會考：先補完 1–3 冊（約 4/2），再走 4–6 冊',
+    '2027-4':'4/3–4/4 連假：模考卷第 4 回｜4/8 科學班報到｜4/15–16 五模（最後一次模考）｜4/17 走完 4–6 冊、寫第 5 回｜第二本講義＋歷屆 112',
     '2027-5':'歷屆會考 113–115＋錯題本總複習｜考前一週只看錯題紙｜5/15–16 會考｜5/17 之後時間全還給你自己'
   };
 
