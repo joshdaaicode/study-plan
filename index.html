@@ -8904,9 +8904,12 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   }
   function achScore(){ var A=achState(), n=0; Object.keys(A.c).forEach(function(k){ n+=A.c[k]||0; }); return n; }
   function achClaimable(){ var A=achState(), n=0; ACH.concat(SECRET).forEach(function(a){ if((A.r[a.id]||0)>(A.c[a.id]||0)) n++; }); return n; }
-  var CASINO_TI={t_luck:'幸運兒',t_speller:'拼字王',t_god:'單字賭神'};   // 單字賭場用籌碼換的稱號
+  var CASINO_TI={t_luck:'幸運兒',t_speller:'拼字王',t_god:'單字賭神',   // 單字賭場用籌碼換的稱號
+    p_bj:'21 點之王',p_bingo:'賓果大師',p_dict:'人形字典',p_toeic:'多益怪物',p_legend:'傳說賭神'};   // 11-17：賭場新名牌也能在「成就 → 稱號」選
   function titlesOwned(){ var A=achState(), L=[]; ACH.forEach(function(a){ if((A.c[a.id]||0)>=3) L.push(a.ti); }); SECRET.forEach(function(a){ if(A.c[a.id]) L.push(a.ti); });
-    var own=vocabQ().own||{}; Object.keys(CASINO_TI).forEach(function(k){ if(own[k]) L.push(CASINO_TI[k]); }); return L; }
+    var own=vocabQ().own||{}; Object.keys(CASINO_TI).forEach(function(k){ if(own[k]) L.push(CASINO_TI[k]); });
+    if((vocabQ().ach||{}).a_col) L.push('賭場收藏家');   // 11-17：賭場成就「收齊全部獎品」送的名牌
+    return L; }
   function achTitle(){ var A=achState(); return A.title && titlesOwned().indexOf(A.title)>=0 ? A.title : ''; }
   function claimAch(id){
     var A=achState(), a=ACH.filter(function(x){ return x.id===id; })[0], sec=SECRET.filter(function(x){ return x.id===id; })[0];

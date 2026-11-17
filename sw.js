@@ -1,5 +1,5 @@
-const CACHE='study-plan-v12';   // 11-12：v11 裡可能還存著 11-11 以前的舊版（持股上限 500），換名字讓手機丟掉重抓
-const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261110a'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
+const CACHE='study-plan-v13';   // 11-17：daychart.js 換成 20261117s（各科讀書時間圖），預存清單跟著換；v12 是 11-12 丟掉舊版用的
+const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261117s'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'}))).catch(()=>{})));
