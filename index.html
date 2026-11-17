@@ -2110,6 +2110,8 @@ html.pv .wrap{max-width:none;padding:0}
   <!-- 11-09：「給 Claude 檢查」從森林頁搬來（使用者：不該放在森林的東西移出來，不然看一下就被扣心情） -->
   <div class="card" id="chk-card" style="padding:14px 16px;margin-bottom:14px"></div>
   <div class="card" id="dc-card" style="padding:14px 16px;margin-bottom:14px"><h3 style="margin:0 0 6px">每天的讀書長條圖</h3><div id="dc-mine"><p class="sub">載入中…</p></div></div>
+  <!-- 11-17：各科花多少時間（番茄鐘／表定兩種、長條圖／圓餅圖、統計數字和數字表）；daychart.js 的 DayChart.subj，家長頁也用同一份 -->
+  <div class="card" id="ss-card" style="padding:14px 16px;margin-bottom:14px"><h3 style="margin:0 0 8px">各科讀書時間</h3><div id="ss-mine"><p class="sub">載入中…</p></div></div>
   <div class="td-budget" id="bt-sum"></div>
   <div class="card" id="bt-chart" style="padding:14px 16px;margin-bottom:14px"></div>
   <details class="fold-card"><summary>看每天的數字（最近 21 天）</summary><!-- 11-10：收起來，跟上面的長條圖重複 -->
@@ -2160,7 +2162,7 @@ html.pv .wrap{max-width:none;padding:0}
 
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js?v=20261110a"></script>
+<script src="daychart.js?v=20261117s"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -5071,6 +5073,21 @@ html.pv .wrap{max-width:none;padding:0}
   }
   document.addEventListener('plan:tab',function(e){ if(e.detail===4) setTimeout(paintDC,40); });
   if(window.__tab===4) setTimeout(paintDC,40);
+  // 11-17：各科讀書時間（daychart.js 的 DayChart.subj，家長頁也用同一份）：只有正在看「紀錄 → 進度」才算、才畫，
+  // 等新的一頁先畫出來再做（__U.later）；資料沒變、還是同一天就不重畫
+  var ssm=null;
+  function ssOn(){ return window.__tab===4 && window.__sub===21 && !document.hidden; }
+  function paintSS(){
+    if(!ssOn()) return;
+    var el=document.getElementById('ss-mine'); if(!el || !window.DayChart || !window.DayChart.subj) return;
+    if(ssm){ ssm.refresh(); return; }
+    ssm=window.DayChart.subj(el,{get:function(){ var o={};
+      ['plan.state.v3','plan.hist.v1','plan.pomo.v1'].forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; });
+      return o; }});
+  }
+  document.addEventListener('plan:tab',function(e){ if(e.detail===4) window.__U.later(paintSS); });
+  document.addEventListener('visibilitychange',function(){ if(ssOn()) window.__U.later(paintSS); });
+  if(window.__tab===4) window.__U.later(paintSS);
 })();
 </script>
 <script>
