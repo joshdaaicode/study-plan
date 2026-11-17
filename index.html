@@ -4417,7 +4417,25 @@ html.pv .wrap{max-width:none;padding:0}
     if(pushT){ clearTimeout(pushT); pushT=null; }
     if(checking){ pushSoon(); return; }   // 正在看雲端有沒有別台的新資料：等它看完再傳
     pending=true; again=false; lastPushAt=Date.now();
-    upload(true).then(function(){ pending=false; if(again){ again=false; pushSoon(); } },function(){ pending=false; again=false; });
+    upload(true).then(function(){ pending=false; if(again){ again=false; pushSoon(); } },function(e){ pending=false; again=false; syncFail(e); });
+  }
+  // 11-15：同步失敗以前只寫在「設定 → 雲端同步」那一行，平常看不到。11/12 晚上起雲端就沒再更新，
+  // 他兩台裝置的勾選對不起來、以為「每天都有欠帳」是 bug。現在 token 有問題、或超過一天沒同步成功，就在畫面底下跳一次。
+  var failShown=false;
+  function syncFail(e){
+    var m=(e&&e.message)||String(e||''); if(!cl.auto || !cl.token || /^(no token|empty)$/.test(m)) return;
+    var auth=/Token|權限|找不到這個 Gist/.test(m), stale=cl.last && Date.now()-cl.last>24*3600e3;
+    if(!(auth||stale) || failShown || window.__pv) return;
+    failShown=true;
+    var old=document.getElementById('cl-fail'); if(old) old.remove();
+    var b=document.createElement('div'); b.className='rem-banner'; b.id='cl-fail'; b.style.display='flex';
+    b.innerHTML='<span><b>☁ 雲端同步失敗</b>　'+window.__esc(m)+'。'+(cl.last?'上次同步成功是 '+fmt(cl.last)+'，之後的勾選、點數都只存在這台，別台裝置和爸媽頁看不到。':'')
+      +(auth?'到「設定 → 雲端同步」貼一次新的 token（GitHub 重新產生，Gists 權限 Read and write）。':'網路好一點再打開一次；一直這樣就到「設定 → 雲端同步」按「測試連線」。')+'</span>';
+    var go=document.createElement('button'); go.type='button'; go.textContent='去設定';
+    go.addEventListener('click',function(){ b.remove(); if(window.__showTab) window.__showTab(7,19); var c=document.getElementById('cl-status'); if(c) c.scrollIntoView({block:'center'}); });
+    var ok=document.createElement('button'); ok.type='button'; ok.textContent='知道了';
+    ok.addEventListener('click',function(){ b.remove(); });
+    b.appendChild(go); b.appendChild(ok); document.body.appendChild(b);
   }
   // 看雲端有沒有別台傳的新資料：這台沒改過就直接拉下來；這台從沒同步過就問；兩邊都改過就暫停等你決定
   function checkRemote(){
@@ -4444,7 +4462,7 @@ html.pv .wrap{max-width:none;padding:0}
           if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),false);
         }
       }); });
-    }).catch(function(){}).then(function(){ checking=false; pullParent(); });
+    }).catch(function(e){ say('同步失敗：'+(e.message||e),'err'); syncFail(e); }).then(function(){ checking=false; pullParent(); });
   }
   // 家長頻道（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（檔名 study-plan-parent.json）。
   // 這裡只讀，讀到的交給寵物那段 window.__parentApply 套用（每天加點最多 30 點，那段會再擋一次）。
