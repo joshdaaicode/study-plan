@@ -400,8 +400,22 @@
     if(cur==='chip'){ var s=st(); s.chips=Math.max(0,s.chips+n); save(s); return; }
     var ps=API.petState(); ps.gold=Math.max(0,(ps.gold||0)+n); API.savePet(ps);
   }
-  function todayMin(){ var h=API.allHist?API.allHist():{}, e=h[kk(d0())]||{}; return e.m||0; }
-  function capOf(cur){ return cur==='star'?3:50+todayMin(); }   // 今天讀越多，一次能押越多
+  // 押注上限（2026-11-18 使用者定）：保底＋今天表定分鐘＋今天番茄鐘分鐘×1.5
+  //   表定＝今天做完的任務分鐘（含錯字本複習）；番茄鐘＝今天番茄鐘紀錄的分鐘；同一段時間兩邊都有也照加（使用者選）
+  //   保底＝這個月 1 號到昨天，每天（表定＋番茄×1.5）的平均，沒讀的日子算 0；1 號還沒有資料就用上個月整月的平均
+  function pomoByDay(){ var m={}; try{ ((JSON.parse(localStorage.getItem('plan.pomo.v1'))||{}).log||[]).forEach(function(e){ if(e&&e.k) m[e.k]=(m[e.k]||0)+(+e.m||25); }); }catch(e){} return m; }
+  function studyParts(){ var h=API.allHist?API.allHist():{}, pm=pomoByDay(), k=kk(d0()), e=h[k]||{}; return {h:h, pm:pm, sch:e.m||0, pomo:pm[k]||0}; }
+  function scoreOf(h,pm,k){ return ((h[k]||{}).m||0)+1.5*(pm[k]||0); }
+  function todayMin(P){ P=P||studyParts(); return Math.round(P.sch+1.5*P.pomo); }
+  function floorMin(P){
+    P=P||studyParts(); var t=d0(), y=t.getFullYear(), mo=t.getMonth(), n=t.getDate()-1, sum=0, i;
+    if(n<1){ var last=new Date(y,mo,0); n=last.getDate(); y=last.getFullYear(); mo=last.getMonth(); }
+    for(i=1;i<=n;i++) sum+=scoreOf(P.h,P.pm,kk(new Date(y,mo,i)));
+    return Math.round(sum/n);
+  }
+  function capOf(cur,P){ if(cur==='star') return 3; P=P||studyParts(); return floorMin(P)+todayMin(P); }   // 保底＋今天讀的（番茄鐘算 1.5 倍）
+  function capTxt(){ var P=studyParts(), f=floorMin(P), t=todayMin(P);
+    return '保底 '+f+'（這個月平均）＋今天 '+t+'（表定 '+P.sch+(P.pomo?'＋番茄鐘 '+P.pomo+'×1.5':'')+'）＝一次最多押 '+(f+t); }
 
   /* ---------- 能不能下注 ---------- */
   function lockState(){
@@ -490,7 +504,7 @@
     var pet=API.petState?API.petState().pet:null;
     var o='';
     o+=lock.length?'<p class="fp-care bad">🔒 現在不能下注：'+lock.join('；')+'。錯字本複習隨時都可以。</p>'
-      :'<p class="fp-care">✅ 可以下注。今天讀了 '+todayMin()+' 分鐘，一次最多押 '+capOf('pts')+' 點／籌碼（讀越多押越大）、🌟 最多 3 顆。</p>';
+      :'<p class="fp-care">✅ 可以下注。'+capTxt()+' 點／籌碼（讀越多押越大）、🌟 最多 3 顆。</p>';
     o+='<div class="vc-row"><h4>範圍 <span>可以複選；'+esc(SOON)+'</span></h4><div class="vc-chips">'
       +RANGES.map(function(r){ var n=r.id==='wb'?Object.keys(s.wb).length:rangeCount(r.id); return chipBtn('data-rg',r.id,set.rg.indexOf(r.id)>=0,esc(r.n)+' <small>'+n+'</small>'); }).join('')+'</div>'
       +'<details class="vc-more"'+(set.let||set.pos.length?' open':'')+'><summary>只考某些字母、詞性'+(set.let?'（'+set.let.toUpperCase().split('').join('')+'）':'')+(set.pos.length?'（'+set.pos.map(function(p){ return POSF.filter(function(x){ return x[0]===p; })[0][1]; }).join('、')+'）':'')+'</summary>'
@@ -524,7 +538,7 @@
     var pool=poolOf(set,s); if(pool.length<4){ msg='範圍裡至少要 4 個字。'; return render(); }
     var el=document.getElementById('vc-bet'), bet=el?parseInt(el.value,10):set.bet, cur=set.cur, cap=capOf(cur);
     if(!(bet>=1)){ msg='先填要押多少。'; return render(); }
-    if(bet>cap){ msg='這把最多押 '+cap+'（'+(cur==='star'?'🌟 一次最多 3 顆':'50＋今天讀書分鐘')+'）。'; return render(); }
+    if(bet>cap){ msg='這把最多押 '+cap+'（'+(cur==='star'?'🌟 一次最多 3 顆':'保底＋今天表定＋番茄鐘×1.5')+'）。'; return render(); }
     if(bet>bal(cur)){ msg=CUR[cur].n+'不夠：只有 '+bal(cur)+'。'; return render(); }
     var pet=API.petState?API.petState().pet:null;
     if(set.mode==='duel' && (!pet||pet.trip)){ msg='對賭要寵物在家。'; return render(); }
@@ -873,7 +887,7 @@
       +'<thead><tr><th scope="col">等級</th><th scope="col">獎品折扣</th><th scope="col">每日籌碼</th><th scope="col">錯字本每題</th><th scope="col">限時多</th></tr></thead><tbody>'
       +VIPP.slice(1).map(function(v,i){ var me=i+1===lv; return '<tr'+(me?' class="me" aria-current="true"':'')+'><th scope="row">'+v.e+' '+v.n+(me?'（你）':'')+'</th><td>'+Math.round(v.disc*100)+'%</td><td>+'+v.day+'</td><td>+'+v.rv+'</td><td>'+v.sec+' 秒</td></tr>'; }).join('')
       +'</tbody></table></div>'
-      +'<p class="vc-sub">每日籌碼要今天讀滿 '+VIP_STUDY+' 分鐘才能領，一天一次；錯字本用提示答對不送。限時多的秒數用在「限時衝刺」和地獄難度每題的時間。</p>';
+      +'<p class="vc-sub">每日籌碼要今天讀滿 '+VIP_STUDY+' 分鐘（表定＋番茄鐘×1.5）才能領，一天一次；錯字本用提示答對不送。限時多的秒數用在「限時衝刺」和地獄難度每題的時間。</p>';
     if(lv) o+='<div class="bar-btns"><button class="btn solid" type="button" data-act="vipday"'+(got||mins<VIP_STUDY?' disabled':'')+'>'+P.e+' 領今天的 VIP 籌碼（+'+P.day+'）</button><span class="sub" style="margin:0">'
       +(got?'今天領過了':(mins<VIP_STUDY?'今天讀了 '+mins+' 分鐘，還差 '+(VIP_STUDY-mins)+' 分鐘':'可以領了'))+'</span></div>';
     return o+'</div>';
