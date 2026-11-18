@@ -189,6 +189,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
 </div>
 <script src="plan.js"></script>
 <script src="daychart.js?v=20261117t"></script>
+<script src="daysum.js?v=20261118a"></script>
 <script>
 (function(){
   var GK='parent.gist.v1', CK='parent.chan.v1', FILE='study-plan-backup.json', PFILE='study-plan-parent.json', OWNER='joshdaaicode';
@@ -488,6 +489,8 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     if(!show.length) html+='<p class="sub">最近沒有要檢查的作業。</p>';
     html+='</section>';
 
+    // 11-18：今天摘要（跟孩子網站「紀錄 → 日誌」同一份 daysum.js；家長頁不顯示心情和日誌內容）
+    html+='<section class="card"><h2 style="margin-bottom:8px">今天摘要</h2><div id="ds"></div></section>';
     // 長條圖
     html+='<section class="card"><h2>每天的讀書長條圖</h2><div id="dc"></div></section>';
     // 11-17：各科讀書時間（孩子要的：番茄鐘／表定兩種、長條圖／圓餅圖、統計數字）；跟孩子網站「紀錄 → 進度」同一份 daychart.js
@@ -511,6 +514,8 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     if(window.DayChart && dcEl) dcHandle=window.DayChart.mount(dcEl,{get:function(){ return lastO||{}; }});
     var ssEl=document.getElementById('ss');
     if(window.DayChart && window.DayChart.subj && ssEl) window.DayChart.subj(ssEl,{media:true, get:function(){ return lastO||{}; }});   // media：深色跟著手機設定
+    var dsEl=document.getElementById('ds');
+    if(window.DaySum && dsEl) window.DaySum.mount(dsEl,{parent:true, get:function(){ return lastO||{}; }});
     paintActs(); paintSetup(); paintLive();
   }
 

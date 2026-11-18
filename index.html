@@ -2139,6 +2139,9 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   <div class="sec-head"><h2>每日日誌</h2><span class="eyebrow">兩分鐘就好</span></div>
   <p class="sec-note">三個問題，寫完就關掉。第三題是明天的「幾點在哪做」——研究顯示明確指定時間地點能同時提高完成率、降低對完成時間的樂觀偏誤。</p>
 
+  <!-- 11-18：今天摘要（daysum.js，家長頁也用同一份；家長頁不顯示心情和日誌內容） -->
+  <div class="card" id="ds-card" style="padding:14px 16px;margin-bottom:14px"><h3 style="margin:0 0 6px">📋 今天摘要</h3><div id="ds-mine"></div></div>
+
   <div class="card" style="margin-bottom:14px">
     <h3 style="margin-bottom:8px">今天的狀態</h3>
     <p class="sub">心情</p>
@@ -2221,6 +2224,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 </div>
 <script src="plan.js"></script>
 <script src="daychart.js?v=20261117t"></script>
+<script src="daysum.js?v=20261118a"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -5291,6 +5295,22 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   document.addEventListener('plan:tab',function(e){ if(e.detail===4) window.__U.later(paintSS); });
   document.addEventListener('visibilitychange',function(){ if(ssOn()) window.__U.later(paintSS); });
   if(window.__tab===4) window.__U.later(paintSS);
+  // 11-18：今天摘要（daysum.js）：只有正在看「紀錄 → 日誌」才算；點了心情、存了日誌就重算
+  var dsm=null, dsT=0;
+  function dsOn(){ return window.__tab===4 && window.__sub===20 && !document.hidden; }
+  function paintDS(){
+    if(!dsOn()) return;
+    var el=document.getElementById('ds-mine'); if(!el || !window.DaySum) return;
+    if(dsm){ dsm.refresh(); return; }
+    dsm=window.DaySum.mount(el,{get:function(){ var o={};
+      ['plan.state.v3','plan.hist.v1','plan.pomo.v1','plan.checks.v1','plan.shop.v1','plan.vrev.v1','plan.easy.v1','plan.parent.v1','plan.vocab.v1','plan.journal.v1','plan.pet.v1'].forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; });
+      return o; }});
+  }
+  document.addEventListener('plan:tab',function(e){ if(e.detail===4) window.__U.later(paintDS); });
+  document.addEventListener('visibilitychange',function(){ if(dsOn()) window.__U.later(paintDS); });
+  (function(){ var c=document.getElementById('ds-card'), sec=c&&c.parentNode; if(sec) sec.addEventListener('click',function(e){
+    if(!e.target.closest('.mood-row button,#jr-save')) return; clearTimeout(dsT); dsT=setTimeout(paintDS,300); }); })();
+  if(window.__tab===4) window.__U.later(paintDS);
 })();
 </script>
 <script>
