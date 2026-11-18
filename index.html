@@ -387,6 +387,53 @@ section[hidden]{display:none}
 .pm-sel select{font-family:var(--mono);font-size:11px;padding:3px 4px;
   border:1px solid var(--rule);border-radius:2px;background:var(--paper);color:var(--ink-soft)}
 .pm-note{margin:8px 0 0;font-size:11px;color:var(--ink-faint);font-family:var(--mono)}
+/* 11-18：番茄鐘備註（做完問一句）、今天每一顆、專注白噪音、計時中螢幕不關 */
+.pm-ask{margin:10px 0 0;padding:9px 10px;border:1px solid var(--rule);border-radius:var(--r-in);background:var(--hi);text-align:left}
+.pm-ask label{display:block;font-size:12.5px;font-weight:500;color:var(--ink);margin-bottom:5px}
+.pm-ask input,.pm-ed input{width:100%;min-width:0;font-family:inherit;font-size:16px;padding:7px 10px;   /* 16px：iPhone 點輸入框才不會自動放大畫面 */
+  border:1px solid var(--rule);background:var(--card);color:var(--ink)}
+.pm-ask input:focus-visible,.pm-ed input:focus-visible{outline:2px solid var(--sci);outline-offset:1px}
+.pm-ask-b{display:flex;gap:6px;margin-top:7px}
+.pm-ask-b .btn,.pm-ed .btn{padding:6px 12px;font-size:12.5px}
+.pm-ask.ok{background:var(--cap-tint)}
+.pm-ask.ok label{color:var(--cap);margin:0}
+.pm-ask.ok input,.pm-ask.ok .pm-ask-b{display:none}
+@keyframes pmAsk{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:no-preference){.pm-ask{animation:pmAsk .25s ease-out}}
+.pm-nz{margin:11px 0 0;padding-top:10px;border-top:1px dashed var(--rule);text-align:left}
+.pm-nz-l{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px}
+.pm-nz-row{display:flex;gap:6px;align-items:center}
+.pm-nz-row select{flex:1 1 auto;min-width:0;font-family:inherit;font-size:12.5px;padding:5px 6px;
+  border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.pm-nz-row .btn{flex:0 0 auto;min-width:76px;padding:6px 12px;font-size:12.5px}
+.pm-nz-row .btn.on{background:var(--sci-tint);border-color:var(--sci);color:var(--sci)}
+.pm-nz-vol{margin-top:7px;font-size:12px;color:var(--ink-faint)}
+.pm-nz-vol input{flex:1 1 auto;min-width:0;margin:0;accent-color:var(--sci)}
+.pm-chk{display:flex;gap:6px;align-items:flex-start;margin-top:6px;font-size:12px;line-height:1.45;color:var(--ink-soft);cursor:pointer}
+.pm-chk input{flex:0 0 auto;width:15px;height:15px;margin:2px 0 0;accent-color:var(--sci)}
+.pm-nz-hint{margin:5px 0 0;font-size:11.5px;line-height:1.45;color:var(--ink-faint)}
+.pm-nz-hint:empty{display:none}
+.pm-log{margin:10px 0 0;text-align:left}
+.pm-log>summary{cursor:pointer;font-size:12.5px;color:var(--sci);padding:4px 0}
+.pm-ll{list-style:none;margin:2px 0 0;padding:0}
+.pm-ll li{display:grid;grid-template-columns:auto 1fr;gap:1px 8px;align-items:baseline;padding:7px 0;border-top:1px solid var(--rule2);font-size:12.5px}
+.pm-ll li.pm-l0{display:block;color:var(--ink-faint)}
+.pm-lt{font-size:11.5px;color:var(--ink-faint)}
+.pm-ls{color:var(--ink-soft);min-width:0}
+.pm-ls small{margin-left:6px;font-size:11px;color:var(--ink-faint)}
+.pm-ln{grid-column:1/-1;text-align:left;font-family:inherit;font-size:13px;line-height:1.5;color:var(--ink);
+  background:none;border:0;padding:3px 0;cursor:pointer;overflow-wrap:anywhere}
+.pm-ln.empty{color:var(--ink-faint)}
+.pm-ln:not(.empty)::after{content:' ✎';font-size:11px;color:var(--ink-faint)}
+.pm-ln:focus-visible{outline:2px solid var(--warn);outline-offset:2px;border-radius:4px}
+.pm-ed{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
+@media (pointer:coarse){   /* 手指點的按鈕至少 44px 高 */
+  .pm-ask-b .btn,.pm-ed .btn,.pm-nz-row .btn,.pm-nz-row select{min-height:44px}
+  .pm-nz-vol input{min-height:32px}
+  .pm-ln{min-height:40px}
+  .pm-log>summary{padding:10px 0}
+  .pm-chk{padding:5px 0}
+}
 .rem-banner{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:60;
   background:var(--ink);color:#fff;padding:13px 15px;border-radius:4px;font-size:13.5px;
   box-shadow:0 10px 30px rgba(0,0,0,.24);display:none;align-items:center;gap:12px}
@@ -1384,6 +1431,31 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         <select id="pm-b" aria-label="休息分鐘"></select>
       </div>
       <p class="pm-note" id="pm-note">今天 0 顆</p>
+      <!-- 11-18：做完一顆問一句「這段做了什麼」（可略過，存在那顆紀錄的 n） -->
+      <form class="pm-ask" id="pm-ask" hidden>
+        <label for="pm-ask-in" id="pm-ask-l">這顆做了什麼？</label>
+        <input type="text" id="pm-ask-in" maxlength="60" enterkeyhint="done" autocomplete="off" placeholder="一行就好，可以略過">
+        <div class="pm-ask-b">
+          <button class="btn solid" type="submit">記下</button>
+          <button class="btn ghost" type="button" id="pm-ask-skip">略過</button>
+        </div>
+      </form>
+      <!-- 11-18：專注白噪音（Web Audio 現場產生，不用音檔、不連網）＋計時中螢幕不關 -->
+      <div class="pm-nz" role="group" aria-labelledby="pm-nz-l">
+        <span class="pm-nz-l" id="pm-nz-l">🎧 專注白噪音</span>
+        <div class="pm-nz-row">
+          <select id="pm-nz-k" aria-label="聲音種類"></select>
+          <button class="btn" id="pm-nz-go" type="button">▶ 播放</button>
+        </div>
+        <label class="pm-nz-row pm-nz-vol"><span>音量</span><input type="range" id="pm-nz-v" min="0" max="100" step="1" value="40"></label>
+        <label class="pm-chk"><input type="checkbox" id="pm-nz-a"> 只在專注時放（休息時自動停）</label>
+        <label class="pm-chk" id="pm-wl-w" hidden><input type="checkbox" id="pm-wl"> 計時中螢幕保持亮著</label>
+        <p class="pm-nz-hint" id="pm-nz-hint" aria-live="polite"></p>
+      </div>
+      <details class="pm-log" id="pm-log">
+        <summary>今天每一顆・備註</summary>
+        <ul class="pm-ll" id="pm-ll"></ul>
+      </details>
     </div>
   </div>
   <div class="bar-btns" style="margin:0 0 14px">
@@ -3496,10 +3568,17 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 
   /* 提示音（不需外部檔案） */
   var AC=null;
-  function beep(times){
+  // 提示音和專注白噪音共用這一個 AudioContext（11-18）：只建一次、不關，不會越開越多
+  function audio(){
     try{
       AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-      if(AC.state==='suspended') AC.resume();
+      if(AC.state!=='running' && AC.resume){ var r=AC.resume(); if(r&&r.catch) r.catch(function(){}); }   // iPhone 被來電打斷時是 interrupted
+      return AC;
+    }catch(e){ return null; }
+  }
+  function beep(times){
+    try{
+      if(!audio()) return;
       for(var i=0;i<(times||2);i++){
         var o=AC.createOscillator(), gn=AC.createGain(), t0=AC.currentTime+i*0.42;
         o.type='sine'; o.frequency.setValueAtTime(i%2?660:880,t0);
@@ -3582,7 +3661,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   /* ---- 番茄鐘 ---- */
   var mode='work', left=P.w*60, running=false, timer=null, endAt=0;   // 用結束時間算剩餘秒數，背景分頁被節流也不會停
   // 計時狀態存起來：重新整理或手機把網頁關掉再打開，還是同一顆番茄鐘
-  function saveRun(){ P.run={mode:mode, running:running, endAt:endAt, left:left}; s(PK,P); }
+  function saveRun(){ P.run={mode:mode, running:running, endAt:endAt, left:left}; s(PK,P); wlSync(); }   // 11-18：開始、暫停、重設都會經過這裡，順便決定螢幕要不要保持亮著
   if(P.run){ var R0=P.run; mode=R0.mode||'work'; running=!!R0.running; endAt=R0.endAt||0; left=R0.left||P.w*60;
     if(running){ var over=Date.now()-endAt;
       if(over>30*60000){ running=false; mode='work'; left=P.w*60; }   // 結束超過半小時才回來：不算，重新開始
@@ -3604,9 +3683,11 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       mode = lng?'long':'break';
       left = (lng?15:P.b)*60; endAt=Date.now()+left*1000;
       notify('完成一顆番茄鐘', lng?'連續四顆了，休息 15 分鐘再回來':'休息 '+P.b+' 分鐘');
+      focusEnds(P.log[P.log.length-1]);
     } else {
       mode='work'; left=P.w*60; endAt=Date.now()+left*1000;
       notify('休息結束', '回到專注 '+P.w+' 分鐘');
+      focusBegins();
     }
     saveRun(); paintPomo();
   }
@@ -3619,7 +3700,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   elGo.addEventListener('click',function(){
     running=!running;
     elGo.textContent=running?'暫停':'開始';
-    if(running){ endAt=Date.now()+left*1000; beep(1); }
+    if(running){ endAt=Date.now()+left*1000; beep(1); if(mode==='work') focusBegins(); }
     else { left=Math.max(0,Math.ceil((endAt-Date.now())/1000)); }
     saveRun(); paintPomo();
   });
@@ -3643,7 +3724,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     P.done++; P.total=(P.total||0)+1;
     P.log=Array.isArray(P.log)?P.log:[]; P.log.push({k:dayKey(), t:Date.now(), s:subj||'', m:m||25, via:via||''});
     if(P.log.length>4000) P.log=P.log.slice(-4000);
-    s(PK,P); paintPomo();
+    s(PK,P); paintPomo(); paintLog();
     if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘'+(via?'（'+via+'）':''));
   };
 
@@ -3659,17 +3740,250 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     P.total=(P.total||0)+1;
     P.log.push({k:k, t:t, s:sj, m:m, via:'Claude 補登'});
     if(P.log.length>4000) P.log=P.log.slice(-4000);
-    s(PK,P); paintPomo();
+    s(PK,P); paintPomo(); paintLog();
     if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘（Claude 補登）');
     return {dup:false, stopped:stopped};
   };
+
+  /* ===== 11-18：專注白噪音、番茄鐘備註、計時中螢幕不關 ===== */
+  // 專注開始／結束時要做的事（nextPhase、按「開始」會叫）
+  function focusEnds(e){ nzPhase(false); askNote(e); paintLog(); }
+  function focusBegins(){ nzPhase(true); closeAsk(false); }
+
+  /* ---- 專注白噪音：Web Audio 現場產生（不用音檔、不連網），跟提示音共用同一個 AudioContext。
+     設定存在 P.noise={k:種類, v:音量 0–100, a:只在專注時放}；有沒有在播不存（瀏覽器規定要點一下才能出聲） ---- */
+  var NZ_K=[['rain','雨聲'],['wave','海浪'],['white','白噪音'],['pink','粉紅噪音'],['brown','棕噪音']],
+      NZ_LV={rain:1, wave:1, white:.5, pink:.8, brown:1};   // 各種聲音的音量校正：白噪音比較刺耳，小聲一點
+  function own(o,k){ return Object.prototype.hasOwnProperty.call(o,k); }
+  var nz0=(P.noise&&typeof P.noise==='object')?P.noise:{};
+  var NZ={k:own(NZ_LV,nz0.k)?nz0.k:'rain', v:(+nz0.v>=0 && +nz0.v<=100)?Math.round(+nz0.v):40, a:nz0.a!==false,
+          on:false, rest:false, wait:false, job:0, voice:null, buf:null, bufK:''};
+  var elNzK=document.getElementById('pm-nz-k'), elNzGo=document.getElementById('pm-nz-go'), elNzV=document.getElementById('pm-nz-v'),
+      elNzA=document.getElementById('pm-nz-a'), elNzH=document.getElementById('pm-nz-hint'),
+      elWl=document.getElementById('pm-wl'), elWlW=document.getElementById('pm-wl-w');
+  function nzSave(){ P.noise={k:NZ.k, v:NZ.v, a:NZ.a}; s(PK,P); }
+  function nzVol(){ var x=NZ.v/100; return x*x; }   // 平方：小音量那段比較好調
+  function holdAt(p,t){ if(p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(t); else { var v=p.value; p.cancelScheduledValues(t); p.setValueAtTime(v,t); } }
+  // 填一段聲音。白／粉紅（Paul Kellet 濾波）／棕噪音是標準做法；海浪＝棕噪音為主，起伏在播放時用慢速振盪器做；
+  // 雨聲＝高頻沙沙聲＋一點低沉的底＋隨機、大小不一的雨滴聲
+  function nzFill(o,k,sr){
+    var n=o.length, x=(Math.random()*4294967295)>>>0||1, R=4.656612873077393e-10,   // 亂數用 xorshift（整數運算），比每個樣本叫 Math.random 快好幾倍
+        b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0, br=0, hp=0, px=0, ha=Math.exp(-2*Math.PI*800/sr),
+        dEnv=0, dA=0, dK=0, dTh=70/sr*4294967296, i, w, p, u;
+    for(i=0;i<n;i++){
+      x^=x<<13; x^=x>>>17; x^=x<<5; w=x*R;   // -1～1 的白噪音
+      if(k==='white'){ o[i]=w; continue; }
+      br=(br+.02*w)/1.02;
+      if(k==='brown'){ o[i]=br; continue; }
+      b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852;
+      b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898;
+      p=b0+b1+b2+b3+b4+b5+b6+w*.5362; b6=w*.115926;
+      if(k==='pink'){ o[i]=p; continue; }
+      if(k==='wave'){ o[i]=br/.0576*.85+p/1.75*.25; continue; }   // 除以的數＝各自的平均振幅，先調成一樣大再混
+      hp=ha*(hp+p-px); px=p;                                       // 雨聲：粉紅噪音去掉 800 Hz 以下
+      x^=x<<13; x^=x>>>17; x^=x<<5;
+      if((x>>>0)<dTh){ u=Math.random(); dA=.4+1.6*u*u*u*u; dEnv=1; dK=Math.exp(-1/(sr*(.0015+.0035*Math.random()))); }   // 平均每秒 70 滴、大小不一
+      o[i]=hp*.75+br/.0576*.3;
+      if(dEnv>.001){ x^=x<<13; x^=x>>>17; x^=x<<5; o[i]+=x*R/.577*dA*dEnv; dEnv*=dK; }
+    }
+  }
+  // 10 秒、立體聲。只留最近用的一種（約 4 MB），換種類才重做
+  function nzBuffer(ctx){
+    var k=NZ.k, sr=ctx.sampleRate;
+    if(NZ.buf && NZ.bufK===k && NZ.buf.sampleRate===sr) return NZ.buf;
+    var len=Math.round(sr*10), h=len>>1, fd=Math.round(sr*.4), buf=ctx.createBuffer(2,len,sr), tmp=new Float32Array(len+fd), i, x, sum=0, sc, y,
+        d0=buf.getChannelData(0), d1=buf.getChannelData(1);
+    nzFill(tmp,k,sr);
+    // 頭尾等功率交叉淡化：最後一個樣本接回第一個時是連續的，循環播放不會「喀」一聲
+    for(i=0;i<fd;i++){ x=i/fd*Math.PI/2; tmp[i]=tmp[i]*Math.sin(x)+tmp[len+i]*Math.cos(x); }
+    for(i=0;i<len;i++) sum+=tmp[i]*tmp[i];
+    sc=.18*NZ_LV[k]/(Math.sqrt(sum/len)||1);   // 每種聲音調到差不多的平均音量
+    for(i=0;i<len;i++){ y=tmp[i]*sc; d0[i]=y>1?1:(y<-1?-1:y); }
+    // 右聲道＝同一段錯開 5 秒：左右聽起來不一樣（有空間感），一樣能無縫循環，又省一半的計算
+    d1.set(d0.subarray(h)); d1.set(d0.subarray(0,h),len-h);
+    NZ.buf=buf; NZ.bufK=k; return buf;
+  }
+  function nzStart(){
+    var ctx=audio(); if(!ctx) return;
+    nzStop(.4);   // 換種類：舊的淡出
+    var t=ctx.currentTime, buf=nzBuffer(ctx), src=ctx.createBufferSource(), out=ctx.createGain(), nodes=[src,out], osc=[], head=src;
+    src.buffer=buf; src.loop=true;
+    if(NZ.k==='rain'||NZ.k==='wave'){
+      var lp=ctx.createBiquadFilter(); lp.type='lowpass'; nodes.push(lp); src.connect(lp); head=lp;
+      if(NZ.k==='rain'){ lp.frequency.value=7000; lp.Q.value=.5; }
+      else {   // 海浪：兩個很慢的振盪器（約 11 秒、32 秒一圈）一起推濾波器和音量，浪有大有小
+        lp.frequency.value=700; lp.Q.value=.3;
+        var amp=ctx.createGain(); amp.gain.value=.6; nodes.push(amp); lp.connect(amp); head=amp;
+        [[.09,420,.3],[.031,180,.12]].forEach(function(c){
+          var o=ctx.createOscillator(), gf=ctx.createGain(), ga=ctx.createGain();
+          o.frequency.value=c[0]; gf.gain.value=c[1]; ga.gain.value=c[2];
+          o.connect(gf); gf.connect(lp.frequency); o.connect(ga); ga.connect(amp.gain);
+          nodes.push(o,gf,ga); osc.push(o);
+        });
+      }
+    }
+    head.connect(out); out.connect(ctx.destination);
+    out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(nzVol(),t+1.2);   // 慢慢變大聲
+    src.start(t, Math.random()*buf.duration);   // 從隨機位置開始
+    osc.forEach(function(o){ o.start(t); });
+    NZ.voice={src:src, out:out, nodes:nodes, osc:osc};
+  }
+  function nzStop(sec){
+    var v=NZ.voice; if(!v||!AC) return; NZ.voice=null;
+    var t=AC.currentTime, end=t+sec+.05;
+    try{ holdAt(v.out.gain,t); v.out.gain.linearRampToValueAtTime(0,t+sec); }catch(e){}   // 淡出，不會突然斷掉
+    v.src.onended=function(){ v.nodes.forEach(function(nd){ try{ nd.disconnect(); }catch(e){} }); };
+    try{ v.src.stop(end); v.osc.forEach(function(o){ o.stop(end); }); }catch(e){}
+  }
+  // 第一次產生一種聲音要幾十毫秒：先讓按鈕顯示「準備中」再做，點下去不會卡住
+  function nzKick(){
+    var ctx=audio(), job=++NZ.job; if(!ctx){ NZ.on=false; NZ.wait=false; nzPaint(); return; }
+    if(NZ.buf && NZ.bufK===NZ.k && NZ.buf.sampleRate===ctx.sampleRate){ NZ.wait=false; nzStart(); return; }
+    NZ.wait=true; nzPaint();
+    setTimeout(function(){
+      if(job!==NZ.job) return;
+      NZ.wait=false;
+      if(NZ.on && !NZ.rest) nzStart();
+      nzPaint();
+    },30);
+  }
+  function nzHalt(sec){ NZ.job++; NZ.wait=false; nzStop(sec); }
+  // 只在專注時放：專注結束先停（rest），下一顆專注開始自動接著放
+  function nzPhase(focus){
+    if(!NZ.on || !NZ.a) return;
+    if(!focus && !NZ.rest){ NZ.rest=true; nzHalt(1.5); nzPaint(); }
+    else if(focus && NZ.rest){ NZ.rest=false; nzKick(); nzPaint(); }
+  }
+  function nzPaint(){
+    elNzGo.textContent=NZ.wait?'準備中…':(NZ.on?'■ 停止':'▶ 播放');
+    elNzGo.classList.toggle('on',NZ.on);
+    elNzH.textContent=(NZ.on&&NZ.rest)?'休息中先停，下一顆專注開始會自動接著放。':'';
+  }
+  NZ_K.forEach(function(x){ var o=document.createElement('option'); o.value=x[0]; o.textContent=x[1]; elNzK.appendChild(o); });
+  elNzK.value=NZ.k; elNzV.value=NZ.v; elNzA.checked=NZ.a;
+  elNzGo.addEventListener('click',function(){
+    if(NZ.on){ NZ.on=false; NZ.rest=false; nzHalt(.8); }
+    else { NZ.on=true; NZ.rest=false; nzKick(); }   // 一定要在點擊裡叫 audio()，手機才肯出聲
+    nzPaint();
+  });
+  elNzK.addEventListener('change',function(){
+    NZ.k=own(NZ_LV,elNzK.value)?elNzK.value:'rain'; nzSave();
+    if(NZ.on && !NZ.rest){ nzHalt(.4); nzKick(); }
+    nzPaint();
+  });
+  elNzV.addEventListener('input',function(){   // 拉的時候即時變；放開才存（不要每動一格就觸發一次同步）
+    NZ.v=Math.max(0,Math.min(100,Math.round(+elNzV.value)||0));
+    var v=NZ.voice; if(v&&AC){ var t=AC.currentTime; try{ holdAt(v.out.gain,t); v.out.gain.setTargetAtTime(nzVol(),t,.06); }catch(e){} }
+  });
+  elNzV.addEventListener('change',nzSave);
+  elNzA.addEventListener('change',function(){
+    NZ.a=elNzA.checked; nzSave();
+    if(NZ.on && !NZ.a && NZ.rest){ NZ.rest=false; nzKick(); }                                    // 關掉「只在專注時放」：休息中也馬上接著放
+    else if(NZ.on && NZ.a && !NZ.rest && running && mode!=='work'){ NZ.rest=true; nzHalt(1); }   // 打開時正在休息：先停
+    nzPaint();
+  });
+  nzPaint();
+
+  /* ---- 計時中螢幕保持亮著（Screen Wake Lock）：手機螢幕一暗，計時和白噪音都可能被系統停掉。設定存在 P.wake；不支援的瀏覽器不顯示 ---- */
+  var wl=null, wlBusy=false;
+  function wlSync(){
+    if(!navigator.wakeLock) return;
+    var need=!!P.wake && running && !document.hidden;
+    if(need && !wl && !wlBusy){
+      wlBusy=true;
+      navigator.wakeLock.request('screen').then(function(l){
+        wlBusy=false; wl=l;
+        l.addEventListener('release',function(){ if(wl===l) wl=null; });   // 切到別的 App 時瀏覽器會自己放掉，回來再要
+        wlSync();   // 等待時按了暫停：馬上放掉
+      },function(){ wlBusy=false; });
+    } else if(!need && wl){ var l=wl; wl=null; l.release().catch(function(){}); }
+  }
+  if(navigator.wakeLock && elWlW){
+    elWlW.hidden=false; elWl.checked=!!P.wake;
+    elWl.addEventListener('change',function(){ P.wake=elWl.checked; s(PK,P); wlSync(); });
+  }
+  document.addEventListener('visibilitychange',function(){
+    if(document.hidden) return;
+    if(NZ.voice) audio();   // 手機從背景回來，聲音被系統暫停的話接著放
+    wlSync();
+  });
+
+  /* ---- 番茄鐘備註：做完一顆問一句「這段做了什麼」，存在那顆紀錄的 n（字串，最多 60 字）。
+     可以略過、不擋計時；之後在「今天每一顆・備註」補寫或改。舊紀錄沒有 n 照常顯示 ---- */
+  var elAsk=document.getElementById('pm-ask'), elAskIn=document.getElementById('pm-ask-in'), elAskL=document.getElementById('pm-ask-l'),
+      elLog=document.getElementById('pm-log'), elLL=document.getElementById('pm-ll'), askE=null, askTm=0, rows=[], editI=-1;
+  var SUBJ_N={}; SUBJ.forEach(function(x){ if(x[0]) SUBJ_N[x[0]]=x[1].replace('｜',' '); });
+  function cleanNote(v){
+    v=String(v==null?'':v).replace(/\s+/g,' ').trim();
+    if(v.length>60){ v=v.slice(0,60); if(/[\uD800-\uDBFF]$/.test(v)) v=v.slice(0,-1); }   // 不切半個表情符號
+    return v;
+  }
+  function setNote(e,v){ v=cleanNote(v); if(!e || (e.n||'')===v) return; if(v) e.n=v; else delete e.n; s(PK,P); }
+  function askNote(e){
+    if(!e) return;
+    if(askE && askE!==e && elAskIn.value.trim()) setNote(askE,elAskIn.value);   // 上一顆打了字還沒按「記下」：先幫他存
+    clearTimeout(askTm); askE=e; elAsk.classList.remove('ok'); elAskL.textContent='這顆做了什麼？';
+    elAskIn.value=e.n||''; elAsk.hidden=false;   // 不自動跳鍵盤：他可能不在手機前面
+  }
+  function closeAsk(force){
+    if(elAsk.hidden || elAsk.classList.contains('ok')) return;
+    if(!force && (document.activeElement===elAskIn || elAskIn.value.trim())) return;   // 正在打字就先不收
+    elAsk.hidden=true; askE=null;
+  }
+  elAsk.addEventListener('submit',function(ev){   // 用表單送出：注音選字按 Enter 不會被當成送出
+    ev.preventDefault();
+    var v=cleanNote(elAskIn.value);
+    if(!askE || !v){ closeAsk(true); return; }   // 空白＝略過
+    setNote(askE,v); askE=null; elAskIn.blur(); paintLog();
+    elAsk.classList.add('ok'); elAskL.textContent='✓ 記下了';
+    askTm=setTimeout(function(){ elAsk.hidden=true; elAsk.classList.remove('ok'); },1800);
+  });
+  document.getElementById('pm-ask-skip').addEventListener('click',function(){ closeAsk(true); });
+
+  // 今天每一顆：打開才畫（不放在每秒的計時裡）；新的在上面；點備註就地改
+  function paintLog(focusEd){
+    if(!elLog || !elLog.open) return;
+    var esc=window.__esc, k=dayKey(), L=Array.isArray(P.log)?P.log:[], cur=elLL.querySelector('.pm-ed input'),
+        keep=(cur && !focusEd)?cur.value:null, old=editI>=0?rows[editI]:null;
+    rows=L.filter(function(e){ return e && e.k===k; }).reverse();
+    editI=old?rows.indexOf(old):-1;
+    if(!rows.length){ elLL.innerHTML='<li class="pm-l0">今天還沒有做完的番茄鐘。</li>'; return; }
+    elLL.innerHTML=rows.map(function(e,i){
+      var d=new Date(+e.t||0), tm=e.t?pad(d.getHours())+':'+pad(d.getMinutes()):'--:--';
+      return '<li><span class="pm-lt mono">'+tm+'</span><span class="pm-ls">'+esc(own(SUBJ_N,e.s)?SUBJ_N[e.s]:'沒選科目')+'・'+(+e.m||25)+' 分'+(e.via?'<small>'+esc(e.via)+'</small>':'')+'</span>'
+        +(i===editI
+          ? '<form class="pm-ed" data-i="'+i+'"><input type="text" maxlength="60" enterkeyhint="done" autocomplete="off" aria-label="'+tm+' 這顆做了什麼" value="'+esc(keep!==null?keep:(e.n||''))+'">'
+            +'<button class="btn solid" type="submit">存</button><button class="btn ghost" type="button" data-x="1">取消</button></form>'
+          : '<button type="button" class="pm-ln'+(e.n?'':' empty')+'" data-i="'+i+'"'+(e.n?' aria-label="改 '+tm+' 這顆的備註：'+esc(e.n)+'"':'')+'>'
+            +(e.n?esc(e.n):'＋ 寫一句這顆做了什麼')+'</button>')
+        +'</li>';
+    }).join('');
+    if(focusEd){ var inp=elLL.querySelector('.pm-ed input'); if(inp){ inp.focus(); var n=inp.value.length; try{ inp.setSelectionRange(n,n); }catch(x){} } }
+  }
+  function focusRow(i){ var b=i>=0 && elLL.querySelector('.pm-ln[data-i="'+i+'"]'); if(b) b.focus(); }
+  function closeEd(){ var j=editI; editI=-1; paintLog(); focusRow(j); }
+  elLog.addEventListener('toggle',function(){ if(elLog.open) paintLog(); else editI=-1; });
+  elLL.addEventListener('click',function(ev){
+    var b=ev.target.closest('button'); if(!b || b.type==='submit') return;
+    if(b.dataset.x){ closeEd(); return; }
+    if(b.dataset.i!=null){ editI=+b.dataset.i; paintLog(true); }
+  });
+  elLL.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var f=ev.target, e=rows[+f.dataset.i]; if(!e) return;
+    setNote(e,f.querySelector('input').value); closeEd();
+  });
+  elLL.addEventListener('keydown',function(ev){
+    if(ev.key==='Escape' && !ev.isComposing && ev.keyCode!==229 && ev.target.closest('.pm-ed')) closeEd();
+  });
+  wlSync();
 
   window.__baseTitle=document.title;
   elGo.textContent=running?'暫停':'開始';
   paintPomo(); tickNow(); autoSubj();
   setInterval(function(){ tickPomo(); },1000);
   setInterval(function(){
-    if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; s(PK,P); }
+    if(P.day!==dayKey()){ P.day=dayKey(); P.done=0; P.seq=0; s(PK,P); paintLog(); }
     tickNow(); paintPomo(); autoSubj();
   },15000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden){ tickNow(); tickPomo(); } });
