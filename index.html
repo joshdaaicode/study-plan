@@ -2283,9 +2283,9 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   <div class="sec-head"><h2>單字賭場</h2><span class="eyebrow">押點數考單字，答錯的字進錯字本</span></div>
   <details class="sec-rules"><summary>賭場規則</summary><p class="sec-note">範圍可以選會考 2000 字（基本 1200／進階 800）、片語、多益 Level 1～5（3,353 字，會考沒有的 2,606 字中文是自己寫的）、錯字本，還能只考某些字母或詞性；康軒課本之後加入。
     <b>倍率＝題型 × 單字難度</b>：簡單（看英文選中文）×1.5、普通（看中文選英文）×2、困難（拼字）×3、地獄（聽音拼字、限時 15 秒）×5；會考進階、較難的片語再 ×1.2；多益 Level 1～5 再 ×1.5／2／3／4／5（會考也有的字，選會考範圍就照會考算）。同一個字連對 3 次算熟字，倍率只剩 ×1。
-    六種玩法：一局 10 題、一題一注、加倍爬梯、限時衝刺、跟寵物對賭、拉霸轉倍率。可以押點數、籌碼（1 點換 1 籌碼，換回點數打 8 折）或 🌟（一次最多 3 顆）。
+    九種玩法：一局 10 題、一題一注、加倍爬梯、限時衝刺、跟寵物對賭、拉霸轉倍率、單字 21 點、單字賓果、單字踩地雷（11-18）。每天把今天到期的錯字答對 10 題（或全部複習完）自動送 20 籌碼。可以押點數、籌碼（1 點換 1 籌碼，換回點數打 8 折）或 🌟（一次最多 3 顆）。
     <b>讀書時段不能下注、今天任務要做完一半、點數是負的或欠銀行錢也不能玩</b>；一次最多押「保底＋今天表定分鐘＋番茄鐘分鐘×1.5」點（保底＝這個月到昨天每天的平均，沒讀的日子算 0）；爬梯最多拿回 10 倍、限時衝刺最多 3 倍。答錯的字收進錯字本，隔 1、3、7 天再考、連對 3 次移出；錯字本複習不用下注、隨時能做，時間算英文讀書分鐘（每題最多 30 秒，按「不會」不算），滿 25 分鐘種一棵英文番茄樹。</p></details>
-  <div class="card vc-card" id="vc-app"><p class="fp-gone">打開這一頁才會載入賭場（約 270 KB）。</p></div>
+  <div class="card vc-card" id="vc-app"><p class="fp-gone">打開這一頁才會載入賭場（約 380 KB）。</p></div>
 </section>
 
 
@@ -9247,7 +9247,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function achScore(){ var A=achState(), n=0; Object.keys(A.c).forEach(function(k){ n+=A.c[k]||0; }); return n; }
   function achClaimable(){ var A=achState(), n=0; ACH.concat(SECRET).forEach(function(a){ if((A.r[a.id]||0)>(A.c[a.id]||0)) n++; }); return n; }
   var CASINO_TI={t_luck:'幸運兒',t_speller:'拼字王',t_god:'單字賭神',   // 單字賭場用籌碼換的稱號
-    p_bj:'21 點之王',p_bingo:'賓果大師',p_dict:'人形字典',p_toeic:'多益怪物',p_legend:'傳說賭神'};   // 11-17：賭場新名牌也能在「成就 → 稱號」選
+    p_bj:'21 點之王',p_bingo:'賓果大師',p_dict:'人形字典',p_toeic:'多益怪物',p_legend:'傳說賭神',p_mine:'排雷高手',p_review:'錯字終結者'};   // 11-17：賭場新名牌也能在「成就 → 稱號」選
   function titlesOwned(){ var A=achState(), L=[]; ACH.forEach(function(a){ if((A.c[a.id]||0)>=3) L.push(a.ti); }); SECRET.forEach(function(a){ if(A.c[a.id]) L.push(a.ti); });
     var own=vocabQ().own||{}; Object.keys(CASINO_TI).forEach(function(k){ if(own[k]) L.push(CASINO_TI[k]); });
     if((vocabQ().ach||{}).a_col) L.push('賭場收藏家');   // 11-17：賭場成就「收齊全部獎品」送的名牌
@@ -9979,7 +9979,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(window.__tab!==5 || window.__sub!==22) return;
     if(window.__casino){ window.__casino.show(); return; }
     if(asked) return; asked=true;
-    var s=document.createElement('script'); s.src='casino.js?v=20261117f';
+    var s=document.createElement('script'); s.src='casino.js?v=20261118a';
     s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }
