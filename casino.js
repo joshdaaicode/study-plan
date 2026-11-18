@@ -83,6 +83,19 @@
     +'.vc-ach .can{border-color:var(--cap);box-shadow:inset 0 0 0 1px var(--cap)}.vc-ach .got{background:var(--card2)}.vc-ach .btn{padding:6px 10px;font-size:12px;white-space:nowrap}'
     +'.vc-ph{margin:12px 0 6px;font-size:12.5px;color:var(--ink-soft)}.vc-ph:first-child{margin-top:0}'
     +'@media (pointer:coarse){.vc-bc{min-height:80px}}'
+    // 11-18 踩地雷、雷區／極光背景
+    +'.vc-card.bg_mine{--vc-g1:#22252A;--vc-g2:#3E444C;--vc-acc:#FFD23F}.vc-card.bg_mine .vc-top{background:repeating-linear-gradient(135deg,rgba(255,210,63,.12) 0 12px,transparent 12px 24px),linear-gradient(135deg,var(--vc-g1),var(--vc-g2))}'
+    +'.vc-card.bg_aurora{--vc-g1:#071C33;--vc-g2:#0D4F55;--vc-acc:#B8FFD9}.vc-card.bg_aurora .vc-top{background:radial-gradient(ellipse at 18% 0%,rgba(80,255,170,.42),transparent 60%),radial-gradient(ellipse at 82% 8%,rgba(176,120,255,.42),transparent 58%),linear-gradient(160deg,var(--vc-g1),var(--vc-g2))}'
+    +'.vc-mine{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:0 0 10px}'
+    +'.vc-mt{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;min-height:52px;padding:4px 2px;border:1px solid var(--rule);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;text-align:center;cursor:pointer}'
+    +'.vc-mt>span{font-size:20px;line-height:1.15}.vc-mt>small{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink-faint);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}'
+    +'.vc-mt.hid{background:var(--card2)}.vc-mt.hid>span{font-size:17px;font-weight:700;color:var(--ink-faint)}.vc-mt.gem,.vc-mt.df{border-color:var(--cap);background:var(--cap-tint)}.vc-mt.gem>small,.vc-mt.df>small{color:var(--cap)}.vc-mt.df{box-shadow:inset 0 0 0 2px var(--cap)}'
+    +'.vc-mt.bad{border-color:var(--warn);background:var(--warn-tint)}.vc-mt.bad>small{color:var(--warn)}.vc-mt.cur{box-shadow:0 0 0 2px var(--ink)}.vc-mt.cur.bomb{box-shadow:0 0 0 2px var(--warn)}.vc-mt.dim{opacity:.5}'
+    +'.vc-mt:disabled{cursor:default;color:var(--ink)}.vc-mt:focus-visible{outline:2px solid var(--warn);outline-offset:2px}'
+    +'.vc-mnq{margin:0 0 8px;padding:8px 11px;border:1px solid var(--rule);border-radius:10px;font-size:13.5px;line-height:1.5}.vc-mnq.bomb{border-color:var(--warn);background:var(--warn-tint)}'
+    +'@media (prefers-reduced-motion:no-preference){html:not(.no-motion) .vc-mt.new{animation:vc-flip .3s ease-out}html:not(.no-motion) .vc-mt.boom{animation:vc-shake .4s ease-in-out}}'
+    +'@keyframes vc-flip{from{opacity:.3;transform:rotateY(90deg)}to{opacity:1;transform:none}}@keyframes vc-shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}'
+    +'@media (pointer:coarse){.vc-mt{min-height:56px}}'
     +'@media (max-width:480px){.vc-card .bn-ex{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.vc-card .bn-ex button{padding:9px 10px}.vc-hand{grid-template-columns:44px minmax(0,1fr) auto;padding:7px 8px}}';
   if(!document.getElementById('vc-css')){ var stl=document.createElement('style'); stl.id='vc-css'; stl.textContent=CSS; document.head.appendChild(stl); }
   var VK='plan.vocab.v1', RK='plan.vrev.v1';
@@ -110,7 +123,9 @@
     {id:'slot',n:'拉霸轉倍率',e:'🎰',say:'先轉出 ×0～×10（長期平均約 ×1），再答一題：答對拿 注×拉霸×題目倍率'},
     // 11-17 新玩法（他：「我都快要全部玩完了」）：一樣每注都要靠答對單字贏
     {id:'bj',n:'單字 21 點',e:'🃏',say:'每張牌都要答對一個字才拿得到（答錯那張作廢、直接停牌）；比莊家接近 21 點：贏拿 注×（1＋平均倍率）、頭兩張 21 點拿 注×（1＋1.5×平均倍率）、平手退錢'},
-    {id:'bingo',n:'單字賓果',e:'🎯',say:'3×3 單字卡、中間免費：自己挑 6 格答題，答對畫圈；連 1 條拿回一半、2 條回本、3 條以上越多越好，5 條拿 注×平均倍率'}];
+    {id:'bingo',n:'單字賓果',e:'🎯',say:'3×3 單字卡、中間免費：自己挑 6 格答題，答對畫圈；連 1 條拿回一半、2 條回本、3 條以上越多越好，5 條拿 注×平均倍率'},
+    // 11-18：踩地雷（雷在哪是運氣，但只有答對才拿得到錢；地雷答對＝拆彈）
+    {id:'mine',n:'單字踩地雷',e:'💣',say:'4×4 藏 5 顆雷，點一格翻開再答題：寶石答對加 注×(倍率−1)×0.25、答錯扣 注×0.25；地雷答對＝拆彈，加 注×(倍率−1)×0.75，答錯爆炸全輸。翻過 1 格就能收手（最多 5 倍）'}];
   // 單字難度：來源決定（之後加康軒）。多益倍率：使用者 2026-11-02 定 Level 5 ×5（字長、對國中生難），中間照級別遞增
   var SRC={kb:{n:'會考基本 1200',m:1},ka:{n:'會考進階 800',m:1.2},pb:{n:'片語',m:1},pa:{n:'片語（較難）',m:1.2},
     t1:{n:'多益 Level 1',m:1.5},t2:{n:'多益 Level 2',m:2},t3:{n:'多益 Level 3',m:3},t4:{n:'多益 Level 4',m:4},t5:{n:'多益 Level 5',m:5}};
@@ -126,7 +141,8 @@
   var PID=Date.now().toString(36)+Math.random().toString(36).slice(2,6);   // 這個分頁：別的分頁正在打的局不要當成放棄
   var CHIP_BACK=.8;           // 籌碼換回點數打 8 折
   var BGS=[{id:'',n:'經典綠桌'},{id:'bg_neon',n:'霓虹夜'},{id:'bg_royal',n:'皇家紫'},{id:'bg_gold',n:'黃金廳'},
-    {id:'bg_ocean',n:'深海藍'},{id:'bg_sakura',n:'櫻花粉'},{id:'bg_galaxy',n:'銀河'},{id:'bg_lava',n:'熔岩'},{id:'bg_diamond',n:'鑽石廳'},{id:'bg_rainbow',n:'彩虹廳'}];
+    {id:'bg_ocean',n:'深海藍'},{id:'bg_sakura',n:'櫻花粉'},{id:'bg_galaxy',n:'銀河'},{id:'bg_lava',n:'熔岩'},{id:'bg_diamond',n:'鑽石廳'},{id:'bg_rainbow',n:'彩虹廳'},
+    {id:'bg_mine',n:'雷區'},{id:'bg_aurora',n:'極光'}];
   var PRIZES=[
     {id:'visor',k:'acc',n:'發牌員遮陽帽',e:'🧢',c:300,say:'寵物可以戴（到「家 → 穿戴」）'},
     {id:'pokerhat',k:'acc',n:'撲克牌紳士帽',e:'🃏',c:500,say:'寵物可以戴'},
@@ -151,7 +167,12 @@
     {id:'vip1',k:'vip',n:'VIP 銅卡',e:'🥉',c:1000,ti:'銅卡會員'},
     {id:'vip2',k:'vip',n:'VIP 銀卡',e:'🥈',c:3000,ti:'銀卡會員',need:'vip1'},
     {id:'vip3',k:'vip',n:'VIP 金卡',e:'🥇',c:8000,ti:'金卡會員',need:'vip2'},
-    {id:'vip4',k:'vip',n:'VIP 黑卡',e:'🖤',c:20000,ti:'黑卡會員',need:'vip3'}];
+    {id:'vip4',k:'vip',n:'VIP 黑卡',e:'🖤',c:20000,ti:'黑卡會員',need:'vip3'},
+    // 11-18 新獎品：踩地雷、錯字本主題（商店照價錢排；VIP 折扣照樣有）
+    {id:'bg_mine',k:'bg',n:'雷區背景',e:'🚧',c:800},
+    {id:'bg_aurora',k:'bg',n:'極光背景',e:'🌠',c:3500},
+    {id:'p_mine',k:'plate',n:'名牌「排雷高手」',e:'💣',c:1200,ti:'排雷高手'},
+    {id:'p_review',k:'plate',n:'名牌「錯字終結者」',e:'📕',c:2500,ti:'錯字終結者'}];
   var PKIND=[['acc','寵物帽子','買了到「我的森林 → 家 → 穿戴」幫牠戴'],['title','稱號','到「成就 → 稱號」選'],['plate','賭場名牌','掛在賭場招牌下面'],['bg','賭場背景',''],['vip','VIP 會員卡','照順序升級：銅 → 銀 → 金 → 黑']];
   var PLATE_COL={id:'p_col',e:'🏆',ti:'賭場收藏家'};   // 收齊全部獎品的成就送的名牌（不能買）
   // 11-17 賭場成就：達成就能領籌碼（計數只加不改：21 點、賓果是新的；十題全對、拉霸 ×10 從紀錄補算一次）
@@ -168,6 +189,11 @@
     {id:'a_ok',e:'✅',n:'千題斬',say:'在賭場答對 1000 題',v:function(s){ return s.k.ok; },t:1000,c:300},
     {id:'a_clr',e:'📕',n:'錯字剋星',say:'錯字本移出 50 個字',v:function(s){ return s.k.clr; },t:50,c:200},
     {id:'a_mast',e:'🧠',n:'熟字 300',say:'熟字（連對 3 次）累積 300 個',v:function(s){ return masteredN(s); },t:300,c:300},
+    // 11-18 踩地雷、每日錯字本任務（「複習達人」用本來就有的 rvOk 計數，以前複習答對的也算）
+    {id:'a_mn5',e:'💣',n:'拆彈專家',say:'踩地雷一局把 5 顆雷全部拆掉',v:function(s){ return s.k.mnMax; },t:5,c:200},
+    {id:'a_mnd',e:'✂️',n:'雷區清道夫',say:'踩地雷累積拆掉 30 顆雷',v:function(s){ return s.k.mnD; },t:30,c:300},
+    {id:'a_rv',e:'📗',n:'複習達人',say:'錯字本複習答對 300 題',v:function(s){ return s.k.rvOk; },t:300,c:300},
+    {id:'a_dm',e:'📅',n:'天天複習',say:'每日錯字本任務完成 7 天',v:function(s){ return s.k.dmN; },t:7,c:200},
     {id:'a_col',e:'🏆',n:'賭場收藏家',say:'上面的獎品全部收齊（送名牌「賭場收藏家」）',v:function(s){ return prizeOwnedN(s); },t:0,c:500}];
 
   /* ---------- 圖（手畫 SVG，跟寵物同一種畫法：不用載圖檔、離線也能看） ---------- */
@@ -205,6 +231,8 @@
       // 11-17：21 點（兩張牌 A、K），賓果（3×3 有圈有叉）
       else if(id==='bj') s+='<rect x="2.5" y="5" width="11" height="15" rx="2" fill="#fff" stroke="#8A8F98" transform="rotate(-10 8 12.5)"/><text x="6.3" y="12.3" font-size="6.5" font-weight="800" fill="#1E1E1E" font-family="Georgia,serif" transform="rotate(-10 8 12.5)">A</text><rect x="10" y="4" width="11" height="15" rx="2" fill="#fff" stroke="#8A8F98" transform="rotate(8 15.5 11.5)"/><text x="13.2" y="11.6" font-size="6.5" font-weight="800" fill="#C0392B" font-family="Georgia,serif" transform="rotate(8 15.5 11.5)">K</text><text x="12" y="23.5" font-size="5.5" font-weight="800" text-anchor="middle" fill="#1F8A52" font-family="Arial,sans-serif">21</text>';
       else if(id==='bingo') s+='<rect x="2.5" y="2.5" width="19" height="19" rx="3" fill="#fff" stroke="#8A8F98"/><path d="M8.8 2.5 V21.5 M15.2 2.5 V21.5 M2.5 8.8 H21.5 M2.5 15.2 H21.5" stroke="#C9CDD2" stroke-width=".9"/><circle cx="5.7" cy="5.7" r="2" fill="none" stroke="#1F8A52" stroke-width="1.4"/><circle cx="12" cy="12" r="2" fill="#F2C230"/><circle cx="18.3" cy="18.3" r="2" fill="none" stroke="#1F8A52" stroke-width="1.4"/><path d="M16.6 4 l3.4 3.4 M20 4 l-3.4 3.4" stroke="#E5484D" stroke-width="1.4" stroke-linecap="round"/><path d="M4 4 L20 20" stroke="#1F8A52" stroke-width="1" stroke-dasharray="1.6 1.6" opacity=".7"/>';
+      // 11-18：踩地雷（一顆炸彈＋引信火花）
+      else if(id==='mine') s+='<circle cx="10.5" cy="14" r="7" fill="#2B2F36" stroke="#8A8F98" stroke-width=".8"/><rect x="12.6" y="5.6" width="4.6" height="3.4" rx="1" fill="#5A6673" transform="rotate(40 14.9 7.3)"/><path d="M16.6 5.4 q1.6 -2.6 3.6 -1.6" stroke="#A0733A" stroke-width="1.3" fill="none" stroke-linecap="round"/><path d="M21 1.6 l.6 1.4 1.4 .5 -1.4 .5 -.6 1.4 -.6 -1.4 -1.4 -.5 1.4 -.5 Z" fill="#F2C230"/><circle cx="7.9" cy="11.3" r="1.8" fill="#fff" opacity=".35"/>';
       return s+'</svg>';
     },
     // 拉霸機：窗戶裡顯示轉到的倍率（spin() 直接改 .vc-reel 的字）
@@ -229,7 +257,7 @@
   function st(){
     var s=ls(VK,null)||{};
     s.chips=s.chips||0; s.ws=s.ws||{}; s.wb=s.wb||{}; s.rec=s.rec||[]; s.own=s.own||{}; s.log=s.log||[]; s.set=s.set||{};
-    s.k=s.k||{}; ['games','ans','ok','best','run','lad10','petW','petL','clr','rvAns','rvOk','bjW','bjBJ','bgG','bgMax','r10','sl10'].forEach(function(x){ s.k[x]=s.k[x]||0; });
+    s.k=s.k||{}; ['games','ans','ok','best','run','lad10','petW','petL','clr','rvAns','rvOk','bjW','bjBJ','bgG','bgMax','r10','sl10','mnG','mnD','mnMax','dmN'].forEach(function(x){ s.k[x]=s.k[x]||0; });
     s.k.net=s.k.net||{pts:0,chip:0,star:0}; s.ach=s.ach||{};
     if(!s.log.length) s.k.bf=1;   // 11-17：沒有舊紀錄就不用補算（存檔時一起記下）
     MUTE=!!s.set.mute;   // 11-09 C14：記下靜音設定，音效不用為了看這個再讀一次整份資料
@@ -451,6 +479,16 @@
     return pomos;
   }
   function reviewMinToday(){ var r=ls(RK,{})||{}; return Math.floor((r[kk(d0())]||0)/60); }
+  // 11-18 每日錯字本任務：獎勵「複習」，不是多賭。今天到期的錯字答對 10 題（用提示不算）；到期的不到 10 個，就是把到期的都複習完（至少答對 1 題）
+  //   → 自動 +20 籌碼，一天一次。資料：plan.vocab.v1 的 dm={d:日期, ok:今天答對幾題, got:領了沒}、k.dmN＝完成幾天
+  var DM_N=10, DM_CHIP=20;
+  function dmOf(s){ var t=kk(d0()); return s.dm&&s.dm.d===t?s.dm:{d:t, ok:0, got:0}; }
+  function dmNeed(s,D){ return Math.min(DM_N,D.ok+dueList(s).length); }
+  function dmDone(s,D){ return D.ok>=DM_N || (D.ok>=1 && !dueList(s).length); }
+  function dmTxt(s){ var D=dmOf(s), n=dmNeed(s,D);
+    if(D.got) return '✅ 今天的錯字本任務完成了（+'+DM_CHIP+' 籌碼）';
+    if(!n) return '📅 每日錯字本任務：今天沒有要複習的錯字';
+    return '📅 每日錯字本任務：今天到期的字答對 '+D.ok+' / '+n+' 題（用提示不算）→ 自動 +'+DM_CHIP+' 籌碼'; }
 
   /* ---------- 畫面狀態 ---------- */
   var view='home', G=null, R=null, msg='', tick=null;
@@ -525,6 +563,7 @@
       +'<button type="button" class="btn ghost" data-betq="max">最多</button></div>'
       +'<div class="bar-btns"><button class="btn solid" type="button" data-act="start"'+(lock.length||pool.length<4?' disabled':'')+'>'+modeOf(set.mode).e+' 開始</button>'
       +(pool.length<4?'<span class="sub" style="margin:0">範圍裡至少要 4 個字</span>':'<span class="sub" style="margin:0">'+esc(modeOf(set.mode).say)+'</span>')+'</div></div>';
+    var dmD=dmOf(s); if(!dmD.got && dmNeed(s,dmD)) o+='<p class="vc-sub">'+dmTxt(s)+'（在「📕 錯字本」做）</p>';   // 11-18
     o+='<p class="vc-sub">答錯的字自動收進錯字本；錯字本複習不用下注、隨時能做，時間算英文讀書分鐘，滿 25 分鐘種一棵英文番茄樹。'
       +'<button type="button" class="btn ghost vc-mute" data-act="mute">'+(s.set.mute?'🔇 音效關':'🔊 音效開')+'</button></p>';
     return o;
@@ -553,10 +592,12 @@
     if(G.mode==='bj'){ G.ph=[]; G.dh=[bjCard(),bjCard()]; G.pend=null; G.burn=0; G.stood=0; G.dealer=pet&&!pet.trip?pet.name:''; }
     if(G.mode==='bingo'){ var bd=order.slice(0,8); G.board=bd.slice(0,4).map(function(it){ return it.key; }).concat([null],bd.slice(4).map(function(it){ return it.key; }));
       G.bm=G.board.map(function(k){ return k?qMult(BYKEY[k],G.diff,s):0; }); G.marks=[0,0,0,0,1,0,0,0,0]; G.cell=-1; }
+    if(G.mode==='mine'){ var mm=[]; for(var mi=0;mi<MN_N;mi++) mm.push(mi<MN_B?1:0);   // 11-18：雷的位置開局就洗好（看不到）
+      G.mines=shuffle(mm); G.mk=mm.map(function(){ return 0; }); G.mv=G.mk.slice(); G.cell=-1; G.boom=0; }
     s=st(); s.cur={mode:G.mode, diff:G.diff, cur:cur, bet:bet, rg:G.rg, right:0, n:0, w:[], pid:PID, at:Date.now()}; save(s);
     msg=''; view='game';
     if(G.mode==='slot'){ G.spinning=true; renderGame(); spin(); return; }
-    if(G.mode==='bingo'){ renderGame(); return; }   // 賓果：先讓他自己挑格子
+    if(G.mode==='bingo'||G.mode==='mine'){ renderGame(); return; }   // 賓果、踩地雷：先讓他自己挑格子
     nextQ();
   }
   /* ---------- 11-17 單字 21 點：每張牌都要答對一個字才拿得到 ---------- */
@@ -598,6 +639,59 @@
       if(!live) return '<div class="'+cls+'"><span>'+esc(lab)+'</span><small>'+tag+'</small></div>';
       return '<button type="button" class="'+cls+'" data-cell="'+i+'"'+(m||!can?' disabled':'')+' aria-label="'+esc(lab)+'，'+(m===1?'答對':(m===-1?'答錯':'還沒答，倍率 ×'+g.bm[i]))+'"><span>'+esc(lab)+'</span><small>'+tag+'</small></button>';
     }).join('')+'</div>';
+  }
+  /* ---------- 11-18 單字踩地雷：4×4 藏 5 顆雷，點一格翻開再答那格的字 ---------- */
+  // 一格的輸贏（單位：注）：寶石答對 +(倍率−1)×0.25、答錯 −0.25；地雷答對（拆彈）+(倍率−1)×0.75、答錯＝爆炸（null，全輸）。熟字 ×1 答對不加。
+  // 獎金從本金起算，最低 0、最多 5 倍（到了自動收手）；翻過 1 格才能收手。雷在哪是運氣，但每一點獎金都要答對才拿得到（倍率 ×1 時期望值 ≤ 1）。
+  // 期望值（拿回÷押注；照最好的收手時機算，選擇題亂猜答對 25%）：每題 ×1.5 時，答對 80% → 1.28（一路翻完 1.12）、90% → 2.27、70% → 1.01；
+  //   亂猜最好 0.69（翻 1 格就收）、一路翻完約 0；拼字亂猜 0.52。亂猜要倍率 ×3.7 以上才會超過 0.95（一題一注是 ×3.8，差不多）。
+  //   比較：同樣 80%、×1.5，一局 10 題 1.14、一題一注 1.2、爬梯 2.62。
+  var MN_N=16, MN_B=5, MN_G=.25, MN_D=.75, MN_W=.25, MN_CAP=5;
+  function mnDelta(bomb,ok,m){ if(bomb) return ok?(m-1)*MN_D:null; return ok?(m-1)*MN_G:-MN_W; }
+  function mnNext(prize,bet,d){ return d===null?0:Math.min(bet*MN_CAP,Math.max(0,prize+d*bet)); }
+  function mnLeft(g){ var t=0, b=0; g.mk.forEach(function(k,i){ if(!k){ t++; if(g.mines[i]) b++; } }); return {t:t, b:b}; }
+  function mnCount(g){ var c={g:0, gw:0, d:0, open:0}; g.mk.forEach(function(k){ if(k) c.open++; if(k===1) c.g++; if(k===2) c.gw++; if(k===3) c.d++; }); return c; }
+  function mnShow(g,x){ return g.cur==='star'?Math.floor(x):Math.round(x); }
+  function nf(x){ return Math.round(x*10)/10; }
+  function mnPick(i){
+    var g=G; if(!g || g.mode!=='mine' || g.boom || g.mk[i] || (g.q&&!g.q.done) || isOver(g)) return;
+    g.cell=i; var key=g.queue[g.qi%g.queue.length]; g.qi++; askQ(key);
+    var qe=app.querySelector('.vc-q'); if(qe&&qe.scrollIntoView) try{ qe.scrollIntoView({block:'nearest'}); }catch(e){}   // 手機上題目在雷區下面
+  }
+  // mk：0 還沒翻、1 寶石答對、2 寶石答錯、3 拆彈成功、4 爆炸；mv：那格讓獎金變了多少
+  function mnBoard(g,live){
+    var asking=!!(g.q&&!g.q.done), end=!live||g.boom||isOver(g), can=live&&!asking&&!end;
+    return '<div class="vc-mine" role="group" aria-label="雷區 4×4">'+g.mines.map(function(b,i){
+      var k=g.mk[i], v=g.mv[i], cls='vc-mt', face, tag, lab;
+      if(k===0 && live && asking && g.cell===i){ cls+=' cur new'+(b?' bomb':''); face=b?'💣':'💎'; tag='答題中'; lab=(b?'地雷':'寶石')+'，答題中'; }
+      else if(k===0 && end){ cls+=' dim'; face=b?'💣':'💎'; tag='沒翻'; lab=(b?'地雷':'寶石')+'，沒翻開'; }
+      else if(k===0){ cls+=' hid'; face='?'; tag=''; lab='第 '+(i+1)+' 格，還沒翻開'; }
+      else if(k===1){ cls+=' gem'; face='💎'; tag='+'+nf(v); lab='寶石，答對 +'+nf(v); }
+      else if(k===2){ cls+=' bad'; face='💔'; tag='−'+nf(-v); lab='寶石，答錯 −'+nf(-v); }
+      else if(k===3){ cls+=' df'; face='✂️'; tag='拆彈 +'+nf(v); lab='地雷，拆掉了 +'+nf(v); }
+      else { cls+=' bad boom'; face='💥'; tag='爆炸'; lab='地雷，爆炸'; }
+      if(live && k && g.cell===i && g.q && g.q.done) cls+=' new';
+      var inner='<span aria-hidden="true">'+face+'</span><small aria-hidden="true">'+tag+'</small>';
+      if(!live) return '<div class="'+cls+'" role="img" aria-label="'+esc(lab)+'">'+inner+'</div>';
+      return '<button type="button" class="'+cls+'" data-mt="'+i+'"'+(k||!can?' disabled':'')+' aria-label="'+esc(lab)+'">'+inner+'</button>';
+    }).join('')+'</div>';
+  }
+  // 雷區下面那一行：還沒挑格子時說規則和機率；答題中說這格答對、答錯會怎樣；答完說結果
+  function mnLine(g){
+    var q=g.q, L=mnLeft(g), o='';
+    if(q && g.cell>=0){
+      var b=g.mines[g.cell]===1, k=g.mk[g.cell], v=g.mv[g.cell];
+      if(!q.done){ var win=mnDelta(b,true,q.m)*g.bet;
+        return b?'<p class="vc-mnq bomb">💣 <b>是地雷！</b>答對就拆掉：獎金 +'+nf(win)+'；答錯會爆炸，這局什麼都拿不回來（現在獎金 '+mnShow(g,g.prize)+'）。</p>'
+          :'<p class="vc-mnq">💎 是寶石：答對 +'+nf(win)+(q.mast?'（熟字 ×1 不加）':'')+'、答錯 −'+nf(MN_W*g.bet)+'。</p>'; }
+      o=k===3?'<p class="vc-mnq">✂️ <b>拆彈成功！</b>獎金 +'+nf(v)+'，現在 '+mnShow(g,g.prize)+'。</p>'
+        :(k===4?'<p class="vc-mnq bomb">💥 <b>爆炸了！</b>這局全輸。</p>'
+        :(k===1?'<p class="vc-mnq">💎 拿到寶石 +'+nf(v)+'，現在獎金 '+mnShow(g,g.prize)+'。</p>'
+        :'<p class="vc-mnq">💔 寶石碎了 −'+nf(-v)+'，現在獎金 '+mnShow(g,g.prize)+'。</p>'));
+    }
+    if(isOver(g)) return o+(!g.boom&&g.prize>=g.bet*MN_CAP?'<p class="vc-sub">獎金到 '+MN_CAP+' 倍上限，自動收手。</p>':'');
+    return o+'<p class="vc-sub">'+(g.n?'':'點一格翻開再答那格的字：💎 寶石答對 +注×(倍率−1)×0.25、答錯 −注×0.25；💣 地雷答對＝拆彈 +注×(倍率−1)×0.75，答錯爆炸全輸。')
+      +'還剩 '+L.b+' 顆雷在 '+L.t+' 格裡（下一格是雷的機率 '+Math.round(L.b/L.t*100)+'%）'+(g.n?'；可以收手拿 '+mnShow(g,g.prize)+'，或再點一格。':'。')+'</p>';
   }
   function spin(){
     var r=Math.random(), acc=0, res=SLOT[SLOT.length-1][0];
@@ -652,6 +746,10 @@
       if(!ok || tv>=21){ G.stood=1; if(G.ph.length && tv<=21) bjDealer(G); }
     }
     if(G.mode==='bingo'){ G.marks[G.cell]=ok?1:-1; }
+    if(G.mode==='mine'){   // 11-18：這格是寶石還是地雷，開局就定了；答對、答錯決定獎金怎麼變
+      var mb=G.mines[G.cell]===1, md=mnDelta(mb,ok,q.m), mp=mnNext(G.prize,G.bet,md);
+      G.mv[G.cell]=mp-G.prize; G.prize=mp; G.mk[G.cell]=mb?(ok?3:4):(ok?1:2); if(md===null) G.boom=1;
+    }
     if(G.mode==='sprint'){
       if(Date.now()>=G.endAt) return finish();
       if(q.kind==='type'){ G.lastFb=(ok?'✅ ':'❌ ')+BYKEY[q.key].w+'＝'+BYKEY[q.key].zh; return nextQ(); }
@@ -661,7 +759,8 @@
     if(over){ renderGame(); setTimeout(function(){ if(G&&G.q===q) finish(); },G.mode==='bj'?1500:(ok?700:1400)); return; }
     renderGame();
   }
-  function isOver(g){ return (g.mode==='bj'&&!!g.stood) || (g.mode==='bingo'&&g.n>=BG_SHOTS); }   // 11-17 新玩法什麼時候結算
+  function isOver(g){ return (g.mode==='bj'&&!!g.stood) || (g.mode==='bingo'&&g.n>=BG_SHOTS)   // 11-17 新玩法什麼時候結算
+    || (g.mode==='mine'&&(!!g.boom || mnLeft(g).t===0 || g.prize>=g.bet*MN_CAP)); }   // 11-18 踩地雷：爆炸、翻完、到 5 倍
   function ratio10(c,M){ if(c<=4) return 0; if(c<=7) return (c-4)/3; return 1+(M-1)*(c-7)/3; }
   function finish(why){
     if(!G) return; if(tick){ clearInterval(tick); tick=null; }
@@ -678,6 +777,8 @@
       note='你 '+(g.ph.length?pv:0)+(pv>21?'（爆了）':'')+' : 莊家 '+dv+(dv>21?'（爆了）':'')+'，'+{bj:'黑傑克！',win:'贏了',push:'平手',lose:'輸了'}[g.res]+(g.burn?'（答錯一張作廢）':'')+'，平均 ×'+r2(M);
     }
     else if(g.mode==='bingo'){ g.lines=bgLines(g.marks).length; pay=g.bet*bgRatio(g.lines,M); note='連成 '+g.lines+' 條線（答對 '+g.right+'/'+g.n+'），平均 ×'+r2(M); }
+    else if(g.mode==='mine'){ var mc=mnCount(g); pay=g.boom?0:g.prize;
+      note=(g.boom?'💥 踩到雷爆炸；':(g.prize>=g.bet*MN_CAP?'到 '+MN_CAP+' 倍上限；':''))+'翻了 '+mc.open+' 格：寶石答對 '+mc.g+'、答錯 '+mc.gw+'，拆彈 '+mc.d+'，平均 ×'+r2(M); }
     var s=st();
     if(g.mode==='single'){
       note='答 '+g.n+' 題、對 '+g.right+' 題'; s.cur=null; s.k.net[g.cur]=(s.k.net[g.cur]||0)+g.net; s.k.games++; save(s);
@@ -693,6 +794,7 @@
       if(g.mode==='slot'&&g.slot>=10&&g.right) s.k.sl10++;
       if(g.mode==='bj'){ if(g.res==='win'||g.res==='bj') s.k.bjW++; if(g.res==='bj') s.k.bjBJ++; }
       if(g.mode==='bingo'){ s.k.bgG++; s.k.bgMax=Math.max(s.k.bgMax,g.lines); }
+      if(g.mode==='mine'){ var md2=mnCount(g).d; s.k.mnG++; s.k.mnD+=md2; s.k.mnMax=Math.max(s.k.mnMax,md2); }   // 11-18
       save(s);
       addCur(g.cur,pay,'單字賭場：'+modeOf(g.mode).n+'（'+note.replace(/<[^>]+>/g,'')+'）押 '+g.bet+' 拿回 '+pay,pay-g.bet);
     }
@@ -704,7 +806,8 @@
     R={g:g, pay:pay, gain:gain, note:note, why:why||''}; G=null; view='result'; render();
     if(window.__petRefresh) setTimeout(window.__petRefresh,50);
   }
-  function cashOut(){ if(!G) return; if(G.mode==='ladder'){ finish('收手'); } else if(G.mode==='single'){ finish('收手'); } }
+  function cashOut(){ if(!G) return; if(G.mode==='ladder'){ finish('收手'); } else if(G.mode==='single'){ finish('收手'); }
+    else if(G.mode==='mine' && G.n>=1 && !isOver(G) && G.q && G.q.done){ finish('收手'); } }   // 11-18 踩地雷：翻過 1 格、不在答題中才能收手
 
   /* ---------- 遊戲畫面 ---------- */
   function petFace(pose){ var p=API.petState?API.petState().pet:null; return p&&API.petMini?API.petMini(p,pose,52):'🐾'; }
@@ -719,10 +822,12 @@
     if(g.mode==='slot') head+='<span>拉霸 '+(g.spinning?'轉動中':'×'+g.slot)+'</span>';
     if(g.mode==='bj') head+='<span>'+(g.stood?'莊家開牌':(g.ph.length<2?'發牌：第 '+(g.ph.length+(q&&!q.done?1:0))+' / 2 張':'要牌還是停牌？'))+'</span>';
     if(g.mode==='bingo') head+='<span>剩 '+(BG_SHOTS-g.n)+' 次・連成 '+bgLines(g.marks).length+' 條線</span>';
+    if(g.mode==='mine'){ var mL=mnLeft(g); head+='<span>剩 '+mL.b+' 顆雷／'+mL.t+' 格・獎金 <b>'+mnShow(g,g.prize)+'</b></span>'; }
     head+='</div>';
     o+=head;
     if(g.mode==='bj') o+=bjHands(g,true)+(q&&!q.done?'<p class="vc-sub">答對這題，蓋著的那張牌才是你的；答錯就作廢、直接停牌。</p>':'');
     if(g.mode==='bingo') o+=bgBoard(g,true)+(g.n<BG_SHOTS&&!(q&&!q.done)?'<p class="vc-sub">點一格答題：答對畫 ⭕、答錯打 ✗。直的、橫的、斜的連成一條線就算（中間免費）；還剩 '+(BG_SHOTS-g.n)+' 次。</p>':'');
+    if(g.mode==='mine') o+=mnBoard(g,true)+mnLine(g);
     if(g.mode==='duel') o+='<div class="vc-duel"><div><b>你</b><span class="mono">'+g.right+'</span></div><div class="vc-pet">'+petFace(q&&q.done?(q.pet?'stand':'sulk'):'stand')+'<b>'+esc(g.petName)+'</b><span class="mono">'+g.petScore+'</span>'+(q&&q.done?'<small>'+(q.pet?'牠答對了':'牠答錯了')+'</small>':'<small>牠也在想…</small>')+'</div></div>';
     if(g.mode==='slot' && (g.spinning||!q)){ o+='<div class="vc-slot">'+ART.slot('×?')+'<p class="vc-sub">'+(g.spinning?'轉轉轉…':'')+'</p></div></div>'; app.innerHTML=o; return; }
     if(!q){ app.innerHTML=o+'</div>'; return; }
@@ -747,6 +852,7 @@
     if(q.done && g.mode!=='sprint'){
       var over=(g.mode==='round'||g.mode==='duel')&&g.n>=10 || g.mode==='slot' || (g.mode==='ladder'&&(!q.ok||g.rung>=10)) || isOver(g);
       if(!over && g.mode==='bingo') btns+='<span class="sub" style="margin:0">↑ 點上面的賓果卡挑下一格</span>';
+      else if(!over && g.mode==='mine') btns+='<button class="btn solid" type="button" data-act="cash">💰 收手，拿 '+mnShow(g,g.prize)+'</button><span class="sub" style="margin:0">或點上面的雷區再翻一格</span>';
       else if(!over && g.mode==='bj'){
         if(g.ph.length<2) btns+='<button class="btn solid" type="button" data-act="next">發第二張牌 →</button>';
         else btns+='<button class="btn solid" type="button" data-act="hit">🃏 要牌（再答一題）</button><button class="btn" type="button" data-act="stand">✋ 停牌，'+bjTotal(g.ph).t+' 點</button>';
@@ -768,6 +874,7 @@
     if(g.mode==='duel') o+='<div class="vc-duel res">'+petFace(g.right>g.petScore?'sulk':'stand')+'<p>'+esc(g.petName)+'：'+(g.right>g.petScore?'你贏了！我要再多練練 💪':(g.right===g.petScore?'平手！下次再比':'嘿嘿，這次我贏了 😝'))+'</p></div>';
     if(g.mode==='bj') o+=bjHands(g,false);
     if(g.mode==='bingo') o+=bgBoard(g,false);
+    if(g.mode==='mine') o+=mnBoard(g,false);
     if(g.hist.length){
       o+='<div class="vc-list"><h4>這局的字 <span>✗ 的已收進錯字本</span></h4>'+g.hist.map(function(h){ var it=BYKEY[h.key]; return '<div class="'+(h.ok?'ok':'bad')+'"><span>'+(h.ok?'✓':'✗')+'</span><b>'+esc(it.w)+'</b><span>'+esc(it.zh)+'</span><small>×'+h.m+'</small></div>'; }).join('')+'</div>';
     }
@@ -783,6 +890,7 @@
     var o='<div class="vc-row"><h4>錯字本 <span>答錯的字會進來；隔 1、3、7 天再考，連對 3 次就移出</span></h4>';
     o+='<p class="fp-care">今天到期 <b>'+due.length+'</b> 個・錯字本共 '+all.length+' 個・今天已經複習 '+reviewMinToday()+' 分鐘（算英文讀書分鐘，每題最多算 30 秒、按「不會」不算；滿 25 分鐘種一棵英文番茄樹）'
       +(tal?'。寵物天賦「單字」：每答對一題 +'+tal+' 籌碼':'')+'</p>';
+    o+='<p class="vc-sub">'+dmTxt(s)+'</p>';   // 11-18
     o+='<div class="bar-btns"><button class="btn solid" type="button" data-act="rvstart"'+(due.length?'':' disabled')+'>開始複習（'+due.length+' 個）</button></div>';
     if(all.length){
       var list=all.map(function(k){ return {k:k, w:s.wb[k]}; }).sort(function(a,b){ return pk(a.w.due)-pk(b.w.due); });
@@ -819,15 +927,19 @@
     }
     if(ok && tal){ s.chips+=tal; RV.chips+=tal; }
     var vrv=vipPerk(s).rv; if(ok && !q.hint && vrv){ s.chips+=vrv; RV.chips+=vrv; }   // 11-17 VIP
+    var D=dmOf(s), dmNow=0; if(ok && !q.hint) D.ok++;   // 11-18 每日錯字本任務（上面已經更新錯字本，到期清單是新的）
+    if(!D.got && dmDone(s,D)){ D.got=1; s.chips+=DM_CHIP; s.k.dmN++; RV.dm=1; dmNow=1; }
+    s.dm=D;
     save(s); q.ok=ok; q.val=val; snd(ok?'ok':'bad');
     if(pomos) msg='🍅 錯字本複習滿 25 分鐘，種了一棵英文番茄樹！';
+    if(dmNow) msg=(pomos?msg+' ':'')+'📅 今天的錯字本任務完成，+'+DM_CHIP+' 籌碼！';
     RV.i++; renderReview();
   }
   function renderReview(){
     if(!RV){ view='review0'; return render(); }
     var o='<div class="vc-body vc-game"><div class="vc-ghead"><b>📕 錯字本複習</b><span>'+Math.min(RV.i+(RV.q&&!RV.q.done?1:0),RV.queue.length)+' / '+RV.queue.length+'</span><span>對 '+RV.ok+'・錯 '+RV.bad+'</span><span>已算 '+Math.round(RV.sec/60)+' 分鐘</span></div>';
     if(RV.done){
-      o+='<div class="vc-res win"><span class="e">📕</span><div><b>今天的錯字複習完了</b><small>答對 '+RV.ok+'、答錯 '+RV.bad+'；移出錯字本 '+RV.cleared+' 個；算進英文讀書 '+Math.round(RV.sec/60)+' 分鐘'+(RV.chips?'；天賦獎勵 +'+RV.chips+' 籌碼':'')+'。</small></div></div>'
+      o+='<div class="vc-res win"><span class="e">📕</span><div><b>今天的錯字複習完了</b><small>答對 '+RV.ok+'、答錯 '+RV.bad+'；移出錯字本 '+RV.cleared+' 個；算進英文讀書 '+Math.round(RV.sec/60)+' 分鐘'+(RV.chips?'；天賦獎勵 +'+RV.chips+' 籌碼':'')+(RV.dm?'；每日錯字本任務 +'+DM_CHIP+' 籌碼':'')+'。</small></div></div>'
         +'<div class="bar-btns"><button class="btn solid" type="button" data-view="review0">回錯字本</button><button class="btn" type="button" data-view="home">去賭場</button></div></div>';
       app.innerHTML=o; RV=null; if(window.__petRefresh) setTimeout(window.__petRefresh,50); return;
     }
@@ -855,7 +967,7 @@
     // 11-17：獎品變多了，照種類分開；收藏進度在「🏅 賭場成就」
     var nOwn=prizeOwnedN(s);
     o+='<div class="vc-row"><h4>獎品 <span>用籌碼換，只有賭場拿得到；收藏 '+nOwn+' / '+PRIZES.length+'（全部收齊有賭場成就）</span></h4>'+PKIND.map(function(kd){
-        var L=PRIZES.filter(function(p){ return p.k===kd[0]; }); if(!L.length) return '';
+        var L=PRIZES.filter(function(p){ return p.k===kd[0]; }).sort(function(a,b){ return a.c-b.c; }); if(!L.length) return '';   // 11-18：照價錢排（新獎品加在最後面）
         return '<p class="vc-ph"><b>'+kd[1]+'</b>'+(kd[2]?'・'+kd[2]:'')+'</p><div class="bn-ex">'+L.map(function(p){
           var own=ownPrize(s,p), lock=p.need&&!s.own[p.need], nd=lock?PRIZES.filter(function(x){ return x.id===p.need; })[0]:null;
           var pr=priceOf(s,p);
@@ -959,7 +1071,8 @@
       +'<li>淨輸贏：點數 '+sg(s.k.net.pts)+'、籌碼 '+sg(s.k.net.chip)+'、🌟 '+sg(s.k.net.star)+'</li>'
       +'<li>爬梯爬滿 10 階 '+s.k.lad10+' 次；跟寵物對賭 '+s.k.petW+' 勝 '+s.k.petL+' 敗</li>'
       +'<li>21 點贏 '+s.k.bjW+' 局（黑傑克 '+s.k.bjBJ+' 次）；賓果玩 '+s.k.bgG+' 局、最多一局連成 '+s.k.bgMax+' 條線</li>'
-      +'<li>錯字本：複習 '+s.k.rvAns+' 題、答對 '+s.k.rvOk+'、移出 '+s.k.clr+' 個；今天複習 '+reviewMinToday()+' 分鐘</li></ul></div>';
+      +'<li>踩地雷玩 '+s.k.mnG+' 局、累積拆掉 '+s.k.mnD+' 顆雷（一局最多 '+s.k.mnMax+' 顆）</li>'
+      +'<li>錯字本：複習 '+s.k.rvAns+' 題、答對 '+s.k.rvOk+'、移出 '+s.k.clr+' 個；今天複習 '+reviewMinToday()+' 分鐘；每日錯字本任務完成 '+s.k.dmN+' 天</li></ul></div>';
     o+='<div class="vc-row"><h4>最近的局 <span>每局考了哪些字在「📜 紀錄」</span></h4>'+(s.log.length?s.log.slice(0,5).map(function(l){ var d=new Date(l.t), gain=gainOf(l);
         return '<div class="bn-log"><span class="mono">'+(d.getMonth()+1)+'/'+d.getDate()+' '+hm(d.getHours()*60+d.getMinutes())+'</span><span class="mono '+(gain>0?'up':(gain<0?'dn':''))+'">'+sg(gain)+'</span><span>'+modeOf(l.m).e+' '+modeOf(l.m).n+'・'+diffOf(l.d).n+'・'+CUR[l.c].n+(l.ab?'（沒打完）':'')+'・對 '+l.r+'/'+l.n+'</span></div>'; }).join('')
         +'<div class="bar-btns"><button class="btn ghost" type="button" data-view="log">看完整紀錄（'+s.log.length+' 局）</button></div>':'<p class="vc-sub">還沒玩過。</p>')+'</div>';
@@ -1028,6 +1141,7 @@
     if(b.dataset.ach) return claimAch([b.dataset.ach]);
     if(b.dataset.achall) return claimAch(achReady(s).map(function(a){ return a.id; }));
     if(b.dataset.cell!==undefined && G) return bgPick(+b.dataset.cell);
+    if(b.dataset.mt!==undefined && G) return mnPick(+b.dataset.mt);   // 11-18 踩地雷
     if(b.dataset.opt!==undefined && G && G.q){ if(Date.now()-G.q.t0<250) return; return answer(G.q.opts[+b.dataset.opt]); }
     var act=b.dataset.act;
     if(act==='start') return startGame();
