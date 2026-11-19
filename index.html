@@ -402,13 +402,26 @@ section[hidden]{display:none}
 @media (prefers-reduced-motion:no-preference){.pm-ask{animation:pmAsk .25s ease-out}}
 .pm-nz{margin:11px 0 0;padding-top:10px;border-top:1px dashed var(--rule);text-align:left}
 .pm-nz-l{display:block;font-size:12px;color:var(--ink-soft);margin-bottom:5px}
-.pm-nz-row{display:flex;gap:6px;align-items:center}
-.pm-nz-row select{flex:1 1 auto;min-width:0;font-family:inherit;font-size:12.5px;padding:5px 6px;
-  border:1px solid var(--rule);background:var(--paper);color:var(--ink)}
+.pm-nz-row{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.pm-nz-l small{margin-left:6px;font-size:11px;color:var(--ink-faint)}
+.pm-nz-chips{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 7px}
+.pm-nz-chips button,.pm-nz-8d button{font-family:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--ink-soft);cursor:pointer}
+.pm-nz-chips button[aria-pressed="true"]{background:var(--sci-tint);border-color:var(--sci);color:var(--sci);font-weight:600}
+.pm-nz-chips button.dim{opacity:.5}
+.pm-nz-mix{display:grid;gap:3px;margin:0 0 7px}
+.pm-nz-mix:empty{display:none}
+.pm-nz-m{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft)}
+.pm-nz-m span{flex:0 0 6.5em;white-space:nowrap}
+.pm-nz-m input{flex:1 1 auto;min-width:0;margin:0;accent-color:var(--sci)}
 .pm-nz-row .btn{flex:0 0 auto;min-width:76px;padding:6px 12px;font-size:12.5px}
 .pm-nz-row .btn.on{background:var(--sci-tint);border-color:var(--sci);color:var(--sci)}
-.pm-nz-vol{margin-top:7px;font-size:12px;color:var(--ink-faint)}
+.pm-nz-vol{display:flex;flex:1 1 140px;min-width:140px;gap:6px;align-items:center;font-size:12px;color:var(--ink-faint)}
+.pm-nz-vol span{white-space:nowrap}
 .pm-nz-vol input{flex:1 1 auto;min-width:0;margin:0;accent-color:var(--sci)}
+.pm-nz-8d{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px;font-size:12px;color:var(--ink-soft)}
+.pm-nz-8d span{margin-right:2px}
+.pm-nz-8d button{padding:4px 11px;font-size:12px}
+.pm-nz-8d button[aria-pressed="true"]{background:var(--sci);border-color:var(--sci);color:#fff}
 .pm-chk{display:flex;gap:6px;align-items:flex-start;margin-top:6px;font-size:12px;line-height:1.45;color:var(--ink-soft);cursor:pointer}
 .pm-chk input{flex:0 0 auto;width:15px;height:15px;margin:2px 0 0;accent-color:var(--sci)}
 .pm-nz-hint{margin:5px 0 0;font-size:11.5px;line-height:1.45;color:var(--ink-faint)}
@@ -428,7 +441,8 @@ section[hidden]{display:none}
 .pm-ln:focus-visible{outline:2px solid var(--warn);outline-offset:2px;border-radius:4px}
 .pm-ed{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:3px}
 @media (pointer:coarse){   /* 手指點的按鈕至少 44px 高 */
-  .pm-ask-b .btn,.pm-ed .btn,.pm-nz-row .btn,.pm-nz-row select{min-height:44px}
+  .pm-ask-b .btn,.pm-ed .btn,.pm-nz-row .btn{min-height:44px}
+  .pm-nz-chips button,.pm-nz-8d button{min-height:40px}
   .pm-nz-vol input{min-height:32px}
   .pm-ln{min-height:40px}
   .pm-log>summary{padding:10px 0}
@@ -1445,14 +1459,16 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
           <button class="btn ghost" type="button" id="pm-ask-skip">略過</button>
         </div>
       </form>
-      <!-- 11-18：專注白噪音（Web Audio 現場產生，不用音檔、不連網）＋計時中螢幕不關 -->
+      <!-- 11-18：專注白噪音；11-19 改成「專注聲音」：15 種即時生成（sound-worklet.js，不循環重複）、最多疊 4 種、8D 環繞；計時中螢幕不關 -->
       <div class="pm-nz" role="group" aria-labelledby="pm-nz-l">
-        <span class="pm-nz-l" id="pm-nz-l">🎧 專注白噪音</span>
+        <span class="pm-nz-l" id="pm-nz-l">🎧 專注聲音<small>點了就疊上去，最多 4 種</small></span>
+        <div class="pm-nz-chips" id="pm-nz-k" role="group" aria-label="聲音種類"></div>
+        <div class="pm-nz-mix" id="pm-nz-mix"></div>
         <div class="pm-nz-row">
-          <select id="pm-nz-k" aria-label="聲音種類"></select>
           <button class="btn" id="pm-nz-go" type="button">▶ 播放</button>
+          <label class="pm-nz-vol"><span>總音量</span><input type="range" id="pm-nz-v" min="0" max="100" step="1" value="40"></label>
         </div>
-        <label class="pm-nz-row pm-nz-vol"><span>音量</span><input type="range" id="pm-nz-v" min="0" max="100" step="1" value="40"></label>
+        <div class="pm-nz-8d" id="pm-nz-d" role="group" aria-label="空間效果"><span>🌀 空間</span></div>
         <label class="pm-chk"><input type="checkbox" id="pm-nz-a"> 只在專注時放（休息時自動停）</label>
         <label class="pm-chk" id="pm-wl-w" hidden><input type="checkbox" id="pm-wl"> 計時中螢幕保持亮著</label>
         <p class="pm-nz-hint" id="pm-nz-hint" aria-live="polite"></p>
@@ -3780,103 +3796,137 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function focusEnds(e){ nzPhase(false); askNote(e); paintLog(); }
   function focusBegins(){ nzPhase(true); closeAsk(false); }
 
-  /* ---- 專注白噪音：Web Audio 現場產生（不用音檔、不連網），跟提示音共用同一個 AudioContext。
-     設定存在 P.noise={k:種類, v:音量 0–100, a:只在專注時放}；有沒有在播不存（瀏覽器規定要點一下才能出聲） ---- */
-  var NZ_K=[['rain','雨聲'],['wave','海浪'],['white','白噪音'],['pink','粉紅噪音'],['brown','棕噪音']],
-      NZ_LV={rain:1, wave:1, white:.5, pink:.8, brown:1};   // 各種聲音的音量校正：白噪音比較刺耳，小聲一點
+  /* ---- 專注聲音（11-18 白噪音；11-19 他要「更多聲音、ASMR、8D，不能一直循環重複」）：
+     聲音由 sound-worklet.js 在音訊執行緒即時算（不循環、不用音檔、不連網）；最多疊 4 種、各自音量。
+     8D：每一層轉成單聲道、接 HRTF 的 PannerNode 繞著頭轉，轉速、半徑、高低都隨機漫步，每層位置不同；再加一點程式算的殘響。
+     設定 P.noise={L:{種類:音量 0–100}, v:總音量, a:只在專注時放, d:8D 0 關／1 慢／2 中／3 快}；舊的 {k:種類} 自動換成 L。有沒有在播不存（瀏覽器規定要點一下才能出聲） ---- */
+  var NZ_K=[['rain','雨聲','🌧️'],['window','雨打窗','🪟'],['storm','雷雨','⛈️'],['wave','海浪','🌊'],['stream','溪流','🏞️'],['fire','營火','🔥'],['wind','風聲','🌬️'],
+      ['pencil','寫字','✏️'],['keys','打字','⌨️'],['tap','敲擊','🪵'],['brush','刷子','🖌️'],['earpick','掏耳','🪶'],['thump','捶背','🤲'],['purr','呼嚕','🐱'],['white','白噪音','⚪'],['pink','粉紅噪音','🌸'],['brown','棕噪音','🟤']],
+      NZ_MAX=4, NZ_8D=[['一般',0],['8D 慢',19],['8D 中',9],['8D 快',4.5],['👂 耳邊',0]], NZ_SRC='sound-worklet.js?v=20261119a', TAU2=Math.PI*2, NZ_FAR=.06;
+  // NZ_8D：空間效果；8D 的數字＝繞一圈大約幾秒（會隨機忽快忽慢）。耳邊（4）是照他給的 ASMR 範本量出來的：
+  //   左右聲道幾乎不相關、一半以上的時間貼在一邊耳朵（另一耳小 20 dB 以上）、約 7–30 秒換一次邊、低頻很厚（貼近麥克風）
+  function nzMode(d){ return !d?'s':(d===4?'e':'o'); }   // s 一般立體聲、o 8D 環繞、e 耳邊
   function own(o,k){ return Object.prototype.hasOwnProperty.call(o,k); }
-  var nz0=(P.noise&&typeof P.noise==='object')?P.noise:{};
-  var NZ={k:own(NZ_LV,nz0.k)?nz0.k:'rain', v:(+nz0.v>=0 && +nz0.v<=100)?Math.round(+nz0.v):40, a:nz0.a!==false,
-          on:false, rest:false, wait:false, job:0, voice:null, buf:null, bufK:''};
+  function clampV(x,d){ x=+x; return (x>=0&&x<=100)?Math.round(x):d; }
+  var NZ_ID={}; NZ_K.forEach(function(x){ NZ_ID[x[0]]=x; });
+  var nz0=(P.noise&&typeof P.noise==='object')?P.noise:{}, L0={};
+  if(nz0.L&&typeof nz0.L==='object') Object.keys(nz0.L).forEach(function(k){ if(own(NZ_ID,k)&&Object.keys(L0).length<NZ_MAX) L0[k]=clampV(nz0.L[k],70); });
+  else if(own(NZ_ID,nz0.k)) L0[nz0.k]=70;
+  if(!Object.keys(L0).length) L0.rain=70;
+  var NZ={L:L0, v:clampV(nz0.v,40), a:nz0.a!==false, d:(+nz0.d>=0&&+nz0.d<=4)?Math.round(+nz0.d):0, on:false, rest:false, wait:false, job:0, err:'', note:'', mixSig:''};
   var elNzK=document.getElementById('pm-nz-k'), elNzGo=document.getElementById('pm-nz-go'), elNzV=document.getElementById('pm-nz-v'),
-      elNzA=document.getElementById('pm-nz-a'), elNzH=document.getElementById('pm-nz-hint'),
+      elNzA=document.getElementById('pm-nz-a'), elNzH=document.getElementById('pm-nz-hint'), elNzMix=document.getElementById('pm-nz-mix'), elNzD=document.getElementById('pm-nz-d'),
       elWl=document.getElementById('pm-wl'), elWlW=document.getElementById('pm-wl-w');
-  function nzSave(){ P.noise={k:NZ.k, v:NZ.v, a:NZ.a}; s(PK,P); }
-  function nzVol(){ var x=NZ.v/100; return x*x; }   // 平方：小音量那段比較好調
+  function nzSave(){ P.noise={L:NZ.L, v:NZ.v, a:NZ.a, d:NZ.d}; s(PK,P); }
+  function sq(x){ x=x/100; return x*x; }   // 平方：小音量那段比較好調
   function holdAt(p,t){ if(p.cancelAndHoldAtTime) p.cancelAndHoldAtTime(t); else { var v=p.value; p.cancelScheduledValues(t); p.setValueAtTime(v,t); } }
-  // 填一段聲音。白／粉紅（Paul Kellet 濾波）／棕噪音是標準做法；海浪＝棕噪音為主，起伏在播放時用慢速振盪器做；
-  // 雨聲＝高頻沙沙聲＋一點低沉的底＋隨機、大小不一的雨滴聲
-  function nzFill(o,k,sr){
-    var n=o.length, x=(Math.random()*4294967295)>>>0||1, R=4.656612873077393e-10,   // 亂數用 xorshift（整數運算），比每個樣本叫 Math.random 快好幾倍
-        b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0, br=0, hp=0, px=0, ha=Math.exp(-2*Math.PI*800/sr),
-        dEnv=0, dA=0, dK=0, dTh=70/sr*4294967296, i, w, p, u;
-    for(i=0;i<n;i++){
-      x^=x<<13; x^=x>>>17; x^=x<<5; w=x*R;   // -1～1 的白噪音
-      if(k==='white'){ o[i]=w; continue; }
-      br=(br+.02*w)/1.02;
-      if(k==='brown'){ o[i]=br; continue; }
-      b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852;
-      b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898;
-      p=b0+b1+b2+b3+b4+b5+b6+w*.5362; b6=w*.115926;
-      if(k==='pink'){ o[i]=p; continue; }
-      if(k==='wave'){ o[i]=br/.0576*.85+p/1.75*.25; continue; }   // 除以的數＝各自的平均振幅，先調成一樣大再混
-      hp=ha*(hp+p-px); px=p;                                       // 雨聲：粉紅噪音去掉 800 Hz 以下
-      x^=x<<13; x^=x>>>17; x^=x<<5;
-      if((x>>>0)<dTh){ u=Math.random(); dA=.4+1.6*u*u*u*u; dEnv=1; dK=Math.exp(-1/(sr*(.0015+.0035*Math.random()))); }   // 平均每秒 70 滴、大小不一
-      o[i]=hp*.75+br/.0576*.3;
-      if(dEnv>.001){ x^=x<<13; x^=x>>>17; x^=x<<5; o[i]+=x*R/.577*dA*dEnv; dEnv*=dK; }
-    }
+
+  var SE={ctx:null, ready:null, master:null, wet:null, voices:{}, timer:0};
+  // 殘響：用亂數算一段 2.4 秒、越來越小越來越暗的「回音」，左右不一樣（空間感），不用音檔
+  function seIR(ctx){
+    var sr=ctx.sampleRate, n=Math.round(sr*2.4), b=ctx.createBuffer(2,n,sr), c, i, d, lp, t;
+    for(c=0;c<2;c++){ d=b.getChannelData(c); lp=0;
+      for(i=0;i<n;i++){ t=i/sr; lp+=(.12+.6*Math.exp(-t*2.2))*((Math.random()*2-1)-lp); d[i]=lp*Math.exp(-t*2.6)*(t<.01?t/.01:1); } }
+    return b;
   }
-  // 10 秒、立體聲。只留最近用的一種（約 4 MB），換種類才重做
-  function nzBuffer(ctx){
-    var k=NZ.k, sr=ctx.sampleRate;
-    if(NZ.buf && NZ.bufK===k && NZ.buf.sampleRate===sr) return NZ.buf;
-    var len=Math.round(sr*10), h=len>>1, fd=Math.round(sr*.4), buf=ctx.createBuffer(2,len,sr), tmp=new Float32Array(len+fd), i, x, sum=0, sc, y,
-        d0=buf.getChannelData(0), d1=buf.getChannelData(1);
-    nzFill(tmp,k,sr);
-    // 頭尾等功率交叉淡化：最後一個樣本接回第一個時是連續的，循環播放不會「喀」一聲
-    for(i=0;i<fd;i++){ x=i/fd*Math.PI/2; tmp[i]=tmp[i]*Math.sin(x)+tmp[len+i]*Math.cos(x); }
-    for(i=0;i<len;i++) sum+=tmp[i]*tmp[i];
-    sc=.18*NZ_LV[k]/(Math.sqrt(sum/len)||1);   // 每種聲音調到差不多的平均音量
-    for(i=0;i<len;i++){ y=tmp[i]*sc; d0[i]=y>1?1:(y<-1?-1:y); }
-    // 右聲道＝同一段錯開 5 秒：左右聽起來不一樣（有空間感），一樣能無縫循環，又省一半的計算
-    d1.set(d0.subarray(h)); d1.set(d0.subarray(0,h),len-h);
-    NZ.buf=buf; NZ.bufK=k; return buf;
+  function wetOf(){ var m=nzMode(NZ.d); return m==='o'?.3:(m==='e'?.05:.12); }   // 耳邊要「很近」，殘響幾乎不加
+  function seReady(ctx){
+    if(SE.ready && SE.ctx===ctx) return SE.ready;
+    SE.ctx=ctx;
+    if(!ctx.audioWorklet || typeof AudioWorkletNode!=='function') return Promise.reject(new Error('old'));
+    var pr=ctx.audioWorklet.addModule(NZ_SRC).then(function(){
+      var m=ctx.createGain(), cv=ctx.createConvolver(), w=ctx.createGain();
+      m.gain.value=0; cv.buffer=seIR(ctx); w.gain.value=wetOf();
+      m.connect(ctx.destination); m.connect(cv); cv.connect(w); w.connect(ctx.destination);
+      SE.master=m; SE.wet=w;
+    });
+    SE.ready=pr; pr.catch(function(){ if(SE.ready===pr) SE.ready=null; });   // 沒網路載不到：下次按再試
+    return pr;
+  }
+  function walk(o,lo,hi){ if(o.n<=0){ o.t=lo+(hi-lo)*Math.random(); o.n=20+Math.random()*140; } o.v+=(o.t-o.v)*.03; o.n--; return o.v; }   // 8D 用的隨機漫步（每 0.05 秒一步）
+  function seVoice(id){
+    var ctx=SE.ctx, t=ctx.currentTime, nd;
+    try{ nd=new AudioWorkletNode(ctx,'sp-gen',{numberOfInputs:0, numberOfOutputs:1, outputChannelCount:[2], processorOptions:{kind:id, seed:(Math.random()*4294967295)>>>0}}); }catch(e){ return null; }
+    var g=ctx.createGain(); g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(sq(NZ.L[id]),t+1.5);   // 慢慢變大聲
+    var v={id:id, nd:nd, g:g, mono:null, pan:null, st:0, th:Math.random()*TAU2, dir:Math.random()<.5?-1:1,
+           sf:{v:1,t:1,n:0}, r:{v:1.6,t:1.6,n:0}, y:{v:.1,t:.1,n:0}};
+    seRoute(v); g.connect(SE.master); SE.voices[id]=v; return v;
+  }
+  function seUnroute(v){ try{ v.nd.disconnect(); }catch(e){}
+    [v.mono,v.pan].concat(v.ear?[v.ear.sh,v.ear.gl,v.ear.gr,v.ear.mg]:[]).forEach(function(x){ if(x) try{ x.disconnect(); }catch(e){} }); v.mono=v.pan=v.ear=null; }
+  function seRoute(v){   // 一般：直接用立體聲；8D：轉成單聲道 → HRTF 繞著頭轉；耳邊：單聲道、低頻加厚、貼在一邊耳朵
+    seUnroute(v);
+    var md=nzMode(NZ.d); if(md==='s'){ v.nd.connect(v.g); return; }
+    var ctx=SE.ctx, m=ctx.createGain();
+    m.channelCount=1; m.channelCountMode='explicit'; m.channelInterpretation='speakers';
+    if(md==='e'){
+      var sh=ctx.createBiquadFilter(), gl=ctx.createGain(), gr=ctx.createGain(), mg=ctx.createChannelMerger(2);
+      sh.type='lowshelf'; sh.frequency.value=220; sh.gain.value=6;   // 貼近麥克風的低頻（近接效應）
+      v.nd.connect(m); m.connect(sh); sh.connect(gl); sh.connect(gr); gl.connect(mg,0,0); gr.connect(mg,0,1); mg.connect(v.g);
+      v.mono=m; v.ear={sh:sh, gl:gl, gr:gr, mg:mg}; v.side=Math.random()<.5?0:1; seEar(v,true); return;
+    }
+    var p=ctx.createPanner();
+    p.panningModel='HRTF'; p.distanceModel='inverse'; p.refDistance=1; p.maxDistance=50; p.rolloffFactor=.5;
+    v.nd.connect(m); m.connect(p); p.connect(v.g); v.mono=m; v.pan=p; seOrbit(v,true);
+  }
+  // 往後排 1.6 秒的位置（每 0.05 秒一點）：背景分頁計時器變慢也不會卡
+  // 耳邊：貼在一邊（另一耳小約 24 dB），6–24 秒後花 0.8–2 秒換到另一邊；偶爾停在正中間（像在頭後面）幾秒
+  function seEar(v,reset){
+    var e=v.ear; if(!e) return;
+    var now=SE.ctx.currentTime, tl, tr, dur;
+    if(reset){ e.gl.gain.setValueAtTime(v.side?NZ_FAR:1,now); e.gr.gain.setValueAtTime(v.side?1:NZ_FAR,now); v.nextSw=now+6+Math.random()*18; return; }
+    if(now<v.nextSw) return;
+    dur=.8+Math.random()*1.2;
+    if(v.side!==-1 && Math.random()<.15){ v.side=-1; tl=tr=.6; v.nextSw=now+dur+2+Math.random()*4; }
+    else { v.side=v.side===-1?(Math.random()<.5?0:1):1-v.side; tl=v.side?NZ_FAR:1; tr=v.side?1:NZ_FAR; v.nextSw=now+dur+6+Math.random()*18; }
+    holdAt(e.gl.gain,now); holdAt(e.gr.gain,now); e.gl.gain.linearRampToValueAtTime(tl,now+dur); e.gr.gain.linearRampToValueAtTime(tr,now+dur);
+  }
+  function seOrbit(v,reset){
+    var p=v.pan; if(!p||nzMode(NZ.d)!=='o') return;
+    var now=SE.ctx.currentTime, per=NZ_8D[NZ.d][1], dt=.05, x, y, z, r;
+    function pos(){ r=walk(v.r,1.1,2.4); y=walk(v.y,-.35,.6); v.th+=v.dir*TAU2/per*walk(v.sf,.55,1.45)*dt; x=Math.sin(v.th)*r; z=-Math.cos(v.th)*r; }
+    if(!p.positionX){ pos(); try{ p.setPosition(x,y,z); }catch(e){} return; }   // 很舊的瀏覽器：一次跳一格
+    if(reset||v.st<now){ v.st=now; pos(); p.positionX.setValueAtTime(x,now); p.positionY.setValueAtTime(y,now); p.positionZ.setValueAtTime(z,now); }
+    while(v.st<now+1.6){ v.st+=dt; pos(); p.positionX.linearRampToValueAtTime(x,v.st); p.positionY.linearRampToValueAtTime(y,v.st); p.positionZ.linearRampToValueAtTime(z,v.st); }
+  }
+  function seTimer(){
+    var need=NZ.d && Object.keys(SE.voices).length;
+    if(need && !SE.timer) SE.timer=setInterval(function(){ Object.keys(SE.voices).forEach(function(id){ var v=SE.voices[id]; if(v.ear) seEar(v); else seOrbit(v); }); },250);
+    else if(!need && SE.timer){ clearInterval(SE.timer); SE.timer=0; }
+  }
+  function seKill(v,sec){
+    var t=SE.ctx.currentTime; if(SE.voices[v.id]===v) delete SE.voices[v.id];
+    try{ holdAt(v.g.gain,t); v.g.gain.linearRampToValueAtTime(0,t+sec); }catch(e){}
+    setTimeout(function(){ try{ v.nd.port.postMessage({stop:1}); }catch(e){} seUnroute(v); try{ v.g.disconnect(); }catch(e){} }, sec*1000+150);
+  }
+  function seSync(){   // 正在放的層跟設定一樣：關掉的淡出、新加的接進來、音量跟著改
+    var t=SE.ctx.currentTime;
+    Object.keys(SE.voices).forEach(function(id){ var v=SE.voices[id];
+      if(!own(NZ.L,id)) seKill(v,.8); else { holdAt(v.g.gain,t); v.g.gain.setTargetAtTime(sq(NZ.L[id]),t,.08); } });
+    Object.keys(NZ.L).forEach(function(id){ if(!SE.voices[id]) seVoice(id); });
+    seTimer();
   }
   function nzStart(){
-    var ctx=audio(); if(!ctx) return;
-    nzStop(.4);   // 換種類：舊的淡出
-    var t=ctx.currentTime, buf=nzBuffer(ctx), src=ctx.createBufferSource(), out=ctx.createGain(), nodes=[src,out], osc=[], head=src;
-    src.buffer=buf; src.loop=true;
-    if(NZ.k==='rain'||NZ.k==='wave'){
-      var lp=ctx.createBiquadFilter(); lp.type='lowpass'; nodes.push(lp); src.connect(lp); head=lp;
-      if(NZ.k==='rain'){ lp.frequency.value=7000; lp.Q.value=.5; }
-      else {   // 海浪：兩個很慢的振盪器（約 11 秒、32 秒一圈）一起推濾波器和音量，浪有大有小
-        lp.frequency.value=700; lp.Q.value=.3;
-        var amp=ctx.createGain(); amp.gain.value=.6; nodes.push(amp); lp.connect(amp); head=amp;
-        [[.09,420,.3],[.031,180,.12]].forEach(function(c){
-          var o=ctx.createOscillator(), gf=ctx.createGain(), ga=ctx.createGain();
-          o.frequency.value=c[0]; gf.gain.value=c[1]; ga.gain.value=c[2];
-          o.connect(gf); gf.connect(lp.frequency); o.connect(ga); ga.connect(amp.gain);
-          nodes.push(o,gf,ga); osc.push(o);
-        });
-      }
-    }
-    head.connect(out); out.connect(ctx.destination);
-    out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(nzVol(),t+1.2);   // 慢慢變大聲
-    src.start(t, Math.random()*buf.duration);   // 從隨機位置開始
-    osc.forEach(function(o){ o.start(t); });
-    NZ.voice={src:src, out:out, nodes:nodes, osc:osc};
+    var ctx=audio(), job=++NZ.job;   // 一定要在點擊裡叫 audio()，手機才肯出聲
+    if(!ctx){ NZ.on=false; NZ.wait=false; NZ.err='這個瀏覽器不能放聲音。'; nzPaint(); return; }
+    NZ.wait=!SE.master; NZ.err=''; nzPaint();
+    seReady(ctx).then(function(){
+      if(job!==NZ.job || !NZ.on || NZ.rest) return;
+      NZ.wait=false;
+      var t=ctx.currentTime; holdAt(SE.master.gain,t); SE.master.gain.linearRampToValueAtTime(sq(NZ.v),t+1.2);
+      seSync(); nzPaint();
+    },function(e){
+      if(job!==NZ.job) return;
+      NZ.wait=false; NZ.on=false; NZ.err=(e&&e.message==='old')?'這個瀏覽器太舊，放不了（換新版 Chrome 或 Safari）。':'聲音程式載入失敗，連上網路再按一次。'; nzPaint();
+    });
   }
   function nzStop(sec){
-    var v=NZ.voice; if(!v||!AC) return; NZ.voice=null;
-    var t=AC.currentTime, end=t+sec+.05;
-    try{ holdAt(v.out.gain,t); v.out.gain.linearRampToValueAtTime(0,t+sec); }catch(e){}   // 淡出，不會突然斷掉
-    v.src.onended=function(){ v.nodes.forEach(function(nd){ try{ nd.disconnect(); }catch(e){} }); };
-    try{ v.src.stop(end); v.osc.forEach(function(o){ o.stop(end); }); }catch(e){}
+    if(!SE.master||!SE.ctx) return;
+    var t=SE.ctx.currentTime; holdAt(SE.master.gain,t); SE.master.gain.linearRampToValueAtTime(0,t+sec);   // 淡出，不會突然斷掉
+    Object.keys(SE.voices).forEach(function(id){ seKill(SE.voices[id],sec); });
+    seTimer();
   }
-  // 第一次產生一種聲音要幾十毫秒：先讓按鈕顯示「準備中」再做，點下去不會卡住
-  function nzKick(){
-    var ctx=audio(), job=++NZ.job; if(!ctx){ NZ.on=false; NZ.wait=false; nzPaint(); return; }
-    if(NZ.buf && NZ.bufK===NZ.k && NZ.buf.sampleRate===ctx.sampleRate){ NZ.wait=false; nzStart(); return; }
-    NZ.wait=true; nzPaint();
-    setTimeout(function(){
-      if(job!==NZ.job) return;
-      NZ.wait=false;
-      if(NZ.on && !NZ.rest) nzStart();
-      nzPaint();
-    },30);
-  }
+  function nzKick(){ nzStart(); }
   function nzHalt(sec){ NZ.job++; NZ.wait=false; nzStop(sec); }
   // 只在專注時放：專注結束先停（rest），下一顆專注開始自動接著放
   function nzPhase(focus){
@@ -3887,25 +3937,57 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function nzPaint(){
     elNzGo.textContent=NZ.wait?'準備中…':(NZ.on?'■ 停止':'▶ 播放');
     elNzGo.classList.toggle('on',NZ.on);
-    elNzH.textContent=(NZ.on&&NZ.rest)?'休息中先停，下一顆專注開始會自動接著放。':'';
+    var n=Object.keys(NZ.L).length;
+    Array.prototype.forEach.call(elNzK.children,function(b){ var on=own(NZ.L,b.dataset.k); b.setAttribute('aria-pressed',on?'true':'false'); b.classList.toggle('dim',!on&&n>=NZ_MAX); });
+    var sig=Object.keys(NZ.L).join(',');
+    if(sig!==NZ.mixSig){ NZ.mixSig=sig;   // 選的種類變了才重畫音量列（拉到一半不會被重畫打斷）
+      elNzMix.innerHTML=Object.keys(NZ.L).map(function(k){ var x=NZ_ID[k];
+        return '<label class="pm-nz-m"><span>'+x[2]+' '+x[1]+'</span><input type="range" min="0" max="100" step="1" value="'+NZ.L[k]+'" data-mix="'+k+'" aria-label="'+x[1]+'的音量"></label>'; }).join(''); }
+    Array.prototype.forEach.call(elNzD.querySelectorAll('button'),function(b){ b.setAttribute('aria-pressed',(+b.dataset.d===NZ.d)?'true':'false'); });
+    elNzH.textContent=NZ.err||NZ.note||((NZ.on&&NZ.rest)?'休息中先停，下一顆專注開始會自動接著放。':'')||(nzMode(NZ.d)==='o'?'8D 要戴耳機才聽得出聲音繞著頭轉。':(NZ.d===4?'耳邊像 ASMR：聲音貼在一邊耳朵、隔一陣子換邊；要戴耳機。':''));
   }
-  NZ_K.forEach(function(x){ var o=document.createElement('option'); o.value=x[0]; o.textContent=x[1]; elNzK.appendChild(o); });
-  elNzK.value=NZ.k; elNzV.value=NZ.v; elNzA.checked=NZ.a;
+  NZ_K.forEach(function(x){ var b=document.createElement('button'); b.type='button'; b.dataset.k=x[0]; b.textContent=x[2]+' '+x[1]; elNzK.appendChild(b); });
+  elNzD.insertAdjacentHTML('beforeend',NZ_8D.map(function(x,i){ return '<button type="button" data-d="'+i+'" aria-pressed="false">'+x[0]+'</button>'; }).join(''));
+  elNzV.value=NZ.v; elNzA.checked=NZ.a;
   elNzGo.addEventListener('click',function(){
     if(NZ.on){ NZ.on=false; NZ.rest=false; nzHalt(.8); }
-    else { NZ.on=true; NZ.rest=false; nzKick(); }   // 一定要在點擊裡叫 audio()，手機才肯出聲
+    else { NZ.on=true; NZ.rest=false; nzKick(); }
+    NZ.note=''; nzPaint();
+  });
+  elNzK.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-k]'); if(!b) return;
+    var k=b.dataset.k; NZ.note='';
+    if(own(NZ.L,k)){ delete NZ.L[k];
+      if(!Object.keys(NZ.L).length && NZ.on){ NZ.on=false; NZ.rest=false; nzHalt(.8); } }
+    else if(Object.keys(NZ.L).length>=NZ_MAX){ NZ.note='最多疊 '+NZ_MAX+' 種，先點一種關掉。'; nzPaint(); return; }
+    else NZ.L[k]=70;
+    nzSave();
+    if(NZ.on && !NZ.rest && SE.master && !NZ.wait) seSync();
     nzPaint();
   });
-  elNzK.addEventListener('change',function(){
-    NZ.k=own(NZ_LV,elNzK.value)?elNzK.value:'rain'; nzSave();
-    if(NZ.on && !NZ.rest){ nzHalt(.4); nzKick(); }
-    nzPaint();
+  elNzMix.addEventListener('input',function(e){   // 拉的時候即時變；放開才存（不要每動一格就觸發一次同步）
+    var k=e.target.dataset&&e.target.dataset.mix; if(!k||!own(NZ.L,k)) return;
+    NZ.L[k]=clampV(e.target.value,70); var v=SE.voices[k];
+    if(v&&SE.ctx){ var t=SE.ctx.currentTime; try{ holdAt(v.g.gain,t); v.g.gain.setTargetAtTime(sq(NZ.L[k]),t,.06); }catch(e2){} }
   });
-  elNzV.addEventListener('input',function(){   // 拉的時候即時變；放開才存（不要每動一格就觸發一次同步）
-    NZ.v=Math.max(0,Math.min(100,Math.round(+elNzV.value)||0));
-    var v=NZ.voice; if(v&&AC){ var t=AC.currentTime; try{ holdAt(v.out.gain,t); v.out.gain.setTargetAtTime(nzVol(),t,.06); }catch(e){} }
+  elNzMix.addEventListener('change',nzSave);
+  elNzV.addEventListener('input',function(){
+    NZ.v=clampV(elNzV.value,40);
+    if(SE.master&&NZ.on&&!NZ.rest&&!NZ.wait){ var t=SE.ctx.currentTime; try{ holdAt(SE.master.gain,t); SE.master.gain.setTargetAtTime(sq(NZ.v),t,.06); }catch(e){} }
   });
   elNzV.addEventListener('change',nzSave);
+  elNzD.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-d]'); if(!b) return;
+    var d=+b.dataset.d, was=NZ.d; if(d===was) return;
+    NZ.d=d; nzSave(); NZ.note='';
+    if(SE.master && Object.keys(SE.voices).length && nzMode(d)!==nzMode(was)){   // 換空間效果：先很快淡出、換線路、再淡入，不會「喀」一聲
+      var t=SE.ctx.currentTime, on=NZ.on&&!NZ.rest; holdAt(SE.master.gain,t); SE.master.gain.linearRampToValueAtTime(0,t+.15);
+      setTimeout(function(){ Object.keys(SE.voices).forEach(function(id){ seRoute(SE.voices[id]); }); seTimer();
+        var t2=SE.ctx.currentTime; if(SE.wet) SE.wet.gain.setTargetAtTime(wetOf(),t2,.1);
+        if(on&&NZ.on&&!NZ.rest){ holdAt(SE.master.gain,t2); SE.master.gain.linearRampToValueAtTime(sq(NZ.v),t2+.4); } },170);
+    } else if(SE.wet&&SE.ctx){ SE.wet.gain.setTargetAtTime(wetOf(),SE.ctx.currentTime,.1); }
+    nzPaint();
+  });
   elNzA.addEventListener('change',function(){
     NZ.a=elNzA.checked; nzSave();
     if(NZ.on && !NZ.a && NZ.rest){ NZ.rest=false; nzKick(); }                                    // 關掉「只在專注時放」：休息中也馬上接著放
@@ -3934,7 +4016,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   }
   document.addEventListener('visibilitychange',function(){
     if(document.hidden) return;
-    if(NZ.voice) audio();   // 手機從背景回來，聲音被系統暫停的話接著放
+    if(NZ.on && !NZ.rest) audio();   // 手機從背景回來，聲音被系統暫停的話接著放
     wlSync();
   });
 
