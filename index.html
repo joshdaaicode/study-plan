@@ -921,6 +921,13 @@ details.fold-card:not(.card){margin:0 0 14px}
 .var-card p{margin:2px 0;font-size:13.5px;line-height:1.55}
 .var-card p span{display:inline-block;min-width:3.6em;font-size:12px;color:var(--ink-faint)}
 code.dim{font-size:11.5px;color:var(--ink-faint);background:none;padding:0}
+.td-med{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;padding:8px 14px;border-radius:var(--r-card,12px);border:1px solid var(--rule);background:var(--card);font-size:13.5px}
+.td-med small{margin-left:4px;color:var(--ink-faint);font-family:"IBM Plex Mono",monospace;font-size:12px}
+.td-med.due{border-color:var(--warn);box-shadow:inset 3px 0 0 var(--warn);font-weight:600}
+.td-med.ok{color:var(--ink-soft)}
+.td-med-b{flex:0 0 auto;font-family:inherit;font-size:12.5px;padding:5px 14px;border-radius:999px;border:1px solid var(--sci);background:var(--sci);color:#fff;cursor:pointer}
+.td-med-b.ghost{background:none;color:var(--ink-faint);border-color:var(--rule);font-size:12px}
+@media (pointer:coarse){.td-med-b{min-height:40px}}
 .td-first{margin:0 0 12px;padding:10px 14px;border-radius:var(--r-card,12px);background:var(--hi,#FFF4D6);font-size:14.5px;line-height:1.5}
 .td-first b{display:block;font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:2px}
 .td-rule{display:inline-block;margin-left:6px;font-size:12.5px;color:var(--ink-faint)}
@@ -1402,6 +1409,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   <!-- 11-10：搬進版面裡，手機上才能排在「現在＋番茄鐘」後面 -->
   <p class="td-first" id="td-first" hidden></p><!-- 11-09 A3：昨晚日誌寫的「明天的第一件事」 -->
   <div class="td-due" id="td-due" hidden></div><!-- 11-09 A7：「待決定」裡 7 天內到期、還沒勾的 -->
+  <div class="td-med" id="td-med" hidden></div><!-- 11-19：每天 21:00 吃藥提醒（不給點數、不算任務） -->
   <p class="sec-note" id="td-note">勾掉完成的任務。沒勾的會在隔天自動變成「欠帳」排進來；放假日會從娛樂時間扣（平日娛樂本來就只有 30 分，是下限，不會再扣）。</p>
   <div class="td-budget" id="td-note2" hidden style="border-left:3px solid var(--warn)"></div>
   <div class="td-budget" id="td-budget"></div>
@@ -2317,7 +2325,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 </div>
 <script src="plan.js"></script>
 <script src="daychart.js?v=20261117t"></script>
-<script src="daysum.js?v=20261118a"></script>
+<script src="daysum.js?v=20261119a"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -3681,7 +3689,41 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       lastBlock=id;
       if(nxt && nxt.a-mins===5 && warned!==nxt.a && !nxt.quiet){ warned=nxt.a; notify('5 分鐘後：'+nxt.n, '先把手邊的收個尾'); }
     }
+    medTick();
   }
+
+  /* ---- 11-19 每天 21:00 提醒吃藥（他要的：「排程裡多一個提醒我吃藥，不用點數，每天晚上九點」）：
+     「今天」上面一列可以按「吃了」；21:00 跳提醒（沒開時段提醒也會用畫面橫幅），21:30 還沒按再提醒一次；21:00 以後才打開網頁就馬上提醒。
+     不給點數、不算任務、不影響完成率和賭場的鎖。紀錄在 P.med.log={日期:按的時間}（留 60 天，會同步）；日程、每日摘要也看得到。
+     網頁要開著才會跳（手機把網頁關掉就不會響），要更保險可以在手機設每天 21:00 的鬧鐘 ---- */
+  var MED_T=21*60, elMed=document.getElementById('td-med'), medSig='';
+  window.__MED={t:'21:00', n:'💊 吃藥'};
+  function medLog(){ P.med=(P.med&&typeof P.med==='object')?P.med:{}; P.med.log=(P.med.log&&typeof P.med.log==='object')?P.med.log:{}; return P.med.log; }
+  function medTaken(){ return +medLog()[dayKey()]||0; }
+  function paintMed(){
+    if(!elMed || window.__pv) return;
+    var d=new Date(), mins=d.getHours()*60+d.getMinutes(), at=medTaken(), late=!at&&mins>=MED_T, sig=at+'|'+late;
+    if(sig===medSig) return; medSig=sig;
+    elMed.hidden=false; elMed.className='td-med'+(at?' ok':(late?' due':''));
+    if(at){ var t=new Date(at); elMed.innerHTML='<span>💊 今天的藥吃了 ✓<small>'+hhmm(t.getHours()*60+t.getMinutes())+'</small></span><button type="button" class="td-med-b ghost" data-med="0">按錯了</button>'; }
+    else elMed.innerHTML='<span>💊 '+(late?'21:00 了，該吃藥了':'今晚 21:00 吃藥')+'</span><button type="button" class="td-med-b" data-med="1">吃了</button>';
+  }
+  function medTick(){
+    if(window.__pv) return;
+    var d=new Date(), mins=d.getHours()*60+d.getMinutes(), k=dayKey();
+    if(!medTaken() && mins>=MED_T){
+      medLog(); var n=(P.med.rk===k)?(+P.med.rn||0):0;
+      if(n===0 || (n===1 && mins>=MED_T+30)){ P.med.rk=k; P.med.rn=n+1; s(PK,P); notify('💊 該吃藥了','每天 21:00 的提醒；吃完到「今天」按「吃了」'); }
+    }
+    paintMed();
+  }
+  if(elMed) elMed.addEventListener('click',function(e){
+    var b=e.target.closest('button[data-med]'); if(!b) return;
+    var L=medLog(), k=dayKey();
+    if(b.dataset.med==='1'){ L[k]=Date.now(); var ks=Object.keys(L).sort(function(a,c){ return L[a]-L[c]; }); while(ks.length>60) delete L[ks.shift()]; }
+    else delete L[k];
+    s(PK,P); medSig=''; paintMed();
+  });
 
   /* ---- 番茄鐘 ---- */
   var mode='work', left=P.w*60, running=false, timer=null, endAt=0;   // 用結束時間算剩餘秒數，背景分頁被節流也不會停
@@ -10297,9 +10339,16 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     // 時段
     var now=new Date(), nm=now.getHours()*60+now.getMinutes();
     var done=(isToday&&window.__doneToday)?window.__doneToday():null;
-    var html='', used={};
+    var html='', used={}, medT=window.__MED?mm(window.__MED.t):NaN, medDone=false;
+    function medRow(){   // 11-19：每天 21:00 吃藥（不是 plan.js 裡的時段，是網站自己加的提醒）
+      medDone=true; var L0=((ls('plan.pomo.v1',{})||{}).med||{}).log||{}, ok=isToday&&L0[k];
+      var c='dv-item is-life c-life dv-med'+(cur<t||(isToday&&nm>=medT+30)?' past':'')+(ok?' done':'');
+      return '<li class="'+c+'"><div class="dv-time"><b>'+window.__MED.t+'</b></div><div class="dv-body"><div class="dv-title"><span class="dv-chip">提醒</span>'+esc(window.__MED.n)+'</div><div class="dv-how">每天晚上，吃完到「今天」按「吃了」；不算任務、不給點數</div></div></li>';
+    }
     bo.b.forEach(function(b){
-      var fl=b[5]; if(fl===2 && !showLife) return;
+      var fl=b[5];
+      if(!medDone && !isNaN(medT) && mm(b[0])>medT) html+=medRow();
+      if(fl===2 && !showLife) return;
       used[b[2]]=1;
       var a=mm(b[0]), z=mm(b[1]), cls='dv-item c-'+b[2];
       if(fl===1) cls+=' is-fixed'; else if(fl===2) cls+=' is-life'; else if(fl===3||fl===4) cls+=' is-rest';
@@ -10311,6 +10360,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         +'<div class="dv-body"><div class="dv-title"><span class="dv-chip">'+esc(CAT[b[2]]||b[2])+'</span>'+esc(b[3])+'</div>'
         +(b[4]?'<div class="dv-how">'+esc(b[4])+'</div>':'')+'</div></li>';
     });
+    if(!medDone && !isNaN(medT)) html+=medRow();
     elList.innerHTML=html||'<li class="dv-empty">沒有時段。</li>';
     if(elLeg){
       elLeg.innerHTML=Object.keys(CAT).filter(function(c){ return used[c]; }).map(function(c){

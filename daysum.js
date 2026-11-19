@@ -133,6 +133,12 @@
     }
     if(vr){ h+='<div class="ds-sub">📖 錯字本</div><p class="ds-p">複習 '+vr+' 分鐘（算英文讀書時間）</p>'; T.push('錯字本：'+vr+' 分鐘'); }
 
+    // 11-19：每天 21:00 吃藥（plan.pomo.v1 的 med.log＝{日期:按「吃了」的時間}；11/19 以前沒有這個功能就不寫）
+    var mlog=((P.pomo&&P.pomo.med)||{}).log||{}, mt=+mlog[k]||0;
+    if(pk(k)>=new Date(2026,10,19)){
+      var ms=mt?'吃了 ✓（'+hm(mt)+'）':(isT&&new Date().getHours()<21?'今晚 21:00 要吃':'沒有按「吃了」');
+      h+='<div class="ds-sub">💊 吃藥</div><p class="ds-p'+(!mt&&!(isT&&new Date().getHours()<21)?' ds-bad':'')+'">'+esc(ms)+'</p>'; T.push('吃藥：'+ms);
+    }
     if(isT){
       var pet=(J(o,'plan.pet.v1',{})||{}).pet;
       if(pet&&pet.name){
