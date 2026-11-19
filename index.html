@@ -1099,6 +1099,11 @@ html.pv .wrap{max-width:none;padding:0}
 .fp-drag:focus{outline:none}
 .fp-drag:focus-visible .ring{stroke:#E0A030;stroke-width:3}   /* SVG 的 outline 畫不出來，改畫一圈 */
 .fp-spot{cursor:pointer}
+/* 11-18：讀書地標、流星可以點；地標的風車葉片慢慢轉（只在沒有「減少動態效果」、沒關動畫時才轉） */
+.fp-lmk,.fp-wish{cursor:pointer}
+.fp-mill{transform-box:fill-box;transform-origin:50% 50%}
+@media (prefers-reduced-motion:no-preference){ html:not(.no-motion) .fp-mill{animation:fpSpin 14s linear infinite} }
+@keyframes fpSpin{to{transform:rotate(360deg)}}
 .tab-dot{display:inline-block;min-width:16px;height:16px;line-height:16px;padding:0 4px;margin-left:4px;border-radius:999px;background:#E5484D;color:#fff;font-size:10.5px;font-weight:700;text-align:center;vertical-align:1px}
 .tab-dot.soft{background:#A65A0C}
 .rem-banner.ok{background:var(--cap)}
@@ -6765,6 +6770,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       return '<g transform="translate(1 '+(T+.8)+')">'+fl+'</g>'; }
     if(id==='party') return '<g transform="translate(2 '+(T+1.5)+') rotate(-10)"><path d="M-5.5 0 L0 -13 L5.5 0 Z" fill="#5AA9E6"/><path d="M-3.9 -3.6 H3.9 M-2.3 -7.6 H2.3" stroke="#F2C230" stroke-width="1.3"/><path d="M-6.2 0 H6.2" stroke="#E5536B" stroke-width="1.6" stroke-linecap="round"/><circle cy="-13.6" r="1.9" fill="#E5536B"/></g>';
     if(id==='halo') return '<g><ellipse cx="1" cy="'+(T-6)+'" rx="8" ry="2.4" fill="#FFF3B0" opacity=".45"/><ellipse cx="1" cy="'+(T-6)+'" rx="7" ry="2" fill="none" stroke="#F2C230" stroke-width="1.6"/></g>';
+    if(id==='santa') return '<g transform="translate(1 '+(T+1.5)+') rotate(-8)"><path d="M-6.5 -1 C-6 -9 -1 -13.5 5 -12.5 C8 -12 9.5 -9.5 9.5 -7 L7.2 -7.4 C6.5 -9.4 4 -9.6 2.6 -8 C4 -5 5.5 -2.5 6.5 -1 Z" fill="#D7263D"/>'   // 11-18：聖誕帽（聖誕節沒戴東西時自動戴，不存）
+      +'<rect x="-8" y="-2.2" width="16" height="4" rx="2" fill="#fff"/><circle cx="9" cy="-6.8" r="2.3" fill="#fff"/></g>';
     return '';
   }
   function scarfSVG(x,y){ return '<g transform="translate('+x+' '+y+')"><path d="M-6 -2 q6 4.5 12 -.5 l.8 4.2 q-7 5 -13.6 .6 Z" fill="#D9534F"/><path d="M-3 2 l-2.2 7.5 l3.2 .3 l1.4 -6.8 Z" fill="#B83A36"/><path d="M-5 .5 q5 3 10 -.2" stroke="#F3B3A6" stroke-width=".8" fill="none"/></g>'; }
@@ -6991,6 +6998,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       +'<path d="M0 '+(HZ-6)+' C 120 '+(HZ-32)+', 230 '+(HZ-4)+', 330 '+(HZ-22)+' S 520 '+(HZ-28)+', 640 '+(HZ-10)+' L640 '+(HZ+12)+' L0 '+(HZ+12)+' Z" fill="'+mid+'"/>';
     o+='<path d="M0 '+(HZ+10)+' C 120 '+(HZ-12)+', 260 '+(HZ+18)+', 380 '+(HZ-4)+' S 560 '+(HZ+14)+', 640 '+(HZ-2)+' L640 300 L0 300 Z" fill="url(#fpGr)"/>';
     o+=decoNear(L);
+    o+=forestBack(T,L,night);   // 11-18：讀書地標、聖誕樹（在遠處山坡上，樹畫在它們前面）
     o+='<g transform="translate('+(W-46)+' '+(HZ+8)+')"><ellipse cx="0" cy="1" rx="16" ry="3.5" fill="#000" opacity=".12"/><text x="0" y="0" font-size="30" text-anchor="middle">'+L.e+'</text></g>';
     for(var gi=0;gi<26;gi++){
       var gx=18+((gi*0.381966)%1)*(W-36), gy=HZ+20+((gi*0.618034)%1)*(H-HZ-34);
@@ -7014,6 +7022,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       if(!st && z.q.stg>=1 && z.q.t.sp) leaf[z.q.t.sp]=1;
       o+=treeSVG(z.q.t.sp,z.x,z.y,z.s,st,z.q.stg,isNew,i>=swayFrom && z.q.stg>=1,rnd('sw'+z.q.n)*4);
     });
+    o+=forestFront(L,night);   // 11-18：燈籠、彩旗、南瓜；減少動態效果時不動的流星、煙火、天燈
     vis.forEach(function(a){
       var fly=!!a.fly, x=40+rnd(tk+a.id+'x')*(W-80), y=fly? 40+rnd(tk+a.id+'y')*90 : HZ+30+rnd(tk+a.id+'y')*(H-HZ-50);
       o+=critterSVG(a,x,y,fly?[20,24,W-20,HZ-6]:[30,HZ+28,W-30,H-12]);
@@ -7040,10 +7049,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       +(a.fly?'':'<ellipse cx="0" cy="1" rx="'+(fs*.36)+'" ry="2.6" fill="#000" opacity=".12"/>')
       +'<rect x="-15" y="-26" width="30" height="30" fill="transparent"/><g class="f"><text font-size="'+fs+'" text-anchor="middle">'+a.e+'</text></g></g>';
   }
-  function accOf(p){ return p.wear||''; }
+  function accOf(p){ return p.wear||(festNow&&festNow.id==='xmas'?'santa':''); }   // 11-18：聖誕節沒戴東西就戴聖誕帽
   function petActor(p,info,att,x,y,area){
     var S=stage(info.lv.lv)[1]/44*zk(), pose=att.sleep?'sleep':(att.sulk?'sulk':'stand');
-    var badge=p.sick?'🤒':(att.sulk?'':(att.sleep?'':(p.hunger<30?'🍽️':(p.mood<30?'💧':(p.hunger>=70&&p.mood>=70?'💕':'')))));
+    var badge=(giftN&&!att.sulk&&!att.sleep)?'🎁':p.sick?'🤒':(att.sulk?'':(att.sleep?'':(p.hunger<30?'🍽️':(p.mood<30?'💧':(p.hunger>=70&&p.mood>=70?'💕':'')))));
     var spd=p.sick?14:(p.mood>=70?46:34), hh=rigH(p.sp)*S;
     return '<g id="fp-pet-g" data-actor="pet" data-pose="'+pose+'" data-sp="'+p.sp+'" data-mood="'+p.mood+'" data-s="'+S.toFixed(3)+'" data-h="'+hh.toFixed(1)+'" data-spd="'+spd+'" data-area="'+area.join(',')+'" data-x="'+x.toFixed(1)+'" data-y="'+y.toFixed(1)+'" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+')" class="fp-click">'
       +'<ellipse class="fp-shadow" cx="0" cy="0" rx="'+(15*S).toFixed(1)+'" ry="'+(3.6*S).toFixed(1)+'" fill="#000" opacity=".15"/>'
@@ -7129,6 +7138,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     o+='<rect x="40" y="38" width="128" height="94" rx="4" fill="none" stroke="#9B7652" stroke-width="6"/><path d="M104 40 v90 M42 85 h124" stroke="#9B7652" stroke-width="4"/><rect x="34" y="130" width="140" height="7" rx="2" fill="#A98058"/>';
     o+='<path d="M24 30 h160" stroke="#7A5A3D" stroke-width="3" stroke-linecap="round"/><path d="M28 30 q-6 50 4 108 q10 4 18 0 q-10 -50 -2 -108 Z" fill="#E8A6A6"/><path d="M180 30 q6 50 -4 108 q-10 4 -18 0 q10 -50 2 -108 Z" fill="#E8A6A6"/>'
       +'<path d="M36 30 q-3 52 4 106 M172 30 q3 52 -4 106" stroke="#D88E8E" stroke-width="1.5" fill="none"/>';
+    if(festNow) o+=festHome(festNow,night);   // 11-18：節日裝飾
     if(has.sofa) o+=furnSVG('sofa',night);
     if(has.plant) o+=furnSVG('plant',night);
     // 時鐘（指針跟現在時間）
@@ -7503,6 +7513,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(petA && petA.pose!=='sleep' && !petA.act && !petA.q.length && talkLines.length && !game){
       amb.talk-=dt; if(amb.talk<0){ amb.talk=16+Math.random()*18; say(pickR(talkLines),3.4); }
     }
+    skyStep(dt);   // 11-18：流星、煙火、天燈、雪橇、鞭炮
   }
   // 玩玩具：玩具掉下來，牠追過去踢兩次
   function playToy(emo){
@@ -7684,7 +7695,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         return k>=1?{done:1}:{head:30*sn(k*PI), rot:q?8*d*sn(k*PI):0};
       case 'chase': return chaseAct(a,A,dt);
     }
-    return {done:1};
+    return actNew(a,A,dt,ts,k);   // 11-18 新動作（讀書、打瞌睡、挖寶、舉寶物）
   }
   // 新的粒子：音符、煙、水滴、大愛心、彩虹、蝴蝶、鼻涕泡泡（p.upd 自己更新位置、p.opf 自己算透明度、p.die 消失時）
   function spawnMore(p,type,o){
@@ -7714,7 +7725,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
           q.s=(1.8+3.2*(.5+.5*Math.sin(ts*1.5+f.t0)))*Math.min(1,(q.max-q.life)/1.2)*f.S+.01; };
         p.die=function(q){ if(q.follow===petA) spawn('float',q.x,q.y,{txt:'啵',size:10,fill:'#5a8fb0'}); }; return true;
     }
-    return false;
+    return spawnNew(p,type,o);   // 11-18 新粒子（小書、土、流星、煙火、天燈、雪橇…）
   }
   /* ---- 沒事做的時候：照時間、天氣、心情、今天有沒有讀書、家裡有什麼家具，自己找事做 ---- */
   function idleTick(a,dt){
@@ -7746,6 +7757,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(c.mood<30) add(4,function(){ petDo('sigh',{dur:2}); });
     if(c.hunger<30) add(4,function(){ if(home){ petDo('goto',{x:56+30*a.S,y:282,face:-1,run:1.4,max:5}); petDo('sniff',{dur:1.2}); petDo('say',{txt:'碗是空的…'}); } else petDo('growl',{dur:1.4}); });
     if(c.sick) add(5,function(){ petDo('cough',{dur:1.1}); });
+    idleNew(a,c,add,home);   // 11-18：讀書夥伴、睡前打瞌睡、有禮物、節日
     if(!home){
       if((c.ph==='day'||c.ph==='dawn') && !wet && c.wx!=='snow') add(c.bfly?4:2,function(){ chaseBfly(a); });
       if(wet) add(3,function(){ petDo('shakeoff',{dur:1.2}); if(Math.random()<.4) say('下雨了…',2); });
@@ -7804,6 +7816,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function greet(a,c){
     if(c.sick){ petDo('cough',{dur:1.1}); petDo('say',{txt:'咳咳…你來了'}); }
     else if(c.hunger<30){ petDo('growl',{dur:1.4}); petDo('say',{txt:'你來了！肚子好餓…'}); }
+    else if(greetNew(c)){ /* 11-18：有禮物、節日、睡前 */ }
     else if(c.care){ petDo('jump'); petDo('wiggle',{dur:1}); petDo('say',{txt:pickR(['你來了！今天好認真','今天有讀書，我好開心！'])}); }
     else if(nowMin()<9*60){ petDo('stretch',{dur:1.6}); petDo('say',{txt:'早安！今天也要加油'}); }
     else { petDo('wave',{dur:1.6}); petDo('say',{txt:c.left?'你來了！今天還差 '+c.left+' 分鐘':'你來了！'}); }
@@ -7891,7 +7904,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var gear=s.gear||{};
     var gb=function(id,e,n,sub){ return '<button type="button" data-gest="'+id+'"'+(block?' disabled':'')+'><span class="e">'+e+'</span>'+n+(sub?'<small>'+sub+'</small>':'')+'</button>'; };
     return '<div class="fp-row"><h4>互動<span>只是陪牠玩，不改飽足和心情。直接對牠也可以：連點兩下擊掌、按住抱抱、左右來回滑搔癢'+(scene==='home'?'；點家具牠會過去用':'')+'</span></h4><div class="fp-items">'
-      +gb('hug','🤗','抱抱')+gb('tickle','🤭','搔癢')+gb('five','✋','擊掌')+gb('trick','🎪','表演把戲','學會 '+tricksOf(p).length+'/'+TRICKS.length+' 種')+(gear.wand?gb('magic','🪄','變魔術'):'')+'</div></div>'
+      +(giftN?gb('gift','🎁','收禮物','有 '+giftN+' 份'):'')+gb('hug','🤗','抱抱')+gb('tickle','🤭','搔癢')+gb('five','✋','擊掌')+gb('trick','🎪','表演把戲','學會 '+tricksOf(p).length+'/'+TRICKS.length+' 種')+(gear.wand?gb('magic','🪄','變魔術'):'')+'</div></div>'
       +'<div class="fp-row" id="fp-games">'+gamesInner()+'</div>';
   }
   function gamesInner(){
@@ -8103,6 +8116,324 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     return {head:Math.sin(A.t*8)*10, sy:.95, tail:Math.sin(A.t*14)*20};
   }
 
+  /* ================= 11-18：寵物和森林的新東西 =================
+     寵物：讀書夥伴（坐下來陪你看書，說的是你今天真的讀了什麼）、睡前打瞌睡（22:00–22:45 會點頭、提醒你去睡）、
+       番茄鐘禮物（每天每做 2 顆番茄鐘，牠找到 1 份寶物，一天最多 4 份；第 3 份少見、第 4 份稀有，收在圖鑑的寶物盒）。
+     森林：讀書地標（讀書時數越多，左邊山坡上蓋越大的建築）、節日裝飾（照真的日期：萬聖節、聖誕節、跨年、農曆新年、元宵）、
+       流星（今天讀書達標的晚上才有，點流星許願）。
+     資料只多了 plan.pet.v1 的 trs（寶物收藏）、trsGot（昨天、今天各收了幾份禮物）、lmk（宣布過的地標等級）；其他都只是畫面，
+     不改飽足、心情、親密度、點數。家長版（?pv=1）不能收禮物（按鈕本來就擋，點寵物只會表演把戲）。
+     動畫都走原本的迴圈（看不到森林就停）；減少動態效果時流星、煙火、天燈改畫成不動的，風車不轉。 */
+  var festNow=null, giftN=0, skyCtx={}, fpOvr={};
+  // 測試用（只在記憶體，重新整理就沒了）：在主控台打 __fpTest({fest:'xmas', ph:'night', hrs:300, care:true})；fest 可以是 hw／xmas／ny／cny／lantern
+  window.__fpTest=function(o){ fpOvr=o||{}; lastScene=''; paintPet(); return fpOvr; };
+
+  /* ---- 節日（照真的日期） ---- */
+  var CNY={2026:[2,17],2027:[2,6],2028:[1,26],2029:[2,13],2030:[2,3]};   // 農曆正月初一
+  var FEST={hw:{e:'🎃',n:'萬聖節',hi:'不給糖就搗蛋！',L:['不給糖就搗蛋！','南瓜燈好可愛','我要扮成什麼呢？']},
+    xmas:{e:'🎄',n:'聖誕節',hi:'聖誕快樂！',L:['聖誕快樂！','聖誕老公公會送我小魚乾嗎？','聖誕樹好漂亮']},
+    ny:{e:'🎆',n:'新年快樂',hi:'新年快樂！',L:['新年快樂！','新的一年也一起讀書！','今年一定考上！']},
+    cny:{e:'🧧',n:'農曆新年',hi:'新年快樂，恭喜發財！',L:['新年快樂，恭喜發財！','過年也要記得讀書喔','紅包拿來～開玩笑的','劈哩啪啦，好熱鬧']},
+    lantern:{e:'🏮',n:'元宵節',hi:'元宵節快樂！',L:['元宵節快樂！','記得吃湯圓喔','晚上有天燈喔']}};
+  function festOf(d){
+    if(fpOvr.fest) return FEST[fpOvr.fest]?{id:fpOvr.fest, n:FEST[fpOvr.fest].n, e:FEST[fpOvr.fest].e}:null;
+    d=d||new Date(); var y=d.getFullYear(), m=d.getMonth()+1, dd=d.getDate(), c=CNY[y], k;
+    if(c){ k=Math.round((new Date(y,m-1,dd)-new Date(y,c[0]-1,c[1]))/864e5);
+      if(k>=-3 && k<=5) return {id:'cny', n:k<-1?'快過年了':(k===-1?'除夕':(k===0?'大年初一':'新年快樂')), e:'🧧'};
+      if(k===13||k===14) return {id:'lantern', n:'元宵節', e:'🏮'}; }
+    if(m===12 && dd>=18 && dd<=26) return dd===22?{id:'xmas', n:'冬至', e:'🥣', dz:1}:{id:'xmas', n:dd<24?'聖誕節快到了':(dd===24?'平安夜':'聖誕節'), e:'🎄'};
+    if((m===12&&dd===31)||(m===1&&dd===1)) return {id:'ny', n:m===12?'跨年夜':'新年快樂', e:'🎆'};
+    if(m===10 && dd>=25) return {id:'hw', n:'萬聖節', e:'🎃'};
+    return null;
+  }
+  function ropeY(x,y0,sag){ var t=x/W; return y0+4*sag*t*(1-t); }   // 從 (0,y0) 垂到中間 y0+sag 再到 (W,y0) 的繩子
+  function starPath(R,r){ var d=''; for(var i=0;i<10;i++){ var a=-Math.PI/2+i*Math.PI/5, q=i%2?r:R; d+=(i?'L':'M')+(Math.cos(a)*q).toFixed(1)+' '+(Math.sin(a)*q).toFixed(1); } return d+'Z'; }
+  function lanternSVG(x,y,night,s){   // 紅燈籠（x,y＝吊繩上端）
+    return '<g transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+')'+(s?' scale('+s+')':'')+'">'+(night?'<circle class="fp-glow" cy="13" r="15" fill="#FF8A3D" opacity=".3"/>':'')
+      +'<path d="M0 0 v5" stroke="#7A4A2A" stroke-width="1"/><rect x="-4" y="4" width="8" height="2.4" rx="1" fill="#E9B530"/>'
+      +'<ellipse cy="13" rx="9.5" ry="7.6" fill="#D62828"/><path d="M-4.6 6.4 q-2.4 6.6 0 13.2 M4.6 6.4 q2.4 6.6 0 13.2 M0 5.6 v15" stroke="#A61B1B" stroke-width=".8" fill="none"/>'
+      +'<rect x="-4" y="19.6" width="8" height="2.4" rx="1" fill="#E9B530"/><path d="M0 22 v7 M-1.6 22 v5 M1.6 22 v5" stroke="#E9B530" stroke-width=".9"/></g>';
+  }
+  function buntingSVG(y0,sag,sz){   // 跨年的彩旗
+    var C=['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#B79CF2'], o='<path d="M0 '+y0+' Q'+(W/2)+' '+(y0+2*sag)+' '+W+' '+y0+'" stroke="#8A6A4A" stroke-width="1" fill="none"/>';
+    for(var i=0;i<20;i++){ var x=16+i*32.2, y=ropeY(x,y0,sag); o+='<path d="M'+(x-sz*.55).toFixed(1)+' '+y.toFixed(1)+' L'+(x+sz*.55).toFixed(1)+' '+y.toFixed(1)+' L'+x.toFixed(1)+' '+(y+sz).toFixed(1)+' Z" fill="'+C[i%5]+'"/>'; }
+    return o;
+  }
+  function xmasTreeSVG(x,y,night){
+    var o='<g transform="translate('+x+' '+y+')"><ellipse cy="1" rx="22" ry="3" fill="#000" opacity=".12"/><rect x="-3.5" y="-8" width="7" height="8" fill="#7A4E30"/>'
+      +'<path d="M0 -62 L-15 -40 L15 -40 Z M0 -50 L-20 -24 L20 -24 Z M0 -36 L-25 -7 L25 -7 Z" fill="#2E7D4F"/><path d="M0 -62 L-6 -52 L0 -53 Z M0 -50 L-8 -38 L0 -40 Z M0 -36 L-10 -21 L0 -23 Z" fill="#fff" opacity=".12"/>'
+      +'<path d="M-11 -44 Q0 -38 11 -45 M-16 -29 Q0 -21 16 -30 M-21 -13 Q0 -5 21 -14" stroke="#F2C230" stroke-width="1.3" fill="none"/>';
+    [[-6,-48],[7,-43],[-12,-31],[3,-27],[13,-25],[-17,-13],[-4,-10],[10,-12],[19,-9]].forEach(function(b,i){
+      o+='<circle class="fp-bulb" style="animation-delay:-'+((i%4)*.4).toFixed(1)+'s" cx="'+b[0]+'" cy="'+b[1]+'" r="2.1" fill="'+['#FF5A5F','#FFD93D','#5AA9E6','#F28CB1'][i%4]+'"/>'; });
+    if(night) o+='<circle class="fp-glow" cy="-64" r="13" fill="#FFF3B0" opacity=".3"/>';
+    o+='<path transform="translate(0 -64)" d="'+starPath(7,3)+'" fill="#FFD93D" stroke="#E0A800" stroke-width=".6"/>'
+      +'<rect x="-21" y="-7" width="10" height="7" fill="#E5536B"/><path d="M-16 -7 v7 M-21 -3.5 h10" stroke="#FFD93D" stroke-width="1.2"/><rect x="12" y="-6" width="9" height="6" fill="#5AA9E6"/><path d="M16.5 -6 v6 M12 -3 h9" stroke="#fff" stroke-width="1.1"/>';
+    return o+'</g>';
+  }
+  // 森林的節日裝飾：layer 0＝遠處山坡上的（聖誕樹，樹畫在它前面）；layer 1＝掛在上面、擺在最前面的（燈籠、彩旗、南瓜）
+  function festForest(f,L,night,layer){
+    var o='', i, x;
+    if(layer===0) return f.id==='xmas'?xmasTreeSVG(W-104,HZ+12,night):'';
+    if(f.id==='cny'||f.id==='lantern'){ o+='<path d="M0 10 Q'+(W/2)+' 54 '+W+' 10" stroke="#7A4A2A" stroke-width="1.2" fill="none"/>'; for(i=0;i<6;i++){ x=56+i*105.6; o+=lanternSVG(x,ropeY(x,10,22),night); } }
+    if(f.id==='ny') o+=buntingSVG(6,22,13);
+    if(f.id==='hw') [[92,H-12],[W-150,H-14],[W/2+128,H-9]].forEach(function(q){ if(inWater(L.deco,q[0],q[1],4)) return;
+      o+='<g transform="translate('+q[0]+' '+q[1]+')">'+(night?'<circle class="fp-glow" cy="-9" r="15" fill="#FFA94D" opacity=".3"/>':'')+'<ellipse cy="1" rx="11" ry="2.6" fill="#000" opacity=".14"/><text font-size="22" text-anchor="middle">🎃</text></g>'; });
+    return o;
+  }
+  // 家裡的節日裝飾（窗戶上的花圈、倒貼的福、燈籠、彩旗、窗台上的南瓜）
+  function festHome(f,night){
+    var o='';
+    if(f.id==='xmas'){ o+='<g transform="translate(104 85)"><circle r="11" fill="none" stroke="#2E7D4F" stroke-width="6"/><circle r="11" fill="none" stroke="#4FA36B" stroke-width="2" stroke-dasharray="2 5"/>';
+      [[-8,-7],[8,-7],[-10,4],[10,4],[0,-11]].forEach(function(b){ o+='<circle cx="'+b[0]+'" cy="'+b[1]+'" r="1.6" fill="#E5384D"/>'; });
+      o+='<path d="M0 10 l-6 -4 v8 Z M0 10 l6 -4 v8 Z" fill="#D62828"/><circle cy="10" r="1.8" fill="#B71C1C"/></g>'; }
+    if(f.id==='cny'||f.id==='lantern') o+='<g transform="translate(206 32)"><rect x="-11" y="-11" width="22" height="22" transform="rotate(45)" fill="#D62828" stroke="#E9B530" stroke-width="1"/>'
+      +'<text y="5.5" font-size="14" font-weight="700" text-anchor="middle" fill="#F7D774" transform="rotate(180 0 .5)">福</text></g>'+lanternSVG(316,0,night,.9)+lanternSVG(360,0,night,.9);
+    if(f.id==='ny') o+=buntingSVG(2,19,11);
+    if(f.id==='hw') o+=(night?'<circle class="fp-glow" cx="150" cy="122" r="13" fill="#FFA94D" opacity=".3"/>':'')+'<text x="150" y="130" font-size="16" text-anchor="middle">🎃</text>';
+    return o;
+  }
+
+  /* ---- 讀書地標：讀書時數（跟「讀書 X 小時」同一個數）越多，左邊山坡上蓋越大的建築；每塊地都看得到，點它看還差幾小時 ---- */
+  var LMK=[{h:0,n:'工地',hh:24,wd:18},{h:30,n:'石燈籠',hh:35,wd:9},{h:80,n:'小涼亭',hh:43,wd:22},{h:150,n:'讀書小屋',hh:36,wd:17},
+    {h:250,n:'風車',hh:68,wd:10},{h:400,n:'天文台',hh:52,wd:20},{h:600,n:'鐘塔',hh:85,wd:15},{h:850,n:'城堡',hh:73,wd:33}];
+  var LMX=96, LMY=HZ+8, LMS=1.15;
+  function lmkTier(hrs){ var t=0; for(var i=1;i<LMK.length;i++) if(hrs>=LMK[i].h) t=i; return t; }
+  function lmkSVG(t,night){
+    var w=night?'#FFD36B':'#9FC7E6', o='', i;
+    if(t===0) o='<path d="M-17 0 V-8 M17 0 V-8" stroke="#B98A5E" stroke-width="1.6" stroke-linecap="round"/><path d="M-17 -6 Q0 -1 17 -6" stroke="#E9B530" stroke-width="1.2" stroke-dasharray="3 2" fill="none"/>'
+      +'<path d="M-5 0 V-12 M5 0 V-12" stroke="#7A5236" stroke-width="2" stroke-linecap="round"/><rect x="-12.5" y="-22" width="25" height="11" rx="1.5" fill="#F2C230" stroke="#7A5236" stroke-width="1"/><text y="-13.8" font-size="7" font-weight="700" text-anchor="middle" fill="#4A3020">施工中</text>';
+    else if(t===1) o='<rect x="-8" y="-4" width="16" height="4" rx="1" fill="#8E949A"/><rect x="-2.6" y="-15" width="5.2" height="11" fill="#A9AFB5"/><rect x="-6.5" y="-17" width="13" height="2.4" fill="#9AA0A6"/>'
+      +'<rect x="-5" y="-25" width="10" height="8" fill="#B5BBC1"/><rect x="-2.6" y="-23.4" width="5.2" height="4.8" fill="'+(night?'#FFD36B':'#5B6168')+'"/><path d="M-10 -24.5 L0 -31.5 L10 -24.5 Z" fill="#8E949A"/><circle cy="-32.6" r="1.7" fill="#8E949A"/>'
+      +(night?'<circle class="fp-glow" cy="-21" r="10" fill="#FFD36B" opacity=".3"/>':'');
+    else if(t===2) o='<rect x="-21" y="-4" width="42" height="4" rx="1" fill="#B98A5E"/><rect x="-16" y="-25" width="3" height="21" fill="#8A3B2E"/><rect x="13" y="-25" width="3" height="21" fill="#8A3B2E"/><rect x="-1.5" y="-25" width="3" height="21" fill="#8A3B2E" opacity=".45"/>'
+      +'<path d="M-15 -12 h30" stroke="#C0504D" stroke-width="1.4"/><path d="M-27 -23 Q-20 -24 -15 -33 L15 -33 Q20 -24 27 -23 Q0 -27 -27 -23 Z" fill="#C0504D"/><rect x="-15" y="-35" width="30" height="2.4" fill="#9C3B37"/>'
+      +'<path d="M0 -35 v-5" stroke="#E0A800" stroke-width="1.6"/><circle cy="-41" r="1.8" fill="#E0A800"/><path d="M0 -26 v3" stroke="#7A4A2A" stroke-width=".8"/><ellipse cy="-20" rx="2.6" ry="3" fill="'+(night?'#FFD36B':'#D62828')+'"/>'
+      +(night?'<circle class="fp-glow" cy="-20" r="9" fill="#FFD36B" opacity=".3"/>':'');
+    else if(t===3) o='<rect x="-15" y="-20" width="30" height="20" fill="#E9D3A8"/><path d="M-15 -14 h30 M-15 -8 h30" stroke="#D2B98A" stroke-width=".8"/><rect x="-4" y="-12" width="8" height="12" rx="1" fill="#7A5236"/><circle cx="2" cy="-6" r=".8" fill="#E9C46A"/>'
+      +'<rect x="6" y="-16" width="6.5" height="6.5" fill="'+w+'" stroke="#7A5236" stroke-width="1"/><rect x="-12.5" y="-16" width="6.5" height="6.5" fill="'+w+'" stroke="#7A5236" stroke-width="1"/>'
+      +'<rect x="8" y="-33" width="4.5" height="9" fill="#9C6A3E"/><path d="M-19 -19 L0 -35 L19 -19 Z" fill="#8C4A2F"/><rect x="-5" y="-29" width="10" height="6.5" rx="1" fill="#FFF7E6"/>'
+      +'<path d="M0 -29 v6.5 M-3.6 -27.4 h2.6 M-3.6 -25.6 h2.6 M1 -27.4 h2.6 M1 -25.6 h2.6" stroke="#C0504D" stroke-width=".6"/>';
+    else if(t===4){ o='<path d="M-9 0 L-5.5 -40 L5.5 -40 L9 0 Z" fill="#EDE3D0"/><path d="M-9 0 L-5.5 -40" stroke="#D2C4A8" stroke-width="1"/><rect x="-3" y="-9" width="6" height="9" rx="3" fill="#8A5A3B"/><rect x="-2" y="-27" width="4" height="5" fill="'+w+'"/>'
+      +'<path d="M-7 -40 Q0 -49 7 -40 Z" fill="#A0522D"/><g transform="translate(0 -42)"><g class="fp-mill">';
+      for(i=0;i<4;i++) o+='<g transform="rotate('+(i*90+20)+')"><path d="M-1.2 -2 L-3.8 -25 L3.8 -25 L1.2 -2 Z" fill="#F7F1E3" stroke="#9A7650" stroke-width=".7"/><path d="M0 -6 V-24 M-3 -12 h6 M-3.4 -18 h6.8" stroke="#9A7650" stroke-width=".5"/></g>';
+      o+='<circle r="2.4" fill="#7A4E30"/></g></g>'; }
+    else if(t===5) o='<rect x="-18" y="-16" width="36" height="16" fill="#DADDE3"/><rect x="-20" y="-2" width="40" height="2" fill="#B8BDC6"/><rect x="-4" y="-10" width="8" height="10" rx="1" fill="#6C7A8C"/>'
+      +'<rect x="-14" y="-12" width="5" height="5" fill="'+w+'"/><rect x="9" y="-12" width="5" height="5" fill="'+w+'"/><path d="M-16 -16 A16 16 0 0 1 16 -16 Z" fill="#B8C2CF"/>'
+      +'<path d="M-2.5 -31.6 L2.5 -31.6 L3.5 -16 L-3.5 -16 Z" fill="'+(night?'#2A3463':'#6C7A8C')+'"/><path d="M0 -24 L13 -40" stroke="#4A5568" stroke-width="3.4" stroke-linecap="round"/><path d="M11.5 -38.2 L15.5 -43" stroke="#2D3748" stroke-width="4.6" stroke-linecap="round"/>'
+      +(night?'<path class="fp-tw" transform="translate(21 -48)" d="'+starPath(3.4,1.3)+'" fill="#FFF3B0"/>':'');
+    else if(t===6) o='<rect x="-14" y="-12" width="28" height="12" fill="#CDB892"/><rect x="-9" y="-58" width="18" height="47" fill="#D9C6A5"/><path d="M-9 -40 h18 M-9 -24 h18" stroke="#BFA97F" stroke-width="1"/>'
+      +'<rect x="-3" y="-35" width="6" height="8" rx="3" fill="'+w+'"/><rect x="-3" y="-20" width="6" height="7" rx="3" fill="'+w+'"/><rect x="-4" y="-8" width="8" height="8" rx="4" fill="#7A5236"/>'
+      +'<circle cy="-49" r="6.4" fill="#FFFDF7" stroke="#8C6A4A" stroke-width="1.2"/><path d="M0 -49 V-53.5 M0 -49 L3 -47.5" stroke="#3A2A22" stroke-width="1" stroke-linecap="round"/>'
+      +'<path d="M-12 -58 L0 -76 L12 -58 Z" fill="#5E7FA8"/><path d="M0 -76 v-6" stroke="#8C6A4A" stroke-width="1.2"/><path d="M0 -82 l7 2.4 -7 2.4 Z" fill="#E5536B"/>';
+    else { o='<rect x="-32" y="-42" width="13" height="42" fill="#D8D0C3"/><rect x="19" y="-42" width="13" height="42" fill="#D8D0C3"/><rect x="-22" y="-26" width="44" height="26" fill="#CFC6B8"/>';
+      for(i=-22;i<20;i+=6) o+='<rect x="'+i+'" y="-29" width="3.5" height="3" fill="#CFC6B8"/>';
+      o+='<rect x="-8" y="-46" width="16" height="20" fill="#E2DACD"/><path d="M-34 -42 L-25.5 -58 L-17 -42 Z M17 -42 L25.5 -58 L34 -42 Z" fill="#5E7FA8"/><path d="M-10 -46 L0 -62 L10 -46 Z" fill="#4E6E98"/><path d="M-6 0 V-10 Q0 -17 6 -10 V0 Z" fill="#7A5236"/>';
+      [[-27,-34],[22,-34],[-1.5,-41],[-16,-18],[12.5,-18]].forEach(function(q){ o+='<rect x="'+q[0]+'" y="'+q[1]+'" width="3.2" height="5" rx="1.4" fill="'+w+'"/>'; });
+      o+='<path d="M0 -62 v-8 M-25.5 -58 v-5 M25.5 -58 v-5" stroke="#6E5139" stroke-width="1"/><path d="M0 -70 l8 2.6 -8 2.6 Z" fill="#E5536B"/><path d="M-25.5 -63 l5 1.6 -5 1.6 Z M25.5 -63 l5 1.6 -5 1.6 Z" fill="#F2C230"/>'; }
+    var L=LMK[t];
+    return '<g class="fp-lmk" data-lmk="'+t+'" transform="translate('+LMX+' '+LMY+') scale('+LMS+')"><ellipse cy="1" rx="'+L.wd+'" ry="2.6" fill="#000" opacity=".12"/>'+o
+      +'<rect x="-30" y="'+(-L.hh-4)+'" width="60" height="'+(L.hh+6)+'" fill="transparent"/></g>';
+  }
+  function lmkTap(){
+    var X=lastSnap, hrs=fpOvr.hrs!=null?fpOvr.hrs:(X&&X.T?X.T.hours:0), t=lmkTier(hrs), nx=LMK[t+1];
+    say('🏯 '+LMK[t].n+'・讀書 '+Math.floor(hrs)+' 小時',2.8,{x:LMX,y:LMY,hh:LMK[t].hh*LMS});
+    msg('🏯 讀書地標：'+LMK[t].n+'（讀書 '+hrs.toFixed(1)+' 小時）。'+(nx?'讀到 '+nx.h+' 小時會變成'+nx.n+'，還差 '+(nx.h-hrs).toFixed(1)+' 小時。':'已經是最高級了！'));
+    if(petA && !game && petCtx && !petCtx.block && petA.pose==='stand' && !noMotion()){ petA.q=[]; petA.act=null;
+      petDo('goto',{x:LMX+46,y:HZ+48,run:1.8,max:4,face:-1}); petDo('watch',{dur:2.4,line:pickR(['好漂亮喔！','這是你讀書蓋出來的耶！','再讀多一點，會變更大嗎？'])}); }
+  }
+  function forestBack(T,L,night){ return lmkSVG(lmkTier(fpOvr.hrs!=null?fpOvr.hrs:T.hours),night)+(festNow?festForest(festNow,L,night,0):''); }
+  function forestFront(L,night){ return (festNow?festForest(festNow,L,night,1):'')+(night&&noMotion()?skyStatic():''); }
+  function moreNew(T){
+    var hrs=fpOvr.hrs!=null?fpOvr.hrs:T.hours, t=lmkTier(hrs), nx=LMK[t+1];
+    return '<p class="fp-gone">🏯 讀書地標（森林左邊的山坡上，點它看進度）：'+LMK[t].n+(nx?'；讀書 '+nx.h+' 小時變成'+nx.n+'，還差 '+(nx.h-hrs).toFixed(1)+' 小時':'，已經是最高級了')
+      +'。🎁 每天每做 2 顆番茄鐘，寵物會找到 1 份寶物（一天最多 4 份），收在「📖 圖鑑」的寶物盒。🌠 今天讀書達標的晚上，夜空會有流星，點流星可以許願。</p>';
+  }
+
+  /* ---- 番茄鐘禮物：昨天、今天每 2 顆番茄鐘 1 份（一天最多 4 份），點寵物或「🎁 收禮物」收下；更早的沒收就算了 ---- */
+  var TRS=[{id:'acorn',n:'橡實',e:'🌰',t:1},{id:'maple',n:'楓葉',e:'🍁',t:1},{id:'feather',n:'羽毛',e:'🪶',t:1},{id:'shell',n:'貝殼',e:'🐚',t:1},{id:'mush',n:'小香菇',e:'🍄',t:1},{id:'daisy',n:'小黃花',e:'🌼',t:1},
+    {id:'chime',n:'風鈴',e:'🎐',t:2},{id:'puzzle',n:'拼圖片',e:'🧩',t:2},{id:'key',n:'舊鑰匙',e:'🗝️',t:2},{id:'bell',n:'小鈴鐺',e:'🔔',t:2},
+    {id:'gem',n:'寶石',e:'💎',t:3},{id:'compass',n:'古董指南針',e:'🧭',t:3},{id:'star',n:'流星碎片',e:'🌠',t:3}];
+  var GIFT_MAX=4;
+  function giftTier(i){ return i>=4?3:(i===3?2:1); }
+  function giftDays(){ var y=d0(); y.setDate(y.getDate()-1); return [kk(y),kk(d0())]; }
+  function giftLeft(s){   // 還沒收的禮物 [{k:那天, i:那天第幾份}]，舊的在前面
+    var ks=giftDays(), by={}, got=s.trsGot||{}, out=[];
+    pomoLog().forEach(function(e){ if(e && (e.k===ks[0]||e.k===ks[1])) by[e.k]=(by[e.k]||0)+1; });
+    ks.forEach(function(k){ var n=Math.max((s.pomoLog||{})[k]||0, by[k]||0), e=Math.min(GIFT_MAX,Math.floor(n/2));
+      for(var i=(got[k]||0)+1;i<=e;i++) out.push({k:k, i:i}); });
+    return out;
+  }
+  function giftPick(s,g){   // 第幾份決定稀有度；同一級裡優先給還沒有的（用日期當種子，不能重抽）
+    var pool=TRS.filter(function(z){ return z.t===giftTier(g.i); }), have=s.trs||{}, un=pool.filter(function(z){ return !have[z.id]; });
+    var list=(un.length && rnd(g.k+'trsU'+g.i)<.75)?un:pool;
+    return list[Math.floor(rnd(g.k+'trs'+g.i)*list.length)%list.length];
+  }
+  function giftTake(){
+    if(window.__pv || !petA || game) return false;
+    var s=petState(), p=s.pet; if(!p) return false;
+    var att=attitude(s,allHist(),viewState(),p.lvSeen||1); if(att.sulk||att.sleep||att.away) return false;
+    var L=giftLeft(s); if(!L.length){ giftN=0; return false; }
+    var g=L[0], it=giftPick(s,g), have=s.trs=s.trs||{}, isNew=!have[it.id], got=s.trsGot||{}, keep={};
+    have[it.id]=(have[it.id]||0)+1; got[g.k]=(got[g.k]||0)+1;
+    giftDays().forEach(function(k){ if(got[k]) keep[k]=got[k]; }); s.trsGot=keep;
+    savePet(s);
+    var home=(petCtx||{}).scene==='home';
+    flash.push('🎁 '+esc(p.name)+' 送你 '+it.e+' '+it.n+(it.t===3?'（稀有！）':(it.t===2?'（少見）':''))+(isNew?'：新的寶物，收進「📖 圖鑑」的寶物盒了':'（第 '+have[it.id]+' 個）')+'。'+(L.length>1?'還有 '+(L.length-1)+' 份。':''));
+    afterPaint.push(function(){ if(!petA) return; petA.q=[]; petA.act=null;
+      petDo(home?'sniff':'dig',{dur:home?1:1.3}); petDo('present',{dur:1.8,e:it.e}); petDo('say',{txt:isNew?'送你！是'+it.n+'喔':'又找到'+it.n+'了！'}); });
+    paintPet(); return true;
+  }
+  function trsPanel(s,p){
+    var have=s.trs||{}, own=TRS.filter(function(z){ return have[z.id]; }).length, TN=['','每 2 顆番茄鐘','一天第 3 份（6 顆番茄鐘）','一天第 4 份（8 顆番茄鐘）'];
+    return '<div class="fp-panel" style="margin-top:14px"><h4>🎁 寶物盒 '+own+' / '+TRS.length+' <span>每天每做 2 顆番茄鐘，'+(p?esc(p.name):'寵物')+'會找到 1 份寶物（一天最多 4 份：第 3 份少見、第 4 份稀有）</span></h4><div class="fp-dex">'
+      +TRS.map(function(z){ var n=have[z.id]; return '<div class="'+(n?'on':'')+'"><span class="e">'+(n?z.e:'❔')+'</span><b>'+(n?z.n:'？？？')+'</b><small>'+(n?'×'+n:TN[z.t])+'</small></div>'; }).join('')+'</div></div>';
+  }
+
+  /* ---- 讀書夥伴、睡前、節日：閒置動作、打招呼、說的話 ---- */
+  var BED_LINES=['好睏…你也準備睡覺了嗎？','快 10 點 45 了，該去刷牙囉','睡飽了，明天才讀得進去','今天辛苦了，早點睡'];
+  function bedTime(){ var m=nowMin(); return m>=22*60 && m<22*60+45; }
+  function todayStudy(tk){   // 今天的番茄鐘顆數、讀最多的科目
+    var o={}, n=0, top='', best=0;
+    pomoLog().forEach(function(e){ if(e && e.k===tk){ n++; if(e.s) o[e.s]=(o[e.s]||0)+(+e.m||25); } });
+    Object.keys(o).forEach(function(k){ if(o[k]>best){ best=o[k]; top=POMO_SUBJ[k]||''; } });
+    return {n:n, top:top};
+  }
+  function studyLines(c){
+    var L=['原來如此！','這題我會了！','嗯…再讀一次'];
+    if(c.tp) L.push('你今天做了 '+c.tp+' 顆番茄鐘，我也讀 '+c.tp+' 頁！');
+    if(c.ts) L.push('你今天'+c.ts+'讀最多，我也來讀'+c.ts+'！',c.ts+'好難喔，你好厲害');
+    if(c.ex && c.ex.d>0) L.push('離'+c.ex.n+'還有 '+c.ex.d+' 天，一起加油！');
+    if(!c.tp && !c.tm) L.push('我先讀一頁，等你一起來讀！');
+    return L;
+  }
+  function idleNew(a,c,add,home){
+    if(!c.sick) add(c.care?2.6:((c.tp||c.tm)?2:.8),function(){ petDo('study',{dur:3.6+Math.random()*1.6, line:pickR(studyLines(c))}); });
+    if(bedTime()) add(7,function(){ if(home) petDo('goto',{x:520,y:262,run:1.2,max:6,face:1}); petDo('doze',{dur:3.6+Math.random()*1.4}); if(Math.random()<.5) petDo('say',{txt:pickR(BED_LINES)}); });
+    if(c.gift) add(3,function(){ petDo('say',{txt:'我有禮物要給你，點我一下！'}); petDo('sit',{dur:2.2,up:1}); });
+    if(c.fest && !home) add(1.2,function(){ petDo('jump'); petDo('say',{txt:pickR(FEST[c.fest.id].L)}); });
+  }
+  function greetNew(c){
+    if(c.gift){ petDo('jump'); petDo('wiggle',{dur:.8}); petDo('say',{txt:'我找到東西要送你！點我一下'}); return true; }
+    if(c.fest){ petDo('jump'); petDo('say',{txt:c.fest.dz?'冬至快樂！記得吃湯圓':FEST[c.fest.id].hi}); return true; }
+    if(bedTime()){ petDo('yawn',{dur:1.6}); petDo('say',{txt:'好睏…今天辛苦了，早點睡喔'}); return true; }
+    return false;
+  }
+  function talkNew(p){
+    var L=[], f=festNow;
+    if(f){ L=L.concat(FEST[f.id].L); if(f.id==='xmas' && !p.wear) L.push('我戴聖誕帽好看嗎？'); if(f.dz) L.push('今天冬至，要吃湯圓喔！'); }
+    if(nowMin()>=22*60) L=L.concat(BED_LINES);
+    if(giftN) L.push('我有禮物要給你！點我一下');
+    return L;
+  }
+  // 新動作：讀書、打瞌睡、挖寶、把寶物舉高
+  function actNew(a,A,dt,ts,k){
+    var S=a.S, q=!a.bird, d=a.dir, sn=Math.sin, PI=Math.PI, u, f;
+    switch(A.type){
+      case 'study':   // 讀書夥伴：坐下來看書（小書跟著牠、會翻頁），看完冒出燈泡
+        if(!A.b0){ A.b0=1; spawn('book',a.x,a.y,{follow:a,life:(A.dur||4)+.3}); }
+        if(k>=1){ spawn('float',a.x+d*6,a.y-a.hh-8,{txt:'💡',size:15}); if(A.line) say(A.line,2.6); return {done:1}; }
+        f=sn(A.t*1.3)*4+(sn(A.t*.7)>.9?6:0);
+        return q?{rot:-12*d, bob:3*S, legs:[-55,12,-55,-34], head:18+f, tail:4}:{head:16+f, wingR:-34, sy:.95};
+      case 'doze':   // 睡前打瞌睡：頭慢慢垂下、眼睛閉上，突然驚醒
+        if(k>=1) return {done:1};
+        if(k<.72){ u=ease(k/.72); return q?{rot:-12*d, bob:3*S, legs:[-55,12,-55,12], head:4+26*u+sn(A.t*2.2)*2, shut:u>.45, tail:0, sy:1-.03*u}:{head:4+24*u, shut:u>.45, sy:.95-.03*u}; }
+        if(!A.w0){ A.w0=1; spawn('float',a.x+d*4,a.y-a.hh-8,{txt:'❗',size:14}); if(Math.random()<.6) say(pickR(['我、我沒睡著！','嚇我一跳…','差點睡著了…']),2); }
+        f=(k-.72)/.28; return q?{rot:-12*d, bob:3*S-sn(f*PI)*7, legs:[-55,12,-55,12], head:-12*(1-f)}:{head:-12*(1-f), bob:-sn(f*PI)*6};
+      case 'dig':   // 挖寶：前腳快速扒土，土往後噴
+        if(A.c==null) A.c=0; A.c-=dt; if(A.c<0){ A.c=.08; spawn('dirt',a.x+d*12*S,a.y-2,{d:d}); }
+        if(k>=1) return {done:1};
+        u=sn(A.t*32);
+        return q?{rot:12*d, head:24, legs:[0,-40+u*34,0,-40-u*34], tail:22, sy:.97}:{rot:10*d, head:26, wingR:-30+u*26};
+      case 'present':   // 把找到的寶物舉高給你看
+        if(!A.p0){ A.p0=1; A.it=spawn('float',a.x,a.y-a.hh-12,{txt:A.e||'🎁',size:22}); if(A.it){ A.it.vy=0; A.it.life=A.it.max=(A.dur||1.8)+.4; } spawn('spark',a.x-12,a.y-a.hh-16); spawn('spark',a.x+12,a.y-a.hh-12); }
+        if(A.it){ A.it.x=a.x+d*4; A.it.y=a.y-a.hh-14-Math.abs(sn(A.t*5))*3; }
+        if(k>=1) return {done:1};
+        u=k<.2?ease(k/.2):1;
+        return q?{rot:-24*d*u, legs:[-20*u,-150*u,-20*u,-140*u], head:-10*u, joy:1}:{wingR:-120*u, head:-8*u, joy:1, sy:1+.04*u};
+    }
+    return {done:1};
+  }
+  // 新粒子：小書、土、流星、煙火、天燈、雪橇、亮粉、鞭炮火花
+  function spawnNew(p,type,o){
+    var i, an, g;
+    switch(type){
+      case 'book':   // 讀書夥伴的小書：跟著牠，右邊那頁每 1.6 秒翻一次；牠不讀了就收起來
+        p.el=svgEl('g',{}); g=svgEl('g',{transform:'rotate(-6)'});
+        g.appendChild(svgEl('path',{d:'M-9.5 .6 L0 2 L9.5 .6 L9.5 -9.4 L0 -8 L-9.5 -9.4 Z',fill:'#3E6FB0'}));
+        g.appendChild(svgEl('path',{d:'M-8.5 -.4 L0 1 V-7.6 L-8.5 -9 Z',fill:'#FFFDF5'})); g.appendChild(svgEl('path',{d:'M8.5 -.4 L0 1 V-7.6 L8.5 -9 Z',fill:'#F4EEDF'}));
+        g.appendChild(svgEl('path',{d:'M-7 -6.9 l5.4 .8 M-7 -4.9 l5.4 .8 M-7 -2.9 l4 .6 M1.6 -6.1 l5.4 -.8 M1.6 -4.1 l5.4 -.8',stroke:'#B9B2A2','stroke-width':.6}));
+        p.pg=svgEl('path',{d:'M0 1 V-7.6 L7.6 -8.8 L7.6 -.5 Z',fill:'#fff',stroke:'#E3DCCB','stroke-width':.3}); g.appendChild(p.pg); p.el.appendChild(g);
+        p.follow=o.follow; p.life=p.max=o.life||4; p.noOp=1; p.ft=0; p.on=1;
+        p.upd=function(q,dt){ var f=q.follow; if(!f||f!==petA||!f.act||f.act.type!=='study'){ q.life=0; return; }
+          q.x=f.x+f.dir*(f.bird?12:16)*f.S; q.y=f.y-(f.bird?13:8)*f.S+(f.bob||0); q.s=f.S*1.1;
+          q.ft+=dt; var c=q.ft%1.6, on=c<.45?1:0;
+          if(on) q.pg.setAttribute('transform','scale('+Math.cos(c/.45*Math.PI).toFixed(2)+' 1)');
+          if(on!==q.on){ q.on=on; q.pg.style.display=on?'':'none'; } };
+        return true;
+      case 'dirt': p.el=svgEl('circle',{r:(1.2+Math.random()*.9).toFixed(1),fill:'#8B6B47'}); p.vx=-(o.d||1)*(40+Math.random()*60); p.vy=-50-Math.random()*40; p.g=260; p.life=p.max=.55; return true;
+      case 'meteor':   // 流星：點它許願（透明的大圓是手指好點的範圍）
+        p.el=svgEl('g',{'class':'fp-wish','data-wish':'1'}); g=svgEl('g',{transform:'rotate('+(Math.atan2(o.vy,o.vx)*57.3).toFixed(1)+')'});
+        g.appendChild(svgEl('circle',{r:30,fill:'transparent'})); g.appendChild(svgEl('path',{d:'M0 -1.6 L-58 0 L0 1.6 Z',fill:'#FFF6D8',opacity:.75}));
+        g.appendChild(svgEl('circle',{r:5.5,fill:'#FFF6C8',opacity:.3})); g.appendChild(svgEl('circle',{r:2,fill:'#fff'})); p.el.appendChild(g);
+        p.vx=o.vx; p.vy=o.vy; p.life=p.max=2.4; p.opf=function(q,a){ return Math.min(1,(1-a)*6,a*2.5); }; return true;
+      case 'fw':   // 煙火：一團亮點慢慢散開、往下飄、變淡（整團一個元素；不會整個畫面閃）
+        p.el=svgEl('g',{}); var c1=pickR(['#FF6B6B','#FFD93D','#6BCB77','#4D96FF','#F28CB1','#FFA94D']), c2=pickR(['#FFF3B0','#FFFFFF','#FFD6E0']);
+        for(i=0;i<12;i++){ an=i*Math.PI/6; p.el.appendChild(svgEl('circle',{cx:(Math.cos(an)*14).toFixed(1),cy:(Math.sin(an)*14).toFixed(1),r:1.6,fill:c1})); }
+        for(i=0;i<6;i++){ an=i*Math.PI/3+.5; p.el.appendChild(svgEl('circle',{cx:(Math.cos(an)*7).toFixed(1),cy:(Math.sin(an)*7).toFixed(1),r:1.2,fill:c2})); }
+        p.life=p.max=1.6; p.vy=7;
+        p.upd=function(q,dt){ q.y+=q.vy*dt; q.s=.25+Math.sqrt(1-q.life/q.max)*1.35; };
+        p.opf=function(q,a){ return Math.min(1,a*1.8); }; return true;
+      case 'skylan':   // 天燈：慢慢往上飄、越來越小
+        p.el=svgEl('g',{}); p.el.appendChild(svgEl('circle',{cy:-4,r:11,fill:'#FFC861',opacity:.25}));
+        p.el.appendChild(svgEl('path',{d:'M-5 -12 L5 -12 L4 2 L-4 2 Z',fill:'#F6A33A'})); p.el.appendChild(svgEl('path',{d:'M-3 -10 L3 -10 L2.4 0 L-2.4 0 Z',fill:'#FFE29A',opacity:.85}));
+        p.vy=-11-Math.random()*5; p.sw=Math.random()*6; p.life=p.max=10+Math.random()*3; p.s=.8+Math.random()*.4;
+        p.upd=function(q,dt,ts){ q.y+=q.vy*dt; q.x+=Math.sin(ts*.8+q.sw)*6*dt; q.s=Math.max(.35,q.s-.025*dt); };
+        p.opf=function(q,a){ return Math.min(1,(1-a)*4,a*3); }; return true;
+      case 'sleigh':   // 聖誕老公公的雪橇：從右邊飛到左邊，後面掉金色亮粉
+        p.el=svgEl('text',{'font-size':Math.round(18*zk()),'text-anchor':'middle'},'🦌🦌🛷'); p.vx=-70; p.life=p.max=(W+160)/70; p.tr=0; p.y0=p.y;
+        p.upd=function(q,dt,ts){ q.x+=q.vx*dt; q.y=q.y0+Math.sin(ts*1.6)*5; q.tr-=dt; if(q.tr<0){ q.tr=.22; spawn('trail',q.x+26*zk(),q.y-5); } };
+        p.opf=function(){ return 1; }; return true;
+      case 'trail': p.el=svgEl('circle',{r:1.5,fill:'#FFE98A'}); p.vy=10; p.vx=(Math.random()-.5)*10; p.life=p.max=1.1; return true;
+      case 'fcr': p.el=svgEl('circle',{r:(1.2+Math.random()).toFixed(1),fill:pickR(['#E53935','#FFB300','#FF7043'])}); p.vx=(Math.random()-.5)*90; p.vy=-40-Math.random()*60; p.g=200; p.life=p.max=.6; return true;
+    }
+    return false;
+  }
+  /* ---- 夜空和節日的動畫（森林才有；每種各自計時）：流星、煙火、天燈、雪橇、白天的鞭炮 ---- */
+  var WISH=['考上雄中科學班！','會考全部 A++！','明天也讀得很順','考試題目都會寫','每天都有小魚乾'];
+  function skyStep(dt){
+    if(!fxLayer || sceneKey==='home' || game) return;
+    var k=skyCtx||{}, night=nightFx, pa=(petA && petA.pose==='stand' && !petA.act && !petA.q.length)?petA:null, x, y, d2, i;
+    if(amb.met==null){ amb.met=2+Math.random()*4; amb.fw=.5; amb.lan=.5; amb.sl=4+Math.random()*6; amb.fc=2+Math.random()*3; }   // 換畫面時 amb 會重設，這裡補上
+    if(night && k.met){ amb.met-=dt; if(amb.met<0){ amb.met=9+Math.random()*14;
+      var lf=Math.random()<.5, vx=(lf?-1:1)*(120+Math.random()*40);
+      if(spawn('meteor',lf?300+Math.random()*300:20+Math.random()*300,10+Math.random()*28,{vx:vx,vy:25+Math.random()*12}) && pa && Math.random()<.6) petDo('watch',{dur:2.2,line:pickR(['流星！快許願！','哇，流星！'])}); } }
+    if(night && (k.fest==='ny'||k.fest==='cny')){ amb.fw-=dt; if(amb.fw<0){ amb.fw=1.1+Math.random()*2.2;
+      spawn('fw',60+Math.random()*(W-120),25+Math.random()*(HZ-70)); if(pa && Math.random()<.12) petDo('watch',{dur:2,line:'煙火好漂亮！'}); } }
+    if(night && k.fest==='lantern'){ amb.lan-=dt; if(amb.lan<0){ amb.lan=2.6+Math.random()*3;
+      spawn('skylan',40+Math.random()*(W-80),HZ+20+Math.random()*60); if(pa && Math.random()<.15) petDo('watch',{dur:2.4,line:'天燈飛好高，許個願吧'}); } }
+    if(night && k.fest==='xmas'){ amb.sl-=dt; if(amb.sl<0){ amb.sl=22+Math.random()*16;
+      if(spawn('sleigh',W+40,34+Math.random()*40) && pa) petDo('watch',{dur:2.6,line:'是聖誕老公公！'}); } }
+    if(!night && k.fest==='cny'){ amb.fc-=dt; if(amb.fc<0){ amb.fc=7+Math.random()*8;
+      x=60+Math.random()*(W-120); y=HZ+40+Math.random()*(H-HZ-60); d2=gDry(x,y);
+      if(spawn('float',d2[0],d2[1]-6,{txt:'劈哩啪啦',size:11,fill:'#C62828'})){ for(i=0;i<6;i++) spawn('fcr',d2[0],d2[1]); if(pa && Math.random()<.4){ petDo('jump',{h:14,dur:.45}); petDo('say',{txt:'嚇我一跳！'}); } } } }
+  }
+  function skyStatic(){   // 減少動態效果時：流星、煙火、天燈畫成不動的
+    var o='', k=skyCtx||{};
+    if(k.met) o+='<g transform="translate(470 46) rotate(160)"><path d="M0 -1.4 L-60 0 L0 1.4 Z" fill="#FFF6D8" opacity=".75"/><circle r="2" fill="#fff"/></g>';
+    if(k.fest==='ny'||k.fest==='cny') [[150,50,'#FFD93D'],[330,34,'#FF6B6B'],[520,60,'#4D96FF']].forEach(function(b){ o+='<g transform="translate('+b[0]+' '+b[1]+')">';
+      for(var i=0;i<12;i++){ var a=i*Math.PI/6; o+='<path d="M'+(Math.cos(a)*5).toFixed(1)+' '+(Math.sin(a)*5).toFixed(1)+' L'+(Math.cos(a)*15).toFixed(1)+' '+(Math.sin(a)*15).toFixed(1)+'" stroke="'+b[2]+'" stroke-width="1.6" stroke-linecap="round" opacity=".85"/>'; }
+      o+='</g>'; });
+    if(k.fest==='lantern') [[120,70],[260,40],[410,84],[560,52]].forEach(function(b,i){ o+='<g transform="translate('+b[0]+' '+b[1]+') scale('+(i%2?.8:1)+')"><circle cy="-4" r="11" fill="#FFC861" opacity=".25"/><path d="M-5 -12 L5 -12 L4 2 L-4 2 Z" fill="#F6A33A"/><path d="M-3 -10 L3 -10 L2.4 0 L-2.4 0 Z" fill="#FFE29A" opacity=".85"/></g>'; });
+    return o;
+  }
+  function wishTap(el){
+    var q=parts.filter(function(z){ return z.el===el; })[0]; if(!q || q.wished) return;
+    q.wished=1; q.life=Math.min(q.life,.4); for(var i=0;i<4;i++) spawn('star',q.x,q.y);
+    var w=pickR(WISH), me=!!(petA && petCtx && !petCtx.block);
+    say((me?'許願：':'🌠 ')+w,3,me?petA:{x:q.x,y:q.y+30,hh:0});
+    msg('🌠 許好願了：'+w);
+  }
+
   /* ---- 主畫面 ---- */
   var app=document.getElementById('fp-app'), mini=document.getElementById('fp-mini'), pick=null, flash=[], bagPick={food:'',charm:false,tool:'',ticket:false};
   var lastScene='', afterPaint=[], lastSnap=null;
@@ -8121,6 +8452,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var ex=nextExam(); if(ex) L.push(ex.d===0?ex.n+'就是今天，加油！':'離'+ex.n+'還有 '+ex.d+' 天');
     if(bk.loan) L.push('欠銀行的點數要記得還');
     if(lvNext) L.push('親密度到 '+lvNext.b+' 我就學會'+lvNext.n);
+    L=L.concat(talkNew(p));   // 11-18：節日、睡前、有禮物
     L.push('今天也要加油喔','讀書的你最帥了','我會乖乖等你','錯題訂正了嗎？');
     return L;
   }
@@ -8160,7 +8492,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var cc=caredCum(h,lv), stageCnt=[0,0,0,0];
     T.trees.forEach(function(t,i){ if(deadSet[i]) return; var g=treeStage(t,cc); stageCnt[g]++; });
     var trees={state:state, alive:T.trees.length-nDead, curLand:curLand, inLand:Math.max(0,Math.min(land(li).cap,T.trees.length-landStart(li)))};
-    var ph=dayPhase(), streak=streakDays(h,lv), vis=visitorsToday(li,streak,ph), wx=weatherOf(s,h,li);
+    var ph=fpOvr.ph||dayPhase(), streak=streakDays(h,lv), vis=visitorsToday(li,streak,ph), wx=weatherOf(s,h,li);
+    festNow=festOf(); giftN=(p && !p.trip && !window.__pv)?giftLeft(s).length:0;   // 11-18：今天的節日、還沒收的番茄鐘禮物
     vis.forEach(function(a){ if(!s.dex[a.id]){ s.dex[a.id]=tk; ev.push('dex|'+a.e+' '+a.n); } });
     var info=null;
     if(p){ var xp=xpSince(h,pk(p.born),p.pomo0||0,C); info={xp:xp, lv:levelOf(xp)}; if(info.lv.lv!==p.lvSeen){ if(p.lvSeen && info.lv.lv>p.lvSeen) ev.push('lv|'+info.lv.lv); p.lvSeen=info.lv.lv; } }
@@ -8171,6 +8504,14 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       if(newT.length){ p.tricks=p.tricks.concat(newT.map(function(t){ return t.id; })); var t0=newT[newT.length-1];
         flash.push('🎓 '+esc(p.name)+' 學會新把戲：'+newT.map(function(t){ return t.n; }).join('、')+'！點牠就會表演。');
         afterPaint.push(function(){ petDo(t0.id==='jump'?'jump':t0.id,{dur:t0.d||1}); petDo('say',{txt:'我學會'+t0.n+'了！'}); }); } }
+    // 11-18：讀書地標升級要說一聲（s.lmk＝宣布過的最高一級；第一次只說現在蓋到哪裡，工地不說）
+    var lmkT=lmkTier(T.hours);
+    if(!(s.lmk>=lmkT)){
+      if(lmkT>0){ var lmN=LMK[lmkT], lmX=LMK[lmkT+1], lmOld=s.lmk!=null;
+        flash.push('🏯 讀書 '+Math.floor(T.hours)+' 小時，森林左邊的山坡蓋好了'+lmN.n+'！'+(lmX?'讀到 '+lmX.h+' 小時會變成'+lmX.n+'。':''));
+        if(lmOld) afterPaint.push(function(){ petDo('star',{dur:1.7}); petDo('say',{txt:'森林蓋好'+lmN.n+'了！'}); }); }
+      s.lmk=lmkT;
+    }
     savePet(s);
     var lootChips=loot.filter(function(L){ return L.k==='chips'; }).length;
     if(lootChips){ var vq=ls('plan.vocab.v1',{})||{}; vq.chips=(vq.chips||0)+15*lootChips; sv('plan.vocab.v1',vq); }
@@ -8258,8 +8599,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         top+='<button type="button" data-land="'+L2+'" aria-pressed="'+(L2===li)+'">'+LL.e+' '+LL.n+' <small>'+cnt2+'/'+LL.cap+'</small></button>'; }
       var nxL=land(curLand+1); top+='<span class="fp-lock">🔒 '+nxL.n+'（'+land(curLand).n+'種滿 '+land(curLand).cap+' 棵開放）</span></div>';
     }
+    skyCtx={met:!!((fpOvr.care||careToday) && wx!=='rain' && wx!=='gloom' && wx!=='snow'), fest:festNow?festNow.id:''};   // 11-18：今天讀書達標、天氣好的晚上才有流星
     var WXI=ph==='night'&&(wx==='sunny'||wx==='rainbow')?['🌙','晴朗的夜晚']:(ph==='night'&&wx==='cloudy'?['☁️','多雲的夜晚']:WXN[wx]);
-    var hud='<div class="fp-hud" aria-hidden="true"><span>'+WXI[0]+' '+WXI[1]+'</span><span>⚡ '+B.n+'</span>'+(scene==='home'&&p&&!att.away?'<span>點牠表演把戲・按住抱抱</span>':'')+'</div>';
+    if(scene==='forest' && ph==='night' && skyCtx.met) WXI=['🌠',WXI[1]+'・有流星'];
+    var hud='<div class="fp-hud" aria-hidden="true"><span>'+WXI[0]+' '+WXI[1]+'</span><span>⚡ '+B.n+'</span>'+(festNow?'<span>'+festNow.e+' '+festNow.n+'</span>':'')+(scene==='home'&&p&&!att.away?'<span>點牠表演把戲・按住抱抱</span>':'')+'</div>';
     var sk=scene==='home'?'home':'forest'+li;
     var svg=scene==='home'?homeSVG(s,p,info||{lv:{lv:1}},att,fedToday,ph,wx,furn,bk.sav):forestSVG(s,T,trees,cc,li,p,info||{lv:{lv:1}},att,vis,wx,ph,v.seenTrees);
     var sceneHtml=hud+svg;
@@ -8269,6 +8612,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var hasF={}; furn.forEach(function(f){ hasF[f.id]=1; }); Object.keys(s.pfurn||{}).forEach(function(k){ if(s.pfurn[k]) hasF[k]=1; });
     petCtx=p?{scene:scene, ph:ph, wx:wx, care:careToday, mood:p.mood||0, hunger:p.hunger||0, sick:!!p.sick, bond:p.bond||0, furn:hasF, gear:s.gear||{}, games:s.games||{},
       bfly:vis.some(function(a){ return a.id==='butterfly'; }), left:Math.max(0,need.m-(te.m||0)), block:block, nT:tricksOf(p).length}:null;
+    if(petCtx){ var tdy=todayStudy(tk); petCtx.tp=Math.max(tdy.n,x.pomo||0); petCtx.ts=tdy.top; petCtx.tm=te.m||0; petCtx.ex=nextExam(); petCtx.gift=giftN; petCtx.fest=festNow; }   // 11-18：讀書夥伴說的話、禮物、節日
     var body='';
     if(tabk==='main'){
       if(p){
@@ -8293,6 +8637,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
           if(p.neglect>=1) msg+='　<b>第 '+SICK_AT+' 天生病、第 '+LEAVE_AT+' 天離家。</b>';
         }
         if(bk.loan && bk.loan.late) msg+='<br>🏦 欠銀行的點數逾期了，牠很擔心你（心情最多 60）。';
+        if(giftN) msg+='<br>🎁 '+esc(p.name)+'幫你找到 '+giftN+' 份禮物：'+(block?'等牠理你再收':'點牠或下面的「收禮物」收下')+'。';   // 11-18
         if(p.bag && !p.trip) msg+='<br>🎒 行李打包好了（'+esc(p.bag.food)+(p.bag.charm?'、護身符':'')+(p.bag.tool?'、'+esc(p.bag.tool):'')+(p.bag.ticket?'、旅行券':'')+'），牠會自己挑時間出發。';
         body+='<p class="'+cls+'">'+msg+'</p>';
         if(!att.away) body+=playRows(p,s,scene,block);   // 11-17：互動、小遊戲
@@ -8345,6 +8690,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         +(nPend?'　<span style="color:var(--warn)">⏳ '+nPend+' 棵等 Claude 檢查</span>':'')+(nWilt?'　<span style="color:var(--warn)">'+nWilt+' 棵枯萎中</span>':'')+(nDead+s.stumps.length?'　枯死 '+(nDead+s.stumps.length):'')
         +'　讀書 <b>'+T.hours.toFixed(1)+'</b> 小時　連續照顧 '+streak+' 天</span>'
         +Object.keys(TREEN).filter(function(k){ return cnt[k]; }).map(function(k){ return '<span><i style="background:'+TREEN[k][2]+'"></i>'+TREEN[k][0]+'（'+TREEN[k][1]+'）'+cnt[k]+'</span>'; }).join('')+'</div>';
+      body+=moreNew(T);   // 11-18：讀書地標、寶物、流星的說明
       var pw=pomoWeek(), pwk=['chi','math','eng','sci','soc','kbm','kbs'].filter(function(k){ return pw[k]; });
       body+='<p class="fp-gone">這 7 天的番茄鐘：'+(pwk.length?pwk.map(function(k){ return POMO_SUBJ[k]+' '+(pw[k]/60).toFixed(1)+' 時'; }).join('・'):'還沒有')
         +(pw['']?'・沒選科目 '+(pw['']/60).toFixed(1)+' 時':'')+'。少的那科，樹就長不大。</p>';
@@ -8394,6 +8740,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
           return '<div class="'+(seen?'on':'')+'"><span class="e">'+(seen?a.e:'❔')+'</span><b>'+(seen?a.n:'？？？')+'</b><small>'+(seen?md(seen)+' 第一次來':'連續讀書 '+a.streak+' 天'+(a.night?'、晚上':''))+'</small></div>'; }).join('')+'</div>';
       }
       body+='</div>';
+      body+=trsPanel(s,p);   // 11-18：寶物盒
     }
     // 只有畫面真的變了才重畫場景，動物不會跳回原位
     var scEl=app.querySelector('.fp-scene');
@@ -8479,6 +8826,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       if(game && gameTap(e)) return;   // 11-17：小遊戲進行中，點畫面＝丟球／移光點／猜躲在哪
       if(e.target.closest('#fp-piggy')){ goBank(); return; }
       var fu=e.target.closest('[data-furn]'); if(fu){ furnTap(fu.getAttribute('data-furn')); return; }   // 11-17：點家具，牠會去用
+      var wsh=e.target.closest('[data-wish]'); if(wsh){ wishTap(wsh); return; }   // 11-18：點流星許願
+      if(e.target.closest('[data-lmk]')){ lmkTap(); return; }   // 11-18：點讀書地標
       var ag=e.target.closest('[data-actor]');
       if(ag && ag.id==='fp-pet-g'){
         if(eatClick){ eatClick=false; return; }   // 剛剛是按住抱抱、來回滑搔癢，不算點一下
@@ -8486,6 +8835,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         if(!petA){ return; }
         if(att0.sulk){ petDo('turn',{dur:1}); say(pickR(talkLines.length?talkLines:['哼！']),2.6); msg(SULK[att0.sulk]); }
         else if(att0.sleep){ say('呼…呼…（睡得很熟）',2.4); spawn('zz',petA.x+8,petA.y-petA.hh*.7); }
+        else if(giftN && !window.__pv && giftTake()){ return; }   // 11-18：有禮物先收禮物
         else if(petTap()){ return; }   // 11-17：連點兩下＝擊掌
         else if(!petA.act && !petA.q.length){ var tr=doTrick(s0.pet); say(tr.s||(tr.id==='jump'?pickR(talkLines):'看我'+tr.n+'！'),2.6); }
         return;
@@ -8573,6 +8923,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var lv=p.lvSeen||1, C=checks(), T=collect(h,C,s,pk(p.born)), att=attitude(s,h,v,lv);
     if(att.sulk||att.sleep||att.away){ paintPet(); return; }
     // 11-17：互動按鈕（只有動畫，不改資料）、小遊戲（讀書時段、睡覺、旅行、生氣時上面就擋掉了，跟玩耍一樣）
+    if(b.dataset.gest==='gift'){ if(!giftTake()) msg(!petA?'牠不在這塊地，到牠在的地方或「🏠 家」再收。':(game?'先結束小遊戲再收。':'現在沒有禮物可以收。')); return; }   // 11-18
     if(b.dataset.gest){ if(!petA){ msg('牠不在這塊地，到牠在的地方或「🏠 家」再跟牠玩。'); return; } petReact(b.dataset.gest); return; }
     if(b.dataset.game){
       if(b.dataset.game==='stop'){ gameEnd(true); return; }
