@@ -1,4 +1,4 @@
-const CACHE='study-plan-v15';   // 11-17 晚：daychart.js 換成 20261117t（各科讀書時間圖算進錯字本複習）；v13 是 20261117s，v12 是 11-12 丟掉舊版用的
+const CACHE='study-plan-v16';   // 11-17 晚：daychart.js 換成 20261117t（各科讀書時間圖算進錯字本複習）；v13 是 20261117s，v12 是 11-12 丟掉舊版用的
 const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261117t','./daysum.js?v=20261118a'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
 self.addEventListener('install',e=>{
   self.skipWaiting();
