@@ -5,6 +5,8 @@
 //   補一顆番茄鐘：node tools/make_fix.mjs pomo --day 2026-11-07 --end 14:47 --min 50 --subj soc [--orig 1794034024375] [--why "手機清快取"]
 //     --subj：chi 國文、math 數學、eng 英文、sci 自然、soc 社會、kbm 科班資優數學、kbs 科班自然學科
 //     --end：那顆番茄鐘結束的時間（HH:MM）；--orig：雲端備份裡那顆計時的 endAt（毫秒），網站會順便停掉還在跑的同一顆，避免算兩次
+//   刪掉沒人在時計時器自己記的番茄鐘（2026-11-19）：node tools/make_fix.mjs pomodel --from "2026-11-19 00:50" --to "2026-11-19 13:55" --pp 6 --why "…"
+//     只刪 from～to 之間計時器記的（補登、錯字本的不動）；--pp：每顆要扣回幾點（看點數紀錄那顆實際給了多少），一次最多扣 500
 //   補／扣點數：node tools/make_fix.mjs pts --n 20 --why "家長加點沒收到"（一次最多 ±500）
 //   補登以前的小考：node tools/make_fix.mjs quiz --file <rows.json> --why "補習班 LINE 的歷史成績"（2026-11-10）
 //     rows.json＝[[日期 2026-8-8, 科目, 分數, 滿分, 'gq' 或 'q', 備註, 班平均], …]，最多 60 筆；成績只在連結裡、不要放進 repo
@@ -37,6 +39,16 @@ if (kind === 'pomo') {
   payload.t = new Date(y, mo - 1, d, hh, mm).getTime();  // 筆電和手機都是台灣時間
   payload.m = min; payload.s = args.subj;
   if (args.orig) payload.e = Number(args.orig);
+} else if (kind === 'pomodel') {
+  const re = /^(\d{4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{2})$/;
+  const pa = re.exec(String(args.from || '')), pb = re.exec(String(args.to || ''));
+  if (!pa || !pb) die('--from／--to 格式是 "2026-11-19 00:50"');
+  const ms = (m) => new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]).getTime();
+  payload.a = ms(pa); payload.b = ms(pb);
+  if (!(payload.b > payload.a) || payload.b - payload.a > 36 * 3600e3) die('時間範圍要在 36 小時內');
+  const pp = parseInt(args.pp, 10); if (!(pp >= 0 && pp <= 50)) die('--pp 要 0～50');
+  if (!payload.why) die('要寫 --why 理由');
+  payload.pp = pp;
 } else if (kind === 'pts') {
   const n = parseInt(args.n, 10); if (!n || Math.abs(n) > 500) die('--n 要是 ±1～500');
   if (!payload.why) die('點數要寫 --why 理由');
@@ -50,10 +62,10 @@ if (kind === 'pomo') {
     r[0] = r[0].split('-').map(Number).join('-');
   }
   payload.q = rows;
-} else die('第一個參數要是 pomo、pts 或 quiz');
+} else die('第一個參數要是 pomo、pomodel、pts 或 quiz');
 
 const body = b64u(Buffer.from(JSON.stringify(payload), 'utf8'));
 const key = crypto.createPrivateKey(fs.readFileSync(KEY_FILE));
 const sig = crypto.sign('sha256', Buffer.from(body, 'utf8'), { key, dsaEncoding: 'ieee-p1363' });
-console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
+if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
 console.log(SITE + '#fix=' + body + '.' + b64u(sig));

@@ -3670,7 +3670,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   /* ---- 番茄鐘 ---- */
   var mode='work', left=P.w*60, running=false, timer=null, endAt=0;   // 用結束時間算剩餘秒數，背景分頁被節流也不會停
   // 計時狀態存起來：重新整理或手機把網頁關掉再打開，還是同一顆番茄鐘
-  function saveRun(){ P.run={mode:mode, running:running, endAt:endAt, left:left}; s(PK,P); wlSync(); }   // 11-18：開始、暫停、重設都會經過這裡，順便決定螢幕要不要保持亮著
+  // 11-19 使用者選「自動接，但最多連 4 顆」：acN＝休息完自動開始的顆數；按「開始」或網頁上任何按鈕、鍵盤就歸零。
+  // 連 4 顆（自己按的 1 顆＋自動 3 顆）都沒人碰，第 4 顆的休息結束就停下來，不再自己接（以前頁面開著會整晚一直記）
+  var AUTO_MAX=4, acN=(P.run&&+P.run.ac)||0;
+  function saveRun(){ P.run={mode:mode, running:running, endAt:endAt, left:left, ac:acN}; s(PK,P); wlSync(); }   // 11-18：開始、暫停、重設都會經過這裡，順便決定螢幕要不要保持亮著
   if(P.run){ var R0=P.run; mode=R0.mode||'work'; running=!!R0.running; endAt=R0.endAt||0; left=R0.left||P.w*60;
     if(running){ var over=Date.now()-endAt;
       if(over>30*60000){ running=false; mode='work'; left=P.w*60; }   // 結束超過半小時才回來：不算，重新開始
@@ -3694,12 +3697,20 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       notify('完成一顆番茄鐘', lng?'連續四顆了，休息 15 分鐘再回來':'休息 '+P.b+' 分鐘');
       focusEnds(P.log[P.log.length-1]);
     } else {
+      if(acN>=AUTO_MAX-1){   // 連 4 顆都沒人碰：停下來等他按「開始」
+        running=false; mode='work'; left=P.w*60; acN=0; elGo.textContent='開始';
+        notify('休息結束', '已經自動連 '+AUTO_MAX+' 顆了，按「開始」再來一顆');
+        saveRun(); paintPomo(); return;
+      }
+      acN++;
       mode='work'; left=P.w*60; endAt=Date.now()+left*1000;
       notify('休息結束', '回到專注 '+P.w+' 分鐘');
       focusBegins();
     }
     saveRun(); paintPomo();
   }
+  function seenUser(){ if(acN){ acN=0; if(running) saveRun(); } }
+  document.addEventListener('pointerdown',seenUser,true); document.addEventListener('keydown',seenUser,true);
   function tickPomo(){
     if(!running) return;
     left=Math.max(0,Math.ceil((endAt-Date.now())/1000));
@@ -3709,7 +3720,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   elGo.addEventListener('click',function(){
     running=!running;
     elGo.textContent=running?'暫停':'開始';
-    if(running){ endAt=Date.now()+left*1000; beep(1); if(mode==='work') focusBegins(); }
+    if(running){ acN=0; endAt=Date.now()+left*1000; beep(1); if(mode==='work') focusBegins(); }
     else { left=Math.max(0,Math.ceil((endAt-Date.now())/1000)); }
     saveRun(); paintPomo();
   });
@@ -3735,6 +3746,16 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(P.log.length>4000) P.log=P.log.slice(-4000);
     s(PK,P); paintPomo(); paintLog();
     if(window.__award) window.__award((window.__rules?window.__rules().pomo:5),'完成一顆番茄鐘'+(via?'（'+via+'）':''));
+  };
+
+  // 11-19 Claude 刪掉沒人在時計時器自己記的番茄鐘（#fix 的 kind 'pomodel'，使用者選「刪掉，點數扣回」）：
+  // 只刪 a～b（毫秒）之間、計時器記的（via 空的；補登、錯字本複習的不動）。回傳 {n:刪了幾顆, by:{日期:顆數}}
+  window.__pomoDel=function(f){
+    var a=+f.a, b=+f.b, by={}, n=0;
+    P.log=Array.isArray(P.log)?P.log:[];
+    P.log=P.log.filter(function(e){ var del=!!(e&&!e.via&&+e.t>=a&&+e.t<=b); if(del){ n++; by[e.k]=(by[e.k]||0)+1; } return !del; });
+    if(n){ if(by[P.day]) P.done=Math.max(0,(P.done||0)-by[P.day]); P.total=Math.max(0,(P.total||0)-n); s(PK,P); paintPomo(); paintLog(); }
+    return {n:n, by:by};
   };
 
   // Claude 補登（#fix 連結，2026-11-07）：番茄鐘做完卻因為手機清掉資料沒記到時，補一顆到原本那天。
@@ -9818,6 +9839,14 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         var r=window.__pomoFix({k:pl.k, t:pl.t, m:pl.m, s:pl.s, e:pl.e});
         msg=r.dup?'這顆番茄鐘已經有紀錄了，沒有重複加'+(r.stopped?'；還在跑的同一顆已經停掉':'')+'。'
           :'✅ Claude 補登一顆番茄鐘：'+md(pl.k)+' '+hm(new Date(pl.t).getHours()*60+new Date(pl.t).getMinutes())+' 結束、'+pl.m+' 分鐘、'+(FIX_SUBJ[pl.s]||'沒選科目')+why+'。森林多一棵樹'+(r.stopped?'，還在跑的同一顆計時也停掉了（避免算兩次）':'')+'。';
+      } else if(pl.kind==='pomodel'){   // 11-19 刪掉沒人在時自動記的番茄鐘，點數照顆數扣回
+        if(!window.__pomoDel){ passBanner('番茄鐘還沒載入好，重新整理後再點一次連結。'); return; }
+        var rd=window.__pomoDel({a:pl.a, b:pl.b}), ps=petState();
+        Object.keys(rd.by).forEach(function(k){ if(ps.pomoLog[k]) ps.pomoLog[k]=Math.max(0,ps.pomoLog[k]-rd.by[k]); }); savePet(ps);
+        var dn=Math.min(500,Math.round((+pl.pp||0)*rd.n)), da=new Date(pl.a), db=new Date(pl.b);
+        if(dn && window.__award) window.__award(-dn,'Claude 刪掉沒人在時自動記的番茄鐘 '+rd.n+' 顆'+why,true);
+        msg=rd.n?'✅ 刪掉 '+rd.n+' 顆番茄鐘（'+(da.getMonth()+1)+'/'+da.getDate()+' '+hm(da.getHours()*60+da.getMinutes())+'～'+hm(db.getHours()*60+db.getMinutes())+'，計時器自己一直接下去記的）'+(dn?'，扣回 '+dn+' 點':'')+why+'。讀書分、森林的樹跟著變少。'
+          :'這段時間沒有計時器自己記的番茄鐘，沒有刪、也沒有扣點。';
       } else if(pl.kind==='pts'){
         var n=Math.round(+pl.n||0); if(!n || Math.abs(n)>500){ passBanner('❌ 補登的點數不對。'); return; }
         if(window.__award) window.__award(n,'Claude 補登'+why,true);
