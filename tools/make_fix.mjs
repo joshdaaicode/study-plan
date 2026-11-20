@@ -9,6 +9,8 @@
 //     只刪 from～to 之間計時器記的（補登、錯字本的不動）；--pp：每顆要扣回幾點（看點數紀錄那顆實際給了多少），一次最多扣 500
 //   延後檢查期限（2026-11-20 段考週）：node tools/make_fix.mjs chkdelay --file keys.json --from 2026-11-21 --days 7 --why "…"
 //     keys.json＝plan.checks.v1 items 的 key 陣列；from 以後才扣的點退回、才枯的樹苗救回；逾期第 1 天往後 days 天（已扣的不退）
+//   救回枯掉的檢查樹苗（2026-11-20）：node tools/make_fix.mjs revive --file keys.json --why "…"
+//     keys.json 同上；只救樹苗，扣過的點不退、期限不動
 //   補／扣點數：node tools/make_fix.mjs pts --n 20 --why "家長加點沒收到"（一次最多 ±500）
 //   補登以前的小考：node tools/make_fix.mjs quiz --file <rows.json> --why "補習班 LINE 的歷史成績"（2026-11-10）
 //     rows.json＝[[日期 2026-8-8, 科目, 分數, 滿分, 'gq' 或 'q', 備註, 班平均], …]，最多 60 筆；成績只在連結裡、不要放進 repo
@@ -51,6 +53,12 @@ if (kind === 'pomo') {
   const pp = parseInt(args.pp, 10); if (!(pp >= 0 && pp <= 50)) die('--pp 要 0～50');
   if (!payload.why) die('要寫 --why 理由');
   payload.pp = pp;
+} else if (kind === 'revive') {
+  if (!args.file) die('要給 --file <keys.json>');
+  const keys = JSON.parse(fs.readFileSync(args.file, 'utf8'));
+  if (!Array.isArray(keys) || !keys.length || keys.length > 20 || keys.some((k) => typeof k !== 'string' || !/^\d{4}-\d{1,2}-\d{1,2}\|/.test(k))) die('keys 要是 1～20 個「日期|任務名稱」');
+  if (!payload.why) die('要寫 --why 理由');
+  payload.keys = keys;
 } else if (kind === 'chkdelay') {
   if (!args.file) die('要給 --file <keys.json>');
   const keys = JSON.parse(fs.readFileSync(args.file, 'utf8'));
@@ -72,10 +80,10 @@ if (kind === 'pomo') {
     r[0] = r[0].split('-').map(Number).join('-');
   }
   payload.q = rows;
-} else die('第一個參數要是 pomo、pomodel、chkdelay、pts 或 quiz');
+} else die('第一個參數要是 pomo、pomodel、chkdelay、revive、pts 或 quiz');
 
 const body = b64u(Buffer.from(JSON.stringify(payload), 'utf8'));
 const key = crypto.createPrivateKey(fs.readFileSync(KEY_FILE));
 const sig = crypto.sign('sha256', Buffer.from(body, 'utf8'), { key, dsaEncoding: 'ieee-p1363' });
-if (kind === 'chkdelay') console.error(`延後檢查 ${payload.keys.length} 份 ${payload.days} 天（${payload.from} 起）`); else if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
+if (kind === 'revive') console.error(`救回樹苗 ${payload.keys.length} 份`); else if (kind === 'chkdelay') console.error(`延後檢查 ${payload.keys.length} 份 ${payload.days} 天（${payload.from} 起）`); else if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
 console.log(SITE + '#fix=' + body + '.' + b64u(sig));
