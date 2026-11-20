@@ -188,8 +188,9 @@
         h+='<div class="dc-sub">🔍 給 Claude 檢查</div><ul class="dc-ul">'+x.checks.map(function(it){
           var s, cls;
           if(it.st==='pass'){ cls='dc-ok'; s='過關（'+esc(it.g||'')+'）'+(it.pt?'・逾期被扣 '+it.pt+' 點':''); }
+          else if(it.ls && it.ext && days(pk(it.ls),today)+1<=(+it.xpd||0)){ cls='dc-wait'; s=(it.st==='dead'?'樹苗已枯，':'')+'延後 '+it.ext+' 天：'+md(key(addD(pk(it.ls),(+it.xpd||0)-1)))+' 前交・已扣 '+(it.pt||0)+' 點'; }   // 11-20 延後連結（暫停扣點）
           else if(it.ls){ var n=Math.max(0,days(pk(it.ls),today)+1); cls='dc-bad'; s=(it.st==='dead'?'樹苗已枯，':'')+'逾期第 '+n+' 天・已扣 '+(it.pt||0)+' 點'; }
-          else { var left=CHECK_DAYS-days(pk(it.k),today); cls=left>=0?'dc-wait':'dc-bad'; s=left>0?'等檢查，還有 '+left+' 天':(left===0?'等檢查，今天最後一天':'已經超過期限'); }
+          else { var left=CHECK_DAYS+(+it.ext||0)-days(pk(it.k),today); cls=left>=0?'dc-wait':'dc-bad'; s=left>0?'等檢查，還有 '+left+' 天':(left===0?'等檢查，今天最後一天':'已經超過期限'); }
           return '<li><span class="'+cls+'">●</span><span>'+esc(it.n)+'<small class="'+cls+'">'+s+'</small></span></li>'; }).join('')+'</ul>';
       }
       var par=x.parent.filter(function(l){ return l.kind==='pts' && l.n>0; }).reduce(function(a,l){ return a+l.n; },0);

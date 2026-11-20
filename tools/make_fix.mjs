@@ -7,6 +7,8 @@
 //     --end：那顆番茄鐘結束的時間（HH:MM）；--orig：雲端備份裡那顆計時的 endAt（毫秒），網站會順便停掉還在跑的同一顆，避免算兩次
 //   刪掉沒人在時計時器自己記的番茄鐘（2026-11-19）：node tools/make_fix.mjs pomodel --from "2026-11-19 00:50" --to "2026-11-19 13:55" --pp 6 --why "…"
 //     只刪 from～to 之間計時器記的（補登、錯字本的不動）；--pp：每顆要扣回幾點（看點數紀錄那顆實際給了多少），一次最多扣 500
+//   延後檢查期限（2026-11-20 段考週）：node tools/make_fix.mjs chkdelay --file keys.json --from 2026-11-21 --days 7 --why "…"
+//     keys.json＝plan.checks.v1 items 的 key 陣列；from 以後才扣的點退回、才枯的樹苗救回；逾期第 1 天往後 days 天（已扣的不退）
 //   補／扣點數：node tools/make_fix.mjs pts --n 20 --why "家長加點沒收到"（一次最多 ±500）
 //   補登以前的小考：node tools/make_fix.mjs quiz --file <rows.json> --why "補習班 LINE 的歷史成績"（2026-11-10）
 //     rows.json＝[[日期 2026-8-8, 科目, 分數, 滿分, 'gq' 或 'q', 備註, 班平均], …]，最多 60 筆；成績只在連結裡、不要放進 repo
@@ -49,6 +51,14 @@ if (kind === 'pomo') {
   const pp = parseInt(args.pp, 10); if (!(pp >= 0 && pp <= 50)) die('--pp 要 0～50');
   if (!payload.why) die('要寫 --why 理由');
   payload.pp = pp;
+} else if (kind === 'chkdelay') {
+  if (!args.file) die('要給 --file <keys.json>');
+  const keys = JSON.parse(fs.readFileSync(args.file, 'utf8'));
+  if (!Array.isArray(keys) || !keys.length || keys.length > 20 || keys.some((k) => typeof k !== 'string' || !/^\d{4}-\d{1,2}-\d{1,2}\|/.test(k))) die('keys 要是 1～20 個「日期|任務名稱」');
+  if (!/^\d{4}-\d{1,2}-\d{1,2}$/.test(String(args.from || ''))) die('--from 格式是 2026-11-21');
+  const days = parseInt(args.days, 10); if (!(days >= 1 && days <= 14)) die('--days 要 1～14');
+  if (!payload.why) die('要寫 --why 理由');
+  payload.keys = keys; payload.from = args.from.split('-').map(Number).join('-'); payload.days = days;
 } else if (kind === 'pts') {
   const n = parseInt(args.n, 10); if (!n || Math.abs(n) > 500) die('--n 要是 ±1～500');
   if (!payload.why) die('點數要寫 --why 理由');
@@ -62,10 +72,10 @@ if (kind === 'pomo') {
     r[0] = r[0].split('-').map(Number).join('-');
   }
   payload.q = rows;
-} else die('第一個參數要是 pomo、pomodel、pts 或 quiz');
+} else die('第一個參數要是 pomo、pomodel、chkdelay、pts 或 quiz');
 
 const body = b64u(Buffer.from(JSON.stringify(payload), 'utf8'));
 const key = crypto.createPrivateKey(fs.readFileSync(KEY_FILE));
 const sig = crypto.sign('sha256', Buffer.from(body, 'utf8'), { key, dsaEncoding: 'ieee-p1363' });
-if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
+if (kind === 'chkdelay') console.error(`延後檢查 ${payload.keys.length} 份 ${payload.days} 天（${payload.from} 起）`); else if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
 console.log(SITE + '#fix=' + body + '.' + b64u(sig));

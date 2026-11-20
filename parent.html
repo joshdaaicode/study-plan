@@ -188,8 +188,8 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   </footer>
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js?v=20261117t"></script>
-<script src="daysum.js?v=20261119a"></script>
+<script src="daychart.js?v=20261120b"></script>
+<script src="daysum.js?v=20261120c"></script>
 <script>
 (function(){
   var GK='parent.gist.v1', CK='parent.chan.v1', FILE='study-plan-backup.json', PFILE='study-plan-parent.json', OWNER='joshdaaicode';
@@ -376,7 +376,7 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
   function lateDay(it,today){
     if(it.st==='pass'||it.old) return 0;
     if(it.ls) return Math.max(0,days(pk(it.ls),today)+1);
-    return days(addD(pk(it.k),CHECK_DAYS+1),today)>=0 ? -1 : 0;
+    return days(addD(pk(it.k),CHECK_DAYS+1+(+it.ext||0)),today)>=0 ? -1 : 0;   // 11-20：ext＝Claude 延後連結加的天數
   }
   var lastDay='';
   function paintFresh(o){
@@ -482,9 +482,10 @@ footer{font-size:12px;color:var(--ink-faint);margin-top:22px;line-height:1.7}
     html+=show.map(function(it){
       var n=lateDay(it,today), s, cls;
       if(it.st==='pass'){ cls='ok'; s='✅ 過關（'+esc(it.g||'')+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'・逾期被扣 '+it.pt+' 點':''); }
+      else if(it.ls && it.ext && n<=(+it.xpd||0)){ cls='wait'; s=(it.st==='dead'?'🪦 樹苗已枯，':'⏸ ')+'段考週延後 '+it.ext+' 天：'+md(key(addD(pk(it.ls),(+it.xpd||0)-1)))+' 前交・已扣 '+(it.pt||0)+' 點'; }   // 11-20 延後連結（暫停扣點）
       else if(n>0){ cls='bad'; s=(it.st==='dead'?'🪦 樹苗已枯，':'⏰ ')+'逾期第 '+n+' 天・已扣 '+(it.pt||0)+' 點・明天再扣 '+(LATE_PEN*(n+1))+' 點'; }
       else if(n<0){ cls='bad'; s='⏰ 已經超過 3 天期限'; }
-      else { var left=CHECK_DAYS-days(pk(it.k),today); cls='wait'; s='⏳ 等檢查，'+(left>0?'還有 '+left+' 天':'今天是最後一天'); }
+      else { var left=CHECK_DAYS+(+it.ext||0)-days(pk(it.k),today); cls='wait'; s='⏳ 等檢查，'+(left>0?'還有 '+left+' 天':'今天是最後一天')+(it.ext?'（延後了 '+it.ext+' 天）':''); }
       return '<div class="chk"><span class="d">'+md(it.k)+'</span>'+esc(it.n)+'<span class="s '+cls+'">'+s+'</span></div>'; }).join('');
     if(!show.length) html+='<p class="sub">最近沒有要檢查的作業。</p>';
     html+='</section>';

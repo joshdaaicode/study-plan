@@ -111,11 +111,12 @@
 
     var ck=x.checks.map(function(it){
       if(it.st==='pass') return {c:'ds-ok', s:esc(it.n)+'<small>過關（'+esc(it.g||'')+'）</small>', t:it.n+' 過關'+(it.g?'（'+it.g+'）':'')};
-      var left=CHECK_DAYS-days(pk(it.k),today);
+      var left=CHECK_DAYS+(+it.ext||0)-days(pk(it.k),today), dly=it.ls&&it.ext&&days(pk(it.ls),today)+1<=(+it.xpd||0), fr=it.ls?md(key(addD(pk(it.ls),(+it.xpd||0)-1))):'';
+      if(dly) return {c:'ds-wait', s:esc(it.n)+'<small>延後到 '+fr+' 前交・已扣 '+(it.pt||0)+' 點</small>', t:it.n+' 延後到 '+fr};
       return {c:left>=0&&!it.ls?'ds-wait':'ds-bad', s:esc(it.n)+'<small>'+(it.ls?'逾期・已扣 '+(it.pt||0)+' 點':(left>0?'等檢查，還有 '+left+' 天':(left===0?'等檢查，今天最後一天':'超過期限')))+'</small>', t:it.n+' 等檢查'};
     });
-    pend.forEach(function(it){ var late=!!it.ls||CHECK_DAYS-days(pk(it.k),today)<0;
-      ck.push({c:late?'ds-bad':'ds-wait', s:esc(it.n)+'<small>'+md(it.k)+' 的'+(late?'，逾期'+(it.pt?'・已扣 '+it.pt+' 點':''):'，還沒交')+(it.st==='dead'?'（樹苗枯了，還是要交）':'')+'</small>', t:md(it.k)+' '+it.n+(late?' 逾期':' 還沒交')}); });
+    pend.forEach(function(it){ var late=(it.ls?days(pk(it.ls),today)+1>(it.ext?(+it.xpd||0):0):false)||(!it.ls&&CHECK_DAYS+(+it.ext||0)-days(pk(it.k),today)<0);   // 11-20：延後中（還沒扣到新的一天）不算逾期
+      ck.push({c:late?'ds-bad':'ds-wait', s:esc(it.n)+'<small>'+md(it.k)+' 的'+(late?'，逾期'+(it.pt?'・已扣 '+it.pt+' 點':''):(it.ext?'，延後到 '+(it.ls?md(key(addD(pk(it.ls),(+it.xpd||0)-1))):md(key(addD(pk(it.k),CHECK_DAYS+(+it.ext||0)))))+' 前交':'，還沒交'))+(it.st==='dead'?'（樹苗枯了，還是要交）':'')+'</small>', t:md(it.k)+' '+it.n+(late?' 逾期':' 還沒交')}); });
     if(ck.length){
       h+='<div class="ds-sub">🔍 給 Claude 檢查</div><ul class="ds-ul">'+ck.map(function(c){ return '<li><span class="'+c.c+'">●</span><span>'+c.s+'</span></li>'; }).join('')+'</ul>';
       T.push('給 Claude 檢查：'+ck.map(function(c){ return c.t; }).join('；'));

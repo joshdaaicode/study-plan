@@ -2324,8 +2324,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 
 </div>
 <script src="plan.js"></script>
-<script src="daychart.js?v=20261117t"></script>
-<script src="daysum.js?v=20261119a"></script>
+<script src="daychart.js?v=20261120b"></script>
+<script src="daysum.js?v=20261120c"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -6645,13 +6645,31 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function chkRewind(it,t){
     if(!t || !it.ls || it.old) return 0;
     var at=new Date(t); at.setHours(0,0,0,0);
-    var nAt=Math.max(0,daysBetween(pk(it.ls),at)+1), pd=it.pd||0, back=0;
+    var nAt=Math.max(0,daysBetween(pk(it.ls),at)+1, +it.xpd||0), pd=it.pd||0, back=0;   // xpd：延後之前就扣的天數，不退
     for(var d=nAt+1;d<=pd;d++) back+=LATE_PEN*d;
     if(back>0){ it.pd=nAt; it.pt=Math.max(0,(it.pt||0)-back); it.back=(it.back||0)+back; }
     if(it.wd && pk(it.wd)>at){ delete it.wd; it.revived=1; }
     it.chkAt=t;
     return back;
   }
+  // 11-20 他要（段考週）：「這一周到期的檢查都在延後一周」→ Claude 的延後連結（#fix kind 'chkdelay'）。
+  //   from＝從哪天開始暫停：那天以後才扣的點退回、那天以後才枯的樹苗救回來；ls（逾期第 1 天）往後 days 天、ext 記加了幾天；
+  //   xpd＝延後前已經扣到第幾天（照樣算、不退，之後從下一天接著扣）。回傳要退的點數（呼叫的人負責加回去）。
+  function chkDelay(it,from,days){
+    if(!it || it.st==='pass' || it.old) return 0;
+    var back=0;
+    if(it.ls){
+      var nF=Math.max(1,daysBetween(pk(it.ls),pk(from))+1), pd=it.pd||0;
+      for(var d=nF;d<=pd;d++) back+=LATE_PEN*d;
+      if(back>0){ it.pd=nF-1; it.pt=Math.max(0,(it.pt||0)-back); it.back=(it.back||0)+back; }
+      if(it.wd && pk(it.wd)>=pk(from)){ delete it.wd; it.st='late'; it.revived=1; }
+      it.ls=addDays(it.ls,days);
+    }
+    it.xpd=it.pd||0; it.ext=(+it.ext||0)+days;
+    if(it.st==='late' && lateDay(it,d0())<1) it.st='pending';
+    return back;
+  }
+  window.__chkDelay=chkDelay;
   function chkDay(t){ var d=new Date(t); return (d.getMonth()+1)+'/'+d.getDate(); }
   function checksAdvance(C,h){
     var today=d0(), tk=kk(today), changed=false, pen=[];
@@ -6661,7 +6679,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       if(it.st==='pending' && it.k===tk && !((h[tk]||{}).dn||[]).some(function(n){ return n===it.n; })){ delete C.items[key]; changed=true; return; }   // 今天取消勾選
       if(it.st==='pass' || it.old) return;
       if(!it.ls){
-        var due=addDays(it.k,CHECK_DAYS+1);   // 照規則的逾期第 1 天
+        var due=addDays(it.k,CHECK_DAYS+1+(+it.ext||0));   // 照規則的逾期第 1 天（11-20：Claude 延後連結加的天數 ext 也算進去）
         if(pk(due)>today) return;             // 還在 3 天內
         it.ls=due;
         if(it.st==='dead') it.st='late';      // 舊規則枯掉的先救回來，下面照逾期天數決定要不要再枯
@@ -8909,11 +8927,15 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     // 11-10 縮短（使用者：「有些頁面拖太長了」）：還沒過關的直接列出來；做法說明、已過關的收起來（以前全部攤開，這張卡約 2 個畫面長）
     var items=Object.keys(C.items).map(function(key){ return C.items[key]; }).sort(function(a,b){ return pk(b.k)-pk(a.k); });
     function row(it){
-      var left=CHECK_DAYS-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
+      var left=CHECK_DAYS+(+it.ext||0)-daysBetween(pk(it.k),d0()), ln=lateDay(it,d0()), cls=it.st, txt;
+      var px=!!(it.ext&&it.ls&&it.st!=='pass'&&ln<=(+it.xpd||0)), free=it.ls?addDays(it.ls,(+it.xpd||0)-1):addDays(it.k,CHECK_DAYS+(+it.ext||0));   // px＝延後中（還沒扣到新的一天）
+      var dl=(it.ext&&it.st!=='pass'&&(px||!it.ls))?'（延後 '+it.ext+' 天：'+md(free)+' 前交）':'';
       if(it.st==='pass') txt='✅ 過關（'+esc(it.g)+'）'+(it.m?'：'+esc(it.m):'')+(it.pt?'　逾期共扣 '+it.pt+' 點':'')+(it.back?'（照檢查那天算，退回 '+it.back+' 點）':'')+(it.wd?'　樹苗已枯':(it.revived?'　樹苗救回來了':''));
+      else if(it.st==='dead' && px){ cls='late'; txt='🪦 樹苗枯了，還是要交'+dl+'；延後期間不扣，之後從 '+(LATE_PEN*((it.pd||0)+1))+' 點接著扣；已扣 '+(it.pt||0)+' 點'; }
       else if(it.st==='dead'){ cls='late'; txt='🪦 逾期第 '+ln+' 天，樹苗枯了，還是要交！已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1)); }
+      else if(px){ cls='pending'; txt='⏸ 延後中'+dl+'，那之前交就不再扣；已扣 '+(it.pt||0)+' 點，之後從 '+(LATE_PEN*((it.pd||0)+1))+' 點接著扣'; }
       else if(ln>0){ cls='late'; txt='⏰ 逾期第 '+ln+' 天，已扣 '+(it.pt||0)+' 點，明天再扣 '+(LATE_PEN*(ln+1))+'；'+(LATE_DIE-ln>0?'再 '+(LATE_DIE-ln)+' 天沒交樹苗會枯':'明天還沒交樹苗就枯了'); }
-      else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+'，之後每天扣點';
+      else txt='⏳ 等檢查，'+(left>0?'還剩 '+left+' 天':'今天最後一天')+(it.ext?'（延後了 '+it.ext+' 天）':'')+'，之後每天扣點';
       return '<div class="fp-chk '+cls+'"><span class="d">'+md(it.k)+'</span><span>'+esc(it.n)+'</span><span class="st">'+txt+'</span></div>';
     }
     var todo=items.filter(function(it){ return it.st!=='pass' && !it.old; }), done=items.filter(function(it){ return it.st==='pass'; });
@@ -9971,6 +9993,15 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         if(dn && window.__award) window.__award(-dn,'Claude 刪掉沒人在時自動記的番茄鐘 '+rd.n+' 顆'+why,true);
         msg=rd.n?'✅ 刪掉 '+rd.n+' 顆番茄鐘（'+(da.getMonth()+1)+'/'+da.getDate()+' '+hm(da.getHours()*60+da.getMinutes())+'～'+hm(db.getHours()*60+db.getMinutes())+'，計時器自己一直接下去記的）'+(dn?'，扣回 '+dn+' 點':'')+why+'。讀書分、森林的樹跟著變少。'
           :'這段時間沒有計時器自己記的番茄鐘，沒有刪、也沒有扣點。';
+      } else if(pl.kind==='chkdelay'){   // 11-20 延後檢查期限（段考週）
+        var days=Math.round(+pl.days||0), from=String(pl.from||''), keys=Array.isArray(pl.keys)?pl.keys:[];
+        if(!(days>=1&&days<=14) || !/^\d{4}-\d{1,2}-\d{1,2}$/.test(from) || !keys.length){ passBanner('❌ 延後連結的內容不對。'); return; }
+        var Cd=checks(), got=[], bk=0;
+        keys.forEach(function(key){ var it=Cd.items[key]; if(!it||it.st==='pass') return; bk+=chkDelay(it,from,days); got.push(it.n.replace(/^科班考古｜/,'')); });
+        saveChecks(Cd);
+        if(bk && window.__award) window.__award(bk,'Claude 延後檢查：'+from.replace(/^\d+-/,'').replace('-','/')+' 以後扣的退回'+why,true);
+        msg=got.length?'✅ 延後 '+days+' 天：'+got.map(esc).join('、')+why+'。延後期間不扣點、樹苗不會枯；已經扣的不退'+(bk?'（'+from.replace(/^\d+-/,'').replace('-','/')+' 以後才扣的 '+bk+' 點退回）':'')+'。'
+          :'這些檢查已經過關或找不到，沒有延後。';
       } else if(pl.kind==='pts'){
         var n=Math.round(+pl.n||0); if(!n || Math.abs(n)>500){ passBanner('❌ 補登的點數不對。'); return; }
         if(window.__award) window.__award(n,'Claude 補登'+why,true);
