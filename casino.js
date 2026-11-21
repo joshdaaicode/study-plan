@@ -492,6 +492,8 @@
 
   /* ---------- 畫面狀態 ---------- */
   var view='home', G=null, R=null, msg='', tick=null;
+  // 11-21：一局還沒結束時，雲端合併先等（合併完要重新整理，這一局會被當成中途放棄）
+  (window.__busyFns=window.__busyFns||[]).push(function(){ return G?'玩單字賭場':''; });
   function setDef(s){
     var d=s.set; d.rg=d.rg&&d.rg.length?d.rg:['kb']; d.let=d.let||''; d.pos=d.pos||[]; d.diff=d.diff||'easy'; d.mode=d.mode||'round'; d.cur=d.cur||'pts'; d.bet=d.bet||20; return d;
   }

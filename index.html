@@ -2329,6 +2329,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 <script src="plan.js"></script>
 <script src="daychart.js?v=20261120b"></script>
 <script src="daysum.js?v=20261120c"></script>
+<script src="sync.js?v=20261121a"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -2421,19 +2422,24 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var KS={}; K.forEach(function(k){ KS[k]=1; });
     var SP=Storage.prototype, oGet=SP.getItem, oSet=SP.setItem, oDel=SP.removeItem;
     var tell=function(k){ if(window.__onData){ try{ window.__onData(k); }catch(e){} } };
+    // 11-21：雲端合併好、準備重新整理的那一刻（window.__syncFreeze），各段程式手上還是舊的資料，關頁時存檔會把合併好的蓋掉 → 這時擋掉
     SP.setItem=function(k,v){
       var hit=false;
-      if(this===window.localStorage && KS[k]){ try{ hit=oGet.call(this,k)!==String(v); }catch(e){ hit=true; } }
+      if(this===window.localStorage && KS[k]){ if(window.__syncFreeze) return; try{ hit=oGet.call(this,k)!==String(v); }catch(e){ hit=true; } }
       var r=oSet.apply(this,arguments);   // 存檔失敗（空間滿）會丟例外，不會通知
       if(hit) tell(k);
       return r;
     };
     SP.removeItem=function(k){
+      if(this===window.localStorage && KS[k] && window.__syncFreeze) return;
       var hit=false; try{ hit=this===window.localStorage && !!KS[k] && oGet.call(this,k)!==null; }catch(e){}
       var r=oDel.apply(this,arguments);
       if(hit) tell(k);
       return r;
     };
+    // 雲端同步寫入合併結果用（不通知、不被擋）
+    window.__rawSet=function(k,v){ oSet.call(window.localStorage,k,v); };
+    window.__rawDel=function(k){ oDel.call(window.localStorage,k); };
   }catch(e){}
   // 共用的跳脫（使用者打的字放進 innerHTML 前一定要過這個）
   window.__esc=function(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
@@ -3994,6 +4000,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   NZ_K.forEach(function(x){ var b=document.createElement('button'); b.type='button'; b.dataset.k=x[0]; b.textContent=x[2]+' '+x[1]; elNzK.appendChild(b); });
   elNzD.insertAdjacentHTML('beforeend',NZ_8D.map(function(x,i){ return '<button type="button" data-d="'+i+'" aria-pressed="false">'+x[0]+'</button>'; }).join(''));
   elNzV.value=NZ.v; elNzA.checked=NZ.a;
+  // 11-21：白噪音開著時，雲端合併先等（重新整理會讓聲音停掉，瀏覽器又要按一下才肯再放）
+  (window.__busyFns=window.__busyFns||[]).push(function(){ return NZ.on?'聽白噪音':''; });
   elNzGo.addEventListener('click',function(){
     if(NZ.on){ NZ.on=false; NZ.rest=false; nzHalt(.8); }
     else { NZ.on=true; NZ.rest=false; nzKick(); }
@@ -4966,14 +4974,13 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   });
 
   /* ---------- 雲端同步：GitHub Gist ---------- */
-  // 規則：只有確定雲端那份「是這台上次同步過的版本」才上傳；雲端比較新（別台裝置傳過）就停下來問，不覆蓋。
-  // 這台從上次同步之後沒改過東西、雲端又比較新 → 直接自動下載（換裝置、手機電腦輪流用都不用手動）。
+  // 規則（11-21 改）：雲端有別台的新資料就三方合併（兩邊做的都留），合併好再傳上去；做法寫在下面「同步改寫」那段和 sync.js。
   // 新裝置只要貼 token：會自動找到原本的備份 Gist，問一次要不要下載。
   var CLK='plan.cloud.v1', FILE='study-plan-backup.json';
   var cl = ls(CLK) || {token:'', gist:'', auto:false, last:0};
   var elT=document.getElementById('cl-token'), elG=document.getElementById('cl-gist'),
       elA=document.getElementById('cl-auto'), elS=document.getElementById('cl-status');
-  var held=false;   // 偵測到雲端較新、兩邊都改過 → 暫停自動上傳，等使用者決定
+  var held=false;   // 找不到上次同步的那一版、沒辦法自動合併 → 暫停自動上傳，等使用者決定
 
   function say(msg,kind){
     if(!elS) return;
@@ -4985,6 +4992,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function hash(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0).toString(16)+':'+s.length; }
   function api(path, opt){
     opt=opt||{};
+    if(!opt.method || opt.method==='GET'){ if(!opt.cache) opt.cache='no-cache'; }
+    if(lowPri && !opt.priority) opt.priority='low';   // 背景自動同步讓路給畫面要用的（剛打開網站、手動按的照一般優先）   // 11-21：GitHub 的回應可以被瀏覽器存 60 秒，以前可能讀到 60 秒前的舊版；no-cache＝每次問 GitHub「變了沒」，沒變回 304
     opt.headers=Object.assign({
       'Authorization':'Bearer '+(elT&&elT.value.trim()||cl.token),
       'Accept':'application/vnd.github+json',
@@ -5015,10 +5024,35 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     }
     return page(1).then(function(id){ if(id){ cl.gist=id; if(elG) elG.value=id; save(CLK,cl); } return id; });
   }
-  // 雲端是不是比這台上次同步的還新：remoteAt 沒記過（這台從沒同步過）也算「不確定」
+  /* ---- 11-21 同步改寫：三方合併（使用者：「手機和筆電都會用，研究一下同步到底該怎麼寫」）----
+   * 以前：雲端比這台新、這台也改過 → 停下來要你選一邊，選了另一邊這段時間做的就不見。
+   *   而且讀雲端時瀏覽器可以拿 60 秒內存著的舊回應（GitHub 給的 Cache-Control: max-age=60），
+   *   另一台剛傳的看不到，就直接蓋上去了。
+   * 現在：
+   *   1. 每台記住「上次同步的那一版」（cl.bv＝GitHub 上那個版本的編號；內容需要時再跟 GitHub 拿那一版）。
+   *   2. 雲端有別台的新資料：拿「那一版、這台、雲端」三份給 sync.js 合併（兩邊做的都留，規則寫在 sync.js 開頭），
+   *      寫回這台、重新整理，再把合併好的傳上去。
+   *   3. 上傳完看 GitHub 的版本紀錄：前一版不是這台以為的那版（兩台幾乎同時傳），就把那一版也合併回來。
+   *   4. 讀雲端一律跟 GitHub 確認是不是最新的（cache:'no-cache'；沒變的話 GitHub 回 304，很省）。
+   *   5. 剛打開網站、還沒按任何東西：用「打開那一刻」的資料合併（開頁時各段自動算的東西，像逾期扣點，
+   *      重新整理後會在合併好的資料上再算一次，不會兩台各算一次加起來）。
+   *   6. 正在打字、玩夾娃娃機或單字賭場、開著白噪音：先不合併（重新整理會打斷），等一下再試；這段時間這台也先不上傳，資料都還在這台。
+   */
+  var SM=window.__SyncMerge||null, KS={}; KEYS.forEach(function(k){ KS[k]=1; });
+  var KTK='plan.sync.kt', kt=ls(KTK)||{}, ktT=null;   // 這台每種資料最後一次改的時間（兩邊改同一個地方、改得不一樣時，比誰比較晚）
+  function saveKt(){ if(ktT){ clearTimeout(ktT); ktT=null; } save(KTK,kt); }
+  function touchKey(k){ kt[k]=Date.now(); if(!ktT) ktT=setTimeout(saveKt,1500); }
+  var base=null;   // {v:版本, doc:那一版的資料, kt}；只放記憶體，重新整理後要合併時再跟 GitHub 拿那一版
+  // acted：打開網站後他自己按了東西、而且資料真的改了（只滑一下畫面不算）——之後合併就不能再用「打開那一刻」的資料
+  var acted=false, lastInput=0, userAt=0;
+  ['pointerdown','keydown'].forEach(function(ev){ document.addEventListener(ev,function(){ lastInput=Date.now(); },true); });
+  ['click','keydown','input','change'].forEach(function(ev){ document.addEventListener(ev,function(){ userAt=Date.now(); },true); });
+  var bootDoc=null; try{ bootDoc=window.__bootSig!=null?JSON.parse(window.__bootSig):null; }catch(e){}
+
+  // 雲端是不是比這台上次同步的還新（找不到「上次同步那一版」時才用的舊判斷）
   function remoteNewer(g){
     if(cl.remoteAt) return g.updated_at > cl.remoteAt;
-    if(cl.last) return new Date(g.updated_at).getTime() > cl.last + 60000;   // 舊版只記了 last
+    if(cl.last) return new Date(g.updated_at).getTime() > cl.last + 60000;
     return true;
   }
   // 這台有沒有實質資料（剛開的新裝置也會先寫幾個預設值，不能只看 key 數）
@@ -5027,113 +5061,276 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     return {days:Object.keys(h||{}).length, wrong:(w||[]).length, quiz:(q||[]).length, pts:(sh&&sh.pts)||0, log:((sh&&sh.log)||[]).length, pet:!!(pe&&pe.pet),
       txt:'紀錄 '+Object.keys(h||{}).length+' 天、錯題 '+(w||[]).length+' 題、小考 '+(q||[]).length+' 筆、點數 '+((sh&&sh.pts)||0)}; }
   function hasData(){ var m=summ(pick()); return m.days>0||m.wrong>0||m.quiz>0||m.log>0||m.pet; }
-  function realUpload(silent){
-    var body={description:'joshdaai的讀書專屬計畫 · 自動備份', files:{}};
-    var o=pick(), s0=JSON.stringify(o), d=JSON.stringify(Object.assign({_v:2,_at:new Date().toISOString(),_keys:KEYS},o)); body.files[FILE]={content:d};   // 先記下這次上傳的內容，上傳途中改的下次再傳
-    var req = cl.gist
-      ? api('/gists/'+cl.gist,{method:'PATCH',body:JSON.stringify(body)})
-      : api('/gists',{method:'POST',body:JSON.stringify(Object.assign({public:false},body))});
-    if(!silent) say('上傳中…');
-    return req.then(function(g){
-      cl.gist=g.id; cl.last=Date.now(); cl.remoteAt=g.updated_at; lastSig=s0; cl.sh=hash(s0); save(CLK,cl);
-      if(elG) elG.value=g.id;
-      held=false;
-      say('已上傳 ✓　'+stamp(),'ok');
-    });
-  }
-  // 11-09 C4：以前每次上傳前都先把整份備份下載下來（GET /gists/{id}），只為了看雲端的更新時間。
-  // 改成先看最新一筆修改紀錄（很小）：確定雲端沒有比這台上次同步更新，就直接上傳；看不出來或比較新，才走原本完整的檢查。
-  function maybeNewer(id){
-    if(!cl.remoteAt) return Promise.resolve(true);
-    return api('/gists/'+id+'/commits?per_page=1').then(function(list){
-      var c=Array.isArray(list)&&list[0]; if(!c||!c.committed_at) return true;
-      return new Date(c.committed_at).getTime() > new Date(cl.remoteAt).getTime()+5000;   // 差 5 秒以內算同一次（自己上傳的那筆）
-    }).catch(function(){ return true; });
-  }
-  // force：使用者在確認框按了「用這台覆蓋」
-  function upload(silent,force){
-    saveCl();
-    if(!cl.token){ if(!silent) say('請先貼上 token。','err'); return Promise.reject(new Error('no token')); }
-    if(!hasData()){ if(!silent) say('這台還沒有讀書紀錄，不上傳（避免蓋掉雲端的備份）。要用雲端的資料就按「從雲端下載」。','err'); return Promise.reject(new Error('empty')); }
-    var pre = cl.gist ? Promise.resolve(cl.gist) : findGist();
-    return pre.then(function(id){
-      if(!id||force) return realUpload(silent);
-      return maybeNewer(id).then(function(m){ if(!m) return realUpload(silent);
-      return api('/gists/'+id).then(function(g){
-        if(remoteNewer(g)){
-          held=true;
-          if(silent){
-            say('⚠ 雲端有 '+fmt(g.updated_at)+' 的資料，比這台上次同步還新（可能是另一台裝置傳的）。自動上傳先暫停：要用雲端的就按「從雲端下載」，確定這台才是對的就按「上傳到雲端」。','warn');
-            return;
-          }
-          return fetchBackup(g).then(function(txt){
-            var rm=null; try{ rm=summ(JSON.parse(txt)); }catch(e){}
-            var lm=summ(pick());
-            if(!confirm('雲端的資料（'+fmt(g.updated_at)+'）比這台上次同步的還新，可能是另一台裝置傳的。\n\n雲端：'+(rm?rm.txt:'讀不到')+'\n這台：'+lm.txt+'\n\n確定要用這台的資料覆蓋雲端嗎？\n（不確定的話按取消，先「從雲端下載」。）')){ say('已取消上傳。'+stamp()); return; }
-            return realUpload(silent);
-          });
-        }
-        return realUpload(silent);
-      }); });
-    }).catch(function(e){ say('上傳失敗：'+(e.message||e),'err'); throw e; });
+
+  function dataOf(o){ var d={}; Object.keys(o||{}).forEach(function(k){ if(k.charAt(0)!=='_' && typeof o[k]==='string') d[k]=o[k]; }); return d; }
+  function dataOrder(d){ var o={}; KEYS.forEach(function(k){ if(typeof d[k]==='string') o[k]=d[k]; }); return o; }
+  function ktOf(o){ var t=Date.parse(o&&o._at)||0, m={}; Object.keys(dataOf(o)).forEach(function(k){ m[k]=(o._kt&&+o._kt[k])||t; }); return m; }
+  function verOf(g){ return (g&&g.history&&g.history[0]&&g.history[0].version)||''; }
+  function eqDoc(a,b){ return SM?SM.docEq(a,b):JSON.stringify(a)===JSON.stringify(b); }
+  // 這台的資料；這版還不認得的 key（別台比較新的網站版本才有的）照上次同步那一版帶著，不會被這台弄丟
+  function withExtras(d){ if(base&&base.doc) Object.keys(base.doc).forEach(function(k){ if(!KS[k] && !(k in d)) d[k]=base.doc[k]; }); return d; }
+  function localDoc(){ return withExtras(pick()); }
+  function setBase(v,doc,kts,at){
+    base={v:v, doc:doc, kt:kts||{}};
+    cl.bv=v; cl.sh=hash(JSON.stringify(dataOrder(doc))); cl.last=Date.now(); if(at) cl.remoteAt=at; save(CLK,cl);
   }
   function fetchBackup(g){
     var f=g.files&&g.files[FILE];
     if(!f) return Promise.reject(new Error('這個 Gist 裡沒有備份檔'));
-    if(f.truncated&&f.raw_url) return fetch(f.raw_url).then(function(r){ if(!r.ok) throw new Error('下載備份檔失敗'); return r.text(); });
+    if(f.truncated&&f.raw_url) return fetch(f.raw_url,{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error('下載備份檔失敗'); return r.text(); });
     return Promise.resolve(f.content);
   }
-  function applyBackup(txt,meta){
-    var o=JSON.parse(txt);
-    if(!o||typeof o!=='object') throw new Error('備份檔格式不對');
-    try{ if(window.__snapNow) window.__snapNow('下載雲端前'); }catch(e){}
-    var n=window.__restore(o);
-    cl.last=Date.now(); cl.remoteAt=meta.updated_at; cl.sh=hash(sig()); save(CLK,cl);
-    window.__noSync=true;
-    return {n:n, at:o._at?new Date(o._at):null};
+  function readDoc(g){ return fetchBackup(g).then(function(t){ var o=JSON.parse(t); if(!o||typeof o!=='object') throw new Error('備份檔格式不對'); return o; }); }
+  function revDoc(id,v){ return api('/gists/'+id+'/'+v,{cache:'default'}).then(readDoc); }   // 舊的版本內容不會變，瀏覽器存著的可以用
+  function patch(id,d){
+    var t={}, bk=(base&&base.kt)||{};
+    Object.keys(d).forEach(function(k){ t[k]=Math.max(+kt[k]||0,+bk[k]||0); });
+    var doc=Object.assign({_v:3,_at:new Date().toISOString(),_keys:KEYS,_kt:t},d);
+    var body={description:'joshdaai的讀書專屬計畫 · 自動備份', files:{}}; body.files[FILE]={content:JSON.stringify(doc)};
+    var req=id?api('/gists/'+id,{method:'PATCH',body:JSON.stringify(body)}):api('/gists',{method:'POST',body:JSON.stringify(Object.assign({public:false},body))});
+    return req.then(function(g){ return {g:g, kt:t}; });
   }
-  // ask=false：自動下載（這台沒改過東西），不問
+
+  // 現在合併（會重新整理）會不會打斷他：回傳原因，空字串＝可以
+  var MERGE_IDLE=20000;
+  function busyWhy(){
+    if(!document.hidden){
+      var a=document.activeElement;
+      if(a && (a.tagName==='TEXTAREA' || a.isContentEditable || (a.tagName==='INPUT' && !/^(checkbox|radio|button|submit|reset|range|color|file|image)$/i.test(a.type||'')))) return '打字';
+      if(Date.now()-lastInput<MERGE_IDLE) return '操作';   // 11-21 晚：以前 2.5 秒，看一頁看到一半就重新整理；切到別的 App 時（hidden）不用等
+    }
+    var fs=window.__busyFns||[];   // 各段自己登記：夾娃娃機、單字賭場正在玩一局，白噪音開著
+    for(var i=0;i<fs.length;i++){ try{ var w=fs[i](); if(w) return w; }catch(e){} }
+    return '';
+  }
+  // 把合併好的寫回這台並重新整理（先存一份「合併雲端前」快照，可以反悔）
+  function applyLocal(M,info){
+    try{ if(window.__snapNow) window.__snapNow('合併雲端前',{one:true}); }catch(e){}
+    saveKt();
+    var set=window.__rawSet||function(k,v){ localStorage.setItem(k,v); }, del=window.__rawDel||function(k){ localStorage.removeItem(k); };
+    window.__syncFreeze=true; window.__noSync=true;
+    try{
+      KEYS.forEach(function(k){ var c=null; try{ c=localStorage.getItem(k); }catch(e){}
+        if(typeof M[k]==='string'){ if(c!==M[k]) set(k,M[k]); } else if(c!==null) del(k); });
+    }catch(e){ if(window.__quota) window.__quota(e); }
+    try{ sessionStorage.setItem('plan.merged',JSON.stringify(info||{})); }catch(e){}
+    location.reload();
+  }
+  // 把「bd 那一版 → rd」的變化合併進這台。結果跟這台一樣 → 只換「上次同步的那一版」；不一樣 → 寫回這台、重新整理
+  function absorb(bd,rd,rkt,nb,o){
+    var now=localDoc(), useBoot=!!(o.boot && !acted && bootDoc);
+    var ld=useBoot?withExtras(Object.assign({},bootDoc)):now;
+    var res=SM.merge(bd,ld,rd,{keys:KEYS, lt:kt, rt:rkt}), M=res.doc;
+    if(eqDoc(M,now)){ setBase(nb.v,nb.doc,nb.kt,nb.at); return {st:'same'}; }
+    var why=o.force?'':busyWhy();
+    if(why) return {st:'wait', why:why};
+    setBase(nb.v,nb.doc,nb.kt,nb.at);
+    applyLocal(M,{n:res.keys.length, ff:eqDoc(ld,bd), at:nb.at||'', log:res.log.slice(0,12)});
+    return {st:'reload'};
+  }
+  function findBase(id,g){
+    if(base && base.v && base.v===cl.bv) return Promise.resolve(base);
+    if(cl.bv) return revDoc(id,cl.bv).then(function(o){ return {v:cl.bv, doc:dataOf(o), kt:ktOf(o)}; },function(){ return legacyBase(id,g); });
+    return legacyBase(id,g);
+  }
+  // 舊版只記了上次同步時雲端的更新時間（remoteAt）：到版本紀錄裡找那個時間的那一版
+  function legacyBase(id,g){
+    if(!cl.remoteAt || !cl.last) return Promise.resolve(null);
+    var want=Date.parse(cl.remoteAt);
+    function pickV(list){ var best=null, bd=1e18;
+      (Array.isArray(list)?list:[]).forEach(function(h){ var d=Math.abs(Date.parse(h.committed_at)-want); if(d<=5000 && d<bd){ best=h; bd=d; } });
+      return best?best.version:''; }
+    var v=pickV(g.history);
+    return (v?Promise.resolve(v):api('/gists/'+id+'/commits?per_page=100').then(pickV)).then(function(v){
+      if(!v) return null;
+      return revDoc(id,v).then(function(o){ return {v:v, doc:dataOf(o), kt:ktOf(o)}; });
+    }).catch(function(){ return null; });
+  }
+  // 找不到上次同步那一版（從沒同步過、或版本紀錄裡找不到）：照以前的方式，不自己合併
+  function noBase(id,g,ro,o){
+    var rd=dataOf(ro), nb={v:verOf(g), doc:rd, kt:ktOf(ro), at:g.updated_at};
+    if(eqDoc(dataOrder(localDoc()),dataOrder(rd))){ setBase(nb.v,rd,nb.kt,nb.at); held=false; return {st:'same'}; }
+    if(cl.last && !remoteNewer(g)){ base=nb; cl.bv=nb.v; save(CLK,cl); return push(id,o); }   // 雲端沒比這台上次同步新：雲端那版就是上次同步的
+    var clean=cl.last && cl.sh && cl.sh===hash(o.boot&&window.__bootSig!=null?window.__bootSig:sig());
+    if(clean && cl.auto){   // 這台從上次同步之後沒改過：直接換成雲端的
+      var why=o.force?'':busyWhy(); if(why) return {st:'wait', why:why};
+      setBase(nb.v,rd,nb.kt,nb.at); applyLocal(Object.assign({},rd),{ff:true, at:nb.at}); return {st:'reload'};
+    }
+    held=true;
+    if(!cl.last){
+      say('找到雲端備份（'+fmt(g.updated_at)+'）。這台還沒同步過：按「從雲端下載」把資料拿過來。','warn');
+      if(window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),true);
+    } else {
+      say('⚠ 雲端有 '+fmt(g.updated_at)+' 的資料，比這台上次同步還新，這台也改過，但找不到上次同步的那一版，沒辦法自動合併。要用雲端的就按「從雲端下載」；確定這台才是對的就按「上傳到雲端」。自動上傳先暫停。','warn');
+      if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),false);
+    }
+    return {st:'held'};
+  }
+  // 上一次「兩台同時傳」要合併回來的那一版，當時在忙沒合併：現在補
+  function fixUp(id,o){
+    var f=cl.fix; if(!f||!f.b||!f.x) return Promise.resolve(null);
+    delete cl.fix; save(CLK,cl);
+    return Promise.all([revDoc(id,f.b),revDoc(id,f.x)]).then(function(a){
+      var r=absorb(dataOf(a[0]),dataOf(a[1]),ktOf(a[1]),{v:base.v, doc:base.doc, kt:base.kt},o);
+      if(r.st==='wait'){ cl.fix=f; save(CLK,cl); }
+      return r;
+    },function(){ return null; });
+  }
+  // 雲端跟上次同步那一版一樣了：這台有改就傳上去
+  function push(id,o){
+    var d=localDoc();
+    if(base && eqDoc(d,base.doc)){ lastSig=sig(); dirty=false; held=false; return Promise.resolve({st:'clean'}); }
+    if(!hasData()) return Promise.resolve({st:'empty'});
+    var from=cl.bv, prev=base, s0=sig();
+    if(!o.silent) say('上傳中…');
+    return patch(id,d).then(function(x){
+      var g=x.g, h=g.history||[], uv=verOf(g), pred=h[1]&&h[1].version;
+      setBase(uv||from,d,x.kt,g.updated_at); lastSig=s0; held=false;
+      if(!uv || !from || uv===from || !pred || pred===from || !prev) return {st:'up'};
+      // 傳上去的同時另一台也傳了一版（pred）：這台剛剛那次把它蓋掉了，要把它合併回來再傳
+      cl.ra=Date.now(); save(CLK,cl);
+      return revDoc(id,pred).then(function(xo){
+        var r=absorb(prev.doc,dataOf(xo),ktOf(xo),{v:uv, doc:d, kt:x.kt, at:g.updated_at},{force:o.force});   // 這台的就是剛傳上去的那份，不用開頁那一刻的
+        if(r.st==='wait'){ cl.fix={b:from, x:pred}; save(CLK,cl); }
+        return r.st==='same'?{st:'up'}:r;
+      });
+    });
+  }
+  function syncRun(o){
+    if(!SM) return Promise.reject(new Error('同步程式沒載入，重新整理一次'));
+    return (cl.gist?Promise.resolve(cl.gist):findGist()).then(function(id){
+      if(!id){   // 雲端還沒有備份：建一份
+        if(!hasData()) return {st:'empty'};
+        var d=localDoc(), s0=sig();
+        return patch('',d).then(function(x){ cl.gist=x.g.id; if(elG) elG.value=x.g.id; setBase(verOf(x.g),d,x.kt,x.g.updated_at); lastSig=s0; held=false; return {st:'up'}; });
+      }
+      // 11-21 晚：先看雲端最新一版的編號（版本紀錄第一筆，約 1 KB；沒變回 304）。還是上次同步那版、內容也記得 → 不用下載整份
+      //   （以前每次上傳完，下一次檢查都要把自己剛傳的約 80 KB 再下載一次）
+      var quick=(base && base.v && base.v===cl.bv && !cl.fix)
+        ? api('/gists/'+id+'/commits?per_page=1').then(function(l){ var c=Array.isArray(l)&&l[0]; return (c&&c.version)||''; },function(){ return ''; })
+        : Promise.resolve('');
+      return quick.then(function(lv){
+        if(lv && lv===cl.bv){ held=false; return push(id,o); }
+        return api('/gists/'+id).then(function(g){
+          var rv=verOf(g);
+          return readDoc(g).then(function(ro){
+            var nb={v:rv, doc:dataOf(ro), kt:ktOf(ro), at:g.updated_at};
+            if(rv && rv===cl.bv){   // 雲端沒動過
+              base=nb; held=false;
+              return fixUp(id,o).then(function(r){ return (r&&r.st!=='same')?r:push(id,o); });
+            }
+            return findBase(id,g).then(function(bd){
+              if(!bd) return noBase(id,g,ro,o);
+              base=bd; held=false; cl.ra=Date.now();   // 另一台剛傳過東西：接下來看雲端看勤一點
+              var r=absorb(bd.doc,nb.doc,nb.kt,nb,o);
+              return r.st==='same'?push(id,o):r;
+            });
+          });
+        });
+      });
+    });
+  }
+  // 同一時間只跑一個（同一台開兩個分頁也是：Web Locks）
+  var cur=null, again=false, waitT=null, waitD=3000, lowPri=false, errT=null, errD=5000, pollT=null;
+  // 多久看一次雲端（開著、在前景時）：另一台最近 10 分鐘有傳東西（兩台同時在用）→ 30 秒；不然 2 分鐘。沒變的話 GitHub 回 304，不佔額度
+  function pollGap(){ return (cl.ra && Date.now()-cl.ra<10*60000)?30000:120000; }
+  function pollNext(){ clearTimeout(pollT); pollT=setTimeout(function(){ pollT=null; if(!document.hidden) checkRemote(true); else pollNext(); },pollGap()); }
+  // 網路斷掉、GitHub 一時出錯：5 秒、15 秒、45 秒…最多 2 分鐘後自己再試（token 有問題的不試，要他處理）
+  function retryLater(e){
+    var m=(e&&e.message)||String(e||'');
+    if(/Token|權限|找不到|no token|^empty$|同步程式/.test(m) || errT) return;
+    errT=setTimeout(function(){ errT=null; run({silent:true}).catch(function(){}); },errD); errD=Math.min(120000,errD*3);
+  }
+  function run(o){
+    o=o||{};
+    if(!cl.token||window.__noSync) return Promise.resolve(null);
+    if(cur){ again=true; return cur; }
+    var boot=firstCheck; firstCheck=false; if(boot) o.boot=true;
+    checking=true; lowPri=!!(o.silent && !boot && !o.force);
+    var job=function(){ return syncRun(o); };
+    var p=(navigator.locks&&navigator.locks.request)?navigator.locks.request('plan-cloud-sync',job):job();
+    cur=p.then(function(r){
+      cur=null; checking=false; lowPri=false; errD=5000; if(errT){ clearTimeout(errT); errT=null; }
+      var st=r&&r.st;
+      if(st!=='reload') pollNext();
+      if(st==='wait'){
+        say('雲端有另一台的新資料，等你'+r.why+'完就合併（兩邊的資料都在，不會不見）。'+stamp(),'warn');
+        if(!waitT){ waitT=setTimeout(function(){ waitT=null; run({silent:true}); },waitD); waitD=Math.min(30000,waitD*2); }
+      } else if(st!=='reload'){
+        waitD=3000;
+        if(st==='up') say('已上傳 ✓　'+stamp(),'ok');
+        else if((st==='clean'||st==='same') && !o.silent) say('已同步 ✓　雲端和這台一樣。'+stamp(),'ok');
+        else if(st==='empty' && !o.silent) say('這台還沒有讀書紀錄，不上傳（避免蓋掉雲端的備份）。要用雲端的資料就按「從雲端下載」。','err');
+      }
+      if(again){ again=false; if(st!=='reload' && st!=='held') pushSoon(); }
+      if(st!=='reload') pullParent();
+      return r;
+    },function(e){ cur=null; checking=false; lowPri=false; again=false; if(boot) firstCheck=true;   // 開網站時沒連上：下次還是用「打開那一刻」的資料合併
+      say('同步失敗：'+(e.message||e)+'（會自己再試）','err'); syncFail(e); retryLater(e); pollNext(); throw e; });
+    return cur;
+  }
+
+  // 手動「上傳到雲端」：一樣先合併；找不到上次同步那一版（自動上傳暫停中）才問要不要用這台覆蓋
+  function manualUp(){
+    saveCl();
+    if(!cl.token){ say('請先貼上 token。','err'); return; }
+    if(!hasData()){ say('這台還沒有讀書紀錄，不上傳（避免蓋掉雲端的備份）。要用雲端的資料就按「從雲端下載」。','err'); return; }
+    if(!held){ say('同步中…'); run({force:true}).catch(function(){}); return; }
+    var id=cl.gist;
+    api('/gists/'+id).then(function(g){
+      return readDoc(g).then(function(ro){
+        var rm=summ(dataOf(ro)), lm=summ(pick());
+        if(!confirm('雲端的資料（'+fmt(g.updated_at)+'）比這台上次同步的還新，可能是另一台裝置傳的，而且找不到可以自動合併的那一版。\n\n雲端：'+rm.txt+'\n這台：'+lm.txt+'\n\n確定要用這台的資料覆蓋雲端嗎？\n（不確定的話按取消，先「從雲端下載」。）')){ say('已取消上傳。'+stamp()); return; }
+        var d=localDoc(), s0=sig(); say('上傳中…');
+        return patch(id,d).then(function(x){ setBase(verOf(x.g),d,x.kt,x.g.updated_at); lastSig=s0; held=false; say('已上傳 ✓　'+stamp(),'ok'); });
+      });
+    }).catch(function(e){ say('上傳失敗：'+(e.message||e),'err'); });
+  }
+  // 手動「從雲端下載」：整份換成雲端的（先存一份本機快照）
   function download(ask){
     saveCl();
     if(!cl.token){ say('請先貼上 token。','err'); return; }
     say('下載中…');
-    var meta=null;
     (cl.gist?Promise.resolve(cl.gist):findGist()).then(function(id){
       if(!id) throw new Error('帳號裡找不到備份。第一次用的話先按「上傳到雲端」。');
       return api('/gists/'+id);
-    }).then(function(g){ meta=g; return fetchBackup(g); }).then(function(txt){
-      var o=JSON.parse(txt), at=o._at?new Date(o._at):null;
-      if(ask!==false && !confirm('雲端備份的時間是 '+(at?at.toLocaleString():'未知')+'。\n\n匯入後會覆蓋這台裝置目前的資料（這台現在的資料會先存一份本機快照），確定嗎？')) { say(stamp()); return; }
-      var r=applyBackup(txt,meta);
-      try{ sessionStorage.setItem('plan.pulled',String(r.n)+'|'+(r.at?r.at.getTime():'')); }catch(e){}
-      location.reload();
+    }).then(function(g){
+      return readDoc(g).then(function(o){
+        var at=o._at?new Date(o._at):null;
+        if(ask!==false && !confirm('雲端備份的時間是 '+(at?at.toLocaleString():'未知')+'。\n\n匯入後會覆蓋這台裝置目前的資料（這台現在的資料會先存一份本機快照），確定嗎？')) { say(stamp()); return; }
+        try{ if(window.__snapNow) window.__snapNow('下載雲端前'); }catch(e){}
+        var n=window.__restore(o), rd=dataOf(o);
+        setBase(verOf(g),rd,ktOf(o),g.updated_at); held=false;
+        window.__noSync=true; window.__syncFreeze=true;
+        try{ sessionStorage.setItem('plan.pulled',String(n)+'|'+(at?at.getTime():'')); }catch(e){}
+        location.reload();
+      });
     }).catch(function(e){ say('下載失敗：'+(e.message||e),'err'); });
   }
 
-  var lastSig=sig(), pending=false, lastCheck=0, firstCheck=true;
-  // 11-09 C4：以前每 30 秒都把全部資料轉成文字比一次；改成資料核心通知「有改過」才比（dirty），比完一樣就放下
+  var lastSig=sig(), lastCheck=0, firstCheck=true, checking=false;
+  // 11-09 C4：資料核心通知「有改過」才比（dirty），比完一樣就放下
   var dirty=true;
   function changed(){ if(!dirty) return false; var c=sig()!==lastSig; if(!c) dirty=false; return c; }
-  // 一有改動就上傳（2026-11-07）：資料一變，約 2 秒後上傳（同一個動作連續存好幾個檔併成一次）；
-  //   一直在改（例如玩單字賭場）時最多每 10 秒傳一次；上傳途中又改了，傳完馬上補一次。每 30 秒的檢查留著當備用。
-  var PUSH_WAIT=2000, PUSH_GAP=10000, pushT=null, lastPushAt=0, again=false, checking=false;
+  // 一有改動就上傳（2026-11-07）：資料一變，約 2 秒後同步（同一個動作連續存好幾個檔併成一次）；
+  //   一直在改（例如玩單字賭場）時最多每 10 秒一次；同步途中又改了，做完馬上補一次。每 30 秒的檢查留著當備用。
+  var PUSH_WAIT=2000, PUSH_GAP=10000, pushT=null, lastPushAt=0;
   function pushSoon(){
     if(!cl.auto||!cl.token||!cl.gist||held||window.__noSync) return;
-    if(pending){ again=true; return; }
-    if(pushT) return;   // 已經排了一次，到時候會一起傳
+    if(cur){ again=true; return; }
+    if(pushT) return;
     pushT=setTimeout(function(){ pushT=null; autoPush(); }, Math.max(PUSH_WAIT, lastPushAt+PUSH_GAP-Date.now()));
   }
-  window.__onData=function(k){ dirty=true; pushSoon(); };
+  window.__onData=function(k){ dirty=true; touchKey(k); if(Date.now()-userAt<1500) acted=true; pushSoon(); };
   function autoPush(){
-    if(!cl.auto||!cl.token||!cl.gist||pending||held||window.__noSync) return;
+    if(!cl.auto||!cl.token||!cl.gist||held||window.__noSync) return;
     if(!changed()) return;
     if(pushT){ clearTimeout(pushT); pushT=null; }
-    if(checking){ pushSoon(); return; }   // 正在看雲端有沒有別台的新資料：等它看完再傳
-    pending=true; again=false; lastPushAt=Date.now();
-    upload(true).then(function(){ pending=false; if(again){ again=false; pushSoon(); } },function(e){ pending=false; again=false; syncFail(e); });
+    if(cur){ again=true; return; }
+    lastPushAt=Date.now();
+    run({silent:true}).catch(function(){});
   }
-  // 11-15：同步失敗以前只寫在「設定 → 雲端同步」那一行，平常看不到。11/12 晚上起雲端就沒再更新，
-  // 他兩台裝置的勾選對不起來、以為「每天都有欠帳」是 bug。現在 token 有問題、或超過一天沒同步成功，就在畫面底下跳一次。
+  // 11-15：同步失敗以前只寫在「設定 → 雲端同步」那一行，平常看不到。token 有問題、或超過一天沒同步成功，就在畫面底下跳一次。
   var failShown=false;
   function syncFail(e){
     var m=(e&&e.message)||String(e||''); if(!cl.auto || !cl.token || /^(no token|empty)$/.test(m)) return;
@@ -5150,33 +5347,23 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     ok.addEventListener('click',function(){ b.remove(); });
     b.appendChild(go); b.appendChild(ok); document.body.appendChild(b);
   }
-  // 看雲端有沒有別台傳的新資料：這台沒改過就直接拉下來；這台從沒同步過就問；兩邊都改過就暫停等你決定
-  function checkRemote(){
-    if(!cl.token||window.__noSync||pending) return;
-    var now=Date.now(); if(now-lastCheck<60000) return; lastCheck=now;
-    checking=true;   // 看雲端的途中先不要上傳（剛打開網站時，別台的新資料要先拉下來）
-    (cl.gist?Promise.resolve(cl.gist):findGist()).then(function(id){
-      if(!id) return;
-      return maybeNewer(id).then(function(m){ if(!m){ firstCheck=false; held=false; return; }   // 11-09 C4：雲端沒更新就不用下載整份
-      return api('/gists/'+id).then(function(g){
-        // 第一次檢查用「剛打開網站那一刻」的資料比（其他程式開頁時會先補算當天的東西）
-        var base=firstCheck&&window.__bootSig!=null?window.__bootSig:sig(); firstCheck=false;
-        if(!remoteNewer(g)){ held=false; return; }
-        if(cl.last && cl.sh && cl.sh===hash(base) && cl.auto){
-          say('雲端有新資料，自動下載中…');
-          return fetchBackup(g).then(function(txt){ var r=applyBackup(txt,g); try{ sessionStorage.setItem('plan.pulled',String(r.n)+'|'+(r.at?r.at.getTime():'')); }catch(e){} location.reload(); });
-        }
-        held=true;
-        if(!cl.last){
-          say('找到雲端備份（'+fmt(g.updated_at)+'）。這台還沒同步過：按「從雲端下載」把資料拿過來。','warn');
-          if(window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),true);
-        } else {
-          say('⚠ 雲端有 '+fmt(g.updated_at)+' 的資料，比這台上次同步還新，而且這台也改過。要用雲端的就按「從雲端下載」；確定這台才是對的就按「上傳到雲端」。自動上傳先暫停。','warn');
-          if(cl.auto && window.__cloudNotice) window.__cloudNotice(fmt(g.updated_at),false);
-        }
-      }); });
-    }).catch(function(e){ say('同步失敗：'+(e.message||e),'err'); syncFail(e); }).then(function(){ checking=false; pullParent(); });
+  // 看雲端有沒有別台傳的新資料（切回這個畫面、每 2 分鐘）：有就合併；這台改過的也一起傳
+  function checkRemote(force){
+    if(!cl.token||window.__noSync) return;
+    var now=Date.now(); if(!force && now-lastCheck<10000) return; lastCheck=now;
+    run({silent:true}).catch(function(){});
   }
+  // 查問題用：主控台打 __cloudSync.info() 看這台記得的版本；__cloudSync.now() 馬上同步一次（不會給出 token）
+  window.__cloudSync={now:function(){ return run({silent:true}); }, info:function(){ return {bv:cl.bv||'', held:held, last:cl.last||0, base:!!base, fix:!!cl.fix, busy:busyWhy(), poll:pollGap()/1000}; }};
+  // 同一台開了兩個分頁：另一個分頁改了資料，這個分頁手上的是舊的，再存會蓋掉 → 不同步，切回來（或沒在忙）時重新整理
+  var staleTab=false;
+  window.addEventListener('storage',function(e){
+    if(!e.key || !KS[e.key] || window.__pv || staleTab) return;
+    staleTab=true; window.__noSync=true; window.__syncFreeze=true;   // 這個分頁先不存檔（存了會用舊資料蓋掉另一個分頁的）
+    var go=function(){ if(document.hidden){ setTimeout(go,3000); return; } location.reload(); };
+    if(document.hidden) document.addEventListener('visibilitychange',function v(){ if(!document.hidden){ document.removeEventListener('visibilitychange',v); go(); } });
+    else setTimeout(go,1500);
+  });
   // 家長頻道（2026-11-07）：家長在 parent.html 摸摸寵物、留言、加點，寫進帳號裡另一個 Gist（檔名 study-plan-parent.json）。
   // 這裡只讀，讀到的交給寵物那段 window.__parentApply 套用（每天加點最多 30 點，那段會再擋一次）。
   var PFILE='study-plan-parent.json', lastPar=0, lastParList=0;
@@ -5214,6 +5401,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     ok.addEventListener('click',function(){ b.remove(); });
     b.appendChild(go); b.appendChild(ok); document.body.appendChild(b);
   };
+  // 11-21：剛合併了另一台的資料 → 重新整理後告訴使用者（兩邊都改過的地方在主控台印出來，查問題用）
+  try{ var mg=sessionStorage.getItem('plan.merged'); if(mg){ sessionStorage.removeItem('plan.merged'); var mi=JSON.parse(mg)||{};
+    if(mi.log&&mi.log.length&&window.console) console.info('[同步] 兩邊都改過的地方', mi.log);
+    setTimeout(function(){ if(window.__fx&&window.__fx.banner) window.__fx.banner(mi.ff?'☁ 已同步另一台的資料'+(mi.at?'（'+fmt(mi.at)+'）':''):'☁ 已合併另一台的資料，兩邊做的都留下來了'); },600); } }catch(e){}
   // 剛從雲端拉下來 → 重新整理後告訴使用者
   try{ var pulled=sessionStorage.getItem('plan.pulled'); if(pulled){ sessionStorage.removeItem('plan.pulled'); var pp=pulled.split('|');
     setTimeout(function(){ if(window.__fx&&window.__fx.banner) window.__fx.banner('☁ 已同步雲端資料（'+pp[0]+' 項'+(pp[1]?'，'+fmt(+pp[1]):'')+'）'); },600); } }catch(e){}
@@ -5230,25 +5421,35 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       api('/user').then(function(u){
         return (cl.gist?Promise.resolve(cl.gist):findGist()).then(function(id){
           say('連線成功 ✓　帳號：'+u.login+(id?'　找到備份 Gist':'　還沒有備份，按「上傳到雲端」建立')+'。'+stamp(),'ok');
-          if(id && !cl.last){ lastCheck=0; checkRemote(); }
+          if(id && !cl.last) checkRemote(true);
         });
       }).catch(function(e){ say('連線失敗：'+(e.message||e),'err'); });
     });
-    document.getElementById('cl-up').addEventListener('click',function(){ upload(false).catch(function(){}); });
+    document.getElementById('cl-up').addEventListener('click',manualUp);
     document.getElementById('cl-down').addEventListener('click',function(){ download(true); });
     document.getElementById('cl-forget').addEventListener('click',function(){
       if(!confirm('清掉這台裝置上的 token？雲端的資料不會被刪，Gist ID 也會保留。')) return;
       cl.token=''; save(CLK,cl); elT.value=''; say('已清除 token。');
     });
     elA.addEventListener('change',function(){ saveCl(); say(stamp()); });
-    elT.addEventListener('change',function(){ saveCl(); if(cl.token){ lastCheck=0; checkRemote(); } });
+    elT.addEventListener('change',function(){ saveCl(); if(cl.token) checkRemote(true); });
 
-    checkRemote();
-    // 平常靠 pushSoon（一有改動就傳）；每 30 秒再看一次當備用；切到背景（手機切 App、關分頁）時馬上傳；切回來時看雲端有沒有別台的新資料
+    checkRemote(true);
+    // 平常靠 pushSoon（一有改動就傳）；每 30 秒再看一次當備用；切到背景（手機切 App、關分頁）時馬上傳；
+    // 切回來時、開著的時候每 2 分鐘看雲端有沒有別台的新資料（11-21：以前 5 分鐘；沒變的話 GitHub 回 304，不佔額度）
     setInterval(autoPush,30000);
-    setInterval(function(){ if(!document.hidden){ checkRemote(); pullParent(); } },5*60000);
-    document.addEventListener('visibilitychange',function(){ if(document.hidden) autoPush(); else { checkRemote(); pullParent(); } });
-    window.addEventListener('pagehide',autoPush);
+    pollNext();
+    // 切到別的 App、鎖螢幕（hidden）是手機上最後一個靠得住的時間點：馬上傳；有等著要合併的，趁看不到的時候合併、重新整理
+    document.addEventListener('visibilitychange',function(){
+      if(document.hidden){ saveKt(); if(waitT){ clearTimeout(waitT); waitT=null; waitD=3000; run({silent:true}).catch(function(){}); } else autoPush(); }
+      else checkRemote(true);
+    });
+    window.addEventListener('pagehide',function(){ saveKt(); autoPush(); });
+    // 11-21 晚：筆電從別的視窗點回來（focus，視窗沒被蓋住時不會觸發 visibilitychange）、網路恢復（online）、
+    //   手機從「上一頁」快取回來（pageshow persisted）也馬上看一次雲端
+    window.addEventListener('focus',function(){ checkRemote(); });
+    window.addEventListener('online',function(){ errD=5000; checkRemote(true); });
+    window.addEventListener('pageshow',function(e){ if(e.persisted) checkRemote(true); });
   }
   // 沒設定雲端同步：一天提醒一次（資料只在這台，換裝置或瀏覽器清資料就沒了）
   (function(){
@@ -6049,8 +6250,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   var KEYS=window.__DATA_KEYS;
   function dumpAll(){ var o={_at:new Date().toISOString(), _keys:KEYS}; KEYS.forEach(function(k){ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }); return o; }
   function snapList(){ var s=ls(SNK,[]); return Array.isArray(s)?s:[]; }
-  function addSnap(label){
-    var o=dumpAll(), snaps=snapList(); snaps.unshift({d:kk(d0()), t:Date.now(), l:label||'', o:o, kb:Math.round(JSON.stringify(o).length/1024)});   // kb：存的時候就算好大小，畫清單時不用再整份轉文字
+  function addSnap(label,opt){
+    var o=dumpAll(), snaps=snapList();
+    if(opt&&opt.one&&label) snaps=snaps.filter(function(s){ return s.l!==label; });   // 11-21：「合併雲端前」每換一次裝置就存一份，只留最新的，不要把每天的快照擠掉
+    snaps.unshift({d:kk(d0()), t:Date.now(), l:label||'', o:o, kb:Math.round(JSON.stringify(o).length/1024)});   // kb：存的時候就算好大小，畫清單時不用再整份轉文字
     var keep=snaps.slice(0,4);
     try{ localStorage.setItem(SNK,JSON.stringify(keep)); }
     catch(e){ try{ localStorage.setItem(SNK,JSON.stringify(keep.slice(0,2))); }catch(e2){ if(window.__quota) window.__quota(e2); return false; } }
@@ -10573,7 +10776,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(window.__tab!==5 || window.__sub!==22) return;
     if(window.__casino){ window.__casino.show(); return; }
     if(asked) return; asked=true;
-    var s=document.createElement('script'); s.src='casino.js?v=20261118a';
+    var s=document.createElement('script'); s.src='casino.js?v=20261121a';
     s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }
@@ -10588,7 +10791,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(window.__tab!==5 || window.__sub!==18) return;
     if(window.__claw){ window.__claw.show(); return; }
     if(asked) return; asked=true;
-    var s=document.createElement('script'); s.src='claw.js?v=20261121a';
+    var s=document.createElement('script'); s.src='claw.js?v=20261121b';
     s.onerror=function(){ asked=false; var a=document.getElementById('cw-app'); if(a) a.innerHTML='<p class="fp-care bad" style="padding:14px 18px">夾娃娃機載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }

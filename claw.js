@@ -119,6 +119,8 @@
 
   var tab='n', msg='', cv=null, ctx=null, timeEl=null, W=0, H=0, dpr=1;
   var G=null;   // 正在玩的這一局
+  // 11-21：正在夾的時候，雲端合併先等（合併完要重新整理，會把這一局打斷）
+  (window.__busyFns=window.__busyFns||[]).push(function(){ return G?'夾娃娃':''; });
   var clawX=.13, HOME=.13;
   function onTab(){ return window.__tab===5 && window.__sub===18; }
   function total(){ var c=st(); return PZ.filter(function(x){ return c.own[x[0]]; }).length; }
