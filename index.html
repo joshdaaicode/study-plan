@@ -1266,6 +1266,8 @@ html.pv .wrap{max-width:none;padding:0}
 .sg-ser span{font-weight:400;font-size:12px;color:var(--ink-faint);margin-left:6px}
 .sg-it{--rc:#8A8F98;position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;min-block-size:44px;padding:8px 4px 7px;border:1px solid var(--rc);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;text-align:center}
 .sg-it.R{--rc:#2F7FD0} .sg-it.SR{--rc:#9B59B6} .sg-it.SSR{--rc:#C99212;box-shadow:inset 0 0 0 1px var(--rc)}
+.sg-it.UR{--rc:#D6336C;box-shadow:inset 0 0 0 1px var(--rc),0 0 0 2px color-mix(in srgb,var(--rc) 25%,transparent);background:linear-gradient(160deg,color-mix(in srgb,#F2C230 14%,var(--card)),color-mix(in srgb,#D6336C 12%,var(--card)),color-mix(in srgb,#2D7FD3 12%,var(--card)))}
+.sg-tk{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
 .sg-it .e{font-size:26px;line-height:1.15}
 .sg-it b{font-size:12.5px;font-weight:600}
 .sg-it small{font-size:10.5px;color:var(--ink-faint);line-height:1.35}
@@ -2086,6 +2088,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   </div>
   <div class="card" id="sh-logbox" hidden style="margin-top:14px"></div>
   <div class="card sg-card" id="sg-app"></div>
+  <div class="card sg-card" id="cw-app" aria-label="夾娃娃機"></div><!-- 11-21：夾娃娃機（claw.js，打開許願商店才載入） -->
 </section>
 
 <section>
@@ -4265,9 +4268,13 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
      用點數換收藏品（不給點數、🌟、飼料，那些只能靠讀書）；自己訂的願望一個都不動。讀書時段不能轉（跟寵物用品店一樣）。
      資料放在 plan.shop.v1 的 gc：own（每件有幾個）、sh（碎片）、n（轉了幾次）、half（哪天用過半價）、dd（今日限定 {k 日期, id, b 買了沒}）、show（展示櫃，最多 3 個）、spent（花了幾點）。
      價格（模擬：全部 40 件收齊平均約 140 轉 ≈ 3.7 萬點；一個系列幾千點就有機會）：一次 300、10 連 2,700（10 顆至少 1 顆稀有以上）、每天第一次半價。 */
+  // 11-21 他要（「把扭蛋機做多一點東西，再多一個更難抽到的階級」）：多 3 個系列（數學、太空、高雄港與海洋，各 8 件）
+  //   ＋新階級「神話」UR（1%，比傳說 5% 難 5 倍；8 件自成一個系列，不會出現在今日限定）；普通從 55% 降到 54%。
+  //   扭蛋券 tk（夾娃娃機夾到的，轉 1 次不用點數）、金扭蛋券 gtk（特殊娃娃機才有：必出傳說以上，1/6 是神話）。
   var GC_PULL=300, GC_TEN=2700;
-  var GC_RAR=[{id:'N',n:'普通',w:55,sh:1,ex:10,dd:500},{id:'R',n:'稀有',w:28,sh:3,ex:25,dd:1200},{id:'SR',n:'史詩',w:12,sh:8,ex:70,dd:3000},{id:'SSR',n:'傳說',w:5,sh:30,ex:180,dd:7000}];
-  var GC_SER=[{id:'st',n:'文具',e:'📚',b:'文具大師'},{id:'sc',n:'科學',e:'🔬',b:'小小科學家'},{id:'nm',n:'高雄夜市',e:'🏮',b:'夜市達人'},{id:'an',n:'動物',e:'🐾',b:'動物之友'},{id:'ex',n:'考場',e:'🏆',b:'考場戰神'}];
+  var GC_RAR=[{id:'N',n:'普通',w:54,sh:1,ex:10,dd:500},{id:'R',n:'稀有',w:28,sh:3,ex:25,dd:1200},{id:'SR',n:'史詩',w:12,sh:8,ex:70,dd:3000},{id:'SSR',n:'傳說',w:5,sh:30,ex:180,dd:7000},{id:'UR',n:'神話',w:1,sh:80,ex:500,dd:0}];
+  var GC_SER=[{id:'st',n:'文具',e:'📚',b:'文具大師'},{id:'sc',n:'科學',e:'🔬',b:'小小科學家'},{id:'nm',n:'高雄夜市',e:'🏮',b:'夜市達人'},{id:'an',n:'動物',e:'🐾',b:'動物之友'},{id:'ex',n:'考場',e:'🏆',b:'考場戰神'},
+    {id:'ma',n:'數學',e:'📐',b:'數學魔法師'},{id:'sp',n:'太空',e:'🚀',b:'太空探險家'},{id:'oc',n:'高雄港與海洋',e:'⚓',b:'海洋守護者'},{id:'my',n:'神話',e:'🌌',b:'神話收藏家'}];
   var GC=[   // [代號, 系列, 稀有度, 圖, 名字, 一句話]
     ['st1','st','N','✏️','鉛筆','削到剩一半還捨不得丟'],['st2','st','N','📏','直尺','畫圖題的好朋友'],['st3','st','N','📎','迴紋針','把訂正好的考卷夾整齊'],['st4','st','N','🖍️','螢光筆','重點畫太多，就沒有重點'],
     ['st5','st','R','📐','三角板','30°、60°、90°一次搞定'],['st6','st','R','🧮','算盤','古時候的計算機'],['st7','st','SR','🖋️','鋼筆','寫字瞬間變好看'],['st8','st','SSR','🪄','考神的魔杖','揮一下，題目都看得懂了'],
@@ -4278,9 +4285,17 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     ['an1','an','N','🐢','烏龜','慢慢來，比較快'],['an2','an','N','🐧','企鵝','穿著西裝走路'],['an3','an','N','🦔','刺蝟','外表兇，其實很害羞'],['an4','an','N','🐸','青蛙','呱呱，背單字中'],
     ['an5','an','R','🦊','狐狸','聰明又機靈'],['an6','an','R','🦉','貓頭鷹','熬夜讀書的夥伴（但 23:00 要睡）'],['an7','an','SR','🐼','熊貓','吃飽睡、睡飽吃'],['an8','an','SSR','🐉','神龍','傳說中保佑考生的龍'],
     ['ex1','ex','N','📝','考卷','寫完記得檢查一遍'],['ex2','ex','N','⏰','鬧鐘','考試那天別睡過頭'],['ex3','ex','N','🍫','巧克力','考前補充一點能量'],['ex4','ex','N','🧃','鋁箔包','下課十分鐘的快樂'],
-    ['ex5','ex','R','🎒','書包','裝滿講義，有夠重'],['ex6','ex','R','📕','錯題本','錯過的題目不會再錯'],['ex7','ex','SR','🏅','5A++ 金牌','會考五科全 A++'],['ex8','ex','SSR','📜','科學班錄取通知','雄中科學班，等我']];
+    ['ex5','ex','R','🎒','書包','裝滿講義，有夠重'],['ex6','ex','R','📕','錯題本','錯過的題目不會再錯'],['ex7','ex','SR','🏅','5A++ 金牌','會考五科全 A++'],['ex8','ex','SSR','📜','科學班錄取通知','雄中科學班，等我'],
+    ['ma1','ma','N','📊','長條圖','組距要一樣寬'],['ma2','ma','N','🎲','骰子','擲出 6 的機率是 1/6'],['ma3','ma','N','🧩','拼圖','割補法的好朋友'],['ma4','ma','N','🔺','三角形','內角和永遠 180°'],
+    ['ma5','ma','R','🧭','指北針','坐標題先找原點'],['ma6','ma','R','♾️','無限大','等比級數加到最後'],['ma7','ma','SR','🌀','費氏螺旋','1、1、2、3、5、8…'],['ma8','ma','SSR','🥧','圓周率派','3.14159…你背到第幾位？'],
+    ['sp1','sp','N','🌙','月亮','初一看不到、十五最圓'],['sp2','sp','N','⭐','星星','其實是很遠的太陽'],['sp3','sp','N','☄️','彗星','尾巴永遠背向太陽'],['sp4','sp','N','🛰️','人造衛星','繞地球一圈約 90 分鐘'],
+    ['sp5','sp','R','🚀','火箭','作用力與反作用力'],['sp6','sp','R','🪐','土星','密度比水還小'],['sp7','sp','SR','🌌','銀河','一千億顆恆星的家'],['sp8','sp','SSR','🌞','太陽','核融合的大火球'],
+    ['oc1','oc','N','🐚','貝殼','旗津海邊撿的'],['oc2','oc','N','🦀','螃蟹','橫著走也很快'],['oc3','oc','N','🐠','熱帶魚','珊瑚礁的居民'],['oc4','oc','N','⚓','船錨','停好了，開始讀書'],
+    ['oc5','oc','R','🐬','海豚','會用回聲定位'],['oc6','oc','R','🚢','貨櫃輪','高雄港一年進出上萬艘'],['oc7','oc','SR','🐋','鯨魚','地球上最大的動物'],['oc8','oc','SSR','🏝️','旗津小島','騎腳踏車環島一圈'],
+    ['my1','my','UR','👑','學霸皇冠','戴上它，整張考卷全對'],['my2','my','UR','💎','鑽石筆','寫出來的字會發光'],['my3','my','UR','🌈','彩虹橋','通往放榜的那一天'],['my4','my','UR','🔮','水晶球','好像看得到明天的考題'],
+    ['my5','my','UR','🏆','金獎盃','科學班第一名'],['my6','my','UR','🧠','超級大腦','一秒解完壓軸題'],['my7','my','UR','🗝️','黃金鑰匙','打開科學班的大門'],['my8','my','UR','🎖️','榮譽勳章','最難拿到的那一枚']];
   var gcApp=document.getElementById('sg-app'), gcTab='mach', gcLast=null, gcMsg='';
-  function gcState(){ var g=shop.gc||(shop.gc={}); g.own=g.own||{}; g.sh=g.sh||0; g.n=g.n||0; g.show=g.show||[]; g.spent=g.spent||0; return g; }
+  function gcState(){ var g=shop.gc||(shop.gc={}); g.own=g.own||{}; g.sh=g.sh||0; g.n=g.n||0; g.show=g.show||[]; g.spent=g.spent||0; g.tk=g.tk||0; g.gtk=g.gtk||0; return g; }
   function gcRar(id){ return GC_RAR.filter(function(r){ return r.id===id; })[0]; }
   function gcItem(id){ return GC.filter(function(x){ return x[0]===id; })[0]; }
   function gcToday(){ return window.__U.kk(window.__U.d0()); }
@@ -4298,32 +4313,36 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   // 今日限定：每天挑一件還沒有的（都有了就隨便挑），當天固定不變
   function gcDaily(){
     var g=gcState(), k=gcToday();
-    if(!g.dd || g.dd.k!==k || !gcItem(g.dd.id)){ var miss=GC.filter(function(x){ return !g.own[x[0]]; }), pool=miss.length?miss:GC; g.dd={k:k, id:pool[Math.floor(Math.random()*pool.length)][0], b:0}; save(SHK,shop); }
+    if(!g.dd || g.dd.k!==k || !gcItem(g.dd.id) || gcItem(g.dd.id)[2]==='UR'){ var noUR=GC.filter(function(x){ return x[2]!=='UR'; }), miss=noUR.filter(function(x){ return !g.own[x[0]]; }), pool=miss.length?miss:noUR; g.dd={k:k, id:pool[Math.floor(Math.random()*pool.length)][0], b:0}; save(SHK,shop); }   // 11-21：神話不會出現在今日限定
     return g.dd;
   }
-  function gcRoll(guar){
+  function gcRoll(guar,gold){
     var r=Math.random()*100, a=0, ri=0;
     for(var i=0;i<GC_RAR.length;i++){ a+=GC_RAR[i].w; if(r<a){ ri=i; break; } }
     if(guar && ri===0) ri=1;
+    if(gold) ri=Math.random()<1/6?4:3;   // 金扭蛋券：傳說 5/6、神話 1/6
     var L=GC.filter(function(x){ return x[2]===GC_RAR[ri].id; }); return L[Math.floor(Math.random()*L.length)];
   }
   // 拿到一件：新的記 1；重複的變碎片。回傳 {x 那件, nw 新的嗎, sh 變成幾個碎片}
   function gcGet(g,x){ var nw=!g.own[x[0]], sh=nw?0:gcRar(x[2]).sh; g.own[x[0]]=(g.own[x[0]]||0)+1; g.sh+=sh; return {x:x, nw:nw, sh:sh}; }
   function gcBadgeFx(before,g){ var b0=before.map(function(s){ return s.id; }); gcDone(g).forEach(function(se){ if(b0.indexOf(se.id)<0 && window.__fx && window.__fx.unlock) window.__fx.unlock(null,'徽章「'+se.b+'」'); });
-    if(gcHave(g)===GC.length && before.length<GC_SER.length && window.__fx && window.__fx.banner) setTimeout(function(){ window.__fx.banner('🌈 40 件全部收齊：扭蛋全制霸！'); },1200); }
-  function gcPull(n){
+    if(gcHave(g)===GC.length && before.length<GC_SER.length && window.__fx && window.__fx.banner) setTimeout(function(){ window.__fx.banner('🌈 '+GC.length+' 件全部收齊：扭蛋全制霸！'); },1200); }
+  function gcPull(n,tick){   // tick：'tk' 扭蛋券、'gtk' 金扭蛋券（11-21，夾娃娃機夾到的；只轉 1 次、不用點數）
     var lk=gcLock(); if(lk){ gcMsg=lk; return paintGc(); }
-    var g=gcState(), tk=gcToday(), half=n===1 && g.half!==tk, cost=n===10?GC_TEN:(half?GC_PULL/2:GC_PULL);
+    var g=gcState(), tk=gcToday();
+    if(tick){ n=1; if(!(g[tick]>0)) return; if(!confirm('用 1 張'+(tick==='gtk'?'金扭蛋券轉 1 次（必出傳說以上）':'扭蛋券轉 1 次')+'？')) return; }
+    var half=!tick && n===1 && g.half!==tk, cost=tick?0:(n===10?GC_TEN:(half?GC_PULL/2:GC_PULL));
     if(shop.pts<cost){ gcMsg='點數不夠：要 '+cost+' 點，現在 '+shop.pts+' 點。'; return paintGc(); }
-    if(!confirm('用 '+cost+' 點轉 '+n+' 次扭蛋？'+(half?'（今天第一次半價）':'')+'\n轉到的是收藏品，不能退。')) return;
+    if(!tick && !confirm('用 '+cost+' 點轉 '+n+' 次扭蛋？'+(half?'（今天第一次半價）':'')+'\n轉到的是收藏品，不能退。')) return;
     var before=gcDone(g), res=[];
-    for(var i=0;i<n;i++){ var guar=n===10 && i===9 && !res.some(function(r){ return r.x[2]!=='N'; }); res.push(gcGet(g,gcRoll(guar))); }
-    g.n+=n; g.spent+=cost; if(half) g.half=tk;
+    for(var i=0;i<n;i++){ var guar=n===10 && i===9 && !res.some(function(r){ return r.x[2]!=='N'; }); res.push(gcGet(g,gcRoll(guar,tick==='gtk'))); }
+    g.n+=n; g.spent+=cost; if(half) g.half=tk; if(tick) g[tick]--;
     var nw=res.filter(function(r){ return r.nw; }).length, sh=res.reduce(function(a,r){ return a+r.sh; },0);
-    gcLast=res; gcMsg='轉了 '+n+' 次：新的 '+nw+' 件'+(sh?'、重複的變成碎片 +'+sh:'')+'。';
-    window.__award(-cost,'扭蛋機 ×'+n+'（新 '+nw+' 件'+(sh?'、碎片 +'+sh:'')+'）',true);   // 存檔（gc 一起存）、寫兌換紀錄
-    var top=res.filter(function(r){ return r.x[2]==='SSR'; })[0];
-    if(top && window.__fx && window.__fx.banner) window.__fx.banner('✨ 傳說！'+top.x[3]+' '+top.x[4]);
+    gcLast=res; gcMsg=(tick?'用'+(tick==='gtk'?'金':'')+'扭蛋券轉了 1 次':'轉了 '+n+' 次')+'：新的 '+nw+' 件'+(sh?'、重複的變成碎片 +'+sh:'')+'。';
+    if(tick) save(SHK,shop);
+    else window.__award(-cost,'扭蛋機 ×'+n+'（新 '+nw+' 件'+(sh?'、碎片 +'+sh:'')+'）',true);   // 存檔（gc 一起存）、寫兌換紀錄
+    var top=res.filter(function(r){ return r.x[2]==='UR'; })[0]||res.filter(function(r){ return r.x[2]==='SSR'; })[0];
+    if(top && window.__fx && window.__fx.banner) window.__fx.banner((top.x[2]==='UR'?'🌌 神話！':'✨ 傳說！')+top.x[3]+' '+top.x[4]);
     gcBadgeFx(before,g); paintGc();
   }
   function gcExchange(id){
@@ -4367,7 +4386,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       +(done.length?'<div class="sg-badges">'+done.map(function(se){ return '<span>'+se.e+' '+esc(se.b)+'</span>'; }).join('')+(have===GC.length?'<span>🌈 扭蛋全制霸</span>':'')+'</div>':'')+'</div>';
     o+='<div class="fp-tabs sg-tabs" aria-label="扭蛋機分頁">'+[['mach','🥚 扭蛋機'],['book','📖 收藏冊 '+have+'/'+GC.length],['day','🎁 今日限定'+(g.dd&&g.dd.k===tk&&g.dd.b?' ✓':'')]].map(function(t){ return '<button type="button" data-gctab="'+t[0]+'" aria-pressed="'+(gcTab===t[0])+'">'+t[1]+'</button>'; }).join('')+'</div><div class="sg-body">';
     if(gcTab==='book'){
-      o+='<p class="sg-note" style="margin:0 0 10px">點你有的那件放進上面的展示櫃（最多 3 件）。還沒有的可以用碎片換：普通 ✨10、稀有 ✨25、史詩 ✨70、傳說 ✨180。集滿一個系列得到一個徽章。</p>';
+      o+='<p class="sg-note" style="margin:0 0 10px">點你有的那件放進上面的展示櫃（最多 3 件）。還沒有的可以用碎片換：普通 ✨10、稀有 ✨25、史詩 ✨70、傳說 ✨180、神話 ✨500。集滿一個系列得到一個徽章。</p>';
       GC_SER.forEach(function(se){
         var L=GC.filter(function(x){ return x[1]===se.id; }), n=L.filter(function(x){ return g.own[x[0]]; }).length;
         o+='<h4 class="sg-ser">'+se.e+' '+esc(se.n)+' '+n+'/'+L.length+'<span>'+(n===L.length?'✓ 徽章「'+esc(se.b)+'」':'集滿得到徽章「'+esc(se.b)+'」')+'</span></h4><div class="sg-grid">'+L.map(function(x){
@@ -4380,12 +4399,13 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       var dd=gcDaily(), x=gcItem(dd.id), c=gcRar(x[2]).dd, se=GC_SER.filter(function(s){ return s.id===x[1]; })[0];
       o+='<div class="sg-day">'+gcCard(x,{show:1, have:g.own[x[0]]})+'<div><b>今日限定：'+x[3]+' '+esc(x[4])+'</b><p class="sg-note" style="margin-top:4px">'+esc(se.e+' '+se.n)+' 系列・'+gcRar(x[2]).n+'・'+esc(x[5])+'<br>每天挑一件你還沒有的，直接用點數買，一天只能買一次；明天就換別的。</p>'
         +'<div class="sg-btns" style="margin-top:8px">'+(dd.b?'<span class="sub" style="margin:0">今天買過了，明天再來看看。</span>':'<button class="btn solid" type="button" data-gcday="1"'+(lk||shop.pts<c?' disabled':'')+'>用 '+c+' 點買</button>')+'</div></div></div>'
-        +'<p class="sg-note">今日限定的價格：普通 500、稀有 1,200、史詩 3,000、傳說 7,000 點。</p>';
+        +'<p class="sg-note">今日限定的價格：普通 500、稀有 1,200、史詩 3,000、傳說 7,000 點。神話不會出現在今日限定，只能靠轉。</p>';
     } else {
       o+='<div class="sg-mach">'+GC_SVG+'<div><div class="sg-btns">'
         +'<button class="btn solid" type="button" data-gcpull="1"'+(lk||shop.pts<(half?GC_PULL/2:GC_PULL)?' disabled':'')+'>轉 1 次・'+(half?GC_PULL/2+' 點（今天第一次半價）':GC_PULL+' 點')+'</button>'
         +'<button class="btn" type="button" data-gcpull="10"'+(lk||shop.pts<GC_TEN?' disabled':'')+'>10 連轉・'+GC_TEN.toLocaleString()+' 點</button></div>'
-        +'<p class="sg-note">你有 '+shop.pts+' 點。機率：普通 55%、稀有 28%、史詩 12%、傳說 5%；10 連轉保證至少 1 件稀有以上。轉到重複的變成碎片（普通 1、稀有 3、史詩 8、傳說 30），碎片可以在收藏冊換你還沒有的。</p></div></div>';
+        +((g.tk||g.gtk)?'<div class="sg-tk">'+(g.tk?'<button class="btn" type="button" data-gctk="tk"'+(lk?' disabled':'')+'>🎟️ 用扭蛋券轉（剩 '+g.tk+' 張）</button>':'')+(g.gtk?'<button class="btn" type="button" data-gctk="gtk"'+(lk?' disabled':'')+'>🌟 用金扭蛋券（剩 '+g.gtk+' 張・必出傳說以上）</button>':'')+'</div>':'')
+        +'<p class="sg-note">你有 '+shop.pts+' 點。機率：普通 54%、稀有 28%、史詩 12%、傳說 5%、<b>神話 1%</b>；10 連轉保證至少 1 件稀有以上。轉到重複的變成碎片（普通 1、稀有 3、史詩 8、傳說 30、神話 80），碎片可以在收藏冊換你還沒有的。扭蛋券、金扭蛋券在夾娃娃機夾得到。</p></div></div>';
       if(gcLast) o+='<div class="sg-res" aria-label="這次轉到的">'+gcLast.map(function(r,i){ return gcCard(r.x,{have:1, tag:r.nw?'NEW':'', sub:r.nw?'':'碎片 +'+r.sh, style:'animation-delay:'+(i*0.06).toFixed(2)+'s'}); }).join('')+'</div>';
     }
     o+='</div>';
@@ -4397,15 +4417,22 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       var b=e.target.closest('button'); if(!b || b.disabled) return;
       if(b.dataset.gctab){ gcTab=b.dataset.gctab; gcMsg=''; return paintGc(); }
       if(b.dataset.gcpull) return gcPull(+b.dataset.gcpull);
+      if(b.dataset.gctk) return gcPull(1,b.dataset.gctk);
       if(b.dataset.gcx) return gcExchange(b.dataset.gcx);
       if(b.dataset.gcday) return gcBuyDaily();
       if(b.dataset.gcshow) return gcToggleShow(b.dataset.gcshow);
     });
     document.addEventListener('plan:tab',function(){ if(gcOn()) window.__U.later(paintGc); });
     document.addEventListener('plan:points',function(){ if(gcOn()) paintGc(); });   // 點數變了（按鈕能不能按）
+    document.addEventListener('plan:gc',function(){ if(gcOn()) paintGc(); });   // 夾娃娃機給了碎片、扭蛋券
     if(gcOn()) window.__U.later(paintGc);
   }
 
+
+  // 11-21：夾娃娃機（claw.js，打開許願商店才載入）用的出入口：讀寫商店資料（娃娃收藏放 shop.cl、碎片和扭蛋券放 shop.gc）
+  window.__shopApi={shop:function(){ return shop; }, save:function(){ save(SHK,shop); }, gc:gcState,
+    giveSh:function(n){ gcState().sh+=n; save(SHK,shop); try{ document.dispatchEvent(new CustomEvent('plan:gc')); }catch(e){} },
+    giveTk:function(k,n){ var g=gcState(); g[k]=(g[k]||0)+n; save(SHK,shop); try{ document.dispatchEvent(new CustomEvent('plan:gc')); }catch(e){} }};
 
   /* ---------- 點數規則 ---------- */
   function sg(n){ return (n>0?'+':'')+n+' 點'; }
@@ -10014,6 +10041,11 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         if(bk && window.__award) window.__award(bk,'Claude 延後檢查：'+from.replace(/^\d+-/,'').replace('-','/')+' 以後扣的退回'+why,true);
         msg=got.length?'✅ 延後 '+days+' 天：'+got.map(esc).join('、')+why+'。延後期間不扣點、樹苗不會枯；已經扣的不退'+(bk?'（'+from.replace(/^\d+-/,'').replace('-','/')+' 以後才扣的 '+bk+' 點退回）':'')+'。'
           :'這些檢查已經過關或找不到，沒有延後。';
+      } else if(pl.kind==='claw'){   // 11-21 特別任務過關（超修、超前、特殊考卷、臨時抽查…）→ 特殊娃娃機限時開放（claw.js 讀 C.sp）
+        var hrs=Math.round(+pl.hrs||0); if(!(hrs>=1&&hrs<=168)){ passBanner('❌ 特殊娃娃機連結的內容不對。'); return; }
+        var Cw=checks(), until=Math.max((Cw.sp&&+Cw.sp.until)||0, Date.now()+hrs*3600000), ud=new Date(until);
+        Cw.sp={until:until, why:String(pl.task||'').slice(0,60), at:Date.now()}; saveChecks(Cw);
+        msg='💎 特別任務過關'+why+'！特殊娃娃機開放到 '+(ud.getMonth()+1)+'/'+ud.getDate()+' '+hm(ud.getHours()*60+ud.getMinutes())+'。另外還要：最近 7 天平均讀書 3 小時以上、給 Claude 檢查的全部過關，到「獎勵 → 許願商店」最下面看。';
       } else if(pl.kind==='revive'){   // 11-20 救回枯掉的檢查樹苗
         var rkeys=Array.isArray(pl.keys)?pl.keys:[]; if(!rkeys.length){ passBanner('❌ 救回連結的內容不對。'); return; }
         var Cr=checks(), rv=[];
@@ -10543,6 +10575,21 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(asked) return; asked=true;
     var s=document.createElement('script'); s.src='casino.js?v=20261118a';
     s.onerror=function(){ asked=false; var a=document.getElementById('vc-app'); if(a) a.innerHTML='<p class="fp-care bad">賭場載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
+    document.head.appendChild(s);
+  }
+  document.addEventListener('plan:tab',check);
+  check();
+})();
+/* ===== 夾娃娃機（11-21）：打開「獎勵 → 許願商店」才載入 claw.js，平常不佔載入時間 ===== */
+(function(){
+  if(window.__pv) return;
+  var asked=false;
+  function check(){
+    if(window.__tab!==5 || window.__sub!==18) return;
+    if(window.__claw){ window.__claw.show(); return; }
+    if(asked) return; asked=true;
+    var s=document.createElement('script'); s.src='claw.js?v=20261121a';
+    s.onerror=function(){ asked=false; var a=document.getElementById('cw-app'); if(a) a.innerHTML='<p class="fp-care bad" style="padding:14px 18px">夾娃娃機載入失敗（網路不通？），切到別頁再回來會重試。</p>'; };
     document.head.appendChild(s);
   }
   document.addEventListener('plan:tab',check);
