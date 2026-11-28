@@ -1,5 +1,5 @@
-const CACHE='study-plan-v24';   // 11-21 晚：同步改成三方合併（sync.js，放進離線清單）；v23 11-21：扭蛋機擴充、夾娃娃機（claw.js）；v22：11-20 晚：救回樹苗連結（index.html 改）；v21：11-17 晚：daychart.js 換成 20261117t（各科讀書時間圖算進錯字本複習）；v13 是 20261117s，v12 是 11-12 丟掉舊版用的
-const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261120b','./daysum.js?v=20261120c','./sound-worklet.js?v=20261119a','./sync.js?v=20261121a'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
+const CACHE='study-plan-v25';   // 11-28：同步 v2（先對過雲端才結算、自動結算不搶最後修改、效果編號只算一次、寵物和今天清單的保險；sync.js 20261128a）；v24 11-21 晚：同步改成三方合併（sync.js，放進離線清單）；v23 11-21：扭蛋機擴充、夾娃娃機（claw.js）；v22：11-20 晚：救回樹苗連結（index.html 改）；v21：11-17 晚：daychart.js 換成 20261117t（各科讀書時間圖算進錯字本複習）；v13 是 20261117s，v12 是 11-12 丟掉舊版用的
+const ASSETS=['./','./index.html','./plan.js','./manifest.json','./daychart.js?v=20261120b','./daysum.js?v=20261120c','./sound-worklet.js?v=20261119a','./sync.js?v=20261128a'];   // 11-09：daychart.js 補進離線清單（網址要跟兩頁載入的一樣，改檔記得換版本號）
 self.addEventListener('install',e=>{
   self.skipWaiting();
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS.map(u=>new Request(u,{cache:'reload'}))).catch(()=>{})));

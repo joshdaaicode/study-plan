@@ -2329,7 +2329,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
 <script src="plan.js"></script>
 <script src="daychart.js?v=20261120b"></script>
 <script src="daysum.js?v=20261120c"></script>
-<script src="sync.js?v=20261121a"></script>
+<script src="sync.js?v=20261128a"></script>
 <script>
 /* ===== 資料核心：要備份的資料清單、開頁那一刻的資料指紋、還原、存檔失敗提示（要在其他程式之前跑） ===== */
 (function(){
@@ -2355,6 +2355,32 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   function pick(){ var o={}; K.forEach(function(k){ try{ var v=localStorage.getItem(k); if(v!==null) o[k]=v; }catch(e){} }); return o; }
   // 雲端同步用：這台「上次同步之後有沒有改過」要拿開頁那一刻比，其他程式開頁時會先補算當天的東西
   try{ window.__bootSig=JSON.stringify(pick()); }catch(e){ window.__bootSig=null; }
+  // 2026-11-28：自動結算（換日欠帳、寵物、森林、逾期扣點、銀行）要等「這台跟雲端對過資料」才做。
+  //   起因：一台資料停在 6 天前的裝置，開頁沒連上雲端就照舊資料結算（馬鈴鼠離家、樹枯、保管費、重複扣點），再被同步蓋進雲端。
+  //   有開雲端同步的裝置：雲端同步那段第一次對完（雲端沒有更新的、或合併完重新整理）呼叫 __markFresh()，結算才開始；
+  //   沒開雲端同步的照舊直接結算。網站一直開著過了半夜，要等下一次對完雲端才結算新的一天。
+  (function(){
+    var cl=null; try{ cl=JSON.parse(localStorage.getItem('plan.cloud.v1')||'null'); }catch(e){}
+    var need=!!(cl && cl.token) && !window.__pv, freshDay='', forced=false;
+    function tk(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+    window.__settleOK=function(){ return !need || freshDay===tk(); };
+    // forced：沒網路時他按「先用這台的資料」（之後同步時 sync.js 的保險會擋住重複的效果）
+    window.__markFresh=function(f){ var was=window.__settleOK(); freshDay=tk(); if(f) forced=true;
+      if(!was){ try{ document.dispatchEvent(new CustomEvent('plan:fresh')); }catch(e){} } };
+    window.__freshInfo=function(){ return {need:need, day:freshDay, forced:forced}; };
+    // 自動結算寫的資料不算「最後修改」（合併時兩邊都改了，看的是你自己按的時間）：包在 __auto 裡
+    var depth=0;
+    window.__auto=function(fn){ depth++; try{ return fn(); } finally{ depth--; } };
+    window.__isAuto=function(){ return depth>0; };
+    // 效果編號帳（shop.ad、bank.ad）不要無限長：日期型（d|、L|）超過 60 天的拿掉，總數最多 400 筆（拿最早記的）。
+    //   兩台用一樣的規則砍，合併時「一邊刪掉、一邊沒動」就是刪掉，不會打架
+    window.__adPrune=function(ad){
+      var lim=new Date(), ks=Object.keys(ad); lim.setDate(lim.getDate()-60);
+      ks.forEach(function(k){ var m=k.match(/^[dL]\|(\d+)-(\d+)-(\d+)$/); if(m && new Date(+m[1],m[2]-1,+m[3])<lim) delete ad[k]; });
+      ks=Object.keys(ad); for(var i=0;i<ks.length-400;i++) delete ad[ks[i]];
+      return ad;
+    };
+  })();
   // 2026-11-09 考古題改名：11/3–11/8 排的是台南一中 112 物理、化學，他實際寫的是 114（使用者：「先修網站的標的，不然記錄會亂掉」）。
   // plan.js 那幾天已改成 114；這裡把舊的檢查紀錄、每日紀錄、考古題進度裡的名稱跟著改。只動那幾天，所以 1/30 換回來的 112 不受影響。
   // 放在 __bootSig 之後：雲端判斷「這台有沒有改過」仍用改名前的樣子；從雲端拉下舊資料、重新整理後會再改一次（改過的就不會再動）。
@@ -3245,8 +3271,11 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     st.list.forEach(function(x){ if(/^x/.test(x.id)){ if(keepMine[x.id]) st.done[x.id]=1; return; } var k=(x.bk?'b|':'t|')+x.n; if(cnt[k]>0){ cnt[k]--; st.done[x.id]=1; } });
     st.list.forEach(function(x){ if(st.done[x.id] || /^x/.test(x.id)) return; var o=(x.bk?'t|':'b|')+x.n; if(cnt[o]>0){ cnt[o]--; st.done[x.id]=1; } });   // 欠帳↔今天互換位置的
   }
+  var PEND=false;   // 11-28：換日了、但還沒跟雲端對過資料：先不換清單（不然欠帳是照這台舊的資料算的）
   function rollover(){
     var d=today0(), k=key(d);
+    PEND=false;
+    if(st.day!==k && window.__settleOK && !window.__settleOK()){ PEND=true; if(window.__wantFresh) window.__wantFresh(); return d; }
     // 換了新版日程：今天重新產生，欠帳照留（10/31 改：之前換版會把欠帳一筆勾銷，使用者說「會拖太多」，欠帳不能消失）
     if (PL && st.pv !== PL.v){
       st.pv=PL.v;
@@ -3258,12 +3287,16 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       // 換版後隔天才第一次打開：照一般換日處理，昨天沒勾的照樣變欠帳
     }
     if (st.day !== k){
-      var wasEasy=false; try{ wasEasy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[st.day]); }catch(e){}
-      recordHist();
-      // 錯題複習（w 開頭）每天會依到期題數重新產生，沒做完不另外算欠帳
-      st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !x.pre && !st.done[x.id] && !/^w/.test(x.id); })
-        .map(function(x){ return {n:x.n, m:x.m, c:x.c||''}; });
-      st.done={}; st.doneAt={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
+      var auto=window.__auto||function(f){ return f(); };
+      auto(function(){   // 自動換日：不算「最後修改」（同步設計 v2 規則 2）
+        var wasEasy=false; try{ wasEasy=!!(JSON.parse(localStorage.getItem('plan.easy.v1')||'{}')[st.day]); }catch(e){}
+        recordHist();
+        // 錯題複習（w 開頭）每天會依到期題數重新產生，沒做完不另外算欠帳
+        st.backlog = wasEasy ? [] : (st.day ? (st.list||[]) : []).filter(function(x){ return !x.f && !x.pre && !st.done[x.id] && !/^w/.test(x.id); })
+          .map(function(x){ return {n:x.n, m:x.m, c:x.c||''}; });
+        st.rf=st.day||'';   // 11-28：欠帳是從哪天算來的（兩台同一天的清單不一樣時，sync.js 用從比較晚那天算來的）
+        st.done={}; st.doneAt={}; st.bonus=0; st.day=k; st.list=buildList(d, st.backlog); save(SK,st);
+      });
     } else if (!st.list || !st.list.length){
       st.done={}; st.bonus=0;   // 清單是空的就重建：沒有任務可以對，留下的勾選一律清掉
       st.list=buildList(d, st.backlog||[]); save(SK,st);
@@ -3310,6 +3343,16 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(nEl){ if(nt&&(nt.b||nt.t)){ nEl.hidden=false; nEl.innerHTML='<b>'+window.__esc(nt.t||'記事')+'</b>'+(nt.b?'<br>'+window.__esc(nt.b).replace(/\n/g,'<br>'):''); } else nEl.hidden=true; }
 
     elList.innerHTML='';
+    if(PEND){   // 11-28：還沒跟雲端對過資料
+      elList.innerHTML='<div class="td-wait" style="padding:20px 18px;font-size:14px;line-height:1.7">☁ <b>正在跟雲端對資料…</b>對完才換成今天的清單。'
+        +'<br><span style="color:var(--ink-faint);font-size:13px">欠帳、寵物、森林、銀行也等對完才結算，免得用這台比較舊的資料算錯（11/28 馬鈴鼠就是這樣離家的）。</span>'
+        +'<br><button type="button" class="btn ghost" id="td-offline" style="margin-top:10px;padding:6px 14px;font-size:13px">沒有網路？先用這台的資料</button></div>';
+      var ob=document.getElementById('td-offline');
+      if(ob) ob.addEventListener('click',function(){
+        if(!confirm('先用這台的資料換日、結算？\n\n這台的資料可能不是最新的（別台裝置做的還沒拿到）。之後連上網路同步時，重複算的會自動拿掉。')) return;
+        if(window.__markFresh) window.__markFresh(true); render(); });
+      return;
+    }
     if(!st.list.length){
       elList.innerHTML='<div style="padding:20px 18px;color:var(--ink-faint);font-size:13.5px">'
         +'今天沒有排定任務。'+(PL&&!planDay(D)?'讀書計畫的範圍是 '+String(PL.from).replace(/-/g,'/')+' 到 '+String(PL.to).replace(/-/g,'/')+'。':'')+(HOL[key(D)]?'國定假日整天休息——這是計畫的一部分，不是偷懶。':'')
@@ -3540,6 +3583,13 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   // 切回來、從背景恢復、拿到焦點都馬上檢查一次
   var stamp=new Date().toDateString();
   function dayCheck(){ var n=new Date().toDateString(); if(n!==stamp){ stamp=n; render(); } }
+  document.addEventListener('plan:fresh',function(){ render(); });   // 11-28：對過雲端了，換成今天的清單
+  // 11-28：Claude 救回連結用：拿掉別台用舊資料帶進來的欠帳（照名稱；已經勾掉的不動）
+  window.__todayRm=function(names){ var m={}; (names||[]).forEach(function(n){ m[n]=1; });
+    var n0=(st.backlog||[]).length+(st.list||[]).length;
+    st.backlog=(st.backlog||[]).filter(function(x){ return !m[x.n]; });
+    st.list=(st.list||[]).filter(function(x){ return !(x.bk && m[x.n] && !st.done[x.id]); });
+    var n=n0-st.backlog.length-st.list.length; if(n){ save(SK,st); render(); } return n; };
   setInterval(dayCheck,60000);
   document.addEventListener('visibilitychange',function(){ if(!document.hidden) dayCheck(); });
   window.addEventListener('pageshow',dayCheck);
@@ -4196,14 +4246,19 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(!raw && n>0 && window.__bankTake){ window.__bankTakeLabel=''; try{ take=window.__bankTake(n)||0; }catch(e){} }
     if(!raw && n<0 && window.__bankGive){ try{ take=-(window.__bankGive(-n)||0); }catch(e){} if(take) window.__bankTakeLabel='從活存扣回自動存的'; }
     shop.pts=(shop.pts||0)+n-take;   // 可以是負的：扣分扣到底，之後退回才對得上
+    // 11-28：自動效果帶固定編號 opt.aid（逾期扣點 p|項目、領成就 a|成就|等級）：記進 shop.ad，兩台都算到同一筆時 sync.js 只留一筆
+    var aid=opt&&opt.aid; if(aid){ shop.ad=shop.ad||{}; shop.ad[aid]=(+shop.ad[aid]||0)+n-take; window.__adPrune(shop.ad); }
     var ln=(opt&&('logN' in opt))?opt.logN:n;
-    if(ln && !(opt&&opt.quiet)) shop.log.unshift({t:Date.now(), n:(ln>0?'＋':'－')+Math.abs(ln), w:why+note+(take?'（'+(window.__bankTakeLabel||'自動還銀行')+' '+Math.abs(take)+'）':'')});
+    if(ln && !(opt&&opt.quiet)){ var le={t:Date.now(), n:(ln>0?'＋':'－')+Math.abs(ln), w:why+note+(take?'（'+(window.__bankTakeLabel||'自動還銀行')+' '+Math.abs(take)+'）':'')}; if(aid) le.a=aid; shop.log.unshift(le); }
     shop.log=shop.log.slice(0,200);
     save(SHK,shop); paintShop();
     if(bo && bo.lucky && n>0 && window.__fx && window.__fx.banner) window.__fx.banner('🍀 幸運！這項點數 ×2');
     try{ document.dispatchEvent(new CustomEvent('plan:points')); }catch(e){}
     return n;
   };
+  // 11-28：Claude 救回連結（#fix kind 'restore'）用：拿掉指定時間的紀錄（被重複算的那幾筆），點數另外用 __award 記一筆
+  window.__shopRm=function(ts){ var m={}; (ts||[]).forEach(function(t){ m[t]=1; }); var n0=shop.log.length;
+    shop.log=shop.log.filter(function(x){ return !m[x.t]; }); if(shop.log.length!==n0){ save(SHK,shop); paintShop(); } return n0-shop.log.length; };
   window.__pts=function(){ return shop.pts||0; };
   window.__shopItems=function(){ return shop.items.slice(); };   // 銀行的存錢目標用
   window.__shopLog=function(){ return shop.log.slice(); };
@@ -5252,6 +5307,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     cur=p.then(function(r){
       cur=null; checking=false; lowPri=false; errD=5000; if(errT){ clearTimeout(errT); errT=null; }
       var st=r&&r.st;
+      // 11-28：雲端沒有比這台新的（或這台剛傳上去）＝這台的資料是最新的，可以開始今天的自動結算
+      if((st==='same'||st==='clean'||st==='up'||st==='empty') && window.__markFresh) window.__markFresh();
       if(st!=='reload') pollNext();
       if(st==='wait'){
         say('雲端有另一台的新資料，等你'+r.why+'完就合併（兩邊的資料都在，不會不見）。'+stamp(),'warn');
@@ -5321,7 +5378,11 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(pushT) return;
     pushT=setTimeout(function(){ pushT=null; autoPush(); }, Math.max(PUSH_WAIT, lastPushAt+PUSH_GAP-Date.now()));
   }
-  window.__onData=function(k){ dirty=true; touchKey(k); if(Date.now()-userAt<1500) acted=true; pushSoon(); };
+  // 11-28：自動結算寫的（包在 __auto 裡）不記修改時間、也不算「他按了東西」——兩邊都改時，他自己做的優先；自動算的合併後會重算
+  window.__onData=function(k){ dirty=true; if(!(window.__isAuto&&window.__isAuto())){ touchKey(k); if(Date.now()-userAt<1500) acted=true; } pushSoon(); };
+  // 今天頁、寵物頁還在等「對過雲端」時叫這個：馬上看一次雲端（15 秒內不重複）
+  var wantAt=0;
+  window.__wantFresh=function(){ if(!cl.token||window.__noSync||cur) return; if(Date.now()-wantAt<15000) return; wantAt=Date.now(); checkRemote(true); };
   function autoPush(){
     if(!cl.auto||!cl.token||!cl.gist||held||window.__noSync) return;
     if(!changed()) return;
@@ -6929,14 +6990,14 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       var n=lateDay(it,today); if(n<1) return;
       if(it.st==='pending'){ it.st='late'; changed=true; }
       var pd=it.pd||0;
-      if(n>pd){ var amt=0; for(var d=pd+1;d<=n;d++) amt+=LATE_PEN*d; it.pd=n; it.pt=(it.pt||0)+amt; pen.push({n:it.n, a:pd+1, b:n, amt:amt}); changed=true; }
+      if(n>pd){ var amt=0; for(var d=pd+1;d<=n;d++) amt+=LATE_PEN*d; it.pd=n; it.pt=(it.pt||0)+amt; pen.push({n:it.n, a:pd+1, b:n, amt:amt, key:key}); changed=true; }
       var dieAt=dieDay(it);   // 11-20：延後過的，延後期間（逾期天數 ≤ xpd）不會枯
       if(n>dieAt && it.st!=='dead'){ it.st='dead'; it.wd=addDays(it.ls,dieAt); changed=true; }
     });
     if(changed) saveChecks(C);
     // 先存檢查狀態再扣點：就算扣點那步出錯，也不會重複扣
     pen.forEach(function(p){
-      if(window.__award) window.__award(-p.amt,'逾期沒交檢查：'+p.n+'（逾期第 '+(p.a===p.b?p.b:p.a+'～'+p.b)+' 天）',true);
+      if(window.__award) window.__award(-p.amt,'逾期沒交檢查：'+p.n+'（逾期第 '+(p.a===p.b?p.b:p.a+'～'+p.b)+' 天）',true,{aid:'p|'+p.key});   // 11-28：編號＝這份檢查（累計），兩台都扣到時只扣一次
     });
     if(pen.length){ var tot=pen.reduce(function(a,p){ return a+p.amt; },0), msg='⏰ 逾期沒交檢查，扣 '+tot+' 點（'+pen.length+' 份）。交給 Claude 檢查過關就不會再扣。';
       if(flash) flash.push(msg);
@@ -8861,13 +8922,18 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     L.push('今天也要加油喔','讀書的你最帥了','我會乖乖等你','錯題訂正了嗎？');
     return L;
   }
+  document.addEventListener('plan:fresh',function(){ try{ paintPet(); }catch(e){} });   // 11-28：對過雲端了，補做今天的結算
   function paintPet(){
     if(!app&&!mini) return;
     var s=petState(), C=checks(), h=allHist(), v=viewState(), tk=kk(d0());
     var lv=s.pet?(s.pet.lvSeen||1):1;
-    checksAdvance(C,h);
+    // 11-28：逾期扣點、掉寶、森林、寵物、旅行、銀行這些自動結算，要等這台跟雲端對過資料才做（同步設計 v2 規則 1），
+    //   而且包在 __auto 裡：寫進去的不算「最後修改」（規則 2）
+    var SOK=window.__settleOK?window.__settleOK():true, AUTO=window.__auto||function(f){ return f(); };
+    if(!SOK && window.__wantFresh) window.__wantFresh();
+    if(SOK) AUTO(function(){ checksAdvance(C,h); });
     var P=pomoState(); if(P.day) s.pomoLog[P.day]=Math.max(s.pomoLog[P.day]||0,P.done||0);
-    var loot=lootTick(s);
+    var loot=SOK?AUTO(function(){ return lootTick(s); }):[];
     loot.forEach(function(L){ flash.push('🍅 番茄鐘掉寶：'+L.txt); });
     var rare=loot.filter(function(L){ return /clover|chips|star/.test(L.k); });
     if(rare.length && window.__fx && window.__fx.banner) window.__fx.banner('🍅 番茄鐘掉寶：'+rare.map(function(L){ return L.txt; }).join('、'));
@@ -8876,15 +8942,16 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       var toId=function(i){ return typeof i==='number'&&T.trees[i]?T.trees[i].id:(typeof i==='string'?i:null); };
       s.dead=s.dead.map(toId).filter(Boolean); s.wilt.forEach(function(w){ w.idx=(w.idx||[]).map(toId).filter(Boolean); }); s.markV=2;
     }
-    forestAdvance(s,h,T.trees,lv);
-    var ev=petAdvance(s,h,lv);
+    if(SOK) forestAdvance(s,h,T.trees,lv);
+    var ev=SOK?petAdvance(s,h,lv):[];
     var p=s.pet, att=attitude(s,h,v,lv);
-    ev=ev.concat(tripTick(s,att)); p=s.pet; att=attitude(s,h,v,lv);
+    if(SOK) ev=ev.concat(AUTO(function(){ return tripTick(s,att); }));
+    p=s.pet; att=attitude(s,h,v,lv);
     var onTab=rewardIdle();   // 在單字賭場背單字不算「讀書時段來逛」、也不算待太久（B4）
     if(p && onTab && att.sulk==='study'){ var bk0=tk+'@'+att.blk.a; if(!v.peek[bk0]){ v.peek[bk0]=1; p.mood=Math.max(0,p.mood-5); saveView(v); ev.push('peek'); } }
     if(p && onTab && att.sulk==='toolong' && !v.warned){ v.warned=1; p.mood=Math.max(0,p.mood-10); saveView(v); ev.push('toolong'); }
     // 銀行每日結算；欠款逾期，寵物會擔心（心情最多 60）
-    var bev=bankSettle(h,lv), bk=bankState();
+    var bev=SOK?AUTO(function(){ return bankSettle(h,lv); }):[], bk=bankState();
     if(p && bk.loan && bk.loan.late) p.mood=Math.min(p.mood,60);
     // 樹的狀態
     var state={}, deadSet={}, posOf={}; T.trees.forEach(function(t,i){ posOf[t.id]=i; });
@@ -8917,9 +8984,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         if(lmOld) afterPaint.push(function(){ petDo('star',{dur:1.7}); petDo('say',{txt:'森林蓋好'+lmN.n+'了！'}); }); }
       s.lmk=lmkT;
     }
-    savePet(s);
+    // 這裡存的都是這一頁自己算的（s 是開頭才從儲存讀出來的；他按的東西各自在按的時候就存好了）：不算「最後修改」
+    AUTO(function(){ savePet(s); });
     var lootChips=loot.filter(function(L){ return L.k==='chips'; }).length;
-    if(lootChips){ var vq=ls('plan.vocab.v1',{})||{}; vq.chips=(vq.chips||0)+15*lootChips; sv('plan.vocab.v1',vq); }
+    if(lootChips) AUTO(function(){ var vq=ls('plan.vocab.v1',{})||{}; vq.chips=(vq.chips||0)+15*lootChips; sv('plan.vocab.v1',vq); });
     ev.concat(bev).forEach(function(e){
       var q=e.split('|');
       if(q[0]==='sick') flash.push('🤒 '+esc((p||{}).name||'')+' 生病了：連續 2 天有照顧才會好。');
@@ -8945,7 +9013,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     var pendList=Object.keys(C.items).map(function(key){ return C.items[key]; }).filter(function(it){ return it.st!=='pass' && !it.old; });   // 還要交的（含逾期、逾期枯死的）
     // 成就：先算進度（成就頁、家具、寵物稱號都用）
     lastSnap={s:s,h:h,C:C,T:T,stageCnt:stageCnt,curLand:curLand,nDead:nDead,alive:trees.alive,info:info,lv:lv};
-    var newAch=achUpdate(achStats(lastSnap)), achReady=achClaimable();
+    var newAch=AUTO(function(){ return achUpdate(achStats(lastSnap)); }), achReady=achClaimable();
     newAch.forEach(function(n){ flash.push('🏆 達成成就：'+n+'（到下面「成就」領獎）'); });
     if(newAch.length && window.__fx && window.__fx.banner) window.__fx.banner('🏆 達成成就：'+newAch[0]+(newAch.length>1?' 等 '+newAch.length+' 個':''));
     var furn=FURN.filter(function(f){ return achScore()>=f.at; }), title=achTitle();
@@ -9472,7 +9540,10 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     return b;
   }
   function saveBank(b){ sv(BK,b); }
-  function blog(b,n,w){ b.log.unshift({t:Date.now(), n:n, w:w}); b.log=b.log.slice(0,150); }
+  // aid：自動效果的固定編號（11-28，同步設計 v2 規則 3）。帶編號的會記進 b.ad（編號 → 讓活存加減多少），
+  //   兩台都算到同一筆（同一天的利息／保管費 d|日期、同一筆定存到期 f|編號、考試定存 o|編號）時，sync.js 只留一筆
+  function blog(b,n,w,aid){ var e={t:Date.now(), n:n, w:w}; if(aid) e.a=aid; b.log.unshift(e); b.log=b.log.slice(0,150); }
+  function bAd(b,aid,n){ b.ad=b.ad||{}; b.ad[aid]=(+b.ad[aid]||0)+n; if(window.__adPrune) window.__adPrune(b.ad); }
   function wallet(){ return window.__pts?window.__pts():0; }
   function walletAdd(n,why){ if(window.__award) window.__award(n,why,true); }
   function bid(){ return Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36); }
@@ -9510,8 +9581,8 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       if(b.sav>0){
         if(ok){
           if(!b.loan){ var it=Math.floor(b.sav*(BANK.sav+cr.sav+.2*tb)/100); if(b.sav>=20) it=Math.max(1,it); var dbl=B.id==='bank'; it=Math.min(dbl?it*2:it, (BANK.savCap+5*tb)*(dbl?2:1));
-            if(it>0){ b.sav+=it; b.st.int+=it; blog(b,it,md(k)+' 活存利息'+(dbl?'（理財日 ×2）':'')); } }
-        } else { var fee=Math.min(b.sav,Math.max(1,Math.round(b.sav*BANK.fee/100))); b.sav-=fee; b.st.fee+=fee; blog(b,-fee,md(k)+' 沒照顧，保管費 '+BANK.fee+'%'); }
+            if(it>0){ b.sav+=it; b.st.int+=it; blog(b,it,md(k)+' 活存利息'+(dbl?'（理財日 ×2）':''),'d|'+k); bAd(b,'d|'+k,it); } }
+        } else { var fee=Math.min(b.sav,Math.max(1,Math.round(b.sav*BANK.fee/100))); b.sav-=fee; b.st.fee+=fee; blog(b,-fee,md(k)+' 沒照顧，保管費 '+BANK.fee+'%','d|'+k); bAd(b,'d|'+k,-fee); }
       }
       if(b.loan){
         var L=b.loan, age=daysBetween(pk(L.k),d);
@@ -9523,7 +9594,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     }
     var today=d0();
     b.fixed.forEach(function(f){ if(f.st==='open' && today>=pk(f.end)){ var pay=f.broke?f.amt:Math.round(f.amt*(1+f.rate/100)); b.sav+=pay; f.st=f.broke?'bad':'ok'; f.pay=pay;
-      if(f.broke) b.st.fixBad++; else b.st.fixOk++; blog(b,pay,f.d+' 天定存到期'+(f.broke?'（違約，只拿回本金）':'（+'+f.rate+'%）')+'，轉進活存'); ev.push('fixdone|'+pay); } });
+      if(f.broke) b.st.fixBad++; else b.st.fixOk++; blog(b,pay,f.d+' 天定存到期'+(f.broke?'（違約，只拿回本金）':'（+'+f.rate+'%）')+'，轉進活存','f|'+f.id); bAd(b,'f|'+f.id,pay); ev.push('fixdone|'+pay); } });
     b.bonds.forEach(function(o){
       if(o.st!=='open') return; var ed=pk(o.day); if(today<ed) return;
       var res=examResult(o.kind,o.ex), grace=daysBetween(ed,today)>=BANK.bondGrace;
@@ -9532,7 +9603,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
       o.st=win?'win':'lose'; o.pay=pay; o.res=res?res.v:null; b.sav+=pay;
       if(win) b.st.bondWin++; else b.st.bondLose++;
       var why=o.ex+'考試定存'+(win?'達標（'+bondGoalTxt(o.kind,o.goal)+'）×'+o.mul:(res?'沒達標（'+(o.kind==='mock'?'A++ '+res.v+' 科':'平均 '+res.v)+'），拿回一半':'沒登記成績，算沒達標，拿回一半'));
-      blog(b,pay,why+'，'+pay+' 點轉進活存'); ev.push('bond|'+why+'：'+pay+' 點轉進活存');
+      blog(b,pay,why+'，'+pay+' 點轉進活存','o|'+o.id); bAd(b,'o|'+o.id,pay); ev.push('bond|'+why+'：'+pay+' 點轉進活存');
     });
     b.st.maxSav=Math.max(b.st.maxSav,b.sav);
     if(JSON.stringify(b)!==before) saveBank(b);
@@ -10020,7 +10091,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
     if(sec){ pts=100; gold=2; names.push('隱藏'); title=sec.ti; }
     else for(var t=got;t<have;t++){ pts+=TIERS[t].p; gold+=TIERS[t].g; names.push(TIERS[t].n); if(t===2) title=a.ti; }
     A.c[id]=have; saveAch(A);
-    if(window.__award) window.__award(pts,'成就：'+(a?a.n:sec.n)+' '+names.join('、'),true);
+    if(window.__award) window.__award(pts,'成就：'+(a?a.n:sec.n)+' '+names.join('、'),true,{aid:'a|'+id+'|'+have});   // 11-28：兩台都領了同一級只算一次
     if(gold){ var s=petState(); s.gold+=gold; savePet(s); }
     return {pts:pts, gold:gold, name:(a?a.n:sec.n), tiers:names, title:title};
   }
@@ -10209,10 +10280,15 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
      番茄鐘做完卻被手機清掉、點數算錯時，Claude 在筆電用 tools/make_fix.mjs 簽一個連結，點開就補上。
      和過關連結同一把鑰匙；內容一定有 d:'fix'，每個連結只能用一次（記在 plan.checks.v1 的 used）。 */
   var FIX_SUBJ={chi:'國文',math:'數學',eng:'英文',sci:'自然',soc:'社會',kbm:'科班資優數學',kbs:'科班自然學科'};
+  var FIX_RE=/^#fix=([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/;
   function handleFix(){
-    var m=location.hash.match(/^#fix=([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/); if(!m) return;
-    try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+    var h=location.hash, m=h.match(FIX_RE);
+    if(m){ try{ history.replaceState(null,'',location.pathname+location.search); }catch(e){} try{ sessionStorage.setItem('plan.fixPending',h); }catch(e){} }
+    else { try{ h=sessionStorage.getItem('plan.fixPending')||''; }catch(e){ h=''; } m=h.match(FIX_RE); if(!m) return; }
     if(window.__pv) return;
+    // 11-28：連結要套在最新的資料上：還沒跟雲端對過就先等（對完會再叫一次；中間合併重新整理也不會弄丟，記在 sessionStorage）
+    if(window.__settleOK && !window.__settleOK()){ passBanner('☁ 先跟雲端對資料，對完就自動套用 Claude 的連結。'); if(window.__wantFresh) window.__wantFresh(); return; }
+    try{ sessionStorage.removeItem('plan.fixPending'); }catch(e){}
     if(!(window.crypto&&crypto.subtle)){ passBanner('這個瀏覽器沒辦法驗證補登連結，換 Chrome 或 Safari 再點一次。'); return; }
     crypto.subtle.importKey('jwk',PUBKEY,{name:'ECDSA',namedCurve:'P-256'},false,['verify']).then(function(key){
       return crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},key,b64uBytes(m[2]),new TextEncoder().encode(m[1]));
@@ -10256,6 +10332,36 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
         saveChecks(Cr);
         msg=rv.length?'🌱 樹苗救回來了：'+rv.map(function(it){ var nm=esc(it.n.replace(/^科班考古｜/,'')); return it.ls?nm+'（'+md(addDays(it.ls,dieDay(it)-1))+' 前交就不會再枯）':nm; }).join('、')+why+'。扣過的點不退，期限沒變。'
           :'這些樹苗沒有枯、已經過關或找不到，沒有改。';
+      } else if(pl.kind==='restore'){   // 11-28 救回被舊裝置蓋掉的資料（照雲端 10:03 那版；內容由 Claude 比對雲端版本算出來）
+        var R=pl.r||{}, got2=[];
+        if(R.pet){
+          var sp=petState(), g=R.pet.rmGone;
+          if(!sp.pet && R.pet.set && R.pet.set.name){ sp.pet=R.pet.set; got2.push('🐹 '+esc(R.pet.set.name)+' 回家了'); }
+          if(g) sp.gone=(sp.gone||[]).filter(function(x){ return !(x.name===g.name && x.born===g.born && x.left===g.left); });
+          if(g && sp.justLeft && sp.justLeft.indexOf(g.name)===0) sp.justLeft='';
+          var nd=(sp.dead||[]).length+(sp.wilt||[]).reduce(function(a,w){ return a+((w&&w.idx)||[]).length; },0);
+          if(Array.isArray(R.pet.dead)) sp.dead=R.pet.dead;
+          if(Array.isArray(R.pet.wilt)) sp.wilt=R.pet.wilt;
+          if(R.pet.fLast) sp.fLast=R.pet.fLast;
+          savePet(sp); if(nd) got2.push('🌳 救回 '+nd+' 棵枯掉的樹');
+        }
+        if(R.bank){
+          var bb=bankState(), rmB={}; (R.bank.rmLog||[]).forEach(function(t){ rmB[t]=1; });
+          var ds=Math.round(+R.bank.dsav||0); bb.sav+=ds; bb.log=bb.log.filter(function(x){ return !rmB[x.t]; });
+          (R.bank.fixed||[]).forEach(function(f){ for(var i=0;i<bb.fixed.length;i++) if(bb.fixed[i].id===f.id){ bb.fixed[i]=f; break; } });
+          Object.keys(R.bank.st||{}).forEach(function(k){ bb.st[k]=R.bank.st[k]; });
+          bb.st.maxSav=Math.max(bb.st.maxSav,bb.sav);
+          blog(bb,ds,'Claude 救回：拿掉舊資料算的保管費和定存'); saveBank(bb);
+          if(ds) got2.push('🏦 活存 '+(ds>0?'+':'')+ds+'（拿掉舊資料算的保管費、定存違約和重複到期）');
+        }
+        if(R.ach && R.ach.fixok){ var A2=achState(); A2.r.fixok=+R.ach.fixok.r||0; A2.c.fixok=+R.ach.fixok.c||0; saveAch(A2); }
+        if(R.shop){
+          var nr=window.__shopRm?window.__shopRm(R.shop.rmLog):0, dp=Math.round(+R.shop.dpts||0);
+          if(dp && window.__award) window.__award(dp,'Claude 救回：拿掉重複扣的逾期點數和重複的成就'+why,true);
+          if(dp) got2.push('🪙 點數 '+(dp>0?'+':'')+dp+'（拿掉 '+nr+' 筆重複的）');
+        }
+        if(R.today && window.__todayRm){ var nt=window.__todayRm(R.today.rmNames); if(nt) got2.push('📋 拿掉 '+nt+' 項舊資料帶進來的欠帳'); }
+        msg=got2.length?'✅ 救回來了'+why+'：'+got2.join('；')+'。':'這些資料已經是好的，沒有改。';
       } else if(pl.kind==='pts'){
         var n=Math.round(+pl.n||0); if(!n || Math.abs(n)>500){ passBanner('❌ 補登的點數不對。'); return; }
         if(window.__award) window.__award(n,'Claude 補登'+why,true);
@@ -10272,6 +10378,7 @@ button.sg-it:focus-visible{outline:2px solid var(--warn);outline-offset:2px}
   }
   handleFix();
   window.addEventListener('hashchange',handleFix);
+  document.addEventListener('plan:fresh',handleFix);   // 11-28：等雲端對完才套用的連結
 
   /* ---- 給單字賭場（casino.js，打開才載入）用的出入口 ---- */
   window.__petApi={allHist:allHist, studyBlockNow:studyBlockNow, easyMap:easyMap, petState:petState, savePet:savePet, petMini:petMini, bankState:bankState, talent:talLv,

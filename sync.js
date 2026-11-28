@@ -183,6 +183,169 @@
     return out;
   }
 
+  /* ---- 11-28 加的三個保險（設計：同步設計_v2.md）----
+   * 起因：一台資料停在 6 天前的裝置，開頁時沒連上雲端就照舊資料結算（寵物離家、樹枯、保管費、重複扣點），
+   * 之後合併時「比較晚改的那邊」＋「點數相加」把錯的結果蓋進雲端。index.html 那邊改成「先對過雲端才結算」；
+   * 這裡是萬一還是發生時的保險。 */
+  function dayN(k){ var p=String(k||'').split('-'); return p.length===3?(+p[0])*10000+(+p[1])*100+(+p[2]):0; }   // 'YYYY-M-D' → 可以比大小的數字
+  // 合併某個 key 時要看另一個 key（例如點數要看檢查紀錄）：從三份原始資料裡解出來（解過的記住）
+  function side(cx,s,key){
+    var c=cx.pj[s]||(cx.pj[s]={}); if(has(c,key)) return c[key];
+    var raw=cx.raw[s]&&cx.raw[s][key], v=null; try{ v=raw==null?null:JSON.parse(raw); }catch(e){}
+    return (c[key]=v);
+  }
+
+  // (1) 自動效果的編號帳（ad：編號 → 這筆讓點數／存款加減多少）。兩邊都新記了同一個編號＝同一件事算了兩次：
+  //     只留雲端那筆，這台那筆的加減扣回來、紀錄拿掉。只有一邊有的照留（真的是新的）。
+  var EFFECT={'plan.shop.v1':'pts','plan.bank.v1':'sav'};
+  function fixEffects(k,b,l,r,v,cx){
+    var cnt=EFFECT[k]; if(!cnt || !isObj(v) || !isObj(l) || !isObj(r) || !isObj(l.ad)) return v;
+    var B=(isObj(b)&&isObj(b.ad))?b.ad:{}, R=isObj(r.ad)?r.ad:{}, drop={}, nd=0, dup=0, dInt=0, dFee=0;
+    var arr=function(o,f){ return (isObj(o)&&Array.isArray(o[f]))?o[f]:[]; };
+    // 過渡期：雲端那份是舊版網站寫的（還沒有編號帳）。看雲端在「共同祖先之後」是不是已經做過同一件事，做過的話這台那筆是重複的。
+    //   回傳這台那筆裡有多少是重複的（0＝不是重複）
+    function legacyDup(a,dl){
+      var m=a.match(/^d\|(.+)$/), f, id, done;
+      if(k==='plan.bank.v1'){
+        if(m) return (dayN(r.last)>=dayN(m[1]) && !(isObj(b) && dayN(b.last)>=dayN(m[1])))?dl:0;   // 雲端已經結算過那一天
+        m=a.match(/^([fo])\|(.+)$/); if(!m) return 0;
+        f=m[1]==='f'?'fixed':'bonds'; id=m[2];
+        done=function(o){ return arr(o,f).some(function(x){ return isObj(x) && x.id===id && x.st && x.st!=='open'; }); };
+        return (done(r) && !done(b))?dl:0;                                                        // 雲端已經付過那筆定存
+      }
+      if(k!=='plan.shop.v1') return 0;
+      if((m=a.match(/^p\|(.+)$/))){   // 逾期扣點：雲端那份檢查在共同祖先之後已經扣了多少（pt＝累計扣的點）
+        var pt=function(s){ var C=side(cx,s,'plan.checks.v1'), it=C&&isObj(C.items)&&C.items[m[1]]; return isObj(it)?(+it.pt||0):0; };
+        var got=Math.max(0,pt('r')-pt('b'));
+        return dl<0?-Math.min(-dl,got):0;
+      }
+      if((m=a.match(/^a\|(.+)\|(\d+)$/))){   // 領成就：雲端在共同祖先之後已經領到這一級
+        var c=function(s){ var A=side(cx,s,'plan.ach.v1'); return (A&&isObj(A.c))?(+A.c[m[1]]||0):0; };
+        return (c('r')>=+m[2] && c('b')<+m[2])?dl:0;
+      }
+      return 0;
+    }
+    Object.keys(l.ad).forEach(function(a){
+      var bv=has(B,a)?(+B[a]||0):0, dl=(+l.ad[a]||0)-bv, dr=has(R,a)?(+R[a]||0)-bv:0;
+      if(!dl) return;                                       // 這台這次沒動這筆
+      var both=!!dr, lg=(!has(R,a))?legacyDup(a,dl):0;
+      if(!both && !lg) return;                              // 只有這台有：真的是新的
+      if(!both) dl=lg;                                      // 過渡期：只扣掉重複的那部分
+      dup+=dl;
+      if(!isObj(v.ad)) v.ad={};
+      if(both) v.ad[a]=R[a]; else if(dl===(+l.ad[a]||0)-bv) delete v.ad[a]; else v.ad[a]=(+l.ad[a]||0)-dl;
+      if(/^d\|/.test(a)){ if(dl>0) dInt+=dl; else dFee-=dl; }
+      drop[a]=1; nd++; note(cx,'dup',[k,'ad',a],dl,dr,-dl);
+    });
+    if(!nd) return v;
+    // 正確的總數＝共同祖先＋這台的變化＋雲端的變化－這台重複的那幾筆。
+    // 不能直接拿合併結果去減：兩邊改成一樣的數字時，合併本來就只算一次（不會相加）。
+    var num=function(o,f){ return isObj(o)?(+o[f]||0):0; };
+    v[cnt]=num(l,cnt)+num(r,cnt)-num(b,cnt)-dup;
+    if(isObj(v.st) && (dInt||dFee)){
+      v.st.int=num(l.st,'int')+num(r.st,'int')-num(isObj(b)?b.st:null,'int')-dInt;
+      v.st.fee=num(l.st,'fee')+num(r.st,'fee')-num(isObj(b)?b.st:null,'fee')-dFee;
+    }
+    if(k==='plan.bank.v1'){
+      // 拿掉的是定存／考試定存到期：那筆的狀態（ok／bad、pay、違約）也用雲端的，到期次數統計扣回這台多算的
+      var fixSt={fixOk:0,fixBad:0,bondWin:0,bondLose:0}, dayDrop=false;
+      var byId=function(o,f,id){ return arr(o,f).filter(function(x){ return isObj(x) && x.id===id; })[0]; };
+      Object.keys(drop).forEach(function(a){
+        if(/^d\|/.test(a)){ dayDrop=true; return; }
+        var m=a.match(/^([fo])\|(.+)$/); if(!m) return;
+        var f=m[1]==='f'?'fixed':'bonds', id=m[2], re=byId(r,f,id), le=byId(l,f,id), be=byId(b,f,id);
+        if(re && Array.isArray(v[f])) v[f]=v[f].map(function(x){ return (isObj(x) && x.id===id)?re:x; });
+        if(le && le.st && le.st!=='open' && !(be && be.st && be.st!=='open'))
+          fixSt[f==='fixed'?(le.st==='bad'?'fixBad':'fixOk'):(le.st==='win'?'bondWin':'bondLose')]++;
+      });
+      Object.keys(fixSt).forEach(function(sf){ if(fixSt[sf] && isObj(v.st)) v.st[sf]=num(l.st,sf)+num(r.st,sf)-num(isObj(b)?b.st:null,sf)-fixSt[sf]; });
+      // 拿掉的有「某天的利息／保管費」＝這台那幾天是照舊資料算的：還沒到期的定存，「沒照顧天數」和違約也用雲端的
+      if(dayDrop && Array.isArray(v.fixed)) v.fixed=v.fixed.map(function(x){
+        var re=isObj(x)&&byId(r,'fixed',x.id); if(!re || x.st!=='open') return x;
+        var y=Object.assign({},x); y.miss=re.miss||0; if(re.broke) y.broke=re.broke; else delete y.broke; return y; });
+    }
+    if(Array.isArray(v.log)){
+      var keepJ={}; (Array.isArray(r.log)?r.log:[]).concat(isObj(b)&&Array.isArray(b.log)?b.log:[]).forEach(function(x){ keepJ[JSON.stringify(x)]=1; });
+      v.log=v.log.filter(function(x){ return !(isObj(x) && x.a && drop[x.a] && !keepJ[JSON.stringify(x)]); });
+    }
+    return v;
+  }
+  // (2) 寵物：一邊「離家」（新的一筆離家紀錄、寵物是 null），另一邊同一隻還在、而且已經結算到離家那天或更晚
+  //     ＝離家是用舊資料算的：留下還在的那隻，拿掉那筆離家紀錄；森林的枯樹也用還在那邊的（同一份舊資料算的）。
+  function fixPet(b,l,r,v,cx){
+    if(!isObj(v) || !isObj(l) || !isObj(r)) return v;
+    var bg=(isObj(b)&&Array.isArray(b.gone))?b.gone:[];
+    [[l,r],[r,l]].forEach(function(pr){
+      var lost=pr[0], keep=pr[1], g=Array.isArray(lost.gone)&&lost.gone[0];
+      if(lost.pet || !isObj(g) || !isObj(keep.pet)) return;
+      if(bg.some(function(x){ return deepEq(x,g); })) return;                   // 不是這次才離家的
+      var p=keep.pet; if(p.born!==g.born || p.name!==g.name) return;
+      if(dayN(p.last)<dayN(g.left)) return;                                       // 還在的那邊還沒算到那天：離家可能是真的
+      v.pet=p;
+      v.gone=(Array.isArray(v.gone)?v.gone:[]).filter(function(x){ return !deepEq(x,g); });
+      if(v.justLeft && v.justLeft===lost.justLeft) v.justLeft=keep.justLeft||'';
+      ['dead','wilt','fLast'].forEach(function(f){ if(has(keep,f)) v[f]=keep[f]; });
+      note(cx,'pet',['plan.pet.v1','pet'],null,p.name,p.name);
+    });
+    var arr=function(o,f){ return (isObj(o)&&Array.isArray(o[f]))?o[f]:[]; };
+    // 森林：一邊新記了「某天沒照顧、樹枯萎」，另一邊已經算過那天卻沒枯（＝那天其實有照顧）→ 那天的枯萎、和這次跟著死的樹拿掉
+    [[l,r],[r,l]].forEach(function(pr){
+      var S=pr[0], O=pr[1]; if(!Array.isArray(v.wilt)) return;
+      var bw=arr(b,'wilt'), ow=arr(O,'wilt');
+      var bad=arr(S,'wilt').filter(function(w){ return isObj(w) && !bw.some(function(x){ return deepEq(x,w); })
+        && dayN(O.fLast)>=dayN(w.d) && !ow.some(function(x){ return isObj(x) && x.d===w.d; }); });
+      if(!bad.length) return;
+      v.wilt=v.wilt.filter(function(w){ return !bad.some(function(x){ return deepEq(x,w); }); });
+      var bd=arr(b,'dead'), od=arr(O,'dead'), nd=arr(S,'dead').filter(function(id){ return bd.indexOf(id)<0 && od.indexOf(id)<0; });
+      if(nd.length) v.dead=arr(v,'dead').filter(function(id){ return nd.indexOf(id)<0; });
+      note(cx,'forest',['plan.pet.v1','wilt'],bad.length,nd.length,0);
+    });
+    // 同一隻、兩邊都結算到同一天，「連續沒照顧幾天」卻不一樣：看到比較多照顧的那邊資料比較新（照顧的紀錄只會越來越多）
+    if(isObj(v.pet) && isObj(l.pet) && isObj(r.pet) && l.pet.born===r.pet.born && l.pet.last===r.pet.last && (+l.pet.neglect||0)!==(+r.pet.neglect||0)){
+      var good=(+l.pet.neglect||0)<(+r.pet.neglect||0)?l.pet:r.pet;
+      ['neglect','sick','okRun'].forEach(function(f){ if(has(good,f)) v.pet[f]=good[f]; else delete v.pet[f]; });
+      v.pet.bond=Math.max(+l.pet.bond||0,+r.pet.bond||0);
+      note(cx,'pet',['plan.pet.v1','pet','neglect'],l.pet.neglect,r.pet.neglect,good.neglect);
+    }
+    return v;
+  }
+  // (3) 今天清單：兩邊的日期不同 → 用比較晚那天的清單（另一邊只是還沒換日）；
+  //     同一天但欠帳是從不同天算來的（rf＝換日時的前一天）→ 用從比較晚那天算來的，兩邊的勾選照名稱留下。
+  // 換日時是從哪天換過來的：有記 rf 就用；舊版網站沒記，就看那一份每日紀錄裡、今天以前最晚的一天（換日時會把前一天記進每日紀錄）
+  function rfOf(S,s,cx){
+    if(S.rf) return dayN(S.rf);
+    var H=side(cx,s,'plan.hist.v1'), today=dayN(S.day), best=0;
+    if(isObj(H)) Object.keys(H).forEach(function(k){ var n=dayN(k); if(n<today && n>best) best=n; });
+    return best;
+  }
+  function fixState(b,l,r,v,cx){
+    if(!isObj(v) || !isObj(l) || !isObj(r)) return v;
+    var dl=dayN(l.day), dr=dayN(r.day), win=null;
+    if(dl && dr && dl!==dr) win=dl>dr?l:r;
+    else if(dl && dl===dr){ var fl=rfOf(l,'l',cx), fr=rfOf(r,'r',cx); if(fl!==fr) win=fl>fr?l:r; }
+    if(!win) return v;
+    var other=win===l?r:l, F=['day','rf','list','backlog','bonus','pv'];
+    F.forEach(function(f){ if(has(win,f)) v[f]=win[f]; else delete v[f]; });
+    if(!v.rf){ var wn=rfOf(win,win===l?'l':'r',cx); if(wn) v.rf=Math.floor(wn/10000)+'-'+Math.floor(wn/100)%100+'-'+wn%100; }
+    var list=Array.isArray(v.list)?v.list:[], done={}, at={};
+    if(dl===dr){   // 同一天：兩邊勾掉的都算（照名稱對，一個勾只還一項）
+      var want={}, when={};
+      [win,other].forEach(function(S){ var c={};
+        (Array.isArray(S.list)?S.list:[]).forEach(function(x){ if(isObj(x) && S.done && S.done[x.id]){ c[x.n]=(c[x.n]||0)+1; if(S.doneAt&&S.doneAt[x.id]&&!when[x.n]) when[x.n]=S.doneAt[x.id]; } });
+        Object.keys(c).forEach(function(n){ want[n]=Math.max(want[n]||0,c[n]); }); });
+      list.forEach(function(x){ if(isObj(x) && want[x.n]>0){ want[x.n]--; done[x.id]=1; if(when[x.n]) at[x.id]=when[x.n]; } });
+    } else { done=isObj(win.done)?win.done:{}; at=isObj(win.doneAt)?win.doneAt:{}; }
+    v.done=done; v.doneAt=at;
+    note(cx,'today',['plan.state.v3'],l.day+'/'+(l.rf||''),r.day+'/'+(r.rf||''),win.day+'/'+(win.rf||''));
+    return v;
+  }
+  function fixKey(k,b,l,r,v,cx){
+    if(EFFECT[k]) return fixEffects(k,b,l,r,v,cx);
+    if(k==='plan.pet.v1') return fixPet(b,l,r,v,cx);
+    if(k==='plan.state.v3') return fixState(b,l,r,v,cx);
+    return v;
+  }
+
   function parse(s){ if(s===undefined) return {v:undefined}; try{ return {v:JSON.parse(s)}; }catch(e){ return {raw:true, v:s}; } }
 
   /* 合併三份備份資料（key → localStorage 存的字串）
@@ -191,7 +354,7 @@
    * 回傳 {doc, n:各種處理的次數, log:前 40 筆兩邊都改的地方, keys:兩邊都改過的 key} */
   function merge(b,l,r,opt){
     opt=opt||{}; b=b||{}; l=l||{}; r=r||{};
-    var cx={lt:opt.lt||{}, rt:opt.rt||{}, n:{}, log:[]}, out={}, order=[], seen={}, both=[];
+    var cx={lt:opt.lt||{}, rt:opt.rt||{}, n:{}, log:[], raw:{b:b,l:l,r:r}, pj:{}}, out={}, order=[], seen={}, both=[];
     (opt.keys||[]).concat(Object.keys(l),Object.keys(r),Object.keys(b)).forEach(function(k){ if(!seen[k]){ seen[k]=1; order.push(k); } });
     order.forEach(function(k){
       var sb=b[k], sl=l[k], sr=r[k];
@@ -202,6 +365,7 @@
       var pb=parse(sb), pl=parse(sl), pr=parse(sr), v;
       if(pb.raw || pl.raw || pr.raw){ v=lww(sl,sr,[k],cx); if(v!==undefined) out[k]=v; return; }
       v=m3(pb.v,pl.v,pr.v,[k],cx);
+      v=fixKey(k,pb.v,pl.v,pr.v,v,cx);
       if(v===undefined) return;
       out[k]=deepEq(v,pl.v)?sl:(deepEq(v,pr.v)?sr:JSON.stringify(v));
     });
@@ -215,7 +379,7 @@
     return true;
   }
 
-  var api={merge:merge, docEq:docEq, deepEq:deepEq, ruleOf:ruleOf};
+  var api={merge:merge, docEq:docEq, deepEq:deepEq, ruleOf:ruleOf, dayN:dayN};
   if(typeof module!=='undefined' && module.exports) module.exports=api;
   else root.__SyncMerge=api;
 })(typeof window!=='undefined'?window:this);

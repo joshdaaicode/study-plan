@@ -15,6 +15,9 @@
 //     --hours 1～168（從他點開連結算起）；--task 寫做了什麼（會顯示在夾娃娃機）；另外兩個條件（7 天平均讀書 3 小時、檢查全過關）網站自己算
 //   補／扣點數：node tools/make_fix.mjs pts --n 20 --why "家長加點沒收到"（一次最多 ±500）
 //   補登以前的小考：node tools/make_fix.mjs quiz --file <rows.json> --why "補習班 LINE 的歷史成績"（2026-11-10）
+//   救回被別台舊資料蓋掉的資料（2026-11-28）：node tools/make_fix.mjs restore --file <restore_payload.json> [--why "…"]
+//     payload 由比對雲端版本的腳本算好（Claude工作資料\20261128_寵物離家\compute_restore.mjs）：pet／bank／shop／ach／today 各自要改什麼；
+//     網站會等這台跟雲端對過資料才套用
 //     rows.json＝[[日期 2026-8-8, 科目, 分數, 滿分, 'gq' 或 'q', 備註, 班平均], …]，最多 60 筆；成績只在連結裡、不要放進 repo
 import crypto from 'node:crypto';
 import fs from 'node:fs';
@@ -87,10 +90,17 @@ if (kind === 'pomo') {
     r[0] = r[0].split('-').map(Number).join('-');
   }
   payload.q = rows;
-} else die('第一個參數要是 pomo、pomodel、chkdelay、revive、claw、pts 或 quiz');
+} else if (kind === 'restore') {   // 2026-11-28：救回被別台舊資料蓋掉的寵物、森林、銀行、點數、欠帳（內容先比對雲端版本算好，放在 --file）
+  if (!args.file) die('要給 --file <restore_payload.json>');
+  const r = JSON.parse(fs.readFileSync(args.file, 'utf8'));
+  if (r.shop && Math.abs(+r.shop.dpts || 0) > 500) die('點數一次最多 ±500');
+  if (r.bank && Math.abs(+r.bank.dsav || 0) > 50000) die('活存一次最多 ±50000');
+  if (!payload.why) payload.why = String(r.why || '');
+  delete r.why; payload.r = r;
+} else die('第一個參數要是 pomo、pomodel、chkdelay、revive、claw、pts、quiz 或 restore');
 
 const body = b64u(Buffer.from(JSON.stringify(payload), 'utf8'));
 const key = crypto.createPrivateKey(fs.readFileSync(KEY_FILE));
 const sig = crypto.sign('sha256', Buffer.from(body, 'utf8'), { key, dsaEncoding: 'ieee-p1363' });
-if (kind === 'claw') console.error(`特殊娃娃機開放 ${payload.hrs} 小時：${payload.task}`); else if (kind === 'revive') console.error(`救回樹苗 ${payload.keys.length} 份`); else if (kind === 'chkdelay') console.error(`延後檢查 ${payload.keys.length} 份 ${payload.days} 天（${payload.from} 起）`); else if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
+if (kind === 'restore') console.error(`救回：${Object.keys(payload.r).join('、')}（${payload.why}）`); else if (kind === 'claw') console.error(`特殊娃娃機開放 ${payload.hrs} 小時：${payload.task}`); else if (kind === 'revive') console.error(`救回樹苗 ${payload.keys.length} 份`); else if (kind === 'chkdelay') console.error(`延後檢查 ${payload.keys.length} 份 ${payload.days} 天（${payload.from} 起）`); else if (kind === 'pomodel') console.error(`刪番茄鐘：${args.from}～${args.to}，每顆扣 ${payload.pp} 點`); else console.error(kind === 'pomo' ? `補登番茄鐘：${payload.k} ${args.end} 結束、${payload.m} 分、${SUBJ[payload.s]}` : kind === 'quiz' ? `補登小考 ${payload.q.length} 筆` : `點數 ${payload.n > 0 ? '+' : ''}${payload.n}：${payload.why}`);
 console.log(SITE + '#fix=' + body + '.' + b64u(sig));
